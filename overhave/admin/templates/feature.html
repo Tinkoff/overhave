@@ -93,7 +93,7 @@
         function renderSteps() {
             actual_feature_type = $('#s2id_feature_type > a > span').text().toLowerCase();
             if (actual_feature_type.length !== 0){
-                // TODO: https://jira.tcsbank.ru/browse/BDS-4149
+                // TODO
                 steps_container_elements = document.querySelectorAll('[id^="steps_container_"]');
                 for (let steps_container of steps_container_elements){
                     element = $("#".concat(steps_container.id));
@@ -208,7 +208,7 @@
 {% endmacro %}
 
 {% macro render_fixtures_table(title, step_type, feature_type) %}
-    <!-- TODO: https://jira.tcsbank.ru/browse/BDS-4149 -->
+    <!-- TODO -->
     <table style="width:100%;">
         <tbody>
         <tr onclick="$('#{{ feature_type }}_{{ step_type }}_steps').slideToggle('slow');">
