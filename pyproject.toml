@@ -1,18 +1,33 @@
 [tool.poetry]
 name = "overhave"
-version = "1.0.0"
+version = "1.0.1"
 description = "Overhave - web framework for BDD"
 authors = [
     "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",
     "Tinkoff Dialog System Backend Team <bds-dev@tinkoff.ru>"
 ]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Testing :: BDD",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Operating System :: OS Independent",
+    "Framework :: Flask",
+    "Framework :: Pytest",
+]
 
 [[tool.poetry.source]]
 name = "internal"
-url = "https://registry.tcsbank.ru/repository/pypi_internal/"
+url = "https://registry.tcsbank.ru/repository/pypi-all/simple"
 
 [tool.poetry.scripts]
 overhave = 'overhave.cli:overhave'
+
+[tool.poetry.plugins.pytest11]
+overhave = "overhave.pytest.plugin"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -71,7 +86,7 @@ tox = "^3.20.1"
 click = "^7.1.2"
 
 [tool.pytest.ini_options]
-addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM"
+addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
 testpaths = "tests"
 python_files = ["test_*.py"]
 python_classes = ["*Test", "Test*"]

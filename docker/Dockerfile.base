@@ -9,7 +9,7 @@ ENV PIP_NO_CACHE_DIR=off
 ENV PYTHONDONTWRITEBYTECODE=true
 ENV PYTHONPYCACHEPREFIX=/tmp/bytecode
 ENV PYTHONFAULTHANDLER=true
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/.tox/.package
 ENV PYTHONUNBUFFERED=true
 
 WORKDIR /code
@@ -29,13 +29,7 @@ RUN apt-get update \
 COPY pyproject.toml poetry.lock /code/
 
 RUN pip install --no-compile --upgrade pip \
- && pip install --no-compile poetry \
- && poetry config virtualenvs.create false \
- && poetry config cache-dir /tmp/.cache/pypoetry \
- && poetry install --no-dev --no-interaction --no-ansi \
- && pip uninstall --yes poetry \
- && rm -rf /tmp/.cache/pypoetry \
- && rm -rf /tmp/bytecode
+ && pip install --no-compile tox \
+ && tox --notest
 
-ENTRYPOINT ["bash"]
-CMD []
+ENTRYPOINT ["tox"]
