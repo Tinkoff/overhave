@@ -19,7 +19,7 @@ class BaseOverhavePrefix(BaseSettings):
 
 
 class DataBaseSettings(BaseOverhavePrefix):
-    db_url: URL = URL('postgresql://postgres:postgres@localhost/overhave')
+    db_url: URL = 'postgresql://postgres:postgres@localhost/overhave'
     db_pool_recycle: int = 500
     db_pool_size: int = 6
     db_echo: bool = False
