@@ -6,7 +6,7 @@ authors = [
     "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",
     "Tinkoff Dialog System Backend Team <bds-dev@tinkoff.ru>"
 ]
-repository = "https://stash.tcsbank.ru/users/v.mukhamatnurov/repos/overhave"
+repository = "https://registry.tcsbank.ru/repository/pypi_internal/"
 
 [tool.poetry.scripts]
 overhave = 'overhave.cli:overhave'
