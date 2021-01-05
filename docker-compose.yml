@@ -1,0 +1,99 @@
+version: '3.6'
+
+services:
+  base:
+    image: "${IMAGE_BASE}bds/dialog-platform-base:${POETRY_CONTENT_HASH:-unset}"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.upload
+      network: host
+      args:
+        DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
+  lock:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.lock
+      network: host
+      args:
+        DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
+    volumes:
+      - .:/output
+
+  code:
+    image: "${IMAGE_BASE}bds/dialog-platform:${BUILD_NUMBER:-unset}"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.code
+      network: host
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        BUILD_NUMBER: "${BUILD_NUMBER}"
+        POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
+        DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
+
+  test-base:
+    image: "${IMAGE_BASE}bds/dialog-platform-test-base:${TEST_POETRY_CONTENT_HASH:-unset}"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test.base
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
+      network: host
+
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+      network: host
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        BUILD_NUMBER: "${BUILD_NUMBER:-unset}"
+        TEST_POETRY_CONTENT_HASH: "${TEST_POETRY_CONTENT_HASH:-unset}"
+    volumes:
+      - .${ALLUREDIR:-/allure-results}:${ALLUREDIR:-/allure-results}
+    environment:
+      - API_URL=${API_URL:-localhost}
+      - DB_URL=${DB_URL:-postgresql://postgres:postgres@db/postgres}
+      - ANALYTICS_DB_URL=${ANALYTICS_DB_URL:-postgresql://postgres:postgres@db/postgres}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - REDIS_SILENCE_URL=${REDIS_SILENCE_URL:-redis://redis:6379}
+      - REDIS_CACHE_URL=${REDIS_CACHE_URL:-redis://redis:6379}
+      - REDIS_OUTBOUND_URL=${REDIS_OUTBOUND_URL:-redis://redis:6379}
+      - REDIS_CALL_ATTENDANT_URL=${REDIS_CALL_ATTENDANT_URL:-redis://redis:6379}
+      - REDIS_INBOUND_URL=${REDIS_INBOUND_URL:-redis://redis:6379}
+      - REDIS_HINTS_URL=${REDIS_HINTS_URL:-redis://redis:6379}
+      - REDIS_SILENCE_DB=${REDIS_SILENCE_DB:-3}
+      - REDIS_CALL_ATTENDANT_DB=${REDIS_CALL_ATTENDANT_DB:-4}
+      - REDIS_OUTBOUND_DB=${REDIS_OUTBOUND_DB:-0}
+      - KAFKA_URL=kafka:9092
+      - KAFKA_CONSUMER_CONSUMER_TIMEOUT=${KAFKA_CONSUMER_CONSUMER_TIMEOUT:-30000}
+      - ALLUREDIR=${ALLUREDIR:-/allure-results}
+      - STAGE_MARKERS=${STAGE_MARKERS:-unit or integration}
+      - BRANCH=${BRANCH:-unset}
+      - TCRM_HTTP_AUTH_USERNAME=${TCRM_HTTP_AUTH_USERNAME:-unset}
+      - TCRM_SERVICE_USERNAME=${TCRM_SERVICE_USERNAME:-unset}
+      - TCRM_SERVICE_PASSWORD=${TCRM_SERVICE_PASSWORD:-unset}
+      - RERUN_NUMBER=${RERUN_NUMBER:-0}
+      - TEST_WORKERS=${TEST_WORKERS:-auto}
+      - TEST_DROP_DATABASE=${TEST_DROP_DATABASE:-true}
+      - TEST_FIXTURE_SCOPE=${TEST_FIXTURE_SCOPE:-function}
+      - TEST_CREATE_KAFKA_TOPIC=${TEST_CREATE_KAFKA_TOPIC:-true}
+      - TEST_KAFKA_OPERATION_TIMEOUT=${TEST_KAFKA_OPERATION_TIMEOUT:-30}
+      - EXTRA_ARGS=${EXTRA_ARGS}
+      - WIDGET_API_MONGO_HOST=mongo
+      - WIDGET_API_MONGO_PORT=27017
+      - OVERLORD_AUTH_UTILS_USERNAME=${OVERLORD_AUTH_UTILS_USERNAME:-unset}
+      - OVERLORD_AUTH_UTILS_PASSWORD=${OVERLORD_AUTH_UTILS_PASSWORD:-unset}
+    depends_on:
+      - db
+
+  db:
+    image: "${DOCKER_HUB_PROXY}postgres:11.6"
+    command:
+      -c fsync=${FSYNC:-off}
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432

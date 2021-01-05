@@ -1,0 +1,7 @@
+{% extends 'admin/model/list.html' %}
+{% import 'test_run.html' as test_run_lib with context %}
+
+{% block tail %}
+    {{ super() }}
+    {{ test_run_lib.add_button_style() }}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% macro render_specification_template() %}
+    <script>
+        function render_template() {
+            var template_field = document.getElementById('template');
+            var template_value = '{{ admin_view.get_specification_template() | tojson }}';
+            if (template_value !== null) {
+                template_field.value = template_value;
+            }
+        }
+        render_template();
+
+        const type_select = document.getElementById('feature_type');
+        type_select.addEventListener('change', (event) => {
+            render_template();
+        });
+    </script>
+{% endmacro %}

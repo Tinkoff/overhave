@@ -1,0 +1,53 @@
+ARG IMAGE_BASE
+ARG POETRY_CONTENT_HASH
+
+FROM ${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH}
+
+ENV PYTHONPYCACHEPREFIX=/tmp/bytecode
+
+ADD ./entrypoints/wait_scripts/db.py /bin/wait_db
+ADD ./entrypoints/wait_scripts/kafka.py /bin/wait_kafka
+ADD ./entrypoints/wait_scripts/redis.py /bin/wait_redis
+ADD ./entrypoints/wait_deps.sh /bin/entrypoint
+ENTRYPOINT ["entrypoint"]
+
+ENV VIRTUAL_ENV=/code/.venv
+
+COPY http_client/setup.py /code/http_client/
+COPY http_client/README.md /code/http_client/
+COPY overhave/setup.py /code/overhave/
+COPY overhave/README.md /code/overhave/
+COPY overhave/CHANGES.rst /code/overhave/
+COPY container/setup.py /code/container/
+COPY container/README.md /code/container/
+COPY huey_wrapper/setup.py /code/huey_wrapper/
+COPY huey_wrapper/README.md /code/huey_wrapper/
+COPY migration_helper/setup.py /code/migration_helper/
+COPY migration_helper/README.md /code/migration_helper/
+COPY logging_dp/setup.py /code/logging_dp/
+COPY logging_dp/README.md /code/logging_dp/
+
+RUN mkdir /code/dm && touch /code/dm/__init__.py \
+ && mkdir -p /code/overlord && touch /code/overlord/__init__.py \
+ && mkdir -p /code/overhave && touch /code/overhave/__init__.py \
+ && mkdir -p /code/prompter && touch /code/prompter/__init__.py \
+ && mkdir -p /code/http_client && touch /code/http_client/__init__.py \
+ && mkdir -p /code/narkomfin && touch /code/narkomfin/__init__.py \
+ && mkdir -p /code/container && touch /code/container/__init__.py \
+ && mkdir -p /code/huey_wrapper && touch /code/huey_wrapper/__init__.py \
+ && mkdir -p /code/migration_helper && touch /code/migration_helper/__init__.py \
+ && mkdir -p /code/logging_dp && touch /code/logging_dp/__init__.py \
+ && pip install --no-compile poetry \
+ && python3 -m venv $VIRTUAL_ENV \
+ && poetry config virtualenvs.create true \
+ && poetry config cache-dir /tmp/.cache/pypoetry \
+ && poetry install -v --no-interaction --no-ansi \
+ && pip uninstall --yes poetry \
+ && rm -rf /tmp/.cache/pypoetry \
+ && rm -rf /tmp/bytecode \
+ && rm /code/http_client/__init__.py \
+ && rm /code/overhave/__init__.py \
+ && rm /code/container/__init__.py \
+ && rm /code/huey_wrapper/__init__.py \
+ && rm /code/migration_helper/__init__.py \
+ && rm /code/logging_dp/__init__.py

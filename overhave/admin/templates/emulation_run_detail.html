@@ -1,0 +1,27 @@
+{% extends 'admin/model/details.html' %}
+{% import 'test_run.html' as test_run_lib with context %}
+
+{% block tail %}
+    {{ super() }}
+    {{ test_run_lib.add_button_style() }}
+    {% if model.status.processed %}
+        {{ render_edit_button(model) }}
+        {% if admin_view.redirect_allowed(model) %}
+            {{ render_go_button(model) }}
+        {% endif %}
+    {% else %}
+        <meta http-equiv="refresh" content="5">
+    {% endif %}
+{% endblock %}
+
+{% macro render_go_button(model) %}
+    <form action="/emulations/{{ model.port }}" target="_blank">
+        <button class="button" style="border: 2px solid #f44336;">Go to emulation</button>
+    </form>
+{%  endmacro %}
+
+{% macro render_edit_button(model) %}
+    <a href="{{ url_for('emulation.edit_view', id=model.emulation_id) }}">
+        <button class="button" style="border: 2px solid #020924;">Edit template</button>
+    </a>
+{% endmacro %}

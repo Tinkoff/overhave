@@ -1,0 +1,7 @@
+{% extends 'admin/model/create.html' %}
+{% import 'test_user.html' as test_user_lib with context %}
+
+{% block tail_js %}
+    {{ super() }}
+    {{ test_user_lib.render_specification_template() }}
+{% endblock %}

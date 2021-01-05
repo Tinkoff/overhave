@@ -1,0 +1,237 @@
+{% macro render_style() %}
+    <style type="text/css" media="screen">
+        .editor {
+            height: 500px;
+            margin-bottom: 20px;
+        }
+        .toggle-block {
+            cursor: pointer;
+        }
+    </style>
+{% endmacro %}
+
+{% set step_classes = {
+    'given': 'success',
+    'when': 'warning',
+    'then': 'info'
+} %}
+{% set bdd_fixtures = admin_view.get_bdd_steps %}
+
+{% macro render_editor() %}
+    <script type='text/javascript' src="/files/ace-src/ace.js"></script>
+    <link rel="stylesheet" href="https://ace.c9.io/api/resources/csses/ace_api.css">
+    <script>
+        function contains(target, pattern){
+            var value = 0;
+            pattern.forEach(function(word) {
+              value = value + target.includes(word);
+            });
+            return (value === 1)
+        }
+        function with_double_indent(text) {
+            return "\n\n".concat(text)
+        }
+        function with_new_line(text) {
+            return "\n  ".concat(text)
+        }
+        function join_text(arr){
+            var value = "";
+            arr.forEach(function (text) {
+                value = value.concat(text);
+            });
+            return value
+        }
+        var scenario_prefixes = ['Scenario:', 'Сценарий:'];
+        var scenario_outline_prefixes = ['Scenario Outline:', 'Структура сценария:'];
+        var backround_prefixes = ['Background:', 'Предыстория:'];
+        var given_type = "given";
+        var when_type = "when";
+        var then_type = "then";
+
+        function draw_editor() {
+            document.querySelectorAll('.editor').forEach(function(block, index) {
+                var input = document.getElementById('scenario-'.concat(index.toString(), '-text'));
+                var editor = ace.edit(block.id);
+                editor.setValue(input.value);
+
+                editor.setAutoScrollEditorIntoView(true);
+                editor.setHighlightActiveLine(true);
+                editor.setShowPrintMargin(false);
+
+                editor.session.setMode("ace/mode/gherkin");
+                editor.session.setTabSize(2);
+                editor.session.setUseWrapMode(true);
+
+                editor.session.on('change', function (delta) {
+                    input.value = editor.getValue();
+                });
+                document.querySelectorAll('.inserter').forEach((row) => {
+                    row.querySelectorAll('a')[0]
+                        .addEventListener('click', function (event) {
+                            event.preventDefault();
+                            var step = row.querySelectorAll('.code')[0];
+                            var step_text = step.textContent;
+                            var step_type = step.classList[1];
+                            var editor_text = editor.getValue();
+
+                            if (step_type === given_type && ! contains(editor_text, backround_prefixes)) {
+                                editor.insert(join_text([backround_prefixes[1], with_new_line(step_text)]));
+                                return
+                            }
+                            if (step_type !== given_type && ! contains(editor_text, scenario_prefixes) &&
+                                    ! contains(editor_text, scenario_outline_prefixes) ) {
+                                editor.insert(join_text([with_double_indent(scenario_prefixes[1]), " My business-case example", with_new_line(step_text)]));
+                                return
+                            }
+                            editor.insert(with_new_line(step_text));
+                        });
+                });
+                var add_scenario_button = document.getElementById('scenario-button');
+                add_scenario_button.style.display = "none";
+            });
+        }
+        function renderSteps() {
+            actual_feature_type = $('#s2id_feature_type > a > span').text().toLowerCase();
+            if (actual_feature_type.length !== 0){
+                // TODO: https://jira.tcsbank.ru/browse/BDS-4149
+                steps_container_elements = document.querySelectorAll('[id^="steps_container_"]');
+                for (let steps_container of steps_container_elements){
+                    element = $("#".concat(steps_container.id));
+                    search_result = steps_container.id.search(actual_feature_type);
+                    if (search_result === -1) {
+                        element.hide();
+                    }
+                    else {
+                        element.show();
+                    }
+                }
+            }
+        }
+        function observeStepsRendering() {
+              var observer = new MutationObserver(function(mutations){
+                  renderSteps();
+                  for (var mutation of mutations){
+                    for (var node of mutation.addedNodes){
+                        if (node.matches === "function" && node.matches("#s2id_feature_type")) {
+                            observer.disconnect();
+                            $('#s2id_feature_type > a > span').on('DOMSubtreeModified',function(){
+                                renderSteps();
+                            })
+                        }
+                    }
+                  }
+            });
+            observer.observe(document.documentElement, {
+              childList: true,
+              subtree: true
+            });
+        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            draw_editor();
+            observeStepsRendering();
+            window['scenario-button'].addEventListener('click', function (event) {
+                draw_editor()
+            });
+        });
+    </script>
+{% endmacro %}
+
+{% macro render_versions(versions) %}
+    {% for draft_version in versions %}
+        <tr>
+            <td colspan="1">{{ draft_version }}</td>
+            <td colspan="2">
+                {% if draft_version.pr_url %}
+                    {% if draft_version.pr_url.startswith('http') %}
+                        <a href="{{ draft_version.pr_url }}">{{ draft_version.pr_url }}</a>
+                    {% else %}
+                        {{ draft_version.pr_url }}
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td colspan="3">
+                <a href="{{ url_for('testrun.details_view', id=draft_version.test_run_id) }}">
+                    Test_run: {{ draft_version.test_run_id }}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_steps(lib) %}
+    {% if model %}
+        {% set drafts = render_versions(model.versions) %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 align="center">Script panel</h2>
+        </div>
+        <hr>
+        <div class="col-md-8">
+            {% macro extra() %}
+                <input type="submit" class="btn btn-info" value="Run test" name="run">
+            {% endmacro %}
+            {{ lib.render_form(form, return_url, extra(), form_opts) }}
+
+            {% if model and model.versions %}
+                <hr><br>
+            <h3 align="center">Published versions</h3>
+            <table class="table" border="1" bordercolor="gray">
+                <thead>
+                <tr>
+                    <th colspan="1">Draft</th>
+                    <th colspan="2">Pull-request info</th>
+                    <th colspan="3">Report</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {{ drafts }}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        <div class="col-md-4" id="steps_container">
+            {% for feature_type in bdd_fixtures %}
+                <div id="steps_container_{{ feature_type }}" style="display: none;">
+                    {{ render_steps_container(feature_type) }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_steps_container(feature_type) %}
+    {{ render_fixtures_table("Given steps", "given", feature_type) }}
+    {{ render_fixtures_table("When steps", "when", feature_type) }}
+    {{ render_fixtures_table("Then steps", "then", feature_type) }}
+{% endmacro %}
+
+{% macro render_fixtures_table(title, step_type, feature_type) %}
+    <!-- TODO: https://jira.tcsbank.ru/browse/BDS-4149 -->
+    <table style="width:100%;">
+        <tbody>
+        <tr onclick="$('#{{ feature_type }}_{{ step_type }}_steps').slideToggle('slow');">
+            <th style="width:10%;">
+                <a class="toggle-block">►</a>
+            </th>
+            <th class="text-center" title="Push for toggle">
+                <a class="toggle-block"><h4>{{ title }}</h4></a>
+            </th>
+        </tr>
+        </tbody>
+    </table>
+    <div id="{{ feature_type }}_{{ step_type }}_steps" style="display: none">
+        <table class="table">
+            <tbody>
+            {% for bdd_step in bdd_fixtures[feature_type][step_type] %}
+                <tr class="inserter {{ step_classes[step_type] }}">
+                    <th>●</th>
+                    <td class="code {{ step_type }}">{{ bdd_step }}</td>
+                    <td style="width:10%;"><a href="#" class="btn btn-success btn-xs">insert</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}

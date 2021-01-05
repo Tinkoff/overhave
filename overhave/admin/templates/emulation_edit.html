@@ -1,0 +1,6 @@
+{% extends 'admin/model/edit.html' %}
+{% import 'emulation.html' as emulation_lib with context %}
+
+{% block edit_form %}
+    {{ emulation_lib.render_emulation_context(lib) }}
+{% endblock %}

@@ -1,0 +1,41 @@
+ARG DOCKER_HUB_PROXY
+
+FROM ${DOCKER_HUB_PROXY}python:3.8-slim
+
+RUN groupadd -r app && useradd -r -g app app
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=on
+ENV PIP_NO_CACHE_DIR=off
+ENV PYTHONDONTWRITEBYTECODE=true
+ENV PYTHONPYCACHEPREFIX=/tmp/bytecode
+ENV PYTHONFAULTHANDLER=true
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=true
+
+WORKDIR /code
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        gcc \
+        libsasl2-dev \
+        libldap2-dev \
+        libssl-dev \
+        libpq-dev \
+        make \
+        g++ \
+        libgnutls28-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml poetry.lock /code/
+
+RUN pip install --no-compile --upgrade pip \
+ && pip install --no-compile poetry \
+ && poetry config virtualenvs.create false \
+ && poetry config cache-dir /tmp/.cache/pypoetry \
+ && poetry install --no-dev --no-interaction --no-ansi \
+ && pip uninstall --yes poetry \
+ && rm -rf /tmp/.cache/pypoetry \
+ && rm -rf /tmp/bytecode
+
+ENTRYPOINT ["bash"]
+CMD []

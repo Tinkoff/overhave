@@ -1,0 +1,13 @@
+{% macro extra() %}
+    <input type="submit" class="btn btn-info" value="Emulate" name="emulate">
+    {% set details = admin_view.description_link %}
+    {% if details %}
+        <a href="{{ details }}" target="_blank" class="btn btn-default">Wiki</a>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_emulation_context(lib) %}
+    <div class="row">
+    {{ lib.render_form(form, return_url, extra(), form_opts) }}
+    </div>
+{% endmacro %}

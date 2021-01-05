@@ -1,0 +1,43 @@
+{% macro add_button_style() %}
+    <style type="text/css">
+        .button {
+            background-color: white;
+            color: black;
+            padding: 16px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 15px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+        .link-button {
+            background-color: white;
+            color: black;
+            padding: 2px 8px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 2px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border: 2px solid #f44336;
+            width: 100px;
+        }
+        .button:hover {
+            background-color: #f44336;
+            color: white;
+        }
+        .link-button:hover {
+            background-color: #f44336;
+            color: white;
+        }
+        form {
+            display: inline-block;
+        }
+    </style>
+{% endmacro %}

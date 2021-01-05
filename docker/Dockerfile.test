@@ -1,0 +1,9 @@
+ARG IMAGE_BASE
+ARG POETRY_CONTENT_HASH
+ARG DOCKER_HUB_PROXY
+
+FROM ${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH}
+
+COPY ./overhave /code/overhave
+COPY ./README.md /code/README.md
+COPY ./makefile /code/makefile

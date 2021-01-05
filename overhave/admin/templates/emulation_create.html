@@ -1,0 +1,6 @@
+{% extends 'admin/model/create.html' %}
+{% import 'emulation.html' as emulation_lib with context %}
+
+{% block create_form %}
+    {{ emulation_lib.render_emulation_context(lib) }}
+{% endblock %}

@@ -1,0 +1,144 @@
+[tool.poetry]
+name = "Overhave"
+version = "2021.01.03"
+description = "Web framework for BDD"
+authors = [
+    "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",
+    "Tinkoff Dialog System Backend Team <bds-dev@tinkoff.ru>"
+]
+repository = "https://stash.tcsbank.ru/users/v.mukhamatnurov/repos/overhave"
+
+[tool.poetry.scripts]
+overhave = 'overhave.cli:overhave'
+
+[tool.poetry.dependencies]
+python = "^3.8"
+sqlalchemy = "^1.3.3"
+psycopg2-binary = "^2.8"
+click = "^7.0"
+pydantic = ">=1.7"
+requests = ">=2.0.0"
+tenacity = "*"
+sqlalchemy_utils = "^0.34.0"
+yarl = "<=1.1.1"
+pytz = "^2019.1"
+gunicorn = "^20.0.4"
+flask-admin = "^1.5"
+flask-login = "^0.4.1"
+WTForms = "^2.2"
+Flask-WTF = "^0.14.2"
+python-ldap = "^3.2"
+ldap3 = "^2.6"
+wsgi_intercept = "^1.8"
+redis = "^3.4.1"
+walrus = "^0.8.0"
+docker = "*"
+pydantic-sqlalchemy = "^0.0.6"
+sqlalchemy-utc = "0.10.0"
+Jinja2 = "^2.11.2"
+httptools = "^0.1.1"
+python-dateutil = "^2.8.1"
+alembic = "^1.4.3"
+
+
+[tool.poetry.dev-dependencies]
+black = "^19.3b0"
+flake8-awesome = "<1.3"
+pylint = "^2.3"
+requests_mock = "*"
+teamcity-messages = "^1.25"
+flake8-docstrings = "^1.5"
+transliterate = "^1.10"
+pytest-faker = "^2.0"
+sqlalchemy-diff = "^0.1.3"
+mypy = "^0.761"
+gitpython = "^3.0.5"
+filelock = "*"
+pytest-bdd = "^4.0.2"
+pytest = "^6.1.2"
+pytest-cov = "^2.10.1"
+pytest-deadfixtures = "^2.2.1"
+pytest-mock = "^3.3.1"
+pytest-random-order = "^1.0.4"
+allure-pytest = "^2.8.24"
+pytest-markers-presence = "^0.11.1"
+flakehell = "^0.7.1"
+pytest-xdist = "^2.2.0"
+
+[tool.pytest.ini_options]
+addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM"
+testpaths = "tests"
+python_files = ["test_*.py"]
+python_classes = ["*Test", "Test*"]
+python_functions = ["test_*"]
+filterwarnings = ["ignore::DeprecationWarning:sqlalchemy_utils.observer"]
+xfail_strict=true
+
+[tool.isort]
+balanced_wrapping = true
+default_section = "THIRDPARTY"
+include_trailing_comma = true
+known_first_party = ["docker", "overhave", "tests"]
+line_length = 120
+multi_line_output = 3
+
+[tool.black]
+target-version = ['py38']
+line-length = 120
+
+[tool.flakehell]
+exclude = [".git", ".venv", ".tox"]
+ignore = [
+    "A003 ; 'id' is a python builtin, consider renaming the class attribute",
+    "A001 ; 'id' is a python builtin and is being shadowed, consider renaming the variable",
+    "W503 ; line break before binary operator",
+    "N805 ; first argument of a method should be named 'self'",
+    "PT004 ; fixture does not return anything, add leading underscore",
+    "PT011 ; set the match parameter in pytest.raises(ValueError)",
+    "PT012 ; pytest.raises() block should contain a single simple statement",
+    "PT019 ; fixture ... without value is injected as parameter, use @pytest.mark.usefixtures instead",
+    "D100 ; Missing docstring in public module",
+    "D101 ; Missing docstring in public class",
+    "D102 ; Missing docstring in public method",
+    "D103 ; Missing docstring in public function",
+    "D104 ; Missing docstring in public package",
+    "D105 ; Missing docstring in magic method",
+    "D106 ; Missing docstring in public nested class",
+    "D107 ; Missing docstring in __init__",
+    "D205 ; 1  blank line required between summary line and description",
+    "D210 ; No whitespaces allowed surrounding docstring text",
+    "D401 ; First line should be in imperative mood; try rephrasing",
+    "C408 ; Unnecessary dict call - rewrite as a literal",
+    "E203 ; whitespace before ':'",
+    "PT018 ; assertion should be broken down into multiple parts",
+    "PT019 ; fixture <FIXTURE> without value is injected as parameter",
+    "F821 ;"
+    ]
+max_complexity = 8
+max_line_length = 120
+show_source = true
+
+[build-system]
+requires = ["poetry>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = true
+envlist = py38
+setenv =
+    PIP_INDEX_URL = {env:PIP_INDEX_URL}
+
+[testenv]
+whitelist_externals =
+    poetry
+    make
+    docker-compose
+setenv =
+    VENV = .tox/.package
+commands =
+    poetry install
+    make test
+    make lint
+"""

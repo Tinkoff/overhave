@@ -1,0 +1,38 @@
+{% extends 'admin/model/details.html' %}
+{% import 'test_run.html' as test_run_lib with context %}
+
+{% block tail %}
+    {{ super() }}
+    {{ test_run_lib.add_button_style() }}
+    {% if model.status not in ['STARTED', 'RUNNING'] %}
+        {{ render_edit_button(model) }}
+    {% endif %}
+    {% if model.report  %}
+        {% if model.status != 'INTERNAL_ERROR' and model.report != 'not_created' %}
+            {{ render_allure_button(model) }}
+        {% endif %}
+        {% if model.status == 'SUCCESS' %}
+            {{ render_pr_button(model) }}
+        {% endif %}
+    {% else %}
+        <meta http-equiv="refresh" content="5">
+    {% endif %}
+{% endblock %}
+
+{% macro render_allure_button(model) %}
+    <form action="/reports/{{ model.report }}" target="_blank">
+        <button class="button" style="border: 2px solid #f44336;">Allure report</button>
+    </form>
+{%  endmacro %}
+
+{% macro render_pr_button(model) %}
+    <form action="/pull_request/{{ model.id }}" target="_blank">
+        <button class="button" style="border: 2px solid #36a2f4;">Create pull-request</button>
+    </form>
+{%  endmacro %}
+
+{% macro render_edit_button(model) %}
+    <a href="{{ url_for('feature.edit_view', id=model.scenario.feature_id) }}">
+        <button class="button" style="border: 2px solid #020924;">Edit feature</button>
+    </a>
+{%  endmacro %}

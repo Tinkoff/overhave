@@ -1,0 +1,16 @@
+{% extends 'admin/model/edit.html' %}
+{% import 'feature.html' as feature_lib with context %}
+
+{% block tail %}
+    {{ super() }}
+    {{ feature_lib.render_style() }}
+{% endblock %}
+
+{% block tail_js %}
+    {{ super() }}
+    {{ feature_lib.render_editor() }}
+{% endblock %}
+
+{% block edit_form %}
+    {{ feature_lib.render_steps(lib) }}
+{% endblock %}

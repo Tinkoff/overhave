@@ -1,0 +1,64 @@
+{% extends 'admin/master.html' %}
+{% import 'admin/lib.html' as lib with context %}
+
+{% macro render_field(field) %}
+<div style="margin-bottom: 25px" class="input-group">
+    <span class="input-group-addon"><i class="glyphicon {{ field.render_kw['icon'] }}"></i></span>
+    <input
+        id="{{ field.id }}"
+        class="form-control"
+        type="{{ field.widget.input_type  }}"
+        name="{{ field.name }}"
+        placeholder="{{ field.render_kw['placeholder'] }}"
+    >
+</div>
+{% if field.errors %}
+    {% for error in field.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only"></span>
+          {{ error }}
+        </div>
+    {% endfor %}
+{% endif %}
+{% endmacro %}
+
+{% macro render_hidden(form) %}
+    {% if form.hidden_tag is defined %}
+        {{ form.hidden_tag() }}
+    {% else %}
+        {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% endif %}
+        {% for f in form if f.widget.input_type == 'hidden' %}
+            {{ f }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% block body %}
+<div class="container">
+    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info" >
+            <div class="panel-heading">
+                <div class="panel-title" style="text-align: center;">Authorization</div>
+            </div>
+            <div style="padding-top:30px" class="panel-body" >
+                <div style="display:none" id="login-alert" class="alert alert-danger col-sm-12"></div>
+                <form id="loginform" class="form-horizontal" role="form" enctype="multipart/form-data" action method="post">
+                {# render hidden fields #}
+                {{ render_hidden(form) }}
+                {# render fields #}
+                {{ render_field(form.username) }}
+                {{ render_field(form.password) }}
+                <div style="margin-top:10px" class="form-group">
+                    <div class="col-sm-12 controls">
+                      <input type="submit" class="btn btn-success" style="width: 100%;" value="Authorize">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
