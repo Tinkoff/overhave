@@ -43,4 +43,5 @@ pretty:
 clear-cache:
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
+	rm -rf dist
 	rm .coverage
