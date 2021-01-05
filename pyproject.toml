@@ -64,6 +64,8 @@ allure-pytest = "^2.8.24"
 pytest-markers-presence = "^0.11.1"
 flakehell = "^0.7.1"
 pytest-xdist = "^2.2.0"
+tox = "^3.20.1"
+click = "^7.1.2"
 
 [tool.pytest.ini_options]
 addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM"

@@ -13,6 +13,11 @@ init:
 	$(VENV)/bin/python -m pip install poetry
 	$(VENV)/bin/poetry install
 
+precommit-install:
+	@git init
+	echo '#!/bin/sh\ntox\n' > .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+
 build:
 	docker-compose build base
 	docker-compose build code
@@ -35,11 +40,7 @@ pretty:
 	$(VENV)/bin/poetry run isort $(ALL)
 	$(VENV)/bin/poetry run black --skip-string-normalization $(ALL)
 
-precommit_install:
-	@git init
-	echo '#!/bin/sh\nmake lint\n' > .git/hooks/pre-commit
-	chmod +x .git/hooks/pre-commit
-
 clear-cache:
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
+	rm .coverage
