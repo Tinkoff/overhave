@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Overhave"
-version = "2021.01.03"
+version = "1.0.0"
 description = "Web framework for BDD"
 authors = [
     "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",

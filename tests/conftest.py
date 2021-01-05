@@ -1,5 +1,4 @@
-from functools import lru_cache
-from pathlib import Path
+import logging
 from typing import Iterator
 
 import pytest
@@ -9,28 +8,13 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 from sqlalchemy_utils import drop_database
 
-from overhave import OverhaveFileSettings
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
-from overhave.entities import FeatureExtractor
 from tests.objects import DataBaseContext, XDistWorkerValueType
-
-
-@lru_cache(maxsize=None)
-def get_file_settings() -> OverhaveFileSettings:
-    test_features_dir = Path(__file__).parent / 'test_features'
-    return OverhaveFileSettings(
-        fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / 'tmp'
-    )
-
-
-@lru_cache(maxsize=None)
-def get_feature_extractor() -> FeatureExtractor:
-    return FeatureExtractor(file_settings=get_file_settings())
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_logging() -> None:
-    OverhaveLoggingSettings().setup_logging()
+    OverhaveLoggingSettings(log_level=logging.DEBUG).setup_logging()
 
 
 @pytest.fixture(scope="session")

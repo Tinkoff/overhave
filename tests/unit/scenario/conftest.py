@@ -12,7 +12,7 @@ from overhave.entities import (
     ScenarioParser,
 )
 from overhave.utils import get_current_time
-from tests.conftest import get_feature_extractor
+from tests.objects import get_feature_extractor
 
 
 @lru_cache(maxsize=None)
