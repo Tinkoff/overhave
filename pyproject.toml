@@ -21,7 +21,7 @@ classifiers = [
 ]
 
 [[tool.poetry.source]]
-name = "upload"
+name = "internal"
 url = "https://registry.tcsbank.ru/repository/pypi_internal/"
 secondary = true
 
