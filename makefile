@@ -2,6 +2,7 @@ CODE = overhave
 TESTS = tests
 ALL = $(CODE) $(TESTS)
 VENV ?= .venv
+MIN_COVERAGE ?= 60
 
 pre-init:
 	sudo apt install python3.8 python3.8-venv python3.8-dev python3.8-distutils gcc\
@@ -19,7 +20,7 @@ precommit-install:
 	chmod +x .git/hooks/pre-commit
 
 test:
-	$(VENV)/bin/poetry run pytest --cov=$(CODE) --cov-fail-under=60
+	$(VENV)/bin/poetry run pytest --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
 lint:
 	$(VENV)/bin/poetry run black --skip-string-normalization --check $(ALL)

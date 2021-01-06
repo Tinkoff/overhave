@@ -28,13 +28,12 @@ RUN apt-get update \
 COPY pyproject.toml poetry.lock /code/
 
 ARG TOXWORKDIR=/code/.tox
-ARG TOXBINDIR=${TOXWORKDIR}/.package/bin
 
 RUN pip install --no-compile --upgrade pip \
  && pip install --no-compile tox \
  && mkdir -p /code/overhave && touch /code/overhave/__init__.py
-RUN tox --workdir=${TOXWORKDIR} --notest
-RUN ${TOXBINDIR}/poetry install --no-interaction --no-ansi
+RUN tox --workdir=${TOXWORKDIR} -v --notest
 RUN rm -r /code/overhave
 
 ENTRYPOINT ["tox"]
+CMD ["-v"]

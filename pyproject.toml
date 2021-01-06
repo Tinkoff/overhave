@@ -141,19 +141,20 @@ build-backend = "poetry.core.masonry.api"
 legacy_tox_ini = """
 [tox]
 isolated_build = true
+isolated_build_env = .package
 envlist = py38
 setenv =
     PIP_INDEX_URL = {env:PIP_INDEX_URL}
 
 [testenv]
 whitelist_externals =
-    poetry
     make
-venv = {toxworkdir}/.package
+venv = {toxworkdir}/{[tox]isolated_build_env}
 setenv =
     VENV = {[testenv]venv}
+passenv =
+    OVERHAVE_DB_URL
 commands =
-    {[testenv]venv}/bin/poetry install
     make test
     make lint
 """
