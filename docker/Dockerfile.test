@@ -6,7 +6,8 @@ FROM ${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH}
 
 COPY ./overhave /code/overhave
 COPY ./tests /code/tests
-COPY ./docker-compose.yml /code/docker-compose.yml
 COPY ./makefile /code/makefile
 COPY ./mypy.ini /code/mypy.ini
 COPY ./README.md /code/README.md
+
+CMD ["tox", "-v"]

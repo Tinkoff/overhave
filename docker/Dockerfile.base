@@ -6,10 +6,6 @@ RUN groupadd -r app && useradd -r -g app app
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV PIP_NO_CACHE_DIR=off
-ENV PYTHONDONTWRITEBYTECODE=true
-ENV PYTHONPYCACHEPREFIX=/tmp/bytecode
-ENV PYTHONFAULTHANDLER=true
-ENV PYTHONUNBUFFERED=true
 
 WORKDIR /code
 
@@ -27,13 +23,13 @@ RUN apt-get update \
 
 COPY pyproject.toml poetry.lock /code/
 
-ARG TOXWORKDIR=/code/.tox
+ARG POETRYCACHEDIR=/tmp/.cache/pypoetry
 
+RUN mkdir -p /code/overhave && touch /code/overhave/__init__.py
 RUN pip install --no-compile --upgrade pip \
- && pip install --no-compile tox \
- && mkdir -p /code/overhave && touch /code/overhave/__init__.py
-RUN tox --workdir=${TOXWORKDIR} -v --notest
-RUN rm -r /code/overhave
-
-ENTRYPOINT ["tox"]
-CMD ["-v"]
+ && pip install --no-compile poetry
+RUN poetry config virtualenvs.create false \
+ && poetry config cache-dir ${POETRYCACHEDIR} \
+ && poetry install --no-interaction --no-ansi
+RUN tox -v --notest
+RUN rm -rf ${POETRYCACHEDIR} && rm -rf /code/overhave
