@@ -19,3 +19,17 @@ services:
       network: host
       args:
         DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
+  test:
+    image: "${IMAGE_BASE}bds/overhave-test:${BUILD_NUMBER:-unset}"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+      network: host
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
+        DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
+    environment:
+      - OVERHAVE_DB_URL=${OVERHAVE_DB_URL:-postgresql://postgres:postgres@db/postgres}
+    depends_on:
+      - db

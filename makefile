@@ -18,16 +18,7 @@ precommit-install:
 	echo '#!/bin/sh\ntox\n' > .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
 
-build:
-	docker-compose build base
-	docker-compose build code
-
-build-test: build
-	docker-compose build test-base
-	docker-compose build test
-
 test:
-	docker-compose up -d db
 	$(VENV)/bin/poetry run pytest --cov=$(CODE) --cov-fail-under=60
 
 lint:
@@ -45,3 +36,10 @@ clear-cache:
 	rm -rf .pytest_cache
 	rm -rf dist
 	rm .coverage
+
+build:
+	docker-compose build base
+	docker-compose build test
+
+docker-test: build
+	docker-compose run test

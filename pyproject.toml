@@ -20,11 +20,6 @@ classifiers = [
     "Framework :: Pytest",
 ]
 
-[[tool.poetry.source]]
-name = "internal"
-url = "https://registry.tcsbank.ru/repository/pypi_internal/"
-secondary = true
-
 [tool.poetry.scripts]
 overhave = 'overhave.cli:overhave'
 
@@ -81,11 +76,9 @@ pytest-deadfixtures = "^2.2.1"
 pytest-mock = "^3.3.1"
 pytest-random-order = "^1.0.4"
 allure-pytest = "^2.8.24"
-pytest-markers-presence = "^0.11.1"
 flakehell = "^0.7.1"
 pytest-xdist = "^2.2.0"
 tox = "^3.20.1"
-click = "^7.1.2"
 
 [tool.pytest.ini_options]
 addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -156,11 +149,11 @@ setenv =
 whitelist_externals =
     poetry
     make
-    docker-compose
+venv = {toxworkdir}/.package
 setenv =
-    VENV = .tox/.package
+    VENV = {[testenv]venv}
 commands =
-    poetry install
+    {[testenv]venv}/bin/poetry install
     make test
     make lint
 """

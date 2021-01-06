@@ -9,7 +9,6 @@ ENV PIP_NO_CACHE_DIR=off
 ENV PYTHONDONTWRITEBYTECODE=true
 ENV PYTHONPYCACHEPREFIX=/tmp/bytecode
 ENV PYTHONFAULTHANDLER=true
-ENV PYTHONPATH=/.tox/.package
 ENV PYTHONUNBUFFERED=true
 
 WORKDIR /code
@@ -28,10 +27,14 @@ RUN apt-get update \
 
 COPY pyproject.toml poetry.lock /code/
 
+ARG TOXWORKDIR=/code/.tox
+ARG TOXBINDIR=${TOXWORKDIR}/.package/bin
+
 RUN pip install --no-compile --upgrade pip \
-  && pip install --no-compile tox \
-  && mkdir -p /code/overhave && touch /code/overhave/__init__.py
-RUN tox --notest
+ && pip install --no-compile tox \
+ && mkdir -p /code/overhave && touch /code/overhave/__init__.py
+RUN tox --workdir=${TOXWORKDIR} --notest
+RUN ${TOXBINDIR}/poetry install --no-interaction --no-ansi
 RUN rm -r /code/overhave
 
 ENTRYPOINT ["tox"]
