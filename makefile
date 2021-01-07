@@ -42,5 +42,10 @@ build:
 	docker-compose build base
 	docker-compose build test
 
-docker-test: build
+test-docker: build
 	docker-compose run test
+
+publish-internal:
+	poetry config repositories.internal $(PYPI_URL)
+	poetry config http-basic.internal $(PYPI_USER) $(PYPI_PASS)
+	poetry publish --build -r internal
