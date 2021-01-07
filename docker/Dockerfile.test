@@ -5,6 +5,7 @@ ARG DOCKER_HUB_PROXY
 FROM ${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH}
 
 COPY ./overhave /code/overhave
+COPY ./docs /code/docs
 COPY ./tests /code/tests
 COPY ./makefile /code/makefile
 COPY ./mypy.ini /code/mypy.ini
