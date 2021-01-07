@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "1.0.2"
+version = "1.0.3"
 description = "Overhave - web framework for BDD"
 authors = [
     "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",
@@ -143,8 +143,6 @@ legacy_tox_ini = """
 isolated_build = true
 isolated_build_env = .package
 envlist = py38
-setenv =
-    PIP_INDEX_URL = {env:PIP_INDEX_URL}
 
 [testenv]
 whitelist_externals =
