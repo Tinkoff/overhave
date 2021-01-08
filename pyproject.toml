@@ -80,6 +80,7 @@ allure-pytest = "^2.8.24"
 flakehell = "^0.7.1"
 pytest-xdist = "^2.2.0"
 tox = "^3.20.1"
+twine = "^3.3.0"
 
 [tool.pytest.ini_options]
 addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -151,6 +152,7 @@ whitelist_externals =
 venv = {toxworkdir}/{[tox]isolated_build_env}
 setenv =
     VENV = {[testenv]venv}
+    WORKDIR = {toxworkdir}
 passenv =
     OVERHAVE_DB_URL
 commands =

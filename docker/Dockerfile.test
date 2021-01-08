@@ -9,6 +9,6 @@ COPY ./docs /code/docs
 COPY ./tests /code/tests
 COPY ./makefile /code/makefile
 COPY ./mypy.ini /code/mypy.ini
-COPY ./README.md /code/README.md
+COPY ./README.rst /code/README.rst
 
 CMD ["tox", "-v"]

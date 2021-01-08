@@ -2,6 +2,7 @@ CODE = overhave
 TESTS = tests
 ALL = $(CODE) $(TESTS)
 VENV ?= .venv
+WORKDIR ?= .
 MIN_COVERAGE ?= 60
 
 pre-init:
@@ -27,6 +28,7 @@ lint:
 	$(VENV)/bin/poetry run flake8helled --jobs 4 --format=stat --show-source $(ALL)
 	$(VENV)/bin/poetry run mypy $(ALL)
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
+	$(VENV)/bin/poetry run twine check $(WORKDIR)/dist/*
 
 pretty:
 	$(VENV)/bin/poetry run isort $(ALL)

@@ -76,10 +76,8 @@ be realised with follow code:
     Flask Admin and Login Manager plug-ins;
 * ```overhave_core``` is a cached instance of the **Overhave** factory, has an
     access to application components, directly used in ```overhave_app```.
-
-And an example of context configuration for ```my_custom_context``` placed below:
-
-.. include:: docs/context_example.rst
+* ```my_custom_context``` is an example of context configuration, see an
+    example code in `docs/context_example.rst <docs/context_example.rst>`_.
 
 Features structure
 ------------------
