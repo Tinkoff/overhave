@@ -19,7 +19,7 @@ XDistMasterWorker = XDistWorkerValueType("master")
 
 @lru_cache(maxsize=None)
 def get_file_settings() -> OverhaveFileSettings:
-    test_features_dir = Path(__file__).parent / 'test_features'
+    test_features_dir = Path(__file__).parent.parent / 'docs/features_structure_example'
     return OverhaveFileSettings(
         fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / 'tmp'
     )
