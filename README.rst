@@ -13,6 +13,7 @@ Features
 * Traditional Gherkin format for scenarios provided by `pytest-bdd`_
 * Execution and reporting of BDD scenarios based on `PyTest`_  and `Allure`_
 * Auto-collection of `pytest-bdd`_ steps and display on the web-interface
+* Simple business-alike scenarios structure, easy horizontal scaling
 * Versioning and deployment of scenario drafts to `Bitbucket`_
 * Built-in configurable management of users and groups permissions
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
@@ -71,10 +72,10 @@ be realised with follow code:
 
 **Note**:
 
-* ```overhave_app``` is the prepared `Flask` application with already
-enabled Flask Admin and Login Manager plug-ins;
+* ```overhave_app``` is the prepared `Flask` application with already enabled
+    Flask Admin and Login Manager plug-ins;
 * ```overhave_core``` is a cached instance of the **Overhave** factory, has an
-access to application components, directly used in ```overhave_app```.
+    access to application components, directly used in ```overhave_app```.
 
 And an example of context configuration for ```my_custom_context``` placed below:
 
@@ -83,7 +84,16 @@ And an example of context configuration for ```my_custom_context``` placed below
 Features structure
 ------------------
 
-**Overhave** supports it's own special structure of features storage.
+**Overhave** supports it's own special structure of features storage:
+
+.. figure:: docs/features_structure_img.png
+  :width: 400
+  :alt: Features structure example
+
+**Base features directory** could contain different feature types as
+separate directories, each of them corresponds to predefined `pytest-bdd`_
+set of steps. It is possible to create your own horizontal structure of
+different product directions with unique steps and `PyTest`_ fixtures.
 
 ------------
 Contributing
