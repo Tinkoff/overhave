@@ -69,9 +69,21 @@ be realised with follow code:
     overhave_core.set_context(my_custom_context)
     overhave_app().run(host='localhost', port=8080, debug=True)
 
+**Note**:
+
+* ```overhave_app``` is the prepared `Flask` application with already
+enabled Flask Admin and Login Manager plug-ins;
+* ```overhave_core``` is a cached instance of the **Overhave** factory, has an
+access to application components, directly used in ```overhave_app```.
+
 And an example of context configuration for ```my_custom_context``` placed below:
 
 .. include:: docs/context_example.rst
+
+Features structure
+------------------
+
+**Overhave** supports it's own special structure of features storage.
 
 ------------
 Contributing
