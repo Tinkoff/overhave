@@ -12,7 +12,7 @@ services:
       - 5432:5432
 
   base:
-    image: "${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH:-unset}"
+    image: "${IMAGE_BASE}overhave-base:${POETRY_CONTENT_HASH:-unset}"
     build:
       context: .
       dockerfile: docker/Dockerfile.base
@@ -20,7 +20,7 @@ services:
       args:
         DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
   test:
-    image: "${IMAGE_BASE}bds/overhave-test:${BUILD_NUMBER:-unset}"
+    image: "${IMAGE_BASE}overhave:${BUILD_NUMBER:-unset}"
     build:
       context: .
       dockerfile: docker/Dockerfile.test
@@ -28,8 +28,21 @@ services:
       args:
         IMAGE_BASE: "${IMAGE_BASE}"
         POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
-        DOCKER_HUB_PROXY: "${DOCKER_HUB_PROXY}"
     environment:
       - OVERHAVE_DB_URL=${OVERHAVE_DB_URL:-postgresql://postgres:postgres@db/postgres}
     depends_on:
       - db
+
+  upload:
+    command: "make publish-internal"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+      network: host
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
+    environment:
+      - PYPI_URL=${PYPI_URL:-unset}
+      - PYPI_USER=${PYPI_USER:-unset}
+      - PYPI_PASS=${PYPI_PASS:-unset}

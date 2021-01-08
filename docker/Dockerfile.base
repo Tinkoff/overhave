@@ -21,16 +21,23 @@ RUN apt-get update \
         libgnutls28-dev \
  && rm -rf /var/lib/apt/lists/*
 
-ARG README=README.rst
+ARG README=/code/README.rst
+ARG OVERHAVEDIR=/code/overhave
 ARG POETRYCACHEDIR=/tmp/.cache/pypoetry
 
-COPY pyproject.toml poetry.lock ${README} /code/
+COPY pyproject.toml poetry.lock /code/
 
-RUN mkdir -p /code/overhave && touch /code/overhave/__init__.py
+RUN mkdir -p ${OVERHAVEDIR} \
+  && touch ${OVERHAVEDIR}/__init__.py \
+  && touch ${README}
+
 RUN pip install --no-compile --upgrade pip \
  && pip install --no-compile poetry
 RUN poetry config virtualenvs.create false \
  && poetry config cache-dir ${POETRYCACHEDIR} \
  && poetry install --no-interaction --no-ansi
 RUN tox -v --notest
-RUN rm -rf ${POETRYCACHEDIR} && rm -rf /code/overhave && rm ${README}
+
+RUN rm -rf ${POETRYCACHEDIR} \
+  && rm -rf ${OVERHAVEDIR} \
+  && rm ${README}
