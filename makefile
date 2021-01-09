@@ -42,10 +42,10 @@ clear-cache:
 
 build:
 	docker-compose build base
-	docker-compose build test
+	docker-compose build code
 
 test-docker: build
-	docker-compose run test
+	docker-compose run code
 
 publish-internal:
 	poetry config repositories.internal $(PYPI_URL)
