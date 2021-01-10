@@ -2,18 +2,24 @@
 Overhave
 ========
 
-Overhave is a web-framework for BDD: scalable, configurable, easy to use,
-based on `Pydantic`_ and `Flask Admin`_.
+.. figure:: docs/label_img.png
+  :width: 600
+  :align: center
+  :alt: Overhave framework
+
+  Web-framework for BDD: scalable, configurable, easy to use, based on
+  `Flask Admin`_ and `Pydantic`_.
 
 --------
 Features
 --------
 
-* Ready web-interface for easy BDD scenarios management
+* Ready web-interface for easy BDD features management with `Ace`_ editor
 * Traditional Gherkin format for scenarios provided by `pytest-bdd`_
-* Execution and reporting of BDD scenarios based on `PyTest`_  and `Allure`_
+* Execution and reporting of BDD features based on `PyTest`_  and `Allure`_
 * Auto-collection of `pytest-bdd`_ steps and display on the web-interface
 * Simple business-alike scenarios structure, easy horizontal scaling
+* Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_
 * Built-in configurable management of users and groups permissions
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
@@ -33,9 +39,29 @@ You can install **Overhave** via pip from PyPI:
 
     pip install overhave
 
------------
-Quick start
------------
+--------
+Overview
+--------
+
+Web-interface
+-------------
+
+The web-interface is a basic tool for BDD features management. It consists of:
+
+* ```Info``` - index page with optional information about your tool or project;
+* ```Scenarios``` - section for features management, contains subsections
+    ```Features```, ```Test runs``` and ```Versions```;
+* ```Access``` - section for access management, contains ```Users``` and
+    ```Groups``` subsections;
+* ```Emulation``` - experimental section for alternative tools implementation
+    (in developing).
+
+.. figure:: docs/panel_img.png
+  :width: 600
+  :align: center
+  :alt: Script panel
+
+  **Overhave** script panel in edit mode
 
 Command-line interface
 ----------------------
@@ -49,8 +75,8 @@ run consumer and execute basic database operations. Examples are below:
     overhave consumer -s EMULATION
 
 **Note**: service start-up takes a set of settings, so you can set them through
-virtual environment with prefix ```OVERHAVE_```, for example ```OVERHAVE_DB_URL```. If
-you want to configure settings in more explicit way through context injection,
+virtual environment with prefix ```OVERHAVE_```, for example ```OVERHAVE_DB_URL```.
+If you want to configure settings in more explicit way through context injection,
 please see next part of docs.
 
 Context injection
@@ -84,7 +110,7 @@ Features structure
 
 **Overhave** supports it's own special structure of features storage:
 
-.. figure:: docs/features_structure_img.png
+.. image:: docs/features_structure_img.png
   :width: 400
   :alt: Features structure example
 
@@ -92,6 +118,56 @@ Features structure
 separate directories, each of them corresponds to predefined `pytest-bdd`_
 set of steps. It is possible to create your own horizontal structure of
 different product directions with unique steps and `PyTest`_ fixtures.
+
+Feature format
+--------------
+
+**Overhave** has it's own special feature's text format, which inherits
+Gherkin from `pytest-bdd`_ with small updates:
+
+* required tag that is related to existing feature type directory, where
+    current feature is located;
+* info about feature - who is creator, last editor and publisher;
+* task tracker's tickets with traditional format ```PRJ-NUMBER```.
+
+An example of filled feature content is located in
+`docs/.../full_feature_example_en.feature
+<docs/features_structure_example/feature_type_1/full_feature_example_en.feature>`_.
+
+Language
+--------
+
+The web-interface language is ENG by default and could not be switched
+(if it's necessary - please, create a ```feature request``` or contribute
+yourself).
+
+The feature text as well as `pytest-bdd`_ BDD keywords are configurable
+with **Overhave** extra models, for example RUS keywords are already defined
+in framework and available for usage:
+
+.. code-block:: python
+
+    from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+
+    language_settings = OverhaveLanguageSettings(
+        step_prefixes=RUSSIAN_PREFIXES,
+        translit_pack=RUSSIAN_TRANSLIT_PACK
+    )
+
+**Note**: you could create your own prefix-value mapping for your language. See
+RUS example ```RUSSIAN_PREFIXES``` in `prefixes.py <overhave/extra/prefixes.py>`_.
+
+Custom index
+------------
+
+**Overhave** gives an ability to set custom index.html file for rendering. Path
+to file could be set through environment as well as set with context:
+
+.. code-block:: python
+
+    admin_settings = OverhaveAdminSettings(
+        index_template_path="/path/to/index.html"
+    )
 
 ------------
 Contributing
@@ -137,6 +213,7 @@ with a detailed description.
 
 .. _`Pydantic`: https://github.com/samuelcolvin/pydantic
 .. _`Flask Admin`: https://github.com/flask-admin/flask-admin
+.. _`Ace`: https://github.com/ajaxorg/ace
 .. _`PyTest`: https://github.com/pytest-dev/pytest
 .. _`pytest-bdd`: https://github.com/pytest-dev/pytest-bdd
 .. _`Allure`: https://github.com/allure-framework/allure-python

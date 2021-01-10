@@ -47,7 +47,11 @@ build:
 test-docker: build
 	docker-compose run code
 
-publish-internal:
-	poetry config repositories.internal $(PYPI_URL)
-	poetry config http-basic.internal $(PYPI_USER) $(PYPI_PASS)
-	poetry publish --build -r internal
+tag:
+	git tag $(TAG)
+	git push origin $(TAG)
+
+publish:
+	poetry config repositories.pypi $(PYPI_URL)
+	poetry config http-basic.pypi $(PYPI_USER) $(PYPI_PASS)
+	poetry publish --build -r pypi

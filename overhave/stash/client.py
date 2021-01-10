@@ -3,6 +3,7 @@ from typing import Any
 
 import requests.auth
 import tenacity
+from pydantic import ValidationError
 
 from overhave.stash.errors import StashValidationError
 from overhave.stash.models import STASH_RESPONSE_MODELS, AnyStashResponseModel, StashPrRequest
@@ -50,7 +51,7 @@ class StashClient:
             try:
                 logger.debug("Trying to parse '%s'...", model)
                 return model.parse_obj(data)  # type: ignore
-            except StashValidationError:
+            except ValidationError:
                 logger.debug("Could not convert response to '%s'!", model, exc_info=True)
         raise StashValidationError(
             f"Could not parse Stash response while trying to create pull-request!\nResponse: {data}"

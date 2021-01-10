@@ -40,7 +40,7 @@ class TestGenerateTaskInfo:
 )
 class TestScenarioCompiler:
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
-    def test_compile_scenario_incorrect_text(
+    def test_compile_scenario_from_incorrect_text(
         self,
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_text: str,
@@ -49,7 +49,7 @@ class TestScenarioCompiler:
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_processing_ctx)
 
-    def test_compile_eng_scenario_correct_text(
+    def test_compile_scenario_from_correct_text(
         self,
         task_links_keyword: Optional[str],
         test_scenario_compiler: ScenarioCompiler,

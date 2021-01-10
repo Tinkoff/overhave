@@ -103,8 +103,12 @@ class ScenarioParser(PrefixMixin):
 
     def parse(self, feature_txt: str) -> FeatureInfo:
         blocks_delimiter = "\n\n"
-        blocks = [block.lstrip(" \n") for block in feature_txt.split(blocks_delimiter)]
+        indent = "  "
+        indent_substitute = "__"
+        blocks = [
+            block.lstrip(" \n") for block in feature_txt.replace(indent, indent_substitute).split(blocks_delimiter)
+        ]
         header = blocks.pop(0)
         feature_info = self._parse_feature_info(header)
-        feature_info.scenarios = blocks_delimiter.join(blocks)
+        feature_info.scenarios = blocks_delimiter.join(blocks).replace(indent_substitute, indent)
         return feature_info

@@ -1,7 +1,7 @@
 ARG IMAGE_BASE
 ARG POETRY_CONTENT_HASH
 
-FROM ${IMAGE_BASE}bds/overhave-base:${POETRY_CONTENT_HASH}
+FROM ${IMAGE_BASE}overhave-base:${POETRY_CONTENT_HASH}
 
 COPY ./overhave /code/overhave
 COPY ./docs /code/docs

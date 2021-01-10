@@ -9,7 +9,7 @@ ENV PIP_NO_CACHE_DIR=off
 
 WORKDIR /code
 
-RUN apt-get update \
+RUN apt-get update -o Acquire::Check-Valid-Until=false \
  && apt-get install -y --no-install-recommends \
         gcc \
         libsasl2-dev \

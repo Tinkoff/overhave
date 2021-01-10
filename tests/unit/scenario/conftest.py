@@ -1,5 +1,4 @@
-from functools import lru_cache
-from typing import List, Optional
+from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -12,38 +11,23 @@ from overhave.entities import (
     ScenarioParser,
 )
 from overhave.utils import get_current_time
-from tests.objects import get_feature_extractor
-
-
-@lru_cache(maxsize=None)
-def get_feature_types() -> List[str]:
-    feature_texts = []
-    for value in get_feature_extractor().feature_type_to_dir_mapping.values():
-        for item in value.iterdir():
-            if item.is_file() and not any((item.name.startswith("."), item.name.startswith("_"))):
-                feature_texts.append(item.read_text(encoding="utf-8"))
-            continue
-    return feature_texts
-
-
-@lru_cache(maxsize=None)
-def get_scenario_texts() -> List[str]:
-    scenario_texts = []
-    delimiter = "\n\n"
-    for feature_text in get_feature_types():
-        blocks = feature_text.split(delimiter)
-        scenario_texts.append(delimiter.join(blocks[1:]))
-    return scenario_texts
+from tests.objects import TestLanguageName, get_feature_extractor, get_test_feature_containers
 
 
 @pytest.fixture()
 def test_scenario_text(request: FixtureRequest, language_settings: OverhaveLanguageSettings) -> str:
     if hasattr(request, "param"):
         return str(request.param)  # type: ignore
-    scenarios = get_scenario_texts()
+    features = get_test_feature_containers()
     if language_settings.step_prefixes is None:
-        return scenarios[0]  # english scenario
-    return scenarios[1]  # russian scenario
+        lang = TestLanguageName.ENG
+    else:
+        lang = TestLanguageName.RUS
+    return next(
+        iter(
+            feature.scenario for feature in features if feature.language is lang and feature.name.startswith("scenario")
+        )
+    )
 
 
 @pytest.fixture()
