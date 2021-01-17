@@ -21,6 +21,8 @@ def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str
 
 
 class TestingUserView(ModelViewConfigured):
+    """ View for :class:`TestUser` table. """
+
     create_template = 'test_user_create.html'
     edit_template = 'test_user_edit.html'
 

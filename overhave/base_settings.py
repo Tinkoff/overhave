@@ -19,6 +19,8 @@ class BaseOverhavePrefix(BaseSettings):
 
 
 class DataBaseSettings(BaseOverhavePrefix):
+    """ Overhave database settings. """
+
     db_url: URL = 'postgresql://postgres:postgres@localhost/overhave'
     db_pool_recycle: int = 500
     db_pool_size: int = 6
@@ -56,6 +58,8 @@ class DataBaseSettings(BaseOverhavePrefix):
 
 
 class OverhaveLoggingSettings(BaseOverhavePrefix):
+    """ Overhave logging settings. """
+
     log_level: str = logging.getLevelName(logging.INFO)
     log_config: Dict[str, Any] = {}
 

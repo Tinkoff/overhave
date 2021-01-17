@@ -23,6 +23,8 @@ from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationSto
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
+    """ Base factory for application entities resolution and usage. """
+
     def __init__(self) -> None:
         self._context: Optional[OverhaveContext] = None
 

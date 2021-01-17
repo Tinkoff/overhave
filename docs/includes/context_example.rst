@@ -1,16 +1,20 @@
+==========================
+ Overhave context example
+==========================
+
 .. code-block:: python
 
     from overhave import (
         AuthorizationStrategy,
-        LdapClientSettings,
+        OverhaveLdapClientSettings,
         OverhaveAdminSettings,
         OverhaveAuthorizationSettings,
         OverhaveContext,
         OverhaveFileSettings,
         OverhaveLanguageSettings,
         OverhaveProjectSettings,
-        StashClientSettings,
-        StashProjectSettings,
+        OverhaveStashClientSettings,
+        OverhaveStashProjectSettings,
     )
     from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
@@ -27,14 +31,14 @@
         ),
         admin_settings=OverhaveAdminSettings(index_template_path=path_settings.index_template_path),
         auth_settings=OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP, admin_group="admin"),
-        ldap_client_settings=LdapClientSettings(
+        ldap_client_settings=OverhaveLdapClientSettings(
             ldap_url="ldap://company.com", ldap_domain="company\\", ldap_dn="dc=company,dc=com"
         ),
-        stash_project_settings=StashProjectSettings(
+        stash_project_settings=OverhaveStashProjectSettings(
             repository_name='bdd-features',
             key='PRJ',
             default_target_branch_name='master',
             default_reviewer="admin",
         ),
-        stash_client_settings=StashClientSettings(url="https://stash.company.com", auth_token="secret_token"),
+        stash_client_settings=OverhaveStashClientSettings(url="https://stash.company.com", auth_token="secret_token"),
     )

@@ -5,6 +5,8 @@ from transliterate.base import TranslitLanguagePack
 
 
 class TranslitPack:
+    """ Class for feature file name's transliteration before saving. """
+
     def __init__(
         self,
         language_code: Optional[str],

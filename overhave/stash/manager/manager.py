@@ -10,7 +10,7 @@ from overhave.stash.client import StashClient
 from overhave.stash.errors import StashPrCreationError, StashValidationError
 from overhave.stash.manager.abstract import IStashProjectManager
 from overhave.stash.models import StashBranch, StashErrorResponse, StashPrCreationResponse, StashPrRequest
-from overhave.stash.settings import StashProjectSettings
+from overhave.stash.settings import OverhaveStashProjectSettings
 from overhave.storage.pull_request import get_last_pr_url
 from overhave.utils.time import get_current_time
 
@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class StashCommonMixin:
+    """ Mixin for :class:`StashProjectManager`. """
+
     @staticmethod
     def _create_head(name: str, repository: git.Repo) -> git.Head:
         origin: git.Head = repository.remotes.origin
@@ -55,9 +57,11 @@ class StashCommonMixin:
 
 
 class StashProjectManager(StashCommonMixin, IStashProjectManager):
+    """ Class for feature pull requests management. """
+
     def __init__(
         self,
-        settings: StashProjectSettings,
+        settings: OverhaveStashProjectSettings,
         file_settings: OverhaveFileSettings,
         client: StashClient,
         file_manager: FileManager,

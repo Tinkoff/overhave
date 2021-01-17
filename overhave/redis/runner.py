@@ -8,10 +8,17 @@ logger = logging.getLogger(__name__)
 
 
 class RedisConsumerRunnerException(Exception):
+    """ Exception for RedisConsumerRunner errors. """
+
     pass
 
 
 class RedisConsumerRunner:
+    """ Class for running tasks specified by ```mapping```.
+
+    Runner tasks launch with instance of :class:`RedisConsumer` ```consumer```.
+    """
+
     def __init__(
         self, consumer: RedisConsumer, mapping: Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]
     ) -> None:

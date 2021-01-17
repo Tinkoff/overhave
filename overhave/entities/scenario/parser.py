@@ -16,6 +16,8 @@ _DEFAULT_ID = 1
 
 
 class FeatureInfo(BaseModel):
+    """ Model for feature info keeping. """
+
     name: Optional[str]
     type: Optional[str]
     author: Optional[str]
@@ -25,6 +27,8 @@ class FeatureInfo(BaseModel):
 
 
 class ScenarioParser(PrefixMixin):
+    """ Class for feature files parsing. """
+
     def __init__(
         self,
         compilation_settings: OverhaveScenarioCompilerSettings,

@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class BaseAdminAuthorizationManager(IAdminAuthorizationManager, abc.ABC):
+    """ Base class for user authorization. """
+
     def __init__(self, settings: OverhaveAuthorizationSettings):
         self._settings = settings
         logger.info("Authorization manager: %s", type(self))

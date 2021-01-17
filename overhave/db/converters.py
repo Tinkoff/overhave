@@ -9,10 +9,14 @@ from overhave.db.utils import create_session
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
+    """ Model for :class:`FeatureType` row. """
+
     name: str
 
 
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
+    """ Model for :class:`Feature` row. """
+
     name: str
     author: str
     feature_type: FeatureTypeModel
@@ -21,35 +25,42 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
+    """ Model for :class:`Scenario` row. """
+
     text: str
 
 
 class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
+    """ Model for :class:`TestRun` row. """
+
     id: int
     executed_by: str
     start: datetime
 
 
-class BaseProcessingContext(BaseModel):
-    feature: FeatureModel
-    scenario: ScenarioModel
+class ProcessingContext(BaseModel):
+    """ Model for simple processing entities usage. """
 
-
-class ProcessingContext(BaseProcessingContext):
     feature: FeatureModel
     scenario: ScenarioModel
     test_run: TestRunModel
 
 
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
+    """ Model for :class:`TestUser` row. """
+
     feature_type: FeatureTypeModel
 
 
 class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
+    """ Model for :class:`Emulation` row. """
+
     test_user: TestUserModel
 
 
 class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
+    """ Model for :class:`EmulationRun` row. """
+
     emulation: EmulationModel
 
 

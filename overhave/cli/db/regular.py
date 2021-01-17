@@ -11,6 +11,7 @@ from overhave.base_settings import DataBaseSettings
 @click.command(short_help='Create all metadata tables')
 @click.pass_obj
 def create_all(config: Config) -> None:
+    """ Create all metadata tables. """
     click.echo('creating')
     config.attributes["metadata"].create_all()
     click.echo('complete!')
@@ -19,6 +20,7 @@ def create_all(config: Config) -> None:
 @click.command(short_help='Drop all metadata tables, attributes, schema')
 @click.pass_obj
 def drop_all(config: Config) -> None:
+    """ Drop all metadata tables, attributes, schema. """
     click.confirm('it really need?', abort=True)
     click.echo('dropping')
     meta = config.attributes["metadata"]
@@ -31,7 +33,7 @@ def drop_all(config: Config) -> None:
     click.echo('complete!')
 
 
-def ensure_database_exists(db_url: URL) -> None:
+def _ensure_database_exists(db_url: URL) -> None:
     try:
         if not sau.database_exists(db_url):
             sau.create_database(db_url)
@@ -41,7 +43,8 @@ def ensure_database_exists(db_url: URL) -> None:
 
 
 def set_config_to_context(context: click.Context, settings: DataBaseSettings) -> None:
-    ensure_database_exists(settings.db_url)
+    """ Set Alembic config to Click context for easy operations and migrations ability. """
+    _ensure_database_exists(settings.db_url)
     settings.setup_db()
     config = Config()
     config.attributes["engine"] = settings.create_engine()

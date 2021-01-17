@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class ScenarioTextWidget(HiddenInput):
+    """ Widget to override scenario view. """
+
     def __call__(self, field: Field, **kwargs: Any) -> Any:
         widget_name = type(self).__name__
         logger.debug("%s field id: '%s'", widget_name, field.id)
@@ -31,15 +33,21 @@ class ScenarioTextWidget(HiddenInput):
 
 
 class ScenarioTextAreaField(TextAreaField):
+    """ Field to override scenario view. """
+
     widget = ScenarioTextWidget()
 
 
 class ScenarioInlineModelForm(InlineFormAdmin):
+    """ Form to override scenario view. """
+
     form_overrides = dict(text=ScenarioTextAreaField)
     form_excluded_columns = ('created_at', 'test_runs')
 
 
 class FeatureView(ModelViewConfigured):
+    """ View for :class:`Feature` table. """
+
     can_view_details = False
 
     inline_models = (ScenarioInlineModelForm(db.Scenario),)

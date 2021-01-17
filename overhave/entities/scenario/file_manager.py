@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class FileSavingMixin:
+    """ Mixin for files saving. """
+
     @staticmethod
     def _write_data(file: Any, data: str, entity_name: str) -> None:
         file.write(data)
@@ -29,6 +31,8 @@ class FileSavingMixin:
 
 
 class FileManager(FileSavingMixin):
+    """ Class for feature files management. """
+
     def __init__(
         self,
         project_settings: OverhaveProjectSettings,

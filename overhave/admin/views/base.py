@@ -8,6 +8,8 @@ from overhave.admin.views.formatters import datetime_formatter, task_formatter
 
 
 class ModelViewConfigured(ModelView):
+    """ Base model view. """
+
     column_default_sort = ('id', True)
     column_display_pk = True
     can_view_details = True
@@ -57,6 +59,8 @@ class ModelViewConfigured(ModelView):
 
 
 class ModelViewProtected(ModelViewConfigured):
+    """ Protected view. """
+
     can_delete = False
     can_edit = False
     can_create = False

@@ -9,6 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class RedisProducer(RedisTemplate):
+    """ Class for producing tasks.
+
+    Producer send tasks into Redis stream specified by ```mapping``.
+    """
+
     def __init__(self, settings: OverhaveRedisSettings, mapping: Dict[Type[BaseRedisTask], RedisStream]):
         super().__init__(settings)
         self._streams = {task: self._database.Stream(stream.value) for task, stream in mapping.items()}

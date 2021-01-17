@@ -8,6 +8,12 @@ from overhave.storage import IEmulationStorage, IFeatureTypeStorage
 
 
 class ProxyFactory(IOverhaveFactory):
+    """ Factory for application entities resolution and usage, based on proxy-object pattern.
+
+    Class inherits :class:`IOverhaveFactory` and realise logic for dynamic entities resolution before and
+    during application or tests start-up. In fact, it is a proxy-object for :class:`OverhaveBaseFactory`.
+    """
+
     def __init__(self) -> None:
         from overhave.factory.base_factory import OverhaveBaseFactory
 

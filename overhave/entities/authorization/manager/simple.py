@@ -10,6 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleAdminAuthorizationManager(AdminSecretMixin):
+    """ Class for user registration via database.
+
+    Manager does not provide real authorization. Every user could use preferred name.
+    This name will be used for user authority. Every user is unique. Passwords not required.
+    """
+
     def authorize_user(self, username_field: StringField, password_field: PasswordField) -> Optional[db.BaseUser]:
         with db.create_session(expire_on_commit=False) as s:
             db_user = s.query(db.UserRole).filter(db.UserRole.login == username_field.data).one_or_none()

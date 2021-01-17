@@ -11,7 +11,9 @@ from overhave.pytest.test_runner import PytestRunner
 logger = logging.getLogger(__name__)
 
 
-class NullableSettingsError(Exception):
+class NullableEntitiesError(Exception):
+    """ Application error for situation with unresolved entities. """
+
     pass
 
 
@@ -57,7 +59,7 @@ class ConfigInjector:
     def collect_configs(self) -> None:
         """ Special def for pytest run in collect-only mode. Collects pytestbdd steps and other config data. """
         if self._feature_types is None or self._test_runner is None or self._file_settings is None:
-            raise NullableSettingsError
+            raise NullableEntitiesError
         if not self._initialized:
             logger.info("Started initialization process...")
             for feature_type in self._feature_types:
@@ -79,7 +81,7 @@ class ConfigInjector:
     def _load_from_session(self, session: Session) -> None:
         """ Loads pytestbdd steps and other config data from pytest Session. """
         if self._step_collector is None:
-            raise NullableSettingsError
+            raise NullableEntitiesError
         if self._inside_collecting:
             step_fixtures = self._step_collector.get_pytestbdd_steps(session)
             steps_dict = self._step_collector.compile_steps_dict(step_fixtures)

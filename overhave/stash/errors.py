@@ -1,6 +1,6 @@
 class StashValidationError(ValueError):
-    pass
+    """ Exception for stash response validation error. """
 
 
 class StashPrCreationError(RuntimeError):
-    pass
+    """ Exception for pull-request creation error. """

@@ -4,7 +4,7 @@ version = "1.0.5"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
-    "Vladislav Mukhamatnurov <v.mukhamatnurov@tinkoff.ru>",
+    "Vladislav Mukhamatnurov <livestreamepidemz@yandex.ru>",
     "Tinkoff Dialog System Backend Team <bds-dev@tinkoff.ru>"
 ]
 classifiers = [
@@ -77,10 +77,10 @@ pytest-deadfixtures = "^2.2.1"
 pytest-mock = "^3.3.1"
 pytest-random-order = "^1.0.4"
 allure-pytest = "^2.8.24"
-flakehell = "^0.7.1"
 pytest-xdist = "^2.2.0"
 tox = "^3.20.1"
 twine = "^3.3.0"
+Sphinx = "^3.4.3"
 
 [tool.pytest.ini_options]
 addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -103,38 +103,6 @@ multi_line_output = 3
 target-version = ['py38']
 line-length = 120
 
-[tool.flakehell]
-exclude = [".git", ".venv", ".tox"]
-ignore = [
-    "A003 ; 'id' is a python builtin, consider renaming the class attribute",
-    "A001 ; 'id' is a python builtin and is being shadowed, consider renaming the variable",
-    "W503 ; line break before binary operator",
-    "N805 ; first argument of a method should be named 'self'",
-    "PT004 ; fixture does not return anything, add leading underscore",
-    "PT011 ; set the match parameter in pytest.raises(ValueError)",
-    "PT012 ; pytest.raises() block should contain a single simple statement",
-    "PT019 ; fixture ... without value is injected as parameter, use @pytest.mark.usefixtures instead",
-    "D100 ; Missing docstring in public module",
-    "D101 ; Missing docstring in public class",
-    "D102 ; Missing docstring in public method",
-    "D103 ; Missing docstring in public function",
-    "D104 ; Missing docstring in public package",
-    "D105 ; Missing docstring in magic method",
-    "D106 ; Missing docstring in public nested class",
-    "D107 ; Missing docstring in __init__",
-    "D205 ; 1  blank line required between summary line and description",
-    "D210 ; No whitespaces allowed surrounding docstring text",
-    "D401 ; First line should be in imperative mood; try rephrasing",
-    "C408 ; Unnecessary dict call - rewrite as a literal",
-    "E203 ; whitespace before ':'",
-    "PT018 ; assertion should be broken down into multiple parts",
-    "PT019 ; fixture <FIXTURE> without value is injected as parameter",
-    "F821 ;"
-    ]
-max_complexity = 8
-max_line_length = 120
-show_source = true
-
 [build-system]
 requires = ["poetry>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -152,10 +120,9 @@ whitelist_externals =
 venv = {toxworkdir}/{[tox]isolated_build_env}
 setenv =
     VENV = {[testenv]venv}
-    WORKDIR = {toxworkdir}
+    WORK_DIR = {toxworkdir}
 passenv =
     OVERHAVE_DB_URL
 commands =
-    make test
-    make lint
+    make check
 """

@@ -65,3 +65,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# docs
+_build
+_references
+_README.rst

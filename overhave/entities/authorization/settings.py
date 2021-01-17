@@ -15,8 +15,8 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
 
 
 class OverhaveAuthorizationSettings(BaseOverhavePrefix):
-    """
-    Settings for Overhave authorization in admin interface.
+    """ Settings for Overhave authorization in admin interface.
+
     Supports 3 strategies: SIMPLE, DEFAULT and LDAP.
     LDAP authorization uses group politics with administration group `admin_group`.
     SIMPLE and DEFAULT strategies use admin user that would be dynamically created at startup.
@@ -26,7 +26,7 @@ class OverhaveAuthorizationSettings(BaseOverhavePrefix):
     admin_group: Optional[str] = None
 
 
-class LdapClientSettings(BaseOverhavePrefix):
+class OverhaveLdapClientSettings(BaseOverhavePrefix):
     """ Settings for Overhave LDAP client for AuthorizationStrategy.LDAP strategy. """
 
     ldap_url: str  # for example: "ldap://mydomain.ru"

@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationView(ModelViewConfigured):
+    """ View for :class:`Emulation` table. """
+
     create_template = 'emulation_create.html'
     edit_template = 'emulation_edit.html'
 

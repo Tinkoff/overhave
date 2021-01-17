@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from overhave.entities.authorization.manager import LDAPAuthenticator
-from overhave.entities.authorization.settings import LdapClientSettings
+from overhave.entities.authorization.settings import OverhaveLdapClientSettings
 
 
 @pytest.fixture(scope="session")
@@ -32,8 +32,8 @@ def mock_urls(envs_for_mock: Dict[str, Optional[str]]) -> Iterator[None]:
 
 
 @pytest.fixture()
-def test_ldap_client_settings(mock_urls: None) -> LdapClientSettings:
-    return LdapClientSettings()
+def test_ldap_client_settings(mock_urls: None) -> OverhaveLdapClientSettings:
+    return OverhaveLdapClientSettings()
 
 
 TEST_LDAP_GROUPS = ['group1', 'group2']
@@ -55,6 +55,6 @@ def mocked_ldap_connection(cls: Any, *args: Any, **kwargs: Any) -> None:
 
 
 @pytest.fixture()
-def test_ldap_authenticator(test_ldap_client_settings: LdapClientSettings) -> Iterator[LDAPAuthenticator]:
+def test_ldap_authenticator(test_ldap_client_settings: OverhaveLdapClientSettings) -> Iterator[LDAPAuthenticator]:
     with mock.patch.object(LDAPAuthenticator, '_connect', new=mocked_ldap_connection):
         yield LDAPAuthenticator(settings=test_ldap_client_settings)

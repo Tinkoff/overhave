@@ -10,6 +10,8 @@ from overhave.storage import IEmulationStorage, IFeatureTypeStorage
 
 
 class IOverhaveFactory(abc.ABC):
+    """ Factory interface for application entities resolution and usage. """
+
     @abc.abstractmethod
     def set_context(self, context: OverhaveContext) -> None:
         pass

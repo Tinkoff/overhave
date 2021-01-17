@@ -13,13 +13,13 @@ from overhave.entities import (
 )
 from overhave.entities.authorization.settings import (
     AuthorizationStrategy,
-    LdapClientSettings,
     OverhaveAdminSettings,
     OverhaveAuthorizationSettings,
+    OverhaveLdapClientSettings,
 )
 from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
 from overhave.factory import OverhaveContext
 from overhave.factory import proxy_factory as overhave_core
 from overhave.pytest import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.redis import RedisStream as RedisConsumerApp
-from overhave.stash import StashClientSettings, StashProjectSettings
+from overhave.redis import RedisStream as OverhaveRedisConsumerApp
+from overhave.stash import OverhaveStashClientSettings, OverhaveStashProjectSettings

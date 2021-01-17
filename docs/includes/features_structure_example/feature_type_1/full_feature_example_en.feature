@@ -1,4 +1,4 @@
-@feature_type_1
+@feature_type_1 @my_custom_tag
 Feature: Tinkoff Mobile answering machine
 # created by livestreamx | last edited by other_user, 09-01-2021 | published by other_user
 Tasks: PRJ-1234, PRJ-1235

@@ -11,10 +11,6 @@ _ADMIN_USERNAME = "admin"
 
 
 class AdminSecretMixin(BaseAdminAuthorizationManager, abc.ABC):
-    def __init__(self, settings: OverhaveAuthorizationSettings):
-        super().__init__(settings)
-        self._make_secret()
-
     """
     Special class for default admin user preparation.
 
@@ -22,6 +18,10 @@ class AdminSecretMixin(BaseAdminAuthorizationManager, abc.ABC):
     This user will be placed into database, moreover key will be logged with INFO logging level.
     Note: real service administrator should bring this key and change password or delete this user!
     """
+
+    def __init__(self, settings: OverhaveAuthorizationSettings):
+        super().__init__(settings)
+        self._make_secret()
 
     @staticmethod
     def _get_secret() -> UUID:

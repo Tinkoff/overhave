@@ -12,6 +12,8 @@ _PYTESTBDD_FIXTURE_TRACE_MARK = '_trace'
 
 
 class StepCollector:
+    """ Class for `pytest-bdd` steps dynamic collection. """
+
     def __init__(self, step_prefixes: Optional[StepPrefixesModel]) -> None:
         self._step_prefixes = step_prefixes
 
@@ -30,7 +32,7 @@ class StepCollector:
             sorted(
                 (
                     fx
-                    for fx_list in session._fixturemanager._arg2fixturedefs.values()  # pylint: disable=W0212
+                    for fx_list in session._fixturemanager._arg2fixturedefs.values()
                     for fx in fx_list
                     if cls._is_bdd_step(fx)
                 ),

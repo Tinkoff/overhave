@@ -2,6 +2,8 @@ import enum
 
 
 class TestRunStatus(str, enum.Enum):
+    """ Enum for test run statuses. """
+
     STARTED = 'STARTED'
     RUNNING = 'RUNNING'
     FAILED = 'FAILED'
@@ -10,6 +12,8 @@ class TestRunStatus(str, enum.Enum):
 
 
 class EmulationStatus(str, enum.Enum):
+    """ Enum for emulation statuses. """
+
     CREATED = 'CREATED'
     REQUESTED = 'REQUESTED'
     READY = 'READY'

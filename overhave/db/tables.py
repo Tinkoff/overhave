@@ -1,4 +1,3 @@
-# pylint: disable=C0121
 from __future__ import annotations
 
 from typing import Optional, cast
@@ -15,6 +14,8 @@ from overhave.db.users import UserRole
 
 
 class FeatureType(Base, PrimaryKeyWithoutDateMixin):
+    """ Feature types table. """
+
     name = sa.Column(sa.Text, unique=True, nullable=False, doc='Feature types choice')
 
     def __repr__(self) -> str:
@@ -23,6 +24,8 @@ class FeatureType(Base, PrimaryKeyWithoutDateMixin):
 
 @su.generic_repr('name', 'last_edited_by')
 class Feature(Base, PrimaryKeyMixin):
+    """ Features table. """
+
     name = sa.Column(LONG_STR_TYPE, doc="Feature name", nullable=False, unique=True)
     author = sa.Column(
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
@@ -38,6 +41,8 @@ class Feature(Base, PrimaryKeyMixin):
 
 @su.generic_repr('feature_id')
 class Scenario(Base, PrimaryKeyMixin):
+    """ Scenarios table. """
+
     feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
     text = sa.Column(TEXT_TYPE, doc="Text storage for scenarios in feature")
 
@@ -45,6 +50,8 @@ class Scenario(Base, PrimaryKeyMixin):
 
 
 class TestRun(Base, PrimaryKeyMixin):
+    """ Test runs table. """
+
     scenario_id = sa.Column(INT_TYPE, sa.ForeignKey(Scenario.id), nullable=False, index=True)
     name = sa.Column(LONG_STR_TYPE, nullable=False)
     start = sa.Column(DATETIME_TYPE, doc="Test start time", nullable=False)
@@ -59,6 +66,8 @@ class TestRun(Base, PrimaryKeyMixin):
 
 
 class DraftQuery(so.Query):
+    """ Scenario versions table. """
+
     def as_unique(self, test_run_id: int) -> Draft:
         with self.session.no_autoflush:
             run = self.session.query(TestRun).get(test_run_id)
@@ -75,6 +84,7 @@ class DraftQuery(so.Query):
 
 
 class Draft(Base, PrimaryKeyMixin):
+    """ Scenario versions table. """
 
     __query_cls__ = DraftQuery
 
@@ -93,6 +103,8 @@ class Draft(Base, PrimaryKeyMixin):
 
 @su.generic_repr('id', 'name', 'created_by')
 class TestUser(Base, PrimaryKeyMixin):
+    """ Test users table. """
+
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
     feature_type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc='Feature types choice')
     specification = sa.Column(sa.JSON(none_as_null=True))
@@ -103,6 +115,8 @@ class TestUser(Base, PrimaryKeyMixin):
 
 
 class Emulation(Base, PrimaryKeyMixin):
+    """ Emulation templates table. """
+
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
     test_user_id = sa.Column(INT_TYPE, sa.ForeignKey(TestUser.id), nullable=False, doc='Test user ID')
     command = sa.Column(TEXT_TYPE, nullable=False, doc="Command for emulator's execution")
@@ -113,6 +127,8 @@ class Emulation(Base, PrimaryKeyMixin):
 
 
 class EmulationRun(Base, PrimaryKeyMixin):
+    """ Emulation runs table. """
+
     __tablename__ = 'emulation_run'  # type: ignore
     emulation_id = sa.Column(INT_TYPE, sa.ForeignKey(Emulation.id), nullable=False, index=True)
     status = sa.Column(sa.Enum(EmulationStatus), doc="Current emulation status", nullable=False)

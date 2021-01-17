@@ -9,11 +9,15 @@ from overhave.db.types import LONG_STR_TYPE, SHORT_STR_TYPE
 
 
 class Role(str, enum.Enum):
+    """ Enum that declares user access roles. """
+
     user = 'user'
     admin = 'admin'
 
 
 class BaseUser:
+    """ Base user class. """
+
     login: str = sa.Column(SHORT_STR_TYPE, nullable=False, unique=True)
     password: Optional[str] = sa.Column(LONG_STR_TYPE, nullable=True)
     role: str = sa.Column(sa.Enum(Role), nullable=False, default=Role.user)
@@ -46,6 +50,8 @@ class BaseUser:
 
 @su.generic_repr('login')
 class UserRole(Base, PrimaryKeyMixin, BaseUser):
+    """ User access table. """
+
     def __init__(self, login: str, password: Optional[str], role: Role) -> None:
         self.login = login
         self.password = password
@@ -54,6 +60,8 @@ class UserRole(Base, PrimaryKeyMixin, BaseUser):
 
 @su.generic_repr('group')
 class GroupRole(Base, PrimaryKeyMixin):
+    """ Group access table. """
+
     group = sa.Column(SHORT_STR_TYPE, nullable=False, unique=True)
 
     def __init__(self, group: str) -> None:

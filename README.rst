@@ -2,7 +2,7 @@
 Overhave
 ========
 
-.. figure:: docs/label_img.png
+.. figure:: docs/includes/images/label_img.png
   :width: 600
   :align: center
   :alt: Overhave framework
@@ -22,6 +22,7 @@ Features
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_
 * Built-in configurable management of users and groups permissions
+* Configurable strategy for user authorization, LDAP also provided
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
 * Still configurable as `Flask Admin`_, supports plug-ins and extensions
 * Distributed `producer-consumer` architecture based on Redis streams
@@ -48,20 +49,45 @@ Web-interface
 
 The web-interface is a basic tool for BDD features management. It consists of:
 
-* ```Info``` - index page with optional information about your tool or project;
-* ```Scenarios``` - section for features management, contains subsections
-    ```Features```, ```Test runs``` and ```Versions```;
-* ```Access``` - section for access management, contains ```Users``` and
-    ```Groups``` subsections;
-* ```Emulation``` - experimental section for alternative tools implementation
+* `Info` - index page with optional information about your tool or project;
+* `Scenarios` - section for features management, contains subsections
+    `Features`, `Test runs` and `Versions`:
+
+    * `Features`
+        gives an interface for features records management and provides info
+        about id, name author, time, editor and publishing status; it is possible
+        to search, edit or delete items through interface;
+    * `Test runs`
+        gives an interface for test runs management and provides info about
+
+        .. figure:: docs/includes/images/test_runs_img.png
+          :width: 500
+          :align: center
+          :alt: Script panel
+    * Versions
+        contains feature versions for corresponding to test runs.
+
+* `Access` - section for access management, contains `Users` and
+    `Groups` subsections;
+* `Emulation` - experimental section for alternative tools implementation
     (in developing).
 
-.. figure:: docs/panel_img.png
+**Overhave** features could be created and/or edited through special
+*script panel* in feature edit mode. Feature should have type registered by the
+application, unique name, specified tasks list with the traditional format
+```PRJ-NUMBER``` and scenario text.
+
+**Script panel** has `pytest-bdd`_ steps table on the right side of interface.
+These steps should be defined in appropriate fixture modules and registered
+at the application on start-up to be displayed.
+
+
+.. figure:: docs/includes/images/panel_img.png
   :width: 600
   :align: center
   :alt: Script panel
 
-  **Overhave** script panel in edit mode
+  Example of **Overhave** script panel in feature edit mode
 
 Command-line interface
 ----------------------
@@ -70,8 +96,8 @@ run consumer and execute basic database operations. Examples are below:
 
 .. code-block:: shell
 
-    overhave admin --port 8080
     overhave db create-all
+    overhave admin --port 8080
     overhave consumer -s EMULATION
 
 **Note**: service start-up takes a set of settings, so you can set them through
@@ -103,14 +129,14 @@ be realised with follow code:
 * ```overhave_core``` is a cached instance of the **Overhave** factory, has an
     access to application components, directly used in ```overhave_app```.
 * ```my_custom_context``` is an example of context configuration, see an
-    example code in `docs/context_example.rst <docs/context_example.rst>`_.
+    example code in `context_example.rst <docs/includes/context_example.rst>`_.
 
 Features structure
 ------------------
 
 **Overhave** supports it's own special structure of features storage:
 
-.. image:: docs/features_structure_img.png
+.. image:: docs/includes/images/features_structure_img.png
   :width: 400
   :alt: Features structure example
 
@@ -118,6 +144,11 @@ Features structure
 separate directories, each of them corresponds to predefined `pytest-bdd`_
 set of steps. It is possible to create your own horizontal structure of
 different product directions with unique steps and `PyTest`_ fixtures.
+
+**Note**: this structure is used in **Overhave** application. The formed data
+gives a possibility to specify registered feature type in the web-interface
+*script panel*. Also, this structure defines which steps will be displayed in
+the rigth side of *script panel*.
 
 Feature format
 --------------
@@ -131,8 +162,8 @@ Gherkin from `pytest-bdd`_ with small updates:
 * task tracker's tickets with traditional format ```PRJ-NUMBER```.
 
 An example of filled feature content is located in
-`docs/.../full_feature_example_en.feature
-<docs/features_structure_example/feature_type_1/full_feature_example_en.feature>`_.
+`feature_example.rst
+<docs/includes/feature_example.rst>`_.
 
 Language
 --------
@@ -154,8 +185,25 @@ in framework and available for usage:
         translit_pack=RUSSIAN_TRANSLIT_PACK
     )
 
-**Note**: you could create your own prefix-value mapping for your language. See
-RUS example ```RUSSIAN_PREFIXES``` in `prefixes.py <overhave/extra/prefixes.py>`_.
+**Note**: you could create your own prefix-value mapping for your language:
+
+.. code-block:: python
+
+    from overhave import StepPrefixesModel
+
+    GERMAN_PREFIXES = StepPrefixesModel(
+        FEATURE="Merkmal:",
+        SCENARIO_OUTLINE="Szenarioübersicht:",
+        SCENARIO="Szenario:",
+        BACKGROUND="Hintergrund:",
+        EXAMPLES="Beispiele:",
+        EXAMPLES_VERTICAL="Beispiele: Vertikal",
+        GIVEN="Gegeben ",
+        WHEN="Wann ",
+        THEN="Dann ",
+        AND="Und ",
+        BUT="Aber ",
+    )
 
 Custom index
 ------------
@@ -169,10 +217,47 @@ to file could be set through environment as well as set with context:
         index_template_path="/path/to/index.html"
     )
 
+
+Authorization strategy
+----------------------
+
+**Overhave** provides several authorization strategies, declared by
+```AuthorizationStrategy``` enum:
+
+* `Simple` - strategy without real authorization.
+    Every user could use preferred name. This name will be used for user
+    authority. Every user is unique. Password not required.
+
+* `Default` - strategy with real authorization.
+    Every user could use only registered credentials.
+
+* LDAP - strategy with authorization using remote LDAP server.
+    Every user should use his LDAP credentials. LDAP
+    server returns user groups. If user in default 'admin' group or his groups
+    list contains admin group - user will be authorized. If user already placed
+    in database - user will be authorized too. No one password stores.
+
+Appropriate strategy and additional data should be placed into
+```OverhaveAuthorizationSettings```, for example LDAP strategy could be
+configured like this:
+
+.. code-block:: python
+
+    auth_settings=OverhaveAuthorizationSettings(
+        auth_strategy=AuthorizationStrategy.LDAP, admin_group="admin"
+    )
+
+
 ------------
 Contributing
 ------------
-Contributions are very welcome. Project installation is very easy
+
+Contributions are very welcome.
+
+Preparation
+-----------
+
+Project installation is very easy
 and takes just few prepared commands (`make pre-init` works only for Ubuntu;
 so you can install same packages for your OS manually):
 
@@ -181,9 +266,13 @@ so you can install same packages for your OS manually):
     make pre-init
     make init
 
-Packages management is provided by `Poetry`_. Tests can be run with `Tox`_.
-`Docker-compose`_ is used for other services preparation and serving, such as
-database. Simple tests and linters execution:
+Packages management is provided by `Poetry`_.
+
+Check
+-----
+
+Tests can be run with `Tox`_. `Docker-compose`_ is used for other services
+preparation and serving, such as database. Simple tests and linters execution:
 
 .. code-block:: shell
 
@@ -197,6 +286,18 @@ in docker container also:
 .. code-block:: shell
 
     make test-docker
+
+Documentation build
+-------------------
+
+Project documentation could be built via `Sphinx`_ and simple `make` command:
+
+.. code-block:: shell
+
+    make build-docs
+
+By default, the documentation will be built using `html` builder into `_build`
+directory.
 
 -------
 License
@@ -226,3 +327,4 @@ with a detailed description.
 .. _`Poetry`: https://github.com/python-poetry/poetry
 .. _`Docker-compose`: https://docs.docker.com/compose
 .. _`Click`: https://github.com/pallets/click
+.. _`Sphinx`: https://github.com/sphinx-doc/sphinx

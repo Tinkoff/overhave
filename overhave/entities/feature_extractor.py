@@ -9,10 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class FeatureTypeExtractionError(RuntimeError):
+    """ Exception for feature type extraction error. """
+
     pass
 
 
 class IFeatureExtractor(abc.ABC):
+    """ Abstract class for specified project's feature types resolution. """
+
     @property
     @abc.abstractmethod
     def feature_types(self) -> List[str]:
@@ -25,6 +29,8 @@ class IFeatureExtractor(abc.ABC):
 
 
 class FeatureExtractor(IFeatureExtractor):
+    """ Class for specified project's feature types resolution. """
+
     def __init__(self, file_settings: OverhaveFileSettings):
         self._file_settings = file_settings
 

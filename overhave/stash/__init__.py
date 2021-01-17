@@ -1,4 +1,4 @@
 # flake8: noqa
 from .client import StashClient
 from .manager import IStashProjectManager
-from .settings import StashClientSettings, StashProjectSettings
+from .settings import OverhaveStashClientSettings, OverhaveStashProjectSettings

@@ -7,12 +7,12 @@ from pydantic import ValidationError
 
 from overhave.stash.errors import StashValidationError
 from overhave.stash.models import STASH_RESPONSE_MODELS, AnyStashResponseModel, StashPrRequest
-from overhave.stash.settings import StashClientSettings
+from overhave.stash.settings import OverhaveStashClientSettings
 
 logger = logging.getLogger(__name__)
 
 
-class BearerAuth(requests.auth.AuthBase):
+class _BearerAuth(requests.auth.AuthBase):
     def __init__(self, token: str):
         super().__init__()
         self.token = token
@@ -22,13 +22,15 @@ class BearerAuth(requests.auth.AuthBase):
         return r
 
     def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, BearerAuth):
+        if not isinstance(other, _BearerAuth):
             return False
         return self.token == other.token
 
 
 class StashClient:
-    def __init__(self, settings: StashClientSettings):
+    """ Class for communcation with remote Bitbucket server. """
+
+    def __init__(self, settings: OverhaveStashClientSettings):
         self._settings = settings
 
     @tenacity.retry(
@@ -44,7 +46,7 @@ class StashClient:
             repository_name=pull_request.target_branch.repository.name,
         )
         response = requests.post(
-            url.human_repr(), json=pull_request.dict(by_alias=True), auth=BearerAuth(self._settings.auth_token)
+            url.human_repr(), json=pull_request.dict(by_alias=True), auth=_BearerAuth(self._settings.auth_token)
         )
         data = response.json()
         for model in STASH_RESPONSE_MODELS:

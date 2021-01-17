@@ -14,6 +14,8 @@ from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
 
 class TestGenerateTaskInfo:
+    """ Unit tests for :meth:`generate_task_info`. """
+
     @pytest.mark.parametrize("tasks", [['EX-1', 'EX-2']])
     @pytest.mark.parametrize("header", ["tasks_header"])
     def test_generate_task_info(self, tasks: List[str], header: str):
@@ -39,6 +41,8 @@ class TestGenerateTaskInfo:
     ],
 )
 class TestScenarioCompiler:
+    """ Unit tests for :class:`ScenarioCompiler`. """
+
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
         self,

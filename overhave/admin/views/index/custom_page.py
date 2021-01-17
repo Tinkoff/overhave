@@ -8,6 +8,12 @@ from wtforms import Field
 
 
 class CustomPageWidget(XEditableWidget):
+    """ Customising widget.
+
+    Widget content is filled with content from specified
+    ``self.template_path```.
+    """
+
     def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         self.template_path: typing.Optional[Path] = None
         super().__init__(*args, **kwargs)
@@ -20,10 +26,14 @@ class CustomPageWidget(XEditableWidget):
 
 
 class CustomPageField(Field):
+    """ Field for custom page widget. """
+
     widget = CustomPageWidget()
 
 
 class CustomPageForm(BaseForm):
+    """ Form for custom page. """
+
     type = CustomPageField()
 
     def __init__(self, template_path: typing.Optional[Path]):

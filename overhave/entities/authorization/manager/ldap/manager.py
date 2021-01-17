@@ -14,10 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class LDAPEmptyAdminGroupError(ValueError):
+    """ Exception for situation with empty LDAP admin group. """
+
     pass
 
 
 class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
+    """ Class for user authorization via LDAP.
+
+    Manager authorize users using remote LDAP server. Every user should use his LDAP credentials.
+    LDAP server returns user groups. If user in default 'admin' group or his groups list contains admin group - user
+    will be authorized. If user already placed in database - user will be authorized too. No one password stores.
+    """
+
     def __init__(self, settings: OverhaveAuthorizationSettings, ldap_authenticator: LDAPAuthenticator):
         if settings.admin_group is None:
             raise LDAPEmptyAdminGroupError("Admin group could not be empty!")

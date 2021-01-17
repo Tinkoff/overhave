@@ -14,14 +14,20 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationError(Exception):
+    """ Base exception for :class:`Emulator`. """
+
     pass
 
 
 class DangerousExternalCommandError(EmulationError):
+    """ Exception for dangerous command error. """
+
     pass
 
 
 class ExternalCommandCheckMixin:
+    """ Mixin for simple command-line command checking. """
+
     @cached_property
     def _dangerous_pattern(self) -> Pattern[str]:
         return re.compile(r"[$|><]+")
@@ -32,6 +38,8 @@ class ExternalCommandCheckMixin:
 
 
 class Emulator(ExternalCommandCheckMixin):
+    """ Class for creation of emulation runs. """
+
     def __init__(self, storage: IEmulationStorage, settings: OverhaveEmulationSettings):
         self._storage = storage
         self._settings = settings

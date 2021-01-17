@@ -7,6 +7,8 @@ from pydantic.main import BaseModel
 
 
 class RedisStream(str, enum.Enum):
+    """ Enum that declares Redis streams. """
+
     TEST = "test-stream"
     EMULATION = "emulation-stream"
 
@@ -15,14 +17,16 @@ class RedisStream(str, enum.Enum):
         return cast(str, self.value.replace("-", "_"))
 
 
-class IRedisTask(BaseModel, abc.ABC):
+class _IRedisTask(BaseModel, abc.ABC):
     @property
     @abc.abstractmethod
     def message(self) -> Dict[bytes, bytes]:
         pass
 
 
-class BaseRedisTask(IRedisTask):
+class BaseRedisTask(_IRedisTask):
+    """ Base task for Redis streams. """
+
     data: Any
 
     @property
@@ -31,26 +35,35 @@ class BaseRedisTask(IRedisTask):
 
 
 class TestRunData(BaseModel):
+    """ Specific data for test run. """
+
     test_run_id: int
 
 
 class TestRunTask(BaseRedisTask):
+    """ Redis stream task for test run. """
+
     data: TestRunData
 
 
 class EmulationData(BaseModel):
+    """ Specific data for emulation run. """
+
     emulation_run_id: int
 
 
 class EmulationTask(BaseRedisTask):
+    """ Redis stream task for emulation run. """
+
     data: EmulationData
 
 
 TRedisTask = TypeVar('TRedisTask', TestRunTask, EmulationTask, covariant=True)
-AnyRedisTask = Union[TestRunTask, EmulationTask]
 
 
 class RedisPendingData(BaseModel):
+    """ Class that describes pending data from Redis stream. """
+
     message_id: str
     consumer: str
     time_since_delivered: int
@@ -58,6 +71,8 @@ class RedisPendingData(BaseModel):
 
 
 class RedisUnreadData:
+    """ Class for unread data from Redis stream. """
+
     def __init__(self, message_id: bytes, message: Dict[bytes, bytes]) -> None:
         self.message_id = message_id.decode()
         self.message = message
@@ -68,4 +83,9 @@ class RedisUnreadData:
 
 
 class RedisContainer(BaseModel):
-    task: AnyRedisTask
+    """ Class for parsing instance of :class:`RedisUnreadData` from Redis stream.
+
+    ```task``` will be parsed to one of declared models.
+    """
+
+    task: Union[TestRunTask, EmulationTask]

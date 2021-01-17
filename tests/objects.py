@@ -17,13 +17,15 @@ XDistMasterWorker = XDistWorkerValueType("master")
 
 
 class DataBaseContext(NamedTuple):
+    """ Class for easy database entities management through `PyTest` fixtures. """
+
     metadata: MetaData
     engine: Engine
 
 
 @lru_cache(maxsize=None)
 def get_file_settings() -> OverhaveFileSettings:
-    test_features_dir = Path(__file__).parent.parent / 'docs/features_structure_example'
+    test_features_dir = Path(__file__).parent.parent / 'docs/includes/features_structure_example'
     return OverhaveFileSettings(
         fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / 'tmp'
     )
@@ -35,11 +37,15 @@ def get_feature_extractor() -> FeatureExtractor:
 
 
 class TestLanguageName(str, enum.Enum):
+    """ Enum that declares languages for using in tests. """
+
     ENG = "en"
     RUS = "ru"
 
 
 class TestFeatureContainer(BaseModel):
+    """ Class for simple test feature operating. """
+
     name: str
     content: str
     scenario: str

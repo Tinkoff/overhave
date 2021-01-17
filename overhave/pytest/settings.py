@@ -7,15 +7,16 @@ from overhave.base_settings import BaseOverhavePrefix
 
 
 class OverhaveProjectSettings(BaseOverhavePrefix):
-    """ Entity project settings.
+    """
+    Entity project settings.
 
     You could specify your fixture content for specific pytest usage with your own plugins.
     It could give you pretty extended file with powerful possibilities.
     `fixture_context` will be formatted by `OverhaveProccessor` before test would be started.
 
-    For example:
+    For example::
 
-        fixture_content = [
+        fixture_content: = [
             "from pytest_bdd import scenarios",
             "from my_app.plugins import kwargs, plugins",
             "pytest_plugins = plugins",

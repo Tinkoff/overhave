@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def _resolved_factory() -> IOverhaveFactory:
+    """ Resolve necessary settings and prepare instance of :class:`IOverhaveFactory` for usage. """
     logging_settings = OverhaveLoggingSettings()
     logging_settings.setup_logging()
     DataBaseSettings().setup_db()
@@ -25,6 +26,7 @@ def _resolved_factory() -> IOverhaveFactory:
 
 
 def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
+    """ Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`. """
     from overhave.admin.views import (
         DraftView,
         EmulationRunView,
@@ -58,6 +60,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
 
 
 def overhave_app() -> Flask:
+    """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / 'templates'
     files_dir = current_dir / 'files'

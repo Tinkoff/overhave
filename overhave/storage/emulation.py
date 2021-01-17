@@ -13,18 +13,20 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationStorageError(Exception):
-    pass
+    """ Base Exception for :class:`EmulationStorage`. """
 
 
 class NotFoundEmulationError(EmulationStorageError):
-    pass
+    """ Exception for situation without saved emulation.. """
 
 
 class AllPortsAreBusyError(EmulationStorageError):
-    pass
+    """ Exception for situation when all ports are busy. """
 
 
 class IEmulationStorage(abc.ABC):
+    """ Abstract class for emulation runs storage. """
+
     @abc.abstractmethod
     def create_emulation_run(self, emulation_id: int) -> db.EmulationRunModel:
         pass
@@ -43,6 +45,8 @@ class IEmulationStorage(abc.ABC):
 
 
 class EmulationStorage(IEmulationStorage):
+    """ Class for emulation runs storage. """
+
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
 

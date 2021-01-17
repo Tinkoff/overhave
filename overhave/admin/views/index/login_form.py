@@ -14,6 +14,8 @@ _INVALID_AUTH_MSG = "Specified username '{username}' and password pair is invali
 
 
 class LoginForm(Form):
+    """ Form for user authorization. """
+
     username: StringField = StringField(
         'Username',
         validators=[validators.input_required(message='Field required!')],

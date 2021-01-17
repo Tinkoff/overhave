@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationRunView(ModelViewConfigured):
+    """ View for :class:`EmulationRun` table. """
+
     details_template = 'emulation_run_detail.html'
 
     can_view_details = True

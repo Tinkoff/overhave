@@ -19,6 +19,7 @@ RUN apt-get update -o Acquire::Check-Valid-Until=false \
         make \
         g++ \
         libgnutls28-dev \
+        git \
  && rm -rf /var/lib/apt/lists/*
 
 ARG README=/code/README.rst

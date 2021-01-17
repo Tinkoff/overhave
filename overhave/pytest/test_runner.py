@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class PytestRunner:
+    """ Class for running `PyTest` in test and collect-only modes. """
+
     def __init__(self, test_settings: OverhaveTestSettings) -> None:
         self._test_settings = test_settings
 

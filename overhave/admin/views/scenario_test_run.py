@@ -11,6 +11,8 @@ from overhave.admin.views.formatters import result_report_formatter
 
 
 class TestRunView(ModelViewConfigured):
+    """ View for :class:`TestRun` table. """
+
     list_template = 'test_run_list.html'
     details_template = 'test_run_detail.html'
     can_edit = False

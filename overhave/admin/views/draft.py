@@ -6,6 +6,8 @@ from overhave.db import Role
 
 
 class DraftView(ModelViewProtected):
+    """ View for :class:`Draft` table. """
+
     def on_model_delete(self, model) -> None:  # type: ignore
         if not current_user.role == Role.admin:
             raise ValidationError('Only administrator could delete published version of scenario!')

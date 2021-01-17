@@ -10,6 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class DefaultAdminAuthorizationManager(AdminSecretMixin):
+    """ Class for user authorization via database.
+
+    Manager authorize users with registered credentials from database.
+    """
+
     def authorize_user(self, username_field: StringField, password_field: PasswordField) -> Optional[db.BaseUser]:
         with db.create_session(expire_on_commit=False) as s:
             db_user = (

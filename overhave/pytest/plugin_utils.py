@@ -4,7 +4,6 @@ from typing import List, Optional
 import allure
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
-from pytest_markers_presence import is_pytest_bdd_item
 
 from overhave.factory import IOverhaveFactory
 
@@ -24,6 +23,12 @@ def set_issue_links(item: Scenario, keyword: str) -> None:
     links = _get_issue_links(item, keyword)
     if links:
         setattr(item._obj.__scenario__.feature, "links", links)
+
+
+def is_pytest_bdd_item(item: Item) -> bool:
+    if hasattr(item, "_obj"):
+        return hasattr(item._obj, "__scenario__") and isinstance(item._obj.__scenario__, Scenario)  # type: ignore
+    return False
 
 
 def has_issue_links(item: Item) -> bool:

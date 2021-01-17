@@ -9,10 +9,9 @@ from _pytest.config.argparsing import Parser
 from _pytest.main import Session
 from _pytest.nodes import Item
 from pydantic import ValidationError
-from pytest_markers_presence import is_pytest_bdd_item
 
 from overhave.factory import proxy_factory
-from overhave.pytest.plugin_utils import add_issue_links_to_report, has_issue_links, set_issue_links
+from overhave.pytest.plugin_utils import add_issue_links_to_report, has_issue_links, is_pytest_bdd_item, set_issue_links
 
 logger = logging.getLogger(__name__)
 

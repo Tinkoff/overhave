@@ -7,7 +7,7 @@ COPY ./overhave /code/overhave
 COPY ./docs /code/docs
 COPY ./tests /code/tests
 COPY ./makefile /code/makefile
-COPY ./mypy.ini /code/mypy.ini
+COPY ./setup.cfg /code/setup.cfg
 COPY ./README.rst /code/README.rst
 
 CMD ["tox", "-v"]

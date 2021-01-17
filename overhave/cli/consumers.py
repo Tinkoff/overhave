@@ -5,7 +5,7 @@ from overhave.factory import ConsumerFactory
 from overhave.redis import RedisStream
 
 
-@overhave.command(short_help='Run redis consumer')
+@overhave.command(short_help='Run Overhave Redis consumer')
 @click.option(
     "-s",
     "--stream",
@@ -14,4 +14,5 @@ from overhave.redis import RedisStream
     help="Redis stream, which defines application",
 )
 def consumer(stream: RedisStream) -> None:
+    """ Run Overhave Redis consumer. """
     ConsumerFactory(stream).runner.run()

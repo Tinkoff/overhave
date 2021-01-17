@@ -8,6 +8,8 @@ from overhave.redis.runner import RedisConsumerRunner
 
 
 class ConsumerFactory:
+    """ Factory for :class:`RedisConsumer`, :class:`RedisConsumerRunner` and tasks mapping. """
+
     def __init__(self, stream: RedisStream):
         self._stream = stream
         logging_settings = OverhaveLoggingSettings()

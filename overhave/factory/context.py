@@ -8,17 +8,17 @@ from overhave.entities import (
     ProcessorSettings,
 )
 from overhave.entities.authorization.settings import (
-    LdapClientSettings,
     OverhaveAdminSettings,
     OverhaveAuthorizationSettings,
+    OverhaveLdapClientSettings,
 )
 from overhave.pytest import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.stash.settings import StashClientSettings, StashProjectSettings
+from overhave.stash.settings import OverhaveStashClientSettings, OverhaveStashProjectSettings
 
 
 class OverhaveContext:
-    """
-    Application Context, based on BaseSettings.
+    """ Application Context, based on BaseSettings.
+
     This context defines how Overhave application will work.
     """
 
@@ -30,11 +30,11 @@ class OverhaveContext:
         emulation_settings: Optional[OverhaveEmulationSettings] = None,
         file_settings: Optional[OverhaveFileSettings] = None,
         language_settings: Optional[OverhaveLanguageSettings] = None,
-        ldap_client_settings: Optional[LdapClientSettings] = None,
+        ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
         processor_settings: Optional[ProcessorSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
-        stash_client_settings: Optional[StashClientSettings] = None,
-        stash_project_settings: Optional[StashProjectSettings] = None,
+        stash_client_settings: Optional[OverhaveStashClientSettings] = None,
+        stash_project_settings: Optional[OverhaveStashProjectSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
     ) -> None:
         self.admin_settings = admin_settings or OverhaveAdminSettings()
@@ -43,9 +43,9 @@ class OverhaveContext:
         self.emulation_settings = emulation_settings or OverhaveEmulationSettings()
         self.file_settings = file_settings or OverhaveFileSettings()
         self.language_settings = language_settings or OverhaveLanguageSettings()
-        self.ldap_client_settings = ldap_client_settings or LdapClientSettings()
+        self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()
         self.processor_settings = processor_settings or ProcessorSettings()
         self.project_settings = project_settings or OverhaveProjectSettings()
-        self.stash_client_settings = stash_client_settings or StashClientSettings()
-        self.stash_project_settings = stash_project_settings or StashProjectSettings()
+        self.stash_client_settings = stash_client_settings or OverhaveStashClientSettings()
+        self.stash_project_settings = stash_project_settings or OverhaveStashProjectSettings()
         self.test_settings = test_settings or OverhaveTestSettings()

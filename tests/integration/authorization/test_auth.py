@@ -20,6 +20,8 @@ def _create_user_groups(db_groups: Sequence[str]) -> None:
 
 @pytest.mark.usefixtures("database")
 class TestLdapAuthManager:
+    """ Integration tests for :class:`LDAPAdminAuthorizationManager`. """
+
     def test_authorize_user_no_groups(
         self,
         mocked_ldap_authenticator: MagicMock,
@@ -99,6 +101,8 @@ class TestLdapAuthManager:
 
 @pytest.mark.usefixtures("database")
 class TestDefaultAuthManager:
+    """ Integration tests for :class:`DefaultAdminAuthorizationManager`. """
+
     def test_authorize_user_no_user(
         self,
         test_default_auth_manager: DefaultAdminAuthorizationManager,
@@ -129,6 +133,8 @@ class TestDefaultAuthManager:
 
 @pytest.mark.usefixtures("database")
 class TestSimpleAuthManager:
+    """ Integration tests for :class:`SimpleAdminAuthorizationManager`. """
+
     def test_authorize_user_no_user(
         self,
         test_simple_auth_manager: SimpleAdminAuthorizationManager,

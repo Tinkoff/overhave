@@ -19,9 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 class OverhaveIndexView(AdminIndexView):
-    def __init__(
-        self, name: str, url: str, context: OverhaveContext, auth_manager: IAdminAuthorizationManager
-    ) -> None:  # pylint: disable=R0913
+    """ View for index. """
+
+    def __init__(self, name: str, url: str, context: OverhaveContext, auth_manager: IAdminAuthorizationManager) -> None:
         super().__init__(
             name=name, url=url,
         )
@@ -29,7 +29,7 @@ class OverhaveIndexView(AdminIndexView):
         self._auth_manager = auth_manager
 
     @expose('/login', methods=['GET', 'POST'])
-    def login(self) -> Any:  # noqa: C901  # pylint: disable=R0911
+    def login(self) -> Any:  # noqa: C901
         form = LoginForm(auth_manager=self._auth_manager)
         if not form.validate_on_submit():
             return self.render('login.html', form=form)
@@ -46,7 +46,7 @@ class OverhaveIndexView(AdminIndexView):
         except ProgrammingError:
             logger.exception("Error while trying to operate with DataBase")
             return form.flash_and_redirect('Error while trying to operate with DataBase')
-        except Exception:  # pylint: disable=W0703
+        except Exception:
             logger.exception('Unknown error!')
             return form.flash_and_redirect("Unknown error!")
         next_path = flask.request.args.get('next')

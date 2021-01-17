@@ -1,7 +1,6 @@
 # flake8: noqa
 from .base import current_session, metadata
 from .converters import (
-    BaseProcessingContext,
     EmulationModel,
     EmulationRunModel,
     FeatureModel,

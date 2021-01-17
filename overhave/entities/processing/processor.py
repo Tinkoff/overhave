@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 class Processor(IProcessor):
+    """ Class for application entity tasks processing in instance of :class:`ThreadPool`. """
+
     def __init__(
         self,
         settings: ProcessorSettings,
@@ -104,7 +106,7 @@ class Processor(IProcessor):
             else:
                 set_report(run_id, self._settings.report_creation_error_msg)
 
-        except Exception as e:  # pylint: disable=W0703
+        except Exception as e:
             logger.exception("Error!")
             set_run_status(run_id, db.TestRunStatus.INTERNAL_ERROR)
             set_traceback(run_id, f"{e}")

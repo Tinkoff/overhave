@@ -29,18 +29,24 @@ metadata = MetaData(naming_convention=convention)
 
 @as_declarative(metadata=metadata)
 class Base:
+    """ Base table class with __tablename__. """
+
     @declared_attr
     def __tablename__(cls) -> str:
         return _classname_to_tablename(cls.__name__)  # type: ignore
 
 
 class PrimaryKeyWithoutDateMixin:
+    """ Table mixin with declared attribute `id`. """
+
     @declared_attr
     def id(cls) -> sa.Column[int]:
         return sa.Column(f'{cls.__tablename__}_id', INT_TYPE, primary_key=True)  # type: ignore
 
 
 class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
+    """ Table mixin with `id` and `created_at` declared attributes. """
+
     @declared_attr
     def created_at(cls) -> sa.Column[datetime.datetime]:
         return sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
