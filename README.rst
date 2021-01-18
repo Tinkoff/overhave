@@ -108,9 +108,12 @@ please see next part of docs.
 Context injection
 -----------------
 
+Context setting
+^^^^^^^^^^^^^^^
+
 Service could be configured via application context injection with prepared
 instance of `OverhaveContext` object. This context should be set using
-``overhave_core.set_context`` function.
+```overhave_core.set_context``` function.
 
 For example, ```my_custom_context``` prepared. So, application start-up could
 be realised with follow code:
@@ -130,6 +133,39 @@ be realised with follow code:
     access to application components, directly used in ```overhave_app```.
 * ```my_custom_context``` is an example of context configuration, see an
     example code in `context_example.rst <docs/includes/context_example.rst>`_.
+
+Import context in PyTest
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Overhave** has it's own built-in `PyTest`_ plugin, which is used to enable
+and configure injection of prepared context into application core
+```overhave_core```. The plugin provides two options:
+
+* `--enable-injection` - flag to enable context injection;
+
+* `--ctx-module` - option specifying path to Python module with context injection.
+
+The module with context injection should contain
+```overhave_core.set_context``` function, but this module should be
+unique and created only for `PyTest`_ usage instead of web-interface start-up.
+
+For example, ```module_with_injection.py``` module contains:
+
+.. code-block:: python
+
+    from overhave import overhave_core
+
+    overhave_core.set_context(my_custom_context)
+
+And `PyTest` usage should be similar to:
+
+.. code-block:: bash
+
+    pytest --enable-injection --ctx-module=module_with_injection
+
+Specified module will be imported before tests start-up (with
+```pytest_configure``` `PyTest`_ hook).
+
 
 Features structure
 ------------------
