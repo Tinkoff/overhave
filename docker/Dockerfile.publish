@@ -1,0 +1,7 @@
+ARG IMAGE_BASE
+ARG BUILD_NUMBER
+
+FROM ${IMAGE_BASE}overhave:${BUILD_NUMBER}
+
+ENTRYPOINT ["/usr/bin/make"]
+CMD ["publish"]

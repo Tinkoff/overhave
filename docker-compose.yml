@@ -30,8 +30,19 @@ services:
         POETRY_CONTENT_HASH: "${POETRY_CONTENT_HASH:-unset}"
     environment:
       - OVERHAVE_DB_URL=${OVERHAVE_DB_URL:-postgresql://postgres:postgres@db/postgres}
+    depends_on:
+      - db
+
+  publish:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.publish
+      network: host
+      args:
+        IMAGE_BASE: "${IMAGE_BASE}"
+        BUILD_NUMBER: "${BUILD_NUMBER:-unset}"
+    environment:
       - PYPI_URL=${PYPI_URL:-unset}
       - PYPI_USER=${PYPI_USER:-unset}
       - PYPI_PASS=${PYPI_PASS:-unset}
-    depends_on:
-      - db
+      - VENV=${VENV:-.tox/.package}
