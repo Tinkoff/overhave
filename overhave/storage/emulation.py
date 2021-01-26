@@ -6,6 +6,7 @@ from typing import cast
 import sqlalchemy.orm as so
 
 from overhave import db
+from overhave.entities import EmulationRunModel
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.utils import get_current_time
 
@@ -28,11 +29,11 @@ class IEmulationStorage(abc.ABC):
     """ Abstract class for emulation runs storage. """
 
     @abc.abstractmethod
-    def create_emulation_run(self, emulation_id: int) -> db.EmulationRunModel:
+    def create_emulation_run(self, emulation_id: int) -> EmulationRunModel:
         pass
 
     @abc.abstractmethod
-    def get_requested_emulation_run(self, emulation_run_id: int) -> db.EmulationRunModel:
+    def get_requested_emulation_run(self, emulation_run_id: int) -> EmulationRunModel:
         pass
 
     @abc.abstractmethod
@@ -50,12 +51,12 @@ class EmulationStorage(IEmulationStorage):
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
 
-    def create_emulation_run(self, emulation_id: int) -> db.EmulationRunModel:
+    def create_emulation_run(self, emulation_id: int) -> EmulationRunModel:
         with db.create_session() as session:
             emulation_run = db.EmulationRun(emulation_id=emulation_id)
             session.add(emulation_run)
             session.flush()
-            return cast(db.EmulationRunModel, db.EmulationRunModel.from_orm(emulation_run))
+            return cast(EmulationRunModel, EmulationRunModel.from_orm(emulation_run))
 
     @staticmethod
     def _get_emulation_run(session: so.Session, emulation_run_id: int) -> db.EmulationRun:
@@ -94,13 +95,13 @@ class EmulationStorage(IEmulationStorage):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex((self._settings.emulation_bind_ip, port)) == 0
 
-    def get_requested_emulation_run(self, emulation_run_id: int) -> db.EmulationRunModel:
+    def get_requested_emulation_run(self, emulation_run_id: int) -> EmulationRunModel:
         with db.create_session() as session:
             emulation_run = self._get_emulation_run(session, emulation_run_id)
             emulation_run.status = db.EmulationStatus.REQUESTED
             emulation_run.port = self._get_next_port(session)
             emulation_run.changed_at = get_current_time()
-            return cast(db.EmulationRunModel, db.EmulationRunModel.from_orm(emulation_run))
+            return cast(EmulationRunModel, EmulationRunModel.from_orm(emulation_run))
 
     def set_emulation_run_status(self, emulation_run_id: int, status: db.EmulationStatus) -> None:
         with db.create_session() as session:

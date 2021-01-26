@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic.datetime_parse import timedelta
 
 from overhave.base_settings import BaseOverhavePrefix
-from overhave.entities.authorization import AuthorizationStrategy
+from overhave.entities.authorization.strategies import AuthorizationStrategy
 
 
 class OverhaveAdminSettings(BaseOverhavePrefix):

@@ -2,7 +2,7 @@ import abc
 from typing import cast
 
 from overhave import db
-from overhave.db.converters import FeatureTypeModel
+from overhave.entities.converters import FeatureTypeModel
 
 
 class IFeatureTypeStorage(abc.ABC):

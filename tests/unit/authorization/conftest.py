@@ -1,6 +1,5 @@
 from typing import Any, Dict, Iterator, Optional
 from unittest import mock
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -40,7 +39,7 @@ TEST_LDAP_GROUPS = ['group1', 'group2']
 
 
 def mocked_ldap_connection(cls: Any, *args: Any, **kwargs: Any) -> None:
-    cls._ldap_connection = MagicMock()
+    cls._ldap_connection = mock.MagicMock()
     cls._ldap_connection.search_st.return_value = [
         (
             'CN=Very cool member,OU=dep1,DC=mydomain,DC=ru',

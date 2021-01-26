@@ -4,3 +4,7 @@ class StashValidationError(ValueError):
 
 class StashPrCreationError(RuntimeError):
     """ Exception for pull-request creation error. """
+
+
+class NotSpecifiedFeatureTypeError(RuntimeError):
+    """ Exception for incorrect feature type error. """

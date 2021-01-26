@@ -7,9 +7,9 @@ from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
 from overhave.entities import IFeatureExtractor
-from overhave.entities.scenario.errors import FeatureNameParsingError, FeatureTypeParsingError, LastEditorParsingError
-from overhave.entities.scenario.mixin import PrefixMixin
 from overhave.entities.settings import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.scenario.errors import FeatureNameParsingError, FeatureTypeParsingError, LastEditorParsingError
+from overhave.scenario.mixin import PrefixMixin
 
 logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1

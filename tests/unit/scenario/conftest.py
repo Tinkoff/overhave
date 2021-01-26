@@ -3,13 +3,16 @@ from typing import Optional
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from overhave import db
 from overhave.entities import (
+    FeatureModel,
+    FeatureTypeModel,
     OverhaveLanguageSettings,
     OverhaveScenarioCompilerSettings,
-    ScenarioCompiler,
-    ScenarioParser,
+    ProcessingContext,
+    ScenarioModel,
+    TestRunModel,
 )
+from overhave.scenario import ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
 from tests.objects import TestLanguageName, get_feature_extractor, get_test_feature_containers
 
@@ -31,8 +34,8 @@ def test_scenario_text(request: FixtureRequest, language_settings: OverhaveLangu
 
 
 @pytest.fixture()
-def test_feature() -> db.FeatureModel:
-    return db.FeatureModel(
+def test_feature() -> FeatureModel:
+    return FeatureModel(
         id=1,
         name="feature",
         author="keks",
@@ -40,13 +43,13 @@ def test_feature() -> db.FeatureModel:
         task=["OVERHAVE-1"],
         last_edited_by="overlord",
         released=False,
-        feature_type=db.FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
+        feature_type=FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
     )
 
 
 @pytest.fixture()
-def test_testrun() -> db.TestRunModel:
-    return db.TestRunModel(
+def test_testrun() -> TestRunModel:
+    return TestRunModel(
         id=1,
         scenario_id=1,
         name="test",
@@ -60,15 +63,15 @@ def test_testrun() -> db.TestRunModel:
 
 
 @pytest.fixture()
-def test_scenario(test_scenario_text: str) -> db.ScenarioModel:
-    return db.ScenarioModel(id=1, feature_id=1, text=test_scenario_text)
+def test_scenario(test_scenario_text: str) -> ScenarioModel:
+    return ScenarioModel(id=1, feature_id=1, text=test_scenario_text)
 
 
 @pytest.fixture()
 def test_processing_ctx(
-    test_feature: db.FeatureModel, test_scenario: db.ScenarioModel, test_testrun: db.TestRunModel
-) -> db.ProcessingContext:
-    return db.ProcessingContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
+    test_feature: FeatureModel, test_scenario: ScenarioModel, test_testrun: TestRunModel
+) -> ProcessingContext:
+    return ProcessingContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
 
 
 @pytest.fixture()

@@ -12,8 +12,8 @@ from overhave.entities.authorization.settings import (
     OverhaveAuthorizationSettings,
     OverhaveLdapClientSettings,
 )
-from overhave.pytest import OverhaveProjectSettings, OverhaveTestSettings
 from overhave.stash.settings import OverhaveStashClientSettings, OverhaveStashProjectSettings
+from overhave.testing import OverhaveProjectSettings, OverhaveTestSettings
 
 
 class OverhaveContext:

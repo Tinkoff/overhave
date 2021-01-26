@@ -1,10 +1,11 @@
-from overhave.entities import Emulator, FileManager, IFeatureExtractor, IProcessor
-from overhave.entities.authorization.manager import IAdminAuthorizationManager
+from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
-from overhave.pytest import ConfigInjector, PytestRunner
+from overhave.processing import IProcessor
 from overhave.redis import RedisProducer
+from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
+from overhave.testing import ConfigInjector, PytestRunner
 
 
 class ProxyFactory(IOverhaveFactory):

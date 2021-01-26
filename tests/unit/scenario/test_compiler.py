@@ -2,15 +2,9 @@ from typing import List, Optional
 
 import pytest
 
-from overhave import db
-from overhave.entities import (
-    IncorrectScenarioTextError,
-    OverhaveLanguageSettings,
-    ScenarioCompiler,
-    ScenarioParser,
-    generate_task_info,
-)
+from overhave.entities import FeatureModel, OverhaveLanguageSettings, ProcessingContext, ScenarioModel
 from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 
 
 class TestGenerateTaskInfo:
@@ -45,10 +39,7 @@ class TestScenarioCompiler:
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self,
-        test_scenario_compiler: ScenarioCompiler,
-        test_scenario_text: str,
-        test_processing_ctx: db.ProcessingContext,
+        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_processing_ctx: ProcessingContext,
     ):
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_processing_ctx)
@@ -58,9 +49,9 @@ class TestScenarioCompiler:
         task_links_keyword: Optional[str],
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_parser: ScenarioParser,
-        test_feature: db.FeatureModel,
-        test_scenario: db.ScenarioModel,
-        test_processing_ctx: db.ProcessingContext,
+        test_feature: FeatureModel,
+        test_scenario: ScenarioModel,
+        test_processing_ctx: ProcessingContext,
     ):
         feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)

@@ -4,14 +4,14 @@ from typing import List
 from pydantic.main import BaseModel
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
-from overhave.db.tables import Emulation, EmulationRun, Feature, FeatureType, Scenario, TestRun, TestUser
-from overhave.db.utils import create_session
+from overhave.db import Emulation, EmulationRun, Feature, FeatureType, Scenario, TestRun, TestUser, create_session
+from overhave.entities.feature import FeatureTypeName
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
     """ Model for :class:`FeatureType` row. """
 
-    name: str
+    name: FeatureTypeName
 
 
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore

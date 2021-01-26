@@ -5,12 +5,12 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from overhave.db.converters import ProcessingContext
-from overhave.entities.feature_extractor import IFeatureExtractor
-from overhave.entities.scenario.compiler import ScenarioCompiler
-from overhave.entities.scenario.parser import ScenarioParser
+from overhave.entities.converters import ProcessingContext
+from overhave.entities.feature import IFeatureExtractor
 from overhave.entities.settings import OverhaveFileSettings, OverhaveLanguageSettings
-from overhave.pytest.settings import OverhaveProjectSettings
+from overhave.scenario.compiler import ScenarioCompiler
+from overhave.scenario.parser import ScenarioParser
+from overhave.testing.settings import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)
 

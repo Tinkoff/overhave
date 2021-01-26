@@ -6,6 +6,7 @@ from functools import cached_property
 from typing import Pattern
 
 from overhave import db
+from overhave.entities.converters import EmulationRunModel
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.redis import EmulationTask
 from overhave.storage import EmulationStorageError, IEmulationStorage
@@ -16,13 +17,9 @@ logger = logging.getLogger(__name__)
 class EmulationError(Exception):
     """ Base exception for :class:`Emulator`. """
 
-    pass
-
 
 class DangerousExternalCommandError(EmulationError):
     """ Exception for dangerous command error. """
-
-    pass
 
 
 class ExternalCommandCheckMixin:
@@ -44,7 +41,7 @@ class Emulator(ExternalCommandCheckMixin):
         self._storage = storage
         self._settings = settings
 
-    def _initiate(self, emulation_run: db.EmulationRunModel) -> None:
+    def _initiate(self, emulation_run: EmulationRunModel) -> None:
         cmd_from_user = emulation_run.emulation.command.strip()
         self._check_dangerous(cmd_from_user)
 

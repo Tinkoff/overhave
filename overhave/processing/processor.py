@@ -13,14 +13,14 @@ import flask
 import werkzeug
 
 from overhave import db
-from overhave.db.converters import ProcessingContext, get_context_by_test_run_id
-from overhave.entities import IProcessor
-from overhave.entities.scenario import FileManager
+from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.settings import OverhaveFileSettings, ProcessorSettings
-from overhave.pytest import ConfigInjector, PytestRunner
+from overhave.processing.abstract import IProcessor
+from overhave.scenario import FileManager
 from overhave.stash import IStashProjectManager
 from overhave.storage import save_draft, set_report, set_run_status, set_traceback
 from overhave.storage.pull_request import add_pr_url
+from overhave.testing import ConfigInjector, PytestRunner
 
 logger = logging.getLogger(__name__)
 

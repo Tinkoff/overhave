@@ -3,9 +3,9 @@ from typing import Optional
 
 import git
 
-from overhave.db.converters import ProcessingContext, get_context_by_test_run_id
-from overhave.entities.scenario import FileManager, generate_task_info
+from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.settings import OverhaveFileSettings
+from overhave.scenario import FileManager, generate_task_info
 from overhave.stash.client import StashClient
 from overhave.stash.errors import StashPrCreationError, StashValidationError
 from overhave.stash.manager.abstract import IStashProjectManager
@@ -61,13 +61,13 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
 
     def __init__(
         self,
-        settings: OverhaveStashProjectSettings,
+        stash_project_settings: OverhaveStashProjectSettings,
         file_settings: OverhaveFileSettings,
         client: StashClient,
         file_manager: FileManager,
         task_links_keyword: Optional[str],
     ):
-        self._settings = settings
+        self._stash_project_settings = stash_project_settings
         self._file_settings = file_settings
         self._client = client
         self._file_manager = file_manager
@@ -145,9 +145,9 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
             title=f"BDD {ctx.feature.name}",
             description=self._make_description(ctx),
             open=True,
-            fromRef=StashBranch(id=branch_name, repository=self._settings.repository),
-            toRef=self._settings.target_branch,
-            reviewers=[self._settings.reviewer],
+            fromRef=StashBranch(id=branch_name, repository=self._stash_project_settings.repository),
+            toRef=self._stash_project_settings.target_branch,
+            reviewers=[self._stash_project_settings.get_reviewers(feature_type=ctx.feature.feature_type.name)],
         )
         logger.info('Prepared PR: %s', pull_request.json(by_alias=True))
         try:

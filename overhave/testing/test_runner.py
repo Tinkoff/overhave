@@ -4,7 +4,7 @@ from typing import cast
 
 import pytest
 
-from overhave.pytest.settings import OverhaveTestSettings
+from overhave.testing.settings import OverhaveTestSettings
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,12 @@ from _pytest.nodes import Item
 from pydantic import ValidationError
 
 from overhave.factory import proxy_factory
-from overhave.pytest.plugin_utils import add_issue_links_to_report, has_issue_links, is_pytest_bdd_item, set_issue_links
+from overhave.testing.plugin_utils import (
+    add_issue_links_to_report,
+    has_issue_links,
+    is_pytest_bdd_item,
+    set_issue_links,
+)
 
 logger = logging.getLogger(__name__)
 

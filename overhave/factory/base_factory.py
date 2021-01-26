@@ -2,24 +2,18 @@ from functools import cached_property
 from os import makedirs
 from typing import Any, Dict, Optional
 
-from overhave.entities import (
-    FeatureExtractor,
-    FileManager,
-    IFeatureExtractor,
-    IProcessor,
-    OverhaveRedisSettings,
-    ScenarioCompiler,
-    ScenarioParser,
-)
+from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
 from overhave.entities.emulator import EmulationTask, Emulator
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
-from overhave.pytest import ConfigInjector, PytestRunner, StepCollector
+from overhave.processing import IProcessor
 from overhave.redis import RedisProducer, RedisStream
+from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.stash import IStashProjectManager, StashClient
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
+from overhave.testing import ConfigInjector, PytestRunner, StepCollector
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
@@ -108,7 +102,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
         from overhave.stash.manager.manager import StashProjectManager
 
         return StashProjectManager(
-            settings=self.context.stash_project_settings,
+            stash_project_settings=self.context.stash_project_settings,
             file_settings=self.context.file_settings,
             client=self._stash_client,
             file_manager=self._file_manager,
@@ -117,7 +111,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _processor(self) -> IProcessor:
-        from overhave.entities.processing.processor import Processor
+        from overhave.processing.processor import Processor
 
         return Processor(
             settings=self.context.processor_settings,

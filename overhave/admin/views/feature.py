@@ -114,7 +114,7 @@ class FeatureView(ModelViewConfigured):
             return rendered
 
         test_run_id = create_test_run(scenario_id=int(scenario_id), executed_by=current_user.login)
-        return proxy_factory.processor.execute_test(test_run_id)
+        return cast(werkzeug.Response, proxy_factory.processor.execute_test(test_run_id))
 
     @expose('/edit/', methods=('GET', 'POST'))
     def edit_view(self) -> werkzeug.Response:

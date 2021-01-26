@@ -55,7 +55,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
     flask_admin.init_app(app=flask_app)
     login_manager = get_flask_login_manager()
     login_manager.init_app(flask_app)
-    db.ensure_feature_types_exist(factory.feature_extractor.feature_types)
+    db.ensure_feature_types_exist(factory.feature_extractor.feature_types)  # type: ignore
     return flask_app
 
 

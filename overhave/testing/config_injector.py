@@ -3,18 +3,16 @@ from typing import Dict, List, Optional
 
 from _pytest.main import Session
 
-from overhave.entities.settings import OverhaveFileSettings, StepPrefixesModel
-from overhave.pytest.settings import OverhaveProjectSettings
-from overhave.pytest.step_collector import StepCollector
-from overhave.pytest.test_runner import PytestRunner
+from overhave.entities import FeatureTypeName, OverhaveFileSettings, StepPrefixesModel
+from overhave.testing.settings import OverhaveProjectSettings
+from overhave.testing.step_collector import StepCollector
+from overhave.testing.test_runner import PytestRunner
 
 logger = logging.getLogger(__name__)
 
 
 class NullableEntitiesError(Exception):
     """ Application error for situation with unresolved entities. """
-
-    pass
 
 
 class ConfigInjector:
@@ -25,10 +23,10 @@ class ConfigInjector:
         self._step_collector: Optional[StepCollector] = None
         self._test_runner: Optional[PytestRunner] = None
         self._file_settings: Optional[OverhaveFileSettings] = None
-        self._feature_types: Optional[List[str]] = None
+        self._feature_types: Optional[List[FeatureTypeName]] = None
 
-        self._current_type: Optional[str] = None
-        self._steps: Dict[str, Dict[str, List[str]]] = {}
+        self._current_type: Optional[FeatureTypeName] = None
+        self._steps: Dict[FeatureTypeName, Dict[str, List[str]]] = {}
 
         self._initialized = False
 
@@ -45,7 +43,7 @@ class ConfigInjector:
         file_settings: OverhaveFileSettings,
         step_collector: StepCollector,
         test_runner: PytestRunner,
-        feature_types: List[str],
+        feature_types: List[FeatureTypeName],
     ) -> None:
         """ Def for dynamical supplement of settings on-the-fly (strictly after PyTest configuring). """
         self._project_settings = project_settings
@@ -94,5 +92,5 @@ class ConfigInjector:
         if self._inside_collecting:
             self._load_from_session(session)
 
-    def get_steps(self, feature_type: str) -> Dict[str, List[str]]:
+    def get_steps(self, feature_type: FeatureTypeName) -> Dict[str, List[str]]:
         return self._steps.get(feature_type, {})

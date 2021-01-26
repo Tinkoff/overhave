@@ -25,7 +25,7 @@ classifiers = [
 overhave = 'overhave.cli:overhave'
 
 [tool.poetry.plugins.pytest11]
-overhave = "overhave.pytest.plugin"
+overhave = "overhave.testing.plugin"
 
 [tool.poetry.dependencies]
 python = "^3.8"

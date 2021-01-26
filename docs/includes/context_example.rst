@@ -38,7 +38,7 @@
             repository_name='bdd-features',
             key='PRJ',
             default_target_branch_name='master',
-            default_reviewer="admin",
+            default_reviewers=["admin"],
         ),
         stash_client_settings=OverhaveStashClientSettings(url="https://stash.company.com", auth_token="secret_token"),
     )
