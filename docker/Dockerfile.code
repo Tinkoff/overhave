@@ -9,5 +9,6 @@ COPY ./tests /code/tests
 COPY ./makefile /code/makefile
 COPY ./setup.cfg /code/setup.cfg
 COPY ./README.rst /code/README.rst
+COPY ./pyproject.toml /code/pyproject.toml
 
 CMD ["tox", "-v"]
