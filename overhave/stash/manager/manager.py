@@ -147,7 +147,7 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
             open=True,
             fromRef=StashBranch(id=branch_name, repository=self._stash_project_settings.repository),
             toRef=self._stash_project_settings.target_branch,
-            reviewers=[self._stash_project_settings.get_reviewers(feature_type=ctx.feature.feature_type.name)],
+            reviewers=self._stash_project_settings.get_reviewers(feature_type=ctx.feature.feature_type.name),
         )
         logger.info('Prepared PR: %s', pull_request.json(by_alias=True))
         try:
