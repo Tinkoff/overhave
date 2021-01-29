@@ -10,6 +10,10 @@ Overhave
   Web-framework for BDD: scalable, configurable, easy to use, based on
   `Flask Admin`_ and `Pydantic`_.
 
+  .. image:: https://github.com/TinkoffCreditSystems/overhave/workflows/CI/badge.svg
+    :target: https://github.com/TinkoffCreditSystems/overhave/actions?query=workflow%3ACI
+    :alt: CI
+
 --------
 Features
 --------
