@@ -25,12 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: tox -v
-
-      # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          RUN pip install --no-compile --upgrade pip && pip install --no-compile poetry
+          RUN poetry config virtualenvs.create false \
+           && poetry config cache-dir ${POETRYCACHEDIR} \
+           && poetry install --no-interaction --no-ansi
+          RUN tox -v
