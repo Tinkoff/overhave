@@ -30,6 +30,6 @@ jobs:
           PYPI_USER: ${{ secrets.PYPI_USER }}
           PYPI_PASS: ${{ secrets.PYPI_PASS }}
         run: |
-          sudo apt-get install build-essential
+          make pre-init
           make init
           make publish
