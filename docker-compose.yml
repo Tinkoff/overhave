@@ -42,7 +42,5 @@ services:
         IMAGE_BASE: "${IMAGE_BASE}"
         BUILD_NUMBER: "${BUILD_NUMBER:-unset}"
     environment:
-      - PYPI_URL=${PYPI_URL:-unset}
-      - PYPI_USER=${PYPI_USER:-unset}
-      - PYPI_PASS=${PYPI_PASS:-unset}
+      - PYPI_TOKEN=${PYPI_TOKEN:-unset}
       - VENV=${VENV:-.tox/.package}

@@ -18,12 +18,16 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
     
       - name: Run a multi-line script
         env:
-          PYPI_URL: ${{ secrets.PYPI_URL }}
-          PYPI_USER: ${{ secrets.PYPI_USER }}
-          PYPI_PASS: ${{ secrets.PYPI_PASS }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
+          make pre-init
           make init
           make publish
