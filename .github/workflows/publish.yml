@@ -25,6 +25,6 @@ jobs:
           PYPI_USER: ${{ secrets.PYPI_USER }}
           PYPI_PASS: ${{ secrets.PYPI_PASS }}
         run: |
-          apt-get install build-essential
+          sudo apt-get install build-essential
           make init
           make publish
