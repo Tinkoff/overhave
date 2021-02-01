@@ -55,9 +55,8 @@ tag:
 	git push origin $(TAG)
 
 publish:
-	$(VENV)/bin/poetry config repositories.pypi $(PYPI_URL)
-	$(VENV)/bin/poetry config http-basic.pypi $(PYPI_USER) $(PYPI_PASS)
-	$(VENV)/bin/poetry publish --build -r pypi
+	$(VENV)/bin/poetry config pypi-token.pypi $(PYPI_TOKEN)
+	$(VENV)/bin/poetry publish --build
 
 build-docs:
 	cp $(README) $(DOCS_TMP_README) && sed -i.bak 's/docs\///g' $(DOCS_TMP_README) && sed -i.bak 's/.rst/.html/g' $(DOCS_TMP_README) && rm $(DOCS_TMP_README).bak
