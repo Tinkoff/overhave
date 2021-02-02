@@ -4,7 +4,7 @@
    :maxdepth: 2
    :caption: Contents:
 
-.. include:: _README.rst
+.. include:: ../README.rst
 
 --------
 Includes

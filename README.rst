@@ -2,7 +2,7 @@
 Overhave
 ========
 
-.. figure:: docs/includes/images/label_img.png
+.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/label_img.png
   :width: 600
   :align: center
   :alt: Overhave framework
@@ -71,7 +71,7 @@ The web-interface is a basic tool for BDD features management. It consists of:
     * `Test runs`
         gives an interface for test runs management and provides info about
 
-        .. figure:: docs/includes/images/test_runs_img.png
+        .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/test_runs_img.png
           :width: 500
           :align: center
           :alt: Script panel
@@ -93,7 +93,7 @@ These steps should be defined in appropriate fixture modules and registered
 at the application on start-up to be displayed.
 
 
-.. figure:: docs/includes/images/panel_img.png
+.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/panel_img.png
   :width: 600
   :align: center
   :alt: Script panel
@@ -143,7 +143,7 @@ be realised with follow code:
 * ```overhave_core``` is a cached instance of the **Overhave** factory, has an
     access to application components, directly used in ```overhave_app```.
 * ```my_custom_context``` is an example of context configuration, see an
-    example code in `context_example.rst <docs/includes/context_example.rst>`_.
+    example code in `context_example.rst`_.
 
 Import context in PyTest
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -183,7 +183,7 @@ Features structure
 
 **Overhave** supports it's own special structure of features storage:
 
-.. image:: docs/includes/images/features_structure_img.png
+.. image:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/features_structure_img.png
   :width: 400
   :alt: Features structure example
 
@@ -209,8 +209,7 @@ Gherkin from `pytest-bdd`_ with small updates:
 * task tracker's tickets with traditional format ```PRJ-NUMBER```.
 
 An example of filled feature content is located in
-`feature_example.rst
-<docs/includes/feature_example.rst>`_.
+`feature_example.rst`_.
 
 Language
 --------
@@ -375,3 +374,5 @@ with a detailed description.
 .. _`Docker-compose`: https://docs.docker.com/compose
 .. _`Click`: https://github.com/pallets/click
 .. _`Sphinx`: https://github.com/sphinx-doc/sphinx
+.. _`context_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/context_example.rst
+.. _`feature_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/features_structure_example/feature_type_1/full_feature_example_en.feature

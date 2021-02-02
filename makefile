@@ -10,8 +10,6 @@ DOCS_BUILDER ?= html
 DOCS_INCLUDES_DIR = $(DOCS_DIR)/includes
 DOCS_REFERENCES_DIR = $(DOCS_INCLUDES_DIR)/_references
 SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
-README = README.rst
-DOCS_TMP_README = $(DOCS_DIR)/_$(README)
 
 ALL = $(CODE) $(DOCS_DIR) tests
 
@@ -59,7 +57,6 @@ publish:
 	$(VENV)/bin/poetry publish --build
 
 build-docs:
-	cp $(README) $(DOCS_TMP_README) && sed -i.bak 's/docs\///g' $(DOCS_TMP_README) && sed -i.bak 's/.rst/.html/g' $(DOCS_TMP_README) && rm $(DOCS_TMP_README).bak
 	sphinx-apidoc -o $(DOCS_REFERENCES_DIR) $(CODE) $(SPHINXAPIDOC_OPTS)
 	sphinx-build $(DOCS_DIR) $(DOCS_BUILD_DIR)/$(DOCS_BUILDER) -j 4 -b $(DOCS_BUILDER) -a -q -W
 	@echo "Docs build finished. The results have been placed in '$(DOCS_BUILD_DIR)/$(DOCS_BUILDER)'"
