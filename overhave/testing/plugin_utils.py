@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import allure
-from _pytest.mark import Mark
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
 
@@ -46,4 +45,4 @@ def add_issue_links_to_report(project_settings: OverhaveProjectSettings, scenari
 
 
 def add_scenario_title_to_report(item: Item) -> None:
-    item.own_markers.append(Mark(name="allure_display_name", args=(f"{get_scenario(item).name}",), kwargs={},))
+    item._obj.__allure_display_name__ = get_scenario(item).name  # type: ignore

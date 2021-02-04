@@ -71,8 +71,8 @@ class TestPluginUtils:
             add_issue_links_to_report(project_settings=test_project_settings, scenario=scenario)
 
     def test_add_scenario_title_to_report(self, test_scenario_name: str, test_pytest_bdd_item: Item):
-        assert not test_pytest_bdd_item.own_markers
+        allure_attr = "__allure_display_name__"
+        assert not hasattr(test_pytest_bdd_item._obj, allure_attr)
         add_scenario_title_to_report(test_pytest_bdd_item)
-        assert test_pytest_bdd_item.own_markers
-        assert len(test_pytest_bdd_item.own_markers) == 1
-        assert test_scenario_name in test_pytest_bdd_item.own_markers[0].args
+        assert hasattr(test_pytest_bdd_item._obj, allure_attr)
+        assert getattr(test_pytest_bdd_item._obj, allure_attr) == test_scenario_name

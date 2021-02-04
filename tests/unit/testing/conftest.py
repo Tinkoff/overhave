@@ -39,7 +39,6 @@ def test_pytest_bdd_item(test_pytest_bdd_scenario: Scenario) -> Item:
     item = mock.create_autospec(Item)
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
-    setattr(item, "own_markers", [])
     return item
 
 
