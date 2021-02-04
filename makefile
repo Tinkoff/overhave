@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 63
+MIN_COVERAGE ?= 65
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -36,7 +36,7 @@ precommit-install:
 	chmod +x .git/hooks/pre-commit
 
 test:
-	$(VENV)/bin/poetry run pytest --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
+	$(VENV)/bin/poetry run pytest -n 4 --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
 lint:
 	$(VENV)/bin/poetry run black --skip-string-normalization --check $(ALL)
