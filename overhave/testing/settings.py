@@ -6,6 +6,10 @@ from yarl import URL
 from overhave.base_settings import BaseOverhavePrefix
 
 
+class EmptyBrowseURLError(ValueError):
+    """ Exception for situation with empty ```browse_url``` while trying to ```get_link_url```. """
+
+
 class OverhaveProjectSettings(BaseOverhavePrefix):
     """
     Entity project settings.
@@ -54,7 +58,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     def get_link_url(self, link: str) -> str:
         if isinstance(self.browse_url, URL):
             return cast(str, (self.browse_url / link).human_repr())
-        raise ValueError("Browse URL is None, so could not create link URL!")
+        raise EmptyBrowseURLError("Browse URL is None, so could not create link URL!")
 
 
 class OverhaveTestSettings(BaseOverhavePrefix):

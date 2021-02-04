@@ -83,7 +83,7 @@ twine = "^3.3.0"
 Sphinx = "^3.4.3"
 
 [tool.pytest.ini_options]
-addopts = "-l -v -n 4 --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
+addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
 testpaths = "tests"
 python_files = ["test_*.py"]
 python_classes = ["*Test", "Test*"]
