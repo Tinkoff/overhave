@@ -12,4 +12,6 @@ def add_scenario_title_to_report(item: Item) -> None:
 
 @lru_cache(maxsize=None)
 def get_step_context_runner() -> StepContextRunner:
-    return StepContextRunner()
+    from overhave.factory import proxy_factory
+
+    return StepContextRunner(logging_settings=proxy_factory.context.logging_settings)

@@ -1,10 +1,13 @@
 import enum
 import logging
 from functools import cached_property
-from typing import Optional
+from typing import Optional, cast
+from unittest.mock import MagicMock
 
 import allure
 from allure_commons._allure import StepContext
+
+from overhave.base_settings import OverhaveLoggingSettings
 
 
 class _WrapperPosition(str, enum.Enum):
@@ -15,7 +18,9 @@ class _WrapperPosition(str, enum.Enum):
 class StepContextRunner:
     """ Class for Allure StepContext wrapping during pytest-bdd step execution. """
 
-    def __init__(self) -> None:
+    def __init__(self, logging_settings: OverhaveLoggingSettings) -> None:
+        self._logging_settings = logging_settings
+
         self._step: Optional[StepContext] = None
 
     def set_title(self, title: str) -> None:
@@ -29,7 +34,9 @@ class StepContextRunner:
 
     @cached_property
     def _logger(self) -> logging.Logger:
-        return logging.getLogger("overhave")
+        if self._logging_settings.step_context_logs:
+            return logging.getLogger("overhave")
+        return cast(logging.Logger, MagicMock())
 
     def _log_step_state(self, state: str, wrapper_position: _WrapperPosition, symbol: str) -> None:
         description = f"{state.title()} step '{self._defined_step.title}'"

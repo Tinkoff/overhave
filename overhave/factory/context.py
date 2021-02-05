@@ -1,5 +1,6 @@
 from typing import Optional
 
+from overhave.base_settings import OverhaveLoggingSettings
 from overhave.entities import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
@@ -36,6 +37,7 @@ class OverhaveContext:
         stash_client_settings: Optional[OverhaveStashClientSettings] = None,
         stash_project_settings: Optional[OverhaveStashProjectSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
+        logging_settings: Optional[OverhaveLoggingSettings] = None,
     ) -> None:
         self.admin_settings = admin_settings or OverhaveAdminSettings()
         self.auth_settings = auth_settings or OverhaveAuthorizationSettings()
@@ -49,3 +51,4 @@ class OverhaveContext:
         self.stash_client_settings = stash_client_settings or OverhaveStashClientSettings()
         self.stash_project_settings = stash_project_settings or OverhaveStashProjectSettings()
         self.test_settings = test_settings or OverhaveTestSettings()
+        self.logging_settings = logging_settings or OverhaveLoggingSettings()

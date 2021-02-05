@@ -62,6 +62,7 @@ class OverhaveLoggingSettings(BaseOverhavePrefix):
 
     log_level: str = logging.getLevelName(logging.INFO)
     log_config: Dict[str, Any] = {}
+    step_context_logs: bool = False
 
     @validator('log_config', each_item=True)
     def dict_config_validator(cls, v: Dict[str, Any]) -> Optional[DictConfigurator]:
