@@ -1,25 +1,35 @@
 import enum
 import importlib
 import logging
-from typing import Any, Optional, cast
+from typing import Any, Callable, Dict, Optional, cast
 
 import _pytest
+import pytest
 from _pytest.config.argparsing import Parser
+from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
+from _pytest.python import Function
 from pydantic import ValidationError
+from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave.factory import proxy_factory
 from overhave.testing.plugin_utils import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
+    get_full_step_name,
     get_scenario,
+    get_step_context_runner,
     has_issue_links,
     is_pytest_bdd_item,
     set_issue_links,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class StepNotFoundError(RuntimeError):
+    """ Exception for situation with missing or incorrect step definition. """
 
 
 class _Options(str, enum.Enum):
@@ -84,6 +94,54 @@ def pytest_collection_modifyitems(session: Session) -> None:
         add_scenario_title_to_report(item)
         if browse_url is not None:
             set_issue_links(scenario=get_scenario(item), keyword=browse_url.human_repr())
+
+
+def pytest_bdd_before_step(
+    request: FixtureRequest, feature: Feature, scenario: Scenario, step: Step, step_func: Callable[[Any], None]
+) -> None:
+    get_step_context_runner.cache_clear()
+    runner = get_step_context_runner()
+    runner.set_title(get_full_step_name(step))
+    runner.start()
+
+
+def pytest_bdd_after_step(
+    request: FixtureRequest,
+    feature: Feature,
+    scenario: Scenario,
+    step: Step,
+    step_func: Callable[[Any], None],
+    step_func_args: Dict[str, Any],
+) -> None:
+    runner = get_step_context_runner()
+    runner.stop(None)
+
+
+def pytest_bdd_step_error(
+    request: FixtureRequest,
+    feature: Feature,
+    scenario: Scenario,
+    step: Step,
+    step_func: Callable[[Any], None],
+    step_func_args: Dict[str, Any],
+    exception: BaseException,
+) -> None:
+    runner = get_step_context_runner()
+    runner.stop(exception)
+
+
+def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
+    if tag != 'skip':
+        return None
+    marker = pytest.mark.skip(reason="Scenario manually marked as skipped")
+    marker(function)
+    return True
+
+
+def pytest_bdd_step_func_lookup_error(
+    request: FixtureRequest, feature: Feature, scenario: Scenario, step: Step, exception: BaseException
+) -> None:
+    raise StepNotFoundError(f"Could not found specified step '{get_full_step_name(step)}'") from exception
 
 
 def pytest_collection_finish(session: Session) -> None:
