@@ -20,8 +20,10 @@ class PytestRunner:
             fixture_file,
             f"--alluredir={alluredir}",
         ]
-        pytest_cmd.extend(self._test_settings.default_pytest_addoptions.split(" "))
-        pytest_cmd.extend(self._test_settings.extra_pytest_addoptions.split(" "))
+        if isinstance(self._test_settings.default_pytest_addoptions, str):
+            pytest_cmd.extend(self._test_settings.default_pytest_addoptions.split(" "))
+        if isinstance(self._test_settings.extra_pytest_addoptions, str):
+            pytest_cmd.extend(self._test_settings.extra_pytest_addoptions.split(" "))
 
         if self._test_settings.workers is not None:
             pytest_cmd.extend(["-n", f"{self._test_settings.workers}"])
