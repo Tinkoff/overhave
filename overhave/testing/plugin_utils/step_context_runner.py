@@ -15,6 +15,10 @@ class _WrapperPosition(str, enum.Enum):
     BELOW = "below"
 
 
+class StepContextNotDefinedError(Exception):
+    """ Exception for situation with calling for self._step, when StepContext has not been defined. """
+
+
 class StepContextRunner:
     """ Class for Allure StepContext wrapping during pytest-bdd step execution. """
 
@@ -30,7 +34,7 @@ class StepContextRunner:
     def _defined_step(self) -> StepContext:
         if isinstance(self._step, StepContext):
             return self._step
-        raise RuntimeError("Current Allure step not defined!")
+        raise StepContextNotDefinedError("Current Allure step not defined!")
 
     @cached_property
     def _logger(self) -> logging.Logger:

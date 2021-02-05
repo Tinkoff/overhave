@@ -1,6 +1,7 @@
 # flake8: noqa
 from overhave.admin import overhave_app
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
+from overhave.base_settings import OverhaveLoggingSettings
 from overhave.cli import group, set_config_to_context
 from overhave.entities import (
     OverhaveEmulationSettings,
