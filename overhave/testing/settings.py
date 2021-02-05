@@ -64,7 +64,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
 class OverhaveTestSettings(BaseOverhavePrefix):
     """ Settings for PytestRunner, which runs scenario tests with specified addoptions. """
 
-    default_pytest_addoptions: str = "--all-skipped-fail --bdd-titles"
+    default_pytest_addoptions: Optional[str]
     extra_pytest_addoptions: str = "--disable-warnings"
 
     workers: Optional[int]  # Number of xdist workers, `None` by default
