@@ -7,7 +7,8 @@ Overhave
   :align: center
   :alt: Overhave framework
 
-  Web-framework for BDD: scalable, configurable, easy to use, based on `Flask Admin`_ and `Pydantic`_.
+  `Overhave`_ is the web-framework for BDD: scalable, configurable, easy to use, based on
+  `Flask Admin`_ and `Pydantic`_.
 
   .. image:: https://github.com/TinkoffCreditSystems/overhave/workflows/CI/badge.svg
     :target: https://github.com/TinkoffCreditSystems/overhave/actions?query=workflow%3ACI
@@ -358,6 +359,7 @@ Issues
 If you encounter any problems, please report them here in section `Issues`
 with a detailed description.
 
+.. _`Overhave`: https://github.com/TinkoffCreditSystems/overhave
 .. _`Pydantic`: https://github.com/samuelcolvin/pydantic
 .. _`Flask Admin`: https://github.com/flask-admin/flask-admin
 .. _`Ace`: https://github.com/ajaxorg/ace
