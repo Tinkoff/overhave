@@ -18,6 +18,10 @@ Overhave
     :target: https://pypi.org/project/overhave
     :alt: Python versions
 
+  .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/TinkoffCreditSystems/overhave
+    :alt: Code style
+
   .. image:: https://img.shields.io/pypi/v/overhave?color=%2334D058&label=pypi%20package
     :target: https://pypi.org/project/overhave
     :alt: Package version
@@ -31,6 +35,7 @@ Features
 * Execution and reporting of BDD features based on `PyTest`_  and `Allure`_
 * Auto-collection of `pytest-bdd`_ steps and display on the web-interface
 * Simple business-alike scenarios structure, easy horizontal scaling
+* Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_
 * Built-in configurable management of users and groups permissions
