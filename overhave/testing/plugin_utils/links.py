@@ -5,17 +5,8 @@ import allure
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
 
+from overhave.testing.plugin_utils.basic import get_scenario, is_pytest_bdd_item
 from overhave.testing.settings import OverhaveProjectSettings
-
-
-def get_scenario(item: Item) -> Scenario:
-    return item._obj.__scenario__  # type: ignore
-
-
-def is_pytest_bdd_item(item: Item) -> bool:
-    if hasattr(item, "_obj"):
-        return hasattr(item._obj, "__scenario__") and isinstance(get_scenario(item), Scenario)  # type: ignore
-    return False
 
 
 def _get_issue_links(scenario: Scenario, keyword: str) -> Optional[List[str]]:
@@ -42,7 +33,3 @@ def has_issue_links(item: Item) -> bool:
 def add_issue_links_to_report(project_settings: OverhaveProjectSettings, scenario: Scenario) -> None:
     for link in scenario.feature.links:
         allure.dynamic.link(url=project_settings.get_link_url(link), name=link)
-
-
-def add_scenario_title_to_report(item: Item) -> None:
-    item._obj.__allure_display_name__ = get_scenario(item).name  # type: ignore

@@ -1,7 +1,7 @@
 from functools import cached_property
 from typing import Callable, Dict, Type
 
-from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
+from overhave.base_settings import DataBaseSettings
 from overhave.redis.consumer import RedisConsumer
 from overhave.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
 from overhave.redis.runner import RedisConsumerRunner
@@ -12,8 +12,6 @@ class ConsumerFactory:
 
     def __init__(self, stream: RedisStream):
         self._stream = stream
-        logging_settings = OverhaveLoggingSettings()
-        logging_settings.setup_logging()
         DataBaseSettings().setup_db()
 
     @cached_property

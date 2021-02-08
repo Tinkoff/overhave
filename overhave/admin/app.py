@@ -8,7 +8,7 @@ from flask import Flask, Response, redirect, send_from_directory
 from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app
 from overhave.admin.flask.login_manager import get_flask_login_manager
-from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
+from overhave.base_settings import DataBaseSettings
 from overhave.factory import IOverhaveFactory, proxy_factory
 
 logger = logging.getLogger(__name__)
@@ -16,9 +16,8 @@ logger = logging.getLogger(__name__)
 
 def _resolved_factory() -> IOverhaveFactory:
     """ Resolve necessary settings and prepare instance of :class:`IOverhaveFactory` for usage. """
-    logging_settings = OverhaveLoggingSettings()
-    logging_settings.setup_logging()
     DataBaseSettings().setup_db()
+    proxy_factory.context.logging_settings.setup_logging()
     proxy_factory.patch_pytest()
     proxy_factory.supply_injector_for_collection()
     proxy_factory.injector.collect_configs()

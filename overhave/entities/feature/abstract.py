@@ -2,7 +2,7 @@ import abc
 from pathlib import Path
 from typing import Dict, List
 
-from overhave.entities.feature.models import FeatureTypeName
+from overhave.entities.feature.types import FeatureTypeName
 
 
 class IFeatureExtractor(abc.ABC):

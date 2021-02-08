@@ -7,7 +7,8 @@ Overhave
   :align: center
   :alt: Overhave framework
 
-  Web-framework for BDD: scalable, configurable, easy to use, based on `Flask Admin`_ and `Pydantic`_.
+  `Overhave`_ is the web-framework for BDD: scalable, configurable, easy to use, based on
+  `Flask Admin`_ and `Pydantic`_.
 
   .. image:: https://github.com/TinkoffCreditSystems/overhave/workflows/CI/badge.svg
     :target: https://github.com/TinkoffCreditSystems/overhave/actions?query=workflow%3ACI
@@ -16,6 +17,10 @@ Overhave
   .. image:: https://img.shields.io/pypi/pyversions/overhave.svg
     :target: https://pypi.org/project/overhave
     :alt: Python versions
+
+  .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/TinkoffCreditSystems/overhave
+    :alt: Code style
 
   .. image:: https://img.shields.io/pypi/v/overhave?color=%2334D058&label=pypi%20package
     :target: https://pypi.org/project/overhave
@@ -30,6 +35,7 @@ Features
 * Execution and reporting of BDD features based on `PyTest`_  and `Allure`_
 * Auto-collection of `pytest-bdd`_ steps and display on the web-interface
 * Simple business-alike scenarios structure, easy horizontal scaling
+* Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_
 * Built-in configurable management of users and groups permissions
@@ -358,6 +364,7 @@ Issues
 If you encounter any problems, please report them here in section `Issues`
 with a detailed description.
 
+.. _`Overhave`: https://github.com/TinkoffCreditSystems/overhave
 .. _`Pydantic`: https://github.com/samuelcolvin/pydantic
 .. _`Flask Admin`: https://github.com/flask-admin/flask-admin
 .. _`Ace`: https://github.com/ajaxorg/ace

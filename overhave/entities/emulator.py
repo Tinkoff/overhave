@@ -22,6 +22,13 @@ class DangerousExternalCommandError(EmulationError):
     """ Exception for dangerous command error. """
 
 
+class EmulationNotEnabledError(EmulationError):
+    """ Exception for not enabled emulation (```emulation_base_cmd``` not specified). """
+
+
+_EMULATION_NOT_ENABLED_MSG = "Emulation not enabled: 'emulation_base_cmd' has not been specified!"
+
+
 class ExternalCommandCheckMixin:
     """ Mixin for simple command-line command checking. """
 
@@ -40,10 +47,15 @@ class Emulator(ExternalCommandCheckMixin):
     def __init__(self, storage: IEmulationStorage, settings: OverhaveEmulationSettings):
         self._storage = storage
         self._settings = settings
+        if not self._settings.enabled:
+            raise EmulationNotEnabledError(_EMULATION_NOT_ENABLED_MSG)
 
     def _initiate(self, emulation_run: EmulationRunModel) -> None:
         cmd_from_user = emulation_run.emulation.command.strip()
         self._check_dangerous(cmd_from_user)
+
+        if not isinstance(self._settings.emulation_base_cmd, str):
+            raise EmulationNotEnabledError(_EMULATION_NOT_ENABLED_MSG)
 
         emulation_cmd = (
             [self._settings.emulation_core_path]

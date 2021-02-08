@@ -2,7 +2,7 @@ from typing import Optional
 
 import pytest
 from _pytest.nodes import Item
-from pytest_bdd.parser import Scenario
+from pytest_bdd.parser import Scenario, Step
 
 from overhave import OverhaveProjectSettings
 from overhave.testing import (
@@ -14,6 +14,7 @@ from overhave.testing import (
     is_pytest_bdd_item,
     set_issue_links,
 )
+from overhave.testing.plugin_utils import get_full_step_name
 
 
 class TestPluginUtils:
@@ -76,3 +77,8 @@ class TestPluginUtils:
         add_scenario_title_to_report(test_pytest_bdd_item)
         assert hasattr(test_pytest_bdd_item._obj, allure_attr)
         assert getattr(test_pytest_bdd_item._obj, allure_attr) == test_scenario_name
+
+    def test_get_full_step_name(self, test_pytest_bdd_step: Step):
+        assert (
+            get_full_step_name(test_pytest_bdd_step) == f"{test_pytest_bdd_step.keyword} {test_pytest_bdd_step._name}"
+        )
