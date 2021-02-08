@@ -1,5 +1,4 @@
 import enum
-import importlib
 import logging
 from typing import Any, Callable, Dict, Optional, cast
 
@@ -78,6 +77,8 @@ def pytest_configure(config: Any) -> None:
         try:
             if factory_context_path is not None:
                 logger.debug("Factory context path: %s", factory_context_path)
+                import importlib
+
                 importlib.import_module(factory_context_path)
             logger.debug("Try to patch pytest objects...")
             proxy_factory.patch_pytest()
