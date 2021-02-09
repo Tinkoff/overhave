@@ -35,6 +35,7 @@ class ModelViewConfigured(ModelView):
         feature_id="Feature ID",
         test_run_id="Test run ID",
         pr_url="Pull-request URL / Traceback",
+        initiated_by="Initiator",
     )
     column_formatters = dict(
         created_at=datetime_formatter, start=datetime_formatter, end=datetime_formatter, task=task_formatter,
