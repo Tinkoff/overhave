@@ -114,7 +114,7 @@ If you execute tests manually through `PyTest`_, these results are could be
 converted into the `Allure`_ report also with the `Allure CLI`_ tool.
 This report contains scenarios descriptions as they are described in features.
 
-.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/panel_img.png
+.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/report_img.png
   :width: 600
   :align: center
   :alt: Allure test-case report

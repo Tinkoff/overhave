@@ -90,12 +90,13 @@ def pytest_configure(config: Any) -> None:
 
 
 def pytest_collection_modifyitems(session: Session) -> None:
-    browse_url = proxy_factory.context.project_settings.browse_url
     pytest_bdd_scenario_items = (item for item in session.items if is_pytest_bdd_item(item))
     for item in pytest_bdd_scenario_items:
         add_scenario_title_to_report(item)
-        if browse_url is not None:
-            set_issue_links(scenario=get_scenario(item), keyword=browse_url.human_repr())
+
+        links_keyword = proxy_factory.context.project_settings.links_keyword
+        if isinstance(links_keyword, str):
+            set_issue_links(scenario=get_scenario(item), keyword=links_keyword)
 
 
 def pytest_bdd_before_step(
