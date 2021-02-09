@@ -29,7 +29,7 @@ class IEmulationStorage(abc.ABC):
     """ Abstract class for emulation runs storage. """
 
     @abc.abstractmethod
-    def create_emulation_run(self, emulation_id: int) -> EmulationRunModel:
+    def create_emulation_run(self, emulation_id: int, initiated_by: str) -> EmulationRunModel:
         pass
 
     @abc.abstractmethod
@@ -51,9 +51,9 @@ class EmulationStorage(IEmulationStorage):
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
 
-    def create_emulation_run(self, emulation_id: int) -> EmulationRunModel:
+    def create_emulation_run(self, emulation_id: int, initiated_by: str) -> EmulationRunModel:
         with db.create_session() as session:
-            emulation_run = db.EmulationRun(emulation_id=emulation_id)
+            emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
             session.add(emulation_run)
             session.flush()
             return cast(EmulationRunModel, EmulationRunModel.from_orm(emulation_run))

@@ -106,7 +106,7 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     emulation_prefix: str = "--permit-write --once --address {address} --port {port} --timeout {timeout}"
 
     # Specific terminal tool startup command with relative `feature_type`, for example: `myapp {feature_type}`
-    emulation_base_cmd: str
+    emulation_base_cmd: Optional[str]
     # Terminal tool command postfix with specified user `name` and `model`, for example: `--name={name} --model={model}`
     # If it is no need in use - may be optional.
     emulation_postfix: Optional[str]
