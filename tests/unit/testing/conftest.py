@@ -125,3 +125,10 @@ def test_description_manager(
 def description_handler_mock() -> mock.MagicMock:
     with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
         yield mocked_description_handler
+
+
+@pytest.fixture()
+def clear_get_description_manager() -> None:
+    from overhave.testing.plugin_utils import get_description_manager
+
+    get_description_manager.cache_clear()

@@ -3,9 +3,12 @@ from unittest import mock
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from _pytest.nodes import Item
 from _pytest.python import Function
+from faker import Faker
 from pytest_bdd.parser import Step
 
+from overhave import get_description_manager
 from overhave.factory import IOverhaveFactory
 from overhave.testing.plugin import (
     StepNotFoundError,
@@ -14,6 +17,8 @@ from overhave.testing.plugin import (
     pytest_bdd_before_step,
     pytest_bdd_step_error,
     pytest_bdd_step_func_lookup_error,
+    pytest_runtest_setup,
+    pytest_runtest_teardown,
 )
 from overhave.testing.plugin_utils import StepContextNotDefinedError
 
@@ -106,3 +111,22 @@ class TestPytestBddHooks:
                 step=test_pytest_bdd_step,
                 exception=exception("babah!"),
             )
+
+    def test_pytest_runtest_setup(self):
+        with mock.patch(
+            "overhave.get_description_manager", return_value=mock.MagicMock()
+        ) as mocked_description_manager:
+            pytest_runtest_setup(item=mock.create_autospec(Item))
+            mocked_description_manager.assert_not_called()
+
+    def test_pytest_runtest_teardown_description(
+        self,
+        clear_get_description_manager,
+        description_handler_mock: mock.MagicMock,
+        faker: Faker,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        description_manager = get_description_manager()
+        description_manager.add_description(faker.word())
+        pytest_runtest_teardown(item=mock.create_autospec(Item))
+        description_handler_mock.assert_called_once()
