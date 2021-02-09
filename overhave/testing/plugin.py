@@ -160,6 +160,10 @@ def pytest_collection_finish(session: Session) -> None:
         proxy_factory.injector.adapt(session)
 
 
+def pytest_runtest_setup(item: Item) -> None:
+    pass
+
+
 def pytest_runtest_teardown(item: Item) -> None:
     """ Hook for issue links attachment. """
     if all((proxy_factory.context.project_settings.browse_url is not None, has_issue_links(item))):
