@@ -2,8 +2,8 @@ from functools import lru_cache
 
 from _pytest.nodes import Item
 
+from overhave.testing.plugin_utils.allure_utils.step_context_runner import StepContextRunner
 from overhave.testing.plugin_utils.basic import get_scenario
-from overhave.testing.plugin_utils.step_context_runner import StepContextRunner
 
 
 def add_scenario_title_to_report(item: Item) -> None:
