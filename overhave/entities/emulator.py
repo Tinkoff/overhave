@@ -53,13 +53,13 @@ class Emulator(ExternalCommandCheckMixin):
     def _initiate(self, emulation_run: EmulationRunModel) -> None:
         cmd_from_user = emulation_run.emulation.command.strip()
         self._check_dangerous(cmd_from_user)
-        if self._settings.emulation_base_cmd is not None:
-            emulation_base_cmd = self._settings.emulation_base_cmd.format(
-                feature_type=emulation_run.emulation.test_user.feature_type.name
-            ).split(" ")
 
         if not isinstance(self._settings.emulation_base_cmd, str):
             raise EmulationNotEnabledError(_EMULATION_NOT_ENABLED_MSG)
+
+        emulation_base_cmd = self._settings.emulation_base_cmd.format(
+            feature_type=emulation_run.emulation.test_user.feature_type.name
+        ).split(" ")
 
         emulation_cmd = (
             [self._settings.emulation_core_path]
