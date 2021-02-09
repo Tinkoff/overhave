@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from _pytest.nodes import Item
 
+from overhave.testing.plugin_utils.allure_utils.description_manager import DescriptionManager
 from overhave.testing.plugin_utils.allure_utils.step_context_runner import StepContextRunner
 from overhave.testing.plugin_utils.basic import get_scenario
 
@@ -15,3 +16,10 @@ def get_step_context_runner() -> StepContextRunner:
     from overhave.factory import proxy_factory
 
     return StepContextRunner(logging_settings=proxy_factory.context.logging_settings)
+
+
+@lru_cache(maxsize=None)
+def get_description_manager() -> DescriptionManager:
+    from overhave.factory import proxy_factory
+
+    return DescriptionManager(settings=proxy_factory.context.description_manager_settings)

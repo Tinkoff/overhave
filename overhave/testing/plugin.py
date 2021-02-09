@@ -16,6 +16,7 @@ from overhave.factory import proxy_factory
 from overhave.testing.plugin_utils import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
+    get_description_manager,
     get_full_step_name,
     get_scenario,
     get_step_context_runner,
@@ -161,10 +162,11 @@ def pytest_collection_finish(session: Session) -> None:
 
 
 def pytest_runtest_setup(item: Item) -> None:
-    pass
+    get_description_manager.cache_clear()
 
 
 def pytest_runtest_teardown(item: Item) -> None:
-    """ Hook for issue links attachment. """
+    """ Hook for description and issue links attachment to Allure report. """
+    get_description_manager().apply_description()
     if all((proxy_factory.context.project_settings.browse_url is not None, has_issue_links(item))):
         add_issue_links_to_report(project_settings=proxy_factory.context.project_settings, scenario=get_scenario(item))

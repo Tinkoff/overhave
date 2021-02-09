@@ -8,10 +8,10 @@ from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave import OverhaveProjectSettings
+from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings
 from overhave.base_settings import OverhaveLoggingSettings
 from overhave.factory import ProxyFactory
-from overhave.testing.plugin_utils import StepContextRunner
+from overhave.testing.plugin_utils import DescriptionManager, StepContextRunner
 from tests.objects import get_file_settings
 
 
@@ -102,3 +102,26 @@ def clear_get_step_context_runner() -> None:
 @pytest.fixture()
 def test_pytest_function() -> Function:
     return mock.create_autospec(Function)
+
+
+@pytest.fixture()
+def test_blocks_delimiter(faker: Faker) -> str:
+    return cast(str, faker.word())
+
+
+@pytest.fixture()
+def test_description_manager_settings(test_blocks_delimiter: str) -> OverhaveDescriptionManagerSettings:
+    return OverhaveDescriptionManagerSettings(blocks_delimiter=test_blocks_delimiter)
+
+
+@pytest.fixture()
+def test_description_manager(
+    test_description_manager_settings: OverhaveDescriptionManagerSettings,
+) -> DescriptionManager:
+    return DescriptionManager(settings=test_description_manager_settings)
+
+
+@pytest.fixture()
+def description_handler_mock() -> mock.MagicMock:
+    with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
+        yield mocked_description_handler

@@ -23,4 +23,9 @@ from overhave.factory import OverhaveContext
 from overhave.factory import proxy_factory as overhave_core
 from overhave.redis import RedisStream as OverhaveRedisConsumerApp
 from overhave.stash import OverhaveStashClientSettings, OverhaveStashProjectSettings
-from overhave.testing import OverhaveProjectSettings, OverhaveTestSettings
+from overhave.testing import (
+    OverhaveDescriptionManagerSettings,
+    OverhaveProjectSettings,
+    OverhaveTestSettings,
+    get_description_manager,
+)
