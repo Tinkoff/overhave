@@ -106,6 +106,21 @@ at the application on start-up to be displayed.
 
   Example of **Overhave** script panel in feature edit mode
 
+Allure report
+-------------
+
+**Overhave** generates `Allure`_ report after tests execution in web-interface.
+If you execute tests manually through `PyTest`_, these results are could be
+converted into the `Allure`_ report also with the `Allure CLI`_ tool.
+This report contains scenarios descriptions as they are described in features.
+
+.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/panel_img.png
+  :width: 600
+  :align: center
+  :alt: Allure test-case report
+
+  Example of generated `Allure`_ report after execution of **Overhave**'s feature
+
 Command-line interface
 ----------------------
 **Overhave** has a CLI that provides a simple way to start service web-interface,
@@ -371,6 +386,7 @@ with a detailed description.
 .. _`PyTest`: https://github.com/pytest-dev/pytest
 .. _`pytest-bdd`: https://github.com/pytest-dev/pytest-bdd
 .. _`Allure`: https://github.com/allure-framework/allure-python
+.. _`Allure CLI`: https://docs.qameta.io/allure/#_get_started
 .. _`Bitbucket`: https://www.atlassian.com/git
 .. _`SQLAlchemy`: https://github.com/sqlalchemy/sqlalchemy
 .. _`Walrus`: https://github.com/coleifer/walrus
