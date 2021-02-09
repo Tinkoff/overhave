@@ -121,7 +121,6 @@ class Emulation(Base, PrimaryKeyMixin):
     test_user_id = sa.Column(INT_TYPE, sa.ForeignKey(TestUser.id), nullable=False, doc='Test user ID')
     command = sa.Column(TEXT_TYPE, nullable=False, doc="Command for emulator's execution")
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
-
     test_user = so.relationship(TestUser)
     creator = so.relationship(UserRole)
 
@@ -135,9 +134,13 @@ class EmulationRun(Base, PrimaryKeyMixin):
     changed_at = sa.Column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
     port = sa.Column(INT_TYPE, doc="Port for emulation")
     traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback")
+    initiated_by = sa.Column(
+        SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Initiator of start emulation", nullable=False
+    )
 
     emulation = so.relationship(Emulation, backref=so.backref("emulation_runs", cascade="all, delete-orphan"))
 
-    def __init__(self, emulation_id: int):
+    def __init__(self, emulation_id: int, initiated_by: str):
         self.emulation_id = emulation_id
         self.status = EmulationStatus.CREATED
+        self.initiated_by = initiated_by

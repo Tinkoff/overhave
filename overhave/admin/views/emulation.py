@@ -52,7 +52,7 @@ class EmulationView(ModelViewConfigured):
     @staticmethod
     def _run_emulation(emulation_id: int) -> Optional[werkzeug.Response]:
         try:
-            emulation_run = proxy_factory.emulation_storage.create_emulation_run(emulation_id)
+            emulation_run = proxy_factory.emulation_storage.create_emulation_run(emulation_id, current_user.login)
             proxy_factory.redis_producer.add(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id)))
             return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
         except Exception as e:

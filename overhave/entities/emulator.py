@@ -57,6 +57,10 @@ class Emulator(ExternalCommandCheckMixin):
         if not isinstance(self._settings.emulation_base_cmd, str):
             raise EmulationNotEnabledError(_EMULATION_NOT_ENABLED_MSG)
 
+        emulation_base_cmd = self._settings.emulation_base_cmd.format(
+            feature_type=emulation_run.emulation.test_user.feature_type.name
+        ).split(" ")
+
         emulation_cmd = (
             [self._settings.emulation_core_path]
             + self._settings.emulation_prefix.format(
@@ -64,9 +68,7 @@ class Emulator(ExternalCommandCheckMixin):
                 port=emulation_run.port,
                 timeout=self._settings.wait_timeout_seconds,
             ).split(" ")
-            + self._settings.emulation_base_cmd.format(
-                feature_type=emulation_run.emulation.test_user.feature_type.name
-            ).split(" ")
+            + emulation_base_cmd
             + cmd_from_user.split(" ")
         )
         if isinstance(self._settings.emulation_postfix, str):
