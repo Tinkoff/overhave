@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Any, Mapping, Optional, cast
 from unittest import mock
 
 import pytest
@@ -16,6 +16,7 @@ from overhave.factory import ProxyFactory
 from overhave.testing.plugin import pytest_addoption
 from overhave.testing.plugin_utils import DescriptionManager, StepContextRunner
 from tests.objects import get_file_settings
+from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
 @pytest.fixture(scope="session")
@@ -168,3 +169,17 @@ def test_prepared_config(terminal_writer_mock: mock.MagicMock, import_module_moc
     pytest_addoption(test_pytest_parser)
     config._parser = test_pytest_parser
     return config
+
+
+@pytest.fixture()
+def getoption_mapping(request: FixtureRequest) -> Mapping[str, Any]:
+    if hasattr(request, "param"):
+        return cast(Mapping[str, Any], request.param)
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def getoption_mock(getoption_mapping: Mapping[str, Any], test_prepared_config: Config) -> ConfigGetOptionMock:
+    getoption_mock = ConfigGetOptionMock(getoption_mapping)
+    with mock.patch.object(test_prepared_config, 'getoption', new=getoption_mock.getoption):
+        yield getoption_mock

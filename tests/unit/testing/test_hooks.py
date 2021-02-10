@@ -1,4 +1,4 @@
-from typing import Type, cast
+from typing import Any, Mapping, Type, cast
 from unittest import mock
 
 import pytest
@@ -29,6 +29,7 @@ from overhave.testing.plugin import (
     pytest_runtest_teardown,
 )
 from overhave.testing.plugin_utils import StepContextNotDefinedError
+from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
 @pytest.mark.usefixtures("clear_get_step_context_runner")
@@ -173,3 +174,74 @@ class TestPytestCommonHooks:
         terminal_writer_mock.assert_called_once()
         import_module_mock.assert_not_called()
         assert not cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+
+    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    def test_pytest_configure_enabled_injection_without_context_module(
+        self,
+        import_module_mock: mock.MagicMock,
+        test_prepared_config: Config,
+        getoption_mapping: Mapping[str, Any],
+        getoption_mock: ConfigGetOptionMock,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
+            _OptionName.ENABLE_INJECTION.as_variable
+        )
+        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
+            _OptionName.FACTORY_CONTEXT.as_variable
+        )
+        pytest_configure(test_prepared_config)
+        import_module_mock.assert_not_called()
+        assert cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+
+    @pytest.mark.parametrize(
+        "getoption_mapping",
+        [{_OptionName.ENABLE_INJECTION.as_variable: False, _OptionName.FACTORY_CONTEXT.as_variable: "random_module"}],
+        indirect=True,
+    )
+    def test_pytest_configure_disabled_injection_with_context_module(
+        self,
+        import_module_mock: mock.MagicMock,
+        test_prepared_config: Config,
+        getoption_mapping: Mapping[str, Any],
+        getoption_mock: ConfigGetOptionMock,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
+            _OptionName.ENABLE_INJECTION.as_variable
+        )
+        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
+            _OptionName.FACTORY_CONTEXT.as_variable
+        )
+        pytest_configure(test_prepared_config)
+        import_module_mock.assert_not_called()
+        assert not cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+
+    @pytest.mark.parametrize(
+        "getoption_mapping",
+        [{_OptionName.ENABLE_INJECTION.as_variable: True, _OptionName.FACTORY_CONTEXT.as_variable: "random_module"}],
+        indirect=True,
+    )
+    def test_pytest_configure_enabled_injection_with_context_module(
+        self,
+        import_module_mock: mock.MagicMock,
+        test_prepared_config: Config,
+        getoption_mapping: Mapping[str, Any],
+        getoption_mock: ConfigGetOptionMock,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
+            _OptionName.ENABLE_INJECTION.as_variable
+        )
+        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
+            _OptionName.FACTORY_CONTEXT.as_variable
+        )
+        pytest_configure(test_prepared_config)
+        import_module_mock.assert_called_once()
+        assert cast(ProxyFactory, patched_proxy_factory)._pytest_patched
