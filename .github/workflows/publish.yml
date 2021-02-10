@@ -28,6 +28,7 @@ jobs:
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
+          sudo apt-get update
           make pre-init
           make init
           make publish
