@@ -2,6 +2,7 @@ from typing import Optional, cast
 from unittest import mock
 
 import pytest
+from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.nodes import Item
@@ -12,6 +13,7 @@ from pytest_bdd.parser import Feature, Scenario, Step
 from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings
 from overhave.base_settings import OverhaveLoggingSettings
 from overhave.factory import ProxyFactory
+from overhave.testing.plugin import pytest_addoption
 from overhave.testing.plugin_utils import DescriptionManager, StepContextRunner
 from tests.objects import get_file_settings
 
@@ -138,3 +140,31 @@ def clear_get_description_manager() -> None:
 @pytest.fixture()
 def test_pytest_parser() -> Parser:
     return Parser()
+
+
+@pytest.fixture(scope="session")
+def test_empty_config() -> Config:
+    return Config(PytestPluginManager())
+
+
+@pytest.fixture()
+def terminal_writer_mock() -> mock.MagicMock:
+    with mock.patch("_pytest.config.create_terminal_writer", return_value=mock.MagicMock()) as terminal_writer:
+        yield terminal_writer
+
+
+@pytest.fixture()
+def import_module_mock() -> mock.MagicMock:
+    with mock.patch("importlib.import_module", return_value=mock.MagicMock()) as import_module:
+        yield import_module
+
+
+@pytest.fixture()
+def test_prepared_config(terminal_writer_mock: mock.MagicMock, import_module_mock: mock.MagicMock) -> Config:
+    config = Config(PytestPluginManager())
+    test_pytest_parser = Parser(
+        usage="%(prog)s [options] [file_or_dir] [file_or_dir] [...]", processopt=config._processopt
+    )
+    pytest_addoption(test_pytest_parser)
+    config._parser = test_pytest_parser
+    return config

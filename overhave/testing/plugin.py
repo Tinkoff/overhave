@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Optional, cast
 
 import _pytest
 import pytest
+from _pytest.config import Config
 from _pytest.config.argparsing import Argument, Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
@@ -51,14 +52,14 @@ _FACTORY_CONTEXT_HELP = (
 @dataclass(frozen=True)
 class _Options:
     enable_injection = Argument(
-        _OptionName.ENABLE_INJECTION,
+        _OptionName.ENABLE_INJECTION.value,
         action="store_true",
         dest=_OptionName.ENABLE_INJECTION.as_variable,
         default=False,
         help=_ENABLE_INJECTION_HELP,
     )
     context_module = Argument(
-        _OptionName.FACTORY_CONTEXT,
+        _OptionName.FACTORY_CONTEXT.value,
         action="store",
         dest=_OptionName.FACTORY_CONTEXT.as_variable,
         default=None,
@@ -76,10 +77,10 @@ def pytest_addoption(parser: Parser) -> None:
     group.addoption(*_Options.context_module.names(), **_Options.context_module.attrs())
 
 
-def pytest_configure(config: Any) -> None:
+def pytest_configure(config: Config) -> None:
     """ Patch pytest_bdd objects in current hook. """
-    factory_context_path: Optional[str] = config.getoption(_OptionName.FACTORY_CONTEXT.as_variable)
     injection_enabled: bool = config.getoption(_OptionName.ENABLE_INJECTION.as_variable)
+    factory_context_path: Optional[str] = config.getoption(_OptionName.FACTORY_CONTEXT.as_variable)
     tw = _pytest.config.create_terminal_writer(config)
     if factory_context_path is not None and not injection_enabled:
         tw.line("Got path for context definition, but injection is disabled!", yellow=True)

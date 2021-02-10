@@ -2,6 +2,7 @@ from typing import Type, cast
 from unittest import mock
 
 import pytest
+from _pytest.config import Config
 from _pytest.config.argparsing import OptionGroup, Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.nodes import Item
@@ -15,6 +16,7 @@ from overhave.testing.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
     StepNotFoundError,
+    _OptionName,
     _Options,
     pytest_addoption,
     pytest_bdd_after_step,
@@ -22,6 +24,7 @@ from overhave.testing.plugin import (
     pytest_bdd_before_step,
     pytest_bdd_step_error,
     pytest_bdd_step_func_lookup_error,
+    pytest_configure,
     pytest_runtest_setup,
     pytest_runtest_teardown,
 )
@@ -150,3 +153,23 @@ class TestPytestCommonHooks:
         assert group.options[0].attrs() == _Options.enable_injection.attrs()
         assert group.options[1].names() == _Options.context_module.names()
         assert group.options[1].attrs() == _Options.context_module.attrs()
+
+    def test_pytest_configure_failed_no_option(self, test_empty_config: Config):
+        with pytest.raises(ValueError, match="no option named"):
+            pytest_configure(test_empty_config)
+
+    def test_pytest_configure_disabled_options(
+        self,
+        terminal_writer_mock: mock.MagicMock,
+        import_module_mock: mock.MagicMock,
+        test_prepared_config: Config,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        pytest_configure(test_prepared_config)
+        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
+        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is None
+        terminal_writer_mock.assert_called_once()
+        import_module_mock.assert_not_called()
+        assert not cast(ProxyFactory, patched_proxy_factory)._pytest_patched
