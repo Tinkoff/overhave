@@ -2,6 +2,7 @@ from typing import Optional, cast
 from unittest import mock
 
 import pytest
+from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.nodes import Item
 from _pytest.python import Function
@@ -132,3 +133,8 @@ def clear_get_description_manager() -> None:
     from overhave.testing.plugin_utils import get_description_manager
 
     get_description_manager.cache_clear()
+
+
+@pytest.fixture()
+def test_pytest_parser() -> Parser:
+    return Parser()

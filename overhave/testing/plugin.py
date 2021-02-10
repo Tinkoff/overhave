@@ -4,12 +4,13 @@ from typing import Any, Callable, Dict, Optional, cast
 
 import _pytest
 import pytest
-from _pytest.config.argparsing import Parser
+from _pytest.config.argparsing import Argument, Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
 from pydantic import ValidationError
+from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave.factory import proxy_factory
@@ -32,7 +33,7 @@ class StepNotFoundError(RuntimeError):
     """ Exception for situation with missing or incorrect step definition. """
 
 
-class _Options(str, enum.Enum):
+class _OptionName(str, enum.Enum):
     ENABLE_INJECTION = "--enable-injection"
     FACTORY_CONTEXT = "--ctx-module"
 
@@ -47,34 +48,44 @@ _FACTORY_CONTEXT_HELP = (
 )
 
 
-def pytest_addoption(parser: Parser) -> None:
-    group = parser.getgroup("overhave-pytest", "Overhave PyTest plugin commands")
-    group.addoption(
-        _Options.ENABLE_INJECTION,
+@dataclass(frozen=True)
+class _Options:
+    enable_injection = Argument(
+        _OptionName.ENABLE_INJECTION,
         action="store_true",
-        dest=_Options.ENABLE_INJECTION.as_variable,
+        dest=_OptionName.ENABLE_INJECTION.as_variable,
         default=False,
         help=_ENABLE_INJECTION_HELP,
     )
-    group.addoption(
-        _Options.FACTORY_CONTEXT,
+    context_module = Argument(
+        _OptionName.FACTORY_CONTEXT,
         action="store",
-        dest=_Options.FACTORY_CONTEXT.as_variable,
+        dest=_OptionName.FACTORY_CONTEXT.as_variable,
         default=None,
         help=_FACTORY_CONTEXT_HELP,
     )
 
 
+_PLUGIN_NAME = "overhave-pytest"
+_GROUP_HELP = "Overhave PyTest plugin commands"
+
+
+def pytest_addoption(parser: Parser) -> None:
+    group = parser.getgroup(_PLUGIN_NAME, _GROUP_HELP)
+    group.addoption(*_Options.enable_injection.names(), **_Options.enable_injection.attrs())
+    group.addoption(*_Options.context_module.names(), **_Options.context_module.attrs())
+
+
 def pytest_configure(config: Any) -> None:
     """ Patch pytest_bdd objects in current hook. """
-    factory_context_path: Optional[str] = config.getoption(_Options.FACTORY_CONTEXT.as_variable)
-    injection_enabled: bool = config.getoption(_Options.ENABLE_INJECTION.as_variable)
+    factory_context_path: Optional[str] = config.getoption(_OptionName.FACTORY_CONTEXT.as_variable)
+    injection_enabled: bool = config.getoption(_OptionName.ENABLE_INJECTION.as_variable)
     tw = _pytest.config.create_terminal_writer(config)
     if factory_context_path is not None and not injection_enabled:
         tw.line("Got path for context definition, but injection is disabled!", yellow=True)
         return
     if injection_enabled:
-        logger.debug("Got %s flag.", _Options.ENABLE_INJECTION)
+        logger.debug("Got %s flag.", _OptionName.ENABLE_INJECTION)
         try:
             if factory_context_path is not None:
                 logger.debug("Factory context path: %s", factory_context_path)
@@ -149,7 +160,7 @@ def pytest_bdd_step_func_lookup_error(
 
 def pytest_collection_finish(session: Session) -> None:
     """ Supplying of injector configs for steps collection. """
-    if session.config.getoption(_Options.ENABLE_INJECTION.as_variable):
+    if session.config.getoption(_OptionName.ENABLE_INJECTION.as_variable):
         tw = _pytest.config.create_terminal_writer(session.config)
         if not proxy_factory.pytest_patched:
             tw.line("Could not supplement Overhave injector - pytest session has not been patched!", yellow=True)
