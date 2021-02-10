@@ -5,6 +5,7 @@ import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
+from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
@@ -183,3 +184,17 @@ def getoption_mock(getoption_mapping: Mapping[str, Any], test_prepared_config: C
     getoption_mock = ConfigGetOptionMock(getoption_mapping)
     with mock.patch.object(test_prepared_config, 'getoption', new=getoption_mock.getoption):
         yield getoption_mock
+
+
+@pytest.fixture()
+def test_pytest_clean_session(test_clean_item: Item) -> Session:
+    session = mock.create_autospec(Session)
+    setattr(session, "items", [test_clean_item])
+    return session
+
+
+@pytest.fixture()
+def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item) -> Session:
+    session = mock.create_autospec(Session)
+    setattr(session, "items", [test_clean_item, test_pytest_bdd_item])
+    return session

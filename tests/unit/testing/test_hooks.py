@@ -5,6 +5,7 @@ import pytest
 from _pytest.config import Config
 from _pytest.config.argparsing import OptionGroup, Parser
 from _pytest.fixtures import FixtureRequest
+from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
@@ -12,6 +13,7 @@ from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
 from overhave.factory import IOverhaveFactory
+from overhave.testing import get_scenario, has_issue_links
 from overhave.testing.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
@@ -24,6 +26,7 @@ from overhave.testing.plugin import (
     pytest_bdd_before_step,
     pytest_bdd_step_error,
     pytest_bdd_step_func_lookup_error,
+    pytest_collection_modifyitems,
     pytest_configure,
     pytest_runtest_setup,
     pytest_runtest_teardown,
@@ -245,3 +248,28 @@ class TestPytestCommonHooks:
         pytest_configure(test_prepared_config)
         import_module_mock.assert_called_once()
         assert cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+
+    def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
+        with mock.patch(
+            "overhave.testing.plugin_utils.allure_utils.common.add_scenario_title_to_report",
+            return_value=mock.MagicMock(),
+        ) as mocked_title_func:
+            pytest_collection_modifyitems(test_pytest_clean_session)
+            mocked_title_func.assert_not_called()
+
+    @pytest.mark.parametrize("links_keyword", [None, "Tasks"])
+    def test_pytest_collection_modifyitems_bdd(
+        self,
+        test_pytest_bdd_item: Item,
+        test_pytest_bdd_session: Session,
+        patched_proxy_factory: IOverhaveFactory,
+        links_keyword,
+    ):
+        patched_proxy_factory.context.project_settings.links_keyword = links_keyword
+        pytest_collection_modifyitems(test_pytest_bdd_session)
+        assert test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name
+
+        if links_keyword is None:
+            assert not has_issue_links(test_pytest_bdd_item)
+        else:
+            assert has_issue_links(test_pytest_bdd_item)
