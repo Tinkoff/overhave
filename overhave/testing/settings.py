@@ -68,3 +68,9 @@ class OverhaveTestSettings(BaseOverhavePrefix):
     extra_pytest_addoptions: str = "--disable-warnings"
 
     workers: Optional[int]  # Number of xdist workers, `None` by default
+
+
+class OverhaveDescriptionManagerSettings(BaseOverhavePrefix):
+    """ Settings for DescriptionManager, which sets the description to Allure report dynamically after test. """
+
+    blocks_delimiter: str = ""

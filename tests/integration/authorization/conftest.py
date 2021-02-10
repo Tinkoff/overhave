@@ -26,7 +26,7 @@ def test_admin_group(faker: Faker) -> str:
 
 @pytest.fixture()
 def test_db_groups(test_admin_group: str, faker: Faker) -> List[str]:
-    groups: List[str] = faker.words(3)
+    groups: List[str] = ["my", "unique", "groupnames"]
     while test_admin_group in groups:
         groups.remove(test_admin_group)
         groups.append(faker.word())
