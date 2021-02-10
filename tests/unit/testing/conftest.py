@@ -93,8 +93,8 @@ def patched_proxy_factory() -> ProxyFactory:
     from overhave.factory import proxy_factory
 
     proxy_factory.set_context(mock.MagicMock())
-    yield proxy_factory
-    del proxy_factory
+    proxy_factory._pytest_patched = False
+    return proxy_factory
 
 
 @pytest.fixture()
@@ -130,6 +130,12 @@ def test_description_manager(
 def description_handler_mock() -> mock.MagicMock:
     with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
         yield mocked_description_handler
+
+
+@pytest.fixture()
+def link_handler_mock() -> mock.MagicMock:
+    with mock.patch("allure.dynamic.link", return_value=mock.MagicMock()) as mocked_link_handler:
+        yield mocked_link_handler
 
 
 @pytest.fixture()

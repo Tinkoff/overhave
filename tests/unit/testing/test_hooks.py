@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Type, cast
+from typing import Any, Mapping, Optional, Type, cast
 from unittest import mock
 
 import pytest
@@ -124,25 +124,6 @@ class TestPytestBddHooks:
                 exception=exception("babah!"),
             )
 
-    def test_pytest_runtest_setup(self):
-        with mock.patch(
-            "overhave.get_description_manager", return_value=mock.MagicMock()
-        ) as mocked_description_manager:
-            pytest_runtest_setup(item=mock.create_autospec(Item))
-            mocked_description_manager.assert_not_called()
-
-    def test_pytest_runtest_teardown_description(
-        self,
-        clear_get_description_manager,
-        description_handler_mock: mock.MagicMock,
-        faker: Faker,
-        patched_proxy_factory: IOverhaveFactory,
-    ):
-        description_manager = get_description_manager()
-        description_manager.add_description(faker.word())
-        pytest_runtest_teardown(item=mock.create_autospec(Item))
-        description_handler_mock.assert_called_once()
-
 
 class TestPytestCommonHooks:
     """ Unit tests for pytest wrapped hooks. """
@@ -263,7 +244,7 @@ class TestPytestCommonHooks:
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
         patched_proxy_factory: IOverhaveFactory,
-        links_keyword,
+        links_keyword: Optional[str],
     ):
         patched_proxy_factory.context.project_settings.links_keyword = links_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
@@ -273,3 +254,56 @@ class TestPytestCommonHooks:
             assert not has_issue_links(test_pytest_bdd_item)
         else:
             assert has_issue_links(test_pytest_bdd_item)
+
+    def test_pytest_runtest_setup(self, test_clean_item: Item):
+        with mock.patch(
+            "overhave.get_description_manager", return_value=mock.MagicMock()
+        ) as mocked_description_manager:
+            pytest_runtest_setup(item=test_clean_item)
+            mocked_description_manager.assert_not_called()
+
+    def test_pytest_runtest_teardown_clean(
+        self,
+        clear_get_description_manager,
+        description_handler_mock: mock.MagicMock,
+        link_handler_mock: mock.MagicMock,
+        faker: Faker,
+        test_clean_item: Item,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        description_manager = get_description_manager()
+        description_manager.add_description(faker.word())
+        pytest_runtest_teardown(item=test_clean_item)
+        description_handler_mock.assert_called_once()
+        link_handler_mock.assert_not_called()
+
+    @pytest.mark.parametrize(
+        ("browse_url", "links_keyword"), [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")]
+    )
+    def test_pytest_runtest_teardown_bdd(
+        self,
+        clear_get_description_manager,
+        description_handler_mock: mock.MagicMock,
+        link_handler_mock: mock.MagicMock,
+        faker: Faker,
+        test_pytest_bdd_item: Item,
+        test_pytest_bdd_session: Session,
+        patched_proxy_factory: IOverhaveFactory,
+        browse_url: Optional[str],
+        links_keyword: Optional[str],
+    ):
+        description_manager = get_description_manager()
+        description_manager.add_description(faker.word())
+
+        patched_proxy_factory.context.project_settings.browse_url = browse_url
+        patched_proxy_factory.context.project_settings.links_keyword = links_keyword
+
+        pytest_collection_modifyitems(test_pytest_bdd_session)
+        pytest_runtest_teardown(item=test_pytest_bdd_item)
+        description_handler_mock.assert_called_once()
+
+        if browse_url is None:
+            link_handler_mock.assert_not_called()
+        else:
+            assert has_issue_links(test_pytest_bdd_item)
+            assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
