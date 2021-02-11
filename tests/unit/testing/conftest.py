@@ -200,7 +200,8 @@ def test_pytest_clean_session(test_clean_item: Item) -> Session:
 
 
 @pytest.fixture()
-def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item) -> Session:
+def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, test_prepared_config: Config) -> Session:
     session = mock.create_autospec(Session)
     setattr(session, "items", [test_clean_item, test_pytest_bdd_item])
+    setattr(session, "config", test_prepared_config)
     return session
