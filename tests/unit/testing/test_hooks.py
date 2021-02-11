@@ -26,6 +26,7 @@ from overhave.testing.plugin import (
     pytest_bdd_before_step,
     pytest_bdd_step_error,
     pytest_bdd_step_func_lookup_error,
+    pytest_collection_finish,
     pytest_collection_modifyitems,
     pytest_configure,
     pytest_runtest_makereport,
@@ -254,6 +255,45 @@ class TestPytestCommonHooks:
             assert not has_issue_links(test_pytest_bdd_item)
         else:
             assert has_issue_links(test_pytest_bdd_item)
+
+    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
+    def test_pytest_collection_finish_injection_disabled(
+        self,
+        terminal_writer_mock: mock.MagicMock,
+        getoption_mock: ConfigGetOptionMock,
+        test_pytest_bdd_session: Session,
+    ):
+        pytest_collection_finish(test_pytest_bdd_session)
+        terminal_writer_mock.assert_not_called()
+
+    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    def test_pytest_collection_finish_injection_enabled_with_not_patched_pytest(
+        self,
+        terminal_writer_mock: mock.MagicMock,
+        getoption_mock: ConfigGetOptionMock,
+        test_pytest_bdd_session: Session,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        pytest_collection_finish(test_pytest_bdd_session)
+        terminal_writer_mock.assert_called_once()
+        assert cast(ProxyFactory, patched_proxy_factory)._collection_prepared is False
+
+    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    def test_pytest_collection_finish_injection_enabled_with_patched_pytest(
+        self,
+        terminal_writer_mock: mock.MagicMock,
+        getoption_mock: ConfigGetOptionMock,
+        test_pytest_bdd_session: Session,
+        patched_proxy_factory: IOverhaveFactory,
+    ):
+        from overhave.factory import ProxyFactory
+
+        pytest_configure(test_pytest_bdd_session.config)
+        pytest_collection_finish(test_pytest_bdd_session)
+        assert terminal_writer_mock.call_count == 2
+        assert cast(ProxyFactory, patched_proxy_factory)._collection_prepared
 
     def test_pytest_runtest_setup(self, test_clean_item: Item):
         with mock.patch(
