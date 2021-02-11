@@ -28,8 +28,8 @@ from overhave.testing.plugin import (
     pytest_bdd_step_func_lookup_error,
     pytest_collection_modifyitems,
     pytest_configure,
+    pytest_runtest_makereport,
     pytest_runtest_setup,
-    pytest_runtest_teardown,
 )
 from overhave.testing.plugin_utils import StepContextNotDefinedError
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
@@ -262,7 +262,7 @@ class TestPytestCommonHooks:
             pytest_runtest_setup(item=test_clean_item)
             mocked_description_manager.assert_not_called()
 
-    def test_pytest_runtest_teardown_clean(
+    def test_pytest_runtest_makereport_clean(
         self,
         clear_get_description_manager,
         description_handler_mock: mock.MagicMock,
@@ -273,14 +273,14 @@ class TestPytestCommonHooks:
     ):
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
-        pytest_runtest_teardown(item=test_clean_item)
+        pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
         description_handler_mock.assert_called_once()
         link_handler_mock.assert_not_called()
 
     @pytest.mark.parametrize(
         ("browse_url", "links_keyword"), [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")]
     )
-    def test_pytest_runtest_teardown_bdd(
+    def test_pytest_runtest_makereport_bdd(
         self,
         clear_get_description_manager,
         description_handler_mock: mock.MagicMock,
@@ -299,7 +299,7 @@ class TestPytestCommonHooks:
         patched_proxy_factory.context.project_settings.links_keyword = links_keyword
 
         pytest_collection_modifyitems(test_pytest_bdd_session)
-        pytest_runtest_teardown(item=test_pytest_bdd_item)
+        pytest_runtest_makereport(item=test_pytest_bdd_item, call=mock.MagicMock())
         description_handler_mock.assert_called_once()
 
         if browse_url is None:

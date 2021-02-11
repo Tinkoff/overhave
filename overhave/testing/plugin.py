@@ -10,6 +10,8 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
+from _pytest.reports import TestReport
+from _pytest.runner import CallInfo
 from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
@@ -175,11 +177,13 @@ def pytest_collection_finish(session: Session) -> None:
 
 
 def pytest_runtest_setup(item: Item) -> None:
+    """ Hook for purgation of get_description_manager. """
     get_description_manager.cache_clear()
 
 
-def pytest_runtest_teardown(item: Item) -> None:
+def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:
     """ Hook for description and issue links attachment to Allure report. """
     get_description_manager().apply_description()
     if all((proxy_factory.context.project_settings.browse_url is not None, has_issue_links(item))):
         add_issue_links_to_report(project_settings=proxy_factory.context.project_settings, scenario=get_scenario(item))
+    return None  # noqa: R501
