@@ -23,6 +23,7 @@ classifiers = [
 
 [tool.poetry.scripts]
 overhave = 'overhave.cli:overhave'
+overhave-demo = 'demo:overhave_demo'
 
 [tool.poetry.plugins.pytest11]
 overhave = "overhave.testing.plugin"

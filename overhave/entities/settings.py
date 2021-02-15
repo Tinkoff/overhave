@@ -41,7 +41,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     # Template mask for fixtures pytest files which contain `feature_type` key
     fixtures_file_template_mask: str = "test_{feature_type}.py"
     # Temporary directory for scenarios test runs
-    tmp_dir: Path
+    tmp_dir: Path = Path("/tmp/overhave")
 
     @root_validator(pre=True)
     def validate_fixtures_base_dir(cls, values: Dict[str, Any]) -> Dict[str, Any]:
