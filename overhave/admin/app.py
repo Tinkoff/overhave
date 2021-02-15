@@ -9,7 +9,7 @@ from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app
 from overhave.admin.flask.login_manager import get_flask_login_manager
 from overhave.base_settings import DataBaseSettings
-from overhave.factory import IOverhaveFactory, proxy_factory
+from overhave.factory import IOverhaveFactory, get_proxy_factory
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +17,12 @@ logger = logging.getLogger(__name__)
 def _resolved_factory() -> IOverhaveFactory:
     """ Resolve necessary settings and prepare instance of :class:`IOverhaveFactory` for usage. """
     DataBaseSettings().setup_db()
-    proxy_factory.context.logging_settings.setup_logging()
-    proxy_factory.patch_pytest()
-    proxy_factory.supply_injector_for_collection()
-    proxy_factory.injector.collect_configs()
-    return proxy_factory
+    factory = get_proxy_factory()
+    factory.context.logging_settings.setup_logging()
+    factory.patch_pytest()
+    factory.supply_injector_for_collection()
+    factory.injector.collect_configs()
+    return factory
 
 
 def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:

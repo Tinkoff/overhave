@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import Callable, Dict, Type
 
 from overhave.base_settings import DataBaseSettings
+from overhave.factory.proxy_getter import get_proxy_factory
 from overhave.redis.consumer import RedisConsumer
 from overhave.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
 from overhave.redis.runner import RedisConsumerRunner
@@ -22,9 +23,10 @@ class ConsumerFactory:
 
     @cached_property
     def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]:
-        from overhave.factory import proxy_factory
-
-        return {EmulationTask: proxy_factory.emulator.start_emulation, TestRunTask: lambda _: None}  # type: ignore
+        return {
+            EmulationTask: get_proxy_factory().emulator.start_emulation,  # type: ignore
+            TestRunTask: lambda _: None,
+        }
 
     @cached_property
     def runner(self) -> RedisConsumerRunner:
