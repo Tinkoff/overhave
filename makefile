@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 70.4
+MIN_COVERAGE ?= 70.5
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
