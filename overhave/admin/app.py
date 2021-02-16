@@ -13,6 +13,8 @@ from overhave.factory import IOverhaveFactory, ProxyFactory
 
 logger = logging.getLogger(__name__)
 
+OverhaveAppType = typing.NewType('OverhaveAppType', Flask)
+
 
 def _prepare_factory(factory: ProxyFactory) -> None:
     """ Resolve necessary settings and prepare instance of :class:`ProxyFactory` for usage. """
@@ -57,7 +59,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
     return flask_app
 
 
-def overhave_app(factory: ProxyFactory) -> Flask:
+def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / 'templates'
@@ -86,4 +88,4 @@ def overhave_app(factory: ProxyFactory) -> Flask:
     def get_files(file: str) -> Response:
         return typing.cast(Response, send_from_directory(files_dir, file))
 
-    return flask_app  # noqa: R504
+    return OverhaveAppType(flask_app)
