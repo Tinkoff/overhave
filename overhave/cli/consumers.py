@@ -15,5 +15,6 @@ from overhave.redis import RedisStream
 )
 def consumer(stream: RedisStream) -> None:
     """ Run Overhave Redis consumer. """
-    get_proxy_factory().context.logging_settings.setup_logging()
-    ConsumerFactory(stream).runner.run()
+    factory = get_proxy_factory()
+    factory.context.logging_settings.setup_logging()
+    ConsumerFactory(factory=factory, stream=stream).runner.run()

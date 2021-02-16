@@ -144,25 +144,27 @@ Context setting
 ^^^^^^^^^^^^^^^
 
 Service could be configured via application context injection with prepared
-instance of `OverhaveContext` object. This context should be set using
-```overhave_core.set_context``` function.
+instance of `OverhaveContext` object. This context could be set using
+```set_context``` function of initialized ```ProxyFactory``` instance.
 
 For example, ```my_custom_context``` prepared. So, application start-up could
 be realised with follow code:
 
 .. code-block:: python
 
-    from overhave import overhave_app, overhave_core
+    from overhave import overhave_app, overhave_factory
 
-    overhave_core.set_context(my_custom_context)
-    overhave_app().run(host='localhost', port=8080, debug=True)
+    factory = overhave_factory()
+    factory.set_context(my_custom_context)
+    overhave_app(factory).run(host='localhost', port=8080, debug=True)
 
 **Note**:
 
 * ```overhave_app``` is the prepared `Flask` application with already enabled
     Flask Admin and Login Manager plug-ins;
-* ```overhave_core``` is a cached instance of the **Overhave** factory, has an
-    access to application components, directly used in ```overhave_app```.
+* ```overhave_factory``` is a function for LRU cached instance of the **Overhave**
+    factory ```ProxyFactory```; the instance has an access to application components,
+    directly used in ```overhave_app```.
 * ```my_custom_context``` is an example of context configuration, see an
     example code in `context_example.rst`_.
 
@@ -170,24 +172,24 @@ Import context in PyTest
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Overhave** has it's own built-in `PyTest`_ plugin, which is used to enable
-and configure injection of prepared context into application core
-```overhave_core```. The plugin provides two options:
+and configure injection of prepared context into application core instance.
+The plugin provides two options:
 
 * `--enable-injection` - flag to enable context injection;
 
 * `--ctx-module` - option specifying path to Python module with context injection.
 
-The module with context injection should contain
-```overhave_core.set_context``` function, but this module should be
+The module with context injection should contain usage of
+```set_context``` function, but this module should be
 unique and created only for `PyTest`_ usage instead of web-interface start-up.
 
 For example, ```module_with_injection.py``` module contains:
 
 .. code-block:: python
 
-    from overhave import overhave_core
+    from overhave import overhave_factory
 
-    overhave_core.set_context(my_custom_context)
+    overhave_factory().set_context(my_custom_context)
 
 And `PyTest` usage should be similar to:
 

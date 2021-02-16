@@ -9,20 +9,18 @@ from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app
 from overhave.admin.flask.login_manager import get_flask_login_manager
 from overhave.base_settings import DataBaseSettings
-from overhave.factory import IOverhaveFactory, get_proxy_factory
+from overhave.factory import IOverhaveFactory, ProxyFactory
 
 logger = logging.getLogger(__name__)
 
 
-def _resolved_factory() -> IOverhaveFactory:
-    """ Resolve necessary settings and prepare instance of :class:`IOverhaveFactory` for usage. """
+def _prepare_factory(factory: ProxyFactory) -> None:
+    """ Resolve necessary settings and prepare instance of :class:`ProxyFactory` for usage. """
     DataBaseSettings().setup_db()
-    factory = get_proxy_factory()
     factory.context.logging_settings.setup_logging()
     factory.patch_pytest()
     factory.supply_injector_for_collection()
     factory.injector.collect_configs()
-    return factory
 
 
 def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
@@ -59,13 +57,13 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
     return flask_app
 
 
-def overhave_app() -> Flask:
+def overhave_app(factory: ProxyFactory) -> Flask:
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / 'templates'
     files_dir = current_dir / 'files'
 
-    factory = _resolved_factory()
+    _prepare_factory(factory)
     flask_app = _resolved_app(factory=factory, template_dir=template_dir)
 
     @flask_app.teardown_request
