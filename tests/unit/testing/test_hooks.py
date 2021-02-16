@@ -12,7 +12,7 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
-from overhave.factory import IOverhaveFactory
+from overhave.factory import ProxyFactory
 from overhave.testing import get_scenario, has_issue_links
 from overhave.testing.plugin import (
     _GROUP_HELP,
@@ -41,7 +41,7 @@ class TestPytestBddHooks:
     """ Unit tests for pytest-bdd wrapped hooks. """
 
     def test_pytest_bdd_before_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: IOverhaveFactory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: ProxyFactory
     ):
         pytest_bdd_before_step(
             request=request,
@@ -53,7 +53,7 @@ class TestPytestBddHooks:
         assert cast(mock.MagicMock, patched_proxy_factory.context).called_once()
 
     def test_pytest_bdd_after_step_failed(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: IOverhaveFactory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: ProxyFactory
     ):
         with pytest.raises(StepContextNotDefinedError):
             pytest_bdd_after_step(
@@ -66,7 +66,7 @@ class TestPytestBddHooks:
             )
 
     def test_pytest_bdd_after_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: IOverhaveFactory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: ProxyFactory
     ):
         pytest_bdd_before_step(
             request=request,
@@ -85,7 +85,7 @@ class TestPytestBddHooks:
         )
 
     def test_pytest_bdd_step_error(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: IOverhaveFactory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_proxy_factory: ProxyFactory
     ):
         pytest_bdd_before_step(
             request=request,
@@ -149,16 +149,14 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         import_module_mock: mock.MagicMock,
         test_prepared_config: Config,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         pytest_configure(test_prepared_config)
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
         assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is None
         terminal_writer_mock.assert_called_once()
         import_module_mock.assert_not_called()
-        assert not cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+        assert not patched_proxy_factory._pytest_patched
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     def test_pytest_configure_enabled_injection_without_context_module(
@@ -167,10 +165,8 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
@@ -179,7 +175,7 @@ class TestPytestCommonHooks:
         )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_not_called()
-        assert cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+        assert patched_proxy_factory._pytest_patched
 
     @pytest.mark.parametrize(
         "getoption_mapping",
@@ -192,10 +188,8 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
@@ -204,7 +198,7 @@ class TestPytestCommonHooks:
         )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_not_called()
-        assert not cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+        assert not patched_proxy_factory._pytest_patched
 
     @pytest.mark.parametrize(
         "getoption_mapping",
@@ -217,10 +211,8 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
@@ -229,7 +221,7 @@ class TestPytestCommonHooks:
         )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_called_once()
-        assert cast(ProxyFactory, patched_proxy_factory)._pytest_patched
+        assert patched_proxy_factory._pytest_patched
 
     def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
         with mock.patch(
@@ -244,7 +236,7 @@ class TestPytestCommonHooks:
         self,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
         links_keyword: Optional[str],
     ):
         patched_proxy_factory.context.project_settings.links_keyword = links_keyword
@@ -272,13 +264,11 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_called_once()
-        assert cast(ProxyFactory, patched_proxy_factory)._collection_prepared is False
+        assert patched_proxy_factory._collection_prepared is False
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     def test_pytest_collection_finish_injection_enabled_with_patched_pytest(
@@ -286,14 +276,12 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
-        from overhave.factory import ProxyFactory
-
         pytest_configure(test_pytest_bdd_session.config)
         pytest_collection_finish(test_pytest_bdd_session)
         assert terminal_writer_mock.call_count == 2
-        assert cast(ProxyFactory, patched_proxy_factory)._collection_prepared
+        assert patched_proxy_factory._collection_prepared
 
     def test_pytest_runtest_setup(self, test_clean_item: Item):
         with mock.patch(
@@ -309,7 +297,7 @@ class TestPytestCommonHooks:
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
     ):
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
@@ -328,7 +316,7 @@ class TestPytestCommonHooks:
         faker: Faker,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_proxy_factory: IOverhaveFactory,
+        patched_proxy_factory: ProxyFactory,
         browse_url: Optional[str],
         links_keyword: Optional[str],
     ):

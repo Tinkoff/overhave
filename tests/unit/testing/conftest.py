@@ -90,11 +90,12 @@ def test_step_context_runner(test_logging_settings: OverhaveLoggingSettings) -> 
 
 @pytest.fixture()
 def patched_proxy_factory() -> ProxyFactory:
-    from overhave.factory import proxy_factory
+    from overhave.factory import get_proxy_factory
 
-    proxy_factory.set_context(mock.MagicMock())
-    proxy_factory._pytest_patched = False
-    return proxy_factory
+    get_proxy_factory.cache_clear()
+    factory = get_proxy_factory()
+    factory.set_context(mock.MagicMock())
+    return factory
 
 
 @pytest.fixture()

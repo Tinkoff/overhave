@@ -15,7 +15,7 @@ from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import proxy_factory
+from overhave.factory import get_proxy_factory
 from overhave.storage.scenario_test_run import create_test_run
 
 logger = logging.getLogger(__name__)
@@ -92,14 +92,15 @@ class FeatureView(ModelViewConfigured):
 
     @cached_property
     def get_bdd_steps(self) -> Dict[str, Dict[str, List[str]]]:
+        factory = get_proxy_factory()
         return {
-            feature_type: proxy_factory.injector.get_steps(feature_type)
-            for feature_type in proxy_factory.feature_extractor.feature_types
+            feature_type: factory.injector.get_steps(feature_type)
+            for feature_type in factory.feature_extractor.feature_types
         }
 
     @property
     def browse_url(self) -> Optional[str]:
-        browse_url_value = proxy_factory.context.project_settings.browse_url
+        browse_url_value = get_proxy_factory().context.project_settings.browse_url
         if browse_url_value is not None:
             return cast(str, browse_url_value.human_repr())
         return None
@@ -114,7 +115,7 @@ class FeatureView(ModelViewConfigured):
             return rendered
 
         test_run_id = create_test_run(scenario_id=int(scenario_id), executed_by=current_user.login)
-        return cast(werkzeug.Response, proxy_factory.processor.execute_test(test_run_id))
+        return cast(werkzeug.Response, get_proxy_factory().processor.execute_test(test_run_id))
 
     @expose('/edit/', methods=('GET', 'POST'))
     def edit_view(self) -> werkzeug.Response:

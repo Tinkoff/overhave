@@ -4,6 +4,8 @@ from typing import Any, List, Optional
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
 
+from overhave.db import TestRunStatus
+
 
 def datetime_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     time: Optional[datetime.datetime] = getattr(model, name)
@@ -23,17 +25,30 @@ def task_formatter(view: ModelView, context: Any, model: Any, name: str) -> Mark
     return Markup(", ".join(task_links))
 
 
+def _get_button_class_by_status(status: str) -> str:
+    enum_member = TestRunStatus[status]
+    if enum_member is TestRunStatus.SUCCESS:
+        return "success-btn"
+    return "default-btn"
+
+
 def result_report_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     status = getattr(model, name)
     if not status:
         return Markup("")
+
     report_link = getattr(model, 'report')
-    if not report_link:
-        return Markup(f"{status}")
+    if report_link:
+        action = f"action='/reports/{report_link}' target='_blank'"
+        title = "Go to report"
+    else:
+        action = f"action='/testrun/details/?id={model.id}'"
+        title = "Show details"
+
     return Markup(
-        f"<form action='/reports/{ report_link }' target='_blank'>"
-        "<fieldset title='Go to Allure report'>"
-        f"<button class='link-button'>{status}</button>"
+        f"<form {action}>"
+        f"<fieldset title='{title}'>"
+        f"<button class='link-button {_get_button_class_by_status(status)}'>{status}</button>"
         "</fieldset>"
         "</form>"
     )

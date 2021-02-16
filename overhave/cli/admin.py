@@ -1,15 +1,17 @@
 import click
 
-from overhave.base_settings import DataBaseSettings
+from overhave import overhave_app
 from overhave.cli.group import overhave
+from overhave.factory import get_proxy_factory
+
+
+def _run_admin(port: int, debug: bool) -> None:
+    factory = get_proxy_factory()
+    overhave_app(factory).run(host='0.0.0.0', port=port, debug=debug)
 
 
 @overhave.command(short_help='Run Overhave web-service')
 @click.option('--port', default=8076)
-def admin(port: int) -> None:
-    """ Run Overhave web-service. """
-    from overhave.admin import overhave_app
-
-    DataBaseSettings().setup_db()
-
-    overhave_app().run(host='0.0.0.0', port=port, debug=True)
+@click.option('--debug', default=False)
+def admin(port: int, debug: bool) -> None:
+    _run_admin(port, debug)

@@ -16,7 +16,7 @@ from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave.factory import proxy_factory
+from overhave.factory import get_proxy_factory
 from overhave.testing.plugin_utils import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
@@ -96,7 +96,7 @@ def pytest_configure(config: Config) -> None:
 
                 importlib.import_module(factory_context_path)
             logger.debug("Try to patch pytest objects...")
-            proxy_factory.patch_pytest()
+            get_proxy_factory().patch_pytest()
             logger.debug("Successfully patched pytest objects.")
             tw.line("Overhave injector successfully initialized.", green=True)
         except ValidationError as e:
@@ -108,7 +108,7 @@ def pytest_collection_modifyitems(session: Session) -> None:
     for item in pytest_bdd_scenario_items:
         add_scenario_title_to_report(item)
 
-        links_keyword = proxy_factory.context.project_settings.links_keyword
+        links_keyword = get_proxy_factory().context.project_settings.links_keyword
         if isinstance(links_keyword, str):
             set_issue_links(scenario=get_scenario(item), keyword=links_keyword)
 
@@ -165,15 +165,16 @@ def pytest_collection_finish(session: Session) -> None:
     """ Supplying of injector configs for steps collection. """
     if session.config.getoption(_OptionName.ENABLE_INJECTION.as_variable):
         tw = _pytest.config.create_terminal_writer(session.config)
-        if not proxy_factory.pytest_patched:
+        factory = get_proxy_factory()
+        if not factory.pytest_patched:
             tw.line("Could not supplement Overhave injector - pytest session has not been patched!", yellow=True)
             return
         try:
-            proxy_factory.supply_injector_for_collection()
+            factory.supply_injector_for_collection()
             tw.line("Overhave injector successfully supplemented.", green=True)
         except ValidationError as e:
             tw.line(f"Could not supplement Overhave injector!\n{str(e)}", red=True)
-        proxy_factory.injector.adapt(session)
+        factory.injector.adapt(session)
 
 
 def pytest_runtest_setup(item: Item) -> None:
@@ -184,6 +185,7 @@ def pytest_runtest_setup(item: Item) -> None:
 def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:
     """ Hook for description and issue links attachment to Allure report. """
     get_description_manager().apply_description()
-    if all((proxy_factory.context.project_settings.browse_url is not None, has_issue_links(item))):
-        add_issue_links_to_report(project_settings=proxy_factory.context.project_settings, scenario=get_scenario(item))
+    factory = get_proxy_factory()
+    if all((factory.context.project_settings.browse_url is not None, has_issue_links(item))):
+        add_issue_links_to_report(project_settings=factory.context.project_settings, scenario=get_scenario(item))
     return None  # noqa: R501

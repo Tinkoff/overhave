@@ -13,13 +13,13 @@ def add_scenario_title_to_report(item: Item) -> None:
 
 @lru_cache(maxsize=None)
 def get_step_context_runner() -> StepContextRunner:
-    from overhave.factory import proxy_factory
+    from overhave.factory import get_proxy_factory
 
-    return StepContextRunner(logging_settings=proxy_factory.context.logging_settings)
+    return StepContextRunner(logging_settings=get_proxy_factory().context.logging_settings)
 
 
 @lru_cache(maxsize=None)
 def get_description_manager() -> DescriptionManager:
-    from overhave.factory import proxy_factory
+    from overhave.factory import get_proxy_factory
 
-    return DescriptionManager(settings=proxy_factory.context.description_manager_settings)
+    return DescriptionManager(settings=get_proxy_factory().context.description_manager_settings)

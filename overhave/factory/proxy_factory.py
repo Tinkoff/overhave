@@ -1,5 +1,6 @@
 from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
 from overhave.factory.abstract_factory import IOverhaveFactory
+from overhave.factory.base_factory import OverhaveBaseFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.redis import RedisProducer
@@ -16,8 +17,6 @@ class ProxyFactory(IOverhaveFactory):
     """
 
     def __init__(self) -> None:
-        from overhave.factory.base_factory import OverhaveBaseFactory
-
         self._factory = OverhaveBaseFactory()
         self._pytest_patched = False
         self._collection_prepared = False

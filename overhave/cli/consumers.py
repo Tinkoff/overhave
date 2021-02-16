@@ -1,7 +1,7 @@
 import click
 
 from overhave.cli.group import overhave
-from overhave.factory import ConsumerFactory, proxy_factory
+from overhave.factory import ConsumerFactory, get_proxy_factory
 from overhave.redis import RedisStream
 
 
@@ -15,5 +15,6 @@ from overhave.redis import RedisStream
 )
 def consumer(stream: RedisStream) -> None:
     """ Run Overhave Redis consumer. """
-    proxy_factory.context.logging_settings.setup_logging()
-    ConsumerFactory(stream).runner.run()
+    factory = get_proxy_factory()
+    factory.context.logging_settings.setup_logging()
+    ConsumerFactory(factory=factory, stream=stream).runner.run()
