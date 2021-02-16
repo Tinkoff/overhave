@@ -4,7 +4,18 @@ from typing import List
 from pydantic.main import BaseModel
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
-from overhave.db import Emulation, EmulationRun, Feature, FeatureType, Scenario, TestRun, TestUser, create_session
+from overhave.db import (
+    Emulation,
+    EmulationRun,
+    Feature,
+    FeatureType,
+    Scenario,
+    TestReportStatus,
+    TestRun,
+    TestRunStatus,
+    TestUser,
+    create_session,
+)
 from overhave.entities.feature import FeatureTypeName
 
 
@@ -36,6 +47,8 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     id: int
     executed_by: str
     start: datetime
+    status: TestRunStatus
+    report_status: TestReportStatus
 
 
 class ProcessingContext(BaseModel):

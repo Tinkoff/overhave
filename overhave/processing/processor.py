@@ -77,7 +77,7 @@ class Processor(IProcessor):
             return None
 
     def _process_run(self, run_id: int) -> None:
-        set_run_status(run_id, db.TestRunStatus.RUNNING)
+        set_run_status(run_id=run_id, status=db.TestRunStatus.RUNNING)
         try:
             ctx = get_context_by_test_run_id(run_id)
 
@@ -88,10 +88,10 @@ class Processor(IProcessor):
             logger.debug("Test returncode: %s", test_return_code)
 
             if test_return_code == 0:
-                set_run_status(run_id, db.TestRunStatus.SUCCESS)
+                set_run_status(run_id=run_id, status=db.TestRunStatus.SUCCESS)
             else:
                 set_traceback(run_id, "Test run failed! Something went wrong...")
-                set_run_status(run_id, db.TestRunStatus.FAILED)
+                set_run_status(run_id=run_id, status=db.TestRunStatus.FAILED)
 
             allure_tmpdir_name = str(uuid.uuid1())
             logger.debug("Allure report directory: %s", allure_tmpdir_name)
@@ -102,9 +102,11 @@ class Processor(IProcessor):
                 logger.debug(
                     "Allure report successfully generated to directory: %s", report_dir.as_posix(),
                 )
-                set_report(run_id, f"{allure_tmpdir_name}/index.html")
+                set_report(
+                    run_id=run_id, status=db.TestReportStatus.GENERATED, report=f"{allure_tmpdir_name}/index.html"
+                )
             else:
-                set_report(run_id, self._settings.report_creation_error_msg)
+                set_report(run_id=run_id, status=db.TestReportStatus.GENERATION_FAILED)
 
         except Exception as e:
             logger.exception("Error!")

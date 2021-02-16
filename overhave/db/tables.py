@@ -8,7 +8,7 @@ from flask import url_for
 from sqlalchemy import orm as so
 
 from overhave.db.base import Base, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
-from overhave.db.statuses import EmulationStatus, TestRunStatus
+from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
 from overhave.db.users import UserRole
 
@@ -58,7 +58,8 @@ class TestRun(Base, PrimaryKeyMixin):
     end = sa.Column(DATETIME_TYPE, doc="Test finish time")
     executed_by = sa.Column(SHORT_STR_TYPE, doc="Test executor login", nullable=False)
 
-    status = sa.Column(sa.Enum(TestRunStatus), doc="Current test status")
+    status = sa.Column(sa.Enum(TestRunStatus), doc="Current test status", nullable=False)
+    report_status = sa.Column(sa.Enum(TestReportStatus), doc="Report generation result", nullable=False)
     report = sa.Column(TEXT_TYPE, doc="Relative report URL")
     traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback")
 

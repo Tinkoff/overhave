@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
 
-from overhave.db import TestRunStatus
+from overhave.db import TestReportStatus, TestRunStatus
 
 
 def datetime_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
@@ -37,9 +37,9 @@ def result_report_formatter(view: ModelView, context: Any, model: Any, name: str
     if not status:
         return Markup("")
 
-    report_link = getattr(model, 'report')
-    if report_link:
-        action = f"href='/reports/{report_link}' target='_blank'"
+    report_status = TestReportStatus[getattr(model, 'report_status')]
+    if report_status.has_report:
+        action = f"href='/reports/{getattr(model, 'report')}' target='_blank'"
         title = "Go to report"
     else:
         action = f"href='/testrun/details/?id={model.id}'"
