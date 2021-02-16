@@ -48,7 +48,7 @@ class ModelViewConfigured(ModelView):
         user="Author of scenarios set",
         released="Features repository publishing status",
         executed_by="Initiator of scenarios set test run",
-        status="Result scenarios set test run",
+        status="Test run result",
     )
 
     def is_accessible(self) -> Any:
