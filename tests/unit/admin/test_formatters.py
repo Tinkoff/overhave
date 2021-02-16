@@ -30,11 +30,13 @@ class TestResultReportFormatter:
             name="status",
         )
         assert result == Markup(
-            f"<form action='/testrun/details/?id={test_testrun_id}'>"
+            f"<a href='/testrun/details/?id={test_testrun_id}'"
+            f"<form action='#'>"
             f"<fieldset title='Show details'>"
             f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
             "</fieldset>"
             "</form>"
+            "</a>"
         )
 
     @pytest.mark.parametrize("status", [x.value for x in list(TestRunStatus)])
@@ -54,9 +56,11 @@ class TestResultReportFormatter:
             name="status",
         )
         assert result == Markup(
-            f"<form action='/reports/{test_testrun_report_link}' target='_blank'>"
+            f"<a href='/reports/{test_testrun_report_link}' target='_blank'"
+            f"<form action='#'>"
             f"<fieldset title='Go to report'>"
             f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
             "</fieldset>"
             "</form>"
+            "</a>"
         )

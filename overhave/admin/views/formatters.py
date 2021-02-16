@@ -39,18 +39,20 @@ def result_report_formatter(view: ModelView, context: Any, model: Any, name: str
 
     report_link = getattr(model, 'report')
     if report_link:
-        action = f"action='/reports/{report_link}' target='_blank'"
+        action = f"href='/reports/{report_link}' target='_blank'"
         title = "Go to report"
     else:
-        action = f"action='/testrun/details/?id={model.id}'"
+        action = f"href='/testrun/details/?id={model.id}'"
         title = "Show details"
 
     return Markup(
-        f"<form {action}>"
+        f"<a {action}"
+        f"<form action='#'>"
         f"<fieldset title='{title}'>"
         f"<button class='link-button {_get_button_class_by_status(status)}'>{status}</button>"
         "</fieldset>"
         "</form>"
+        "</a>"
     )
 
 
