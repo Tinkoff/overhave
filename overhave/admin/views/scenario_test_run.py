@@ -16,12 +16,25 @@ class TestRunView(ModelViewConfigured):
     list_template = 'test_run_list.html'
     details_template = 'test_run_detail.html'
     can_edit = True
-    column_exclude_list = ('scenario', 'traceback', 'report_status', 'report', 'created_at')  # type: ignore
     column_searchable_list = (
         'name',
         'executed_by',
     )
-    column_filters = ('name', 'start', 'executed_by', 'status')
+    column_list = (
+        'id',
+        'name',
+        'start',
+        'end',
+        'executed_by',
+        'status',
+        'created_at',
+    )
+    column_filters = (
+        'name',
+        'start',
+        'executed_by',
+        'status',
+    )
 
     column_formatters = dict(status=result_report_formatter,)
 

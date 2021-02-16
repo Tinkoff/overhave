@@ -27,7 +27,7 @@ class EmulationView(ModelViewConfigured):
     can_view_details = False
     column_list = ['id', 'name', 'test_user.feature_type', 'test_user', 'created_by']
     column_searchable_list = ['name', 'created_by']
-    form_excluded_columns = ('created_at', 'creator', 'emulation_runs')
+    form_excluded_columns = ('created_at', 'emulation_runs')
 
     column_labels = {"test_user.feature_type": "Template type"}
     column_descriptions = {
