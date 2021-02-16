@@ -32,4 +32,4 @@ def has_issue_links(item: Item) -> bool:
 
 def add_issue_links_to_report(project_settings: OverhaveProjectSettings, scenario: Scenario) -> None:
     for link in scenario.feature.links:
-        allure.dynamic.link(url=project_settings.get_link_url(link), name=link)
+        allure.dynamic.link(url=project_settings.get_link_url(link), link_type="issue", name=link)

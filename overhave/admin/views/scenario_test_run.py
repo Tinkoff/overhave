@@ -16,7 +16,7 @@ class TestRunView(ModelViewConfigured):
     list_template = 'test_run_list.html'
     details_template = 'test_run_detail.html'
     can_edit = True
-    column_exclude_list = ('scenario', 'traceback', 'report', 'created_at')  # type: ignore
+    column_exclude_list = ('scenario', 'traceback', 'report_status', 'report', 'created_at')  # type: ignore
     column_searchable_list = (
         'name',
         'executed_by',
