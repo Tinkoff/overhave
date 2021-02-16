@@ -8,6 +8,7 @@ from overhave.entities import (
     OverhaveScenarioCompilerSettings,
     ProcessorSettings,
 )
+from overhave.entities.authorization import AuthorizationStrategy
 from overhave.entities.authorization.settings import (
     OverhaveAdminSettings,
     OverhaveAuthorizationSettings,
@@ -46,7 +47,6 @@ class OverhaveContext:
         self.emulation_settings = emulation_settings or OverhaveEmulationSettings()
         self.file_settings = file_settings or OverhaveFileSettings()
         self.language_settings = language_settings or OverhaveLanguageSettings()
-        self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()
         self.processor_settings = processor_settings or ProcessorSettings()
         self.project_settings = project_settings or OverhaveProjectSettings()
         self.stash_client_settings = stash_client_settings or OverhaveStashClientSettings()
@@ -54,3 +54,6 @@ class OverhaveContext:
         self.test_settings = test_settings or OverhaveTestSettings()
         self.logging_settings = logging_settings or OverhaveLoggingSettings()
         self.description_manager_settings = description_manager_settings or OverhaveDescriptionManagerSettings()
+
+        if self.auth_settings.auth_strategy is AuthorizationStrategy.LDAP:
+            self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()
