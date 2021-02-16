@@ -1,9 +1,11 @@
+from typing import Optional
+
 import pytest
 from markupsafe import Markup
 from pytest_mock import MockerFixture
 
 from overhave.admin.views import TestRunView, result_report_formatter
-from overhave.db import TestRun, TestRunStatus
+from overhave.db import TestReportStatus, TestRun, TestRunStatus
 
 
 class TestResultReportFormatter:
@@ -14,49 +16,59 @@ class TestResultReportFormatter:
             view=test_testrun_view, context=mocker.MagicMock(), model=TestRun(), name="status"
         ) == Markup("")
 
-    @pytest.mark.parametrize("status", [x.value for x in list(TestRunStatus)])
-    def test_success_status_no_report(
+    @pytest.mark.parametrize("status", list(TestRunStatus))
+    @pytest.mark.parametrize("report_status", [x for x in list(TestReportStatus) if not x.has_report])
+    def test_no_report(
         self,
         test_testrun_view,
         mocker: MockerFixture,
         test_testrun_id: int,
-        status: str,
+        status: TestRunStatus,
+        report_status: TestReportStatus,
         test_testrun_button_css_class: str,
     ):
         result = result_report_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(id=test_testrun_id, status=status),
+            model=TestRun(id=test_testrun_id, status=status, report_status=report_status),
             name="status",
         )
         assert result == Markup(
-            f"<form action='/testrun/details/?id={test_testrun_id}'>"
+            f"<a href='/testrun/details/?id={test_testrun_id}'"
+            f"<form action='#'>"
             f"<fieldset title='Show details'>"
             f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
             "</fieldset>"
             "</form>"
+            "</a>"
         )
 
-    @pytest.mark.parametrize("status", [x.value for x in list(TestRunStatus)])
-    def test_success_status_with_report(
+    @pytest.mark.parametrize("status", list(TestRunStatus))
+    @pytest.mark.parametrize("report_status", [x for x in list(TestReportStatus) if x.has_report])
+    def test_with_report(
         self,
         test_testrun_view,
         mocker: MockerFixture,
         test_testrun_id: int,
-        test_testrun_report_link: str,
-        status: str,
+        status: TestRunStatus,
+        report_status: TestReportStatus,
+        test_testrun_report_link: Optional[str],
         test_testrun_button_css_class: str,
     ):
         result = result_report_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(id=test_testrun_id, status=status, report=test_testrun_report_link),
+            model=TestRun(
+                id=test_testrun_id, status=status, report_status=report_status, report=test_testrun_report_link
+            ),
             name="status",
         )
         assert result == Markup(
-            f"<form action='/reports/{test_testrun_report_link}' target='_blank'>"
+            f"<a href='/reports/{test_testrun_report_link}' target='_blank'"
+            f"<form action='#'>"
             f"<fieldset title='Go to report'>"
             f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
             "</fieldset>"
             "</form>"
+            "</a>"
         )

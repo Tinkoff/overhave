@@ -6,6 +6,8 @@ FROM ${IMAGE_BASE}overhave-base:${POETRY_CONTENT_HASH}
 COPY ./overhave /code/overhave
 COPY ./docs /code/docs
 COPY ./tests /code/tests
+
+COPY ./demo.py /code/demo.py
 COPY ./makefile /code/makefile
 COPY ./setup.cfg /code/setup.cfg
 COPY ./README.rst /code/README.rst

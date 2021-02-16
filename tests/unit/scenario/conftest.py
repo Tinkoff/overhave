@@ -57,6 +57,7 @@ def test_testrun() -> TestRunModel:
         end=get_current_time(),
         executed_by="executor",
         status="SUCCESS",
+        report_status="GENERATION_FAILED",
         report=None,
         traceback=None,
     )

@@ -14,7 +14,7 @@ class OverhaveDemoSettings(BaseOverhavePrefix):
     docs_dir: Path = Path(__file__).parent / "docs"
 
     @validator("docs_dir")
-    def check_existence(cls, v: Path):
+    def check_existence(cls, v: Path) -> Path:
         if not v.exists():
             raise ValueError(f"Could not find docs directory: '{v}'!")
         return v
@@ -23,8 +23,16 @@ class OverhaveDemoSettings(BaseOverhavePrefix):
     def features_base_dir(self) -> Path:
         return self.docs_dir / "includes" / "features_structure_example"
 
+    @property
+    def _prefix(self) -> str:
+        return self.__config__.env_prefix
+
     def enrich_env(self) -> None:
-        environ[self.__config__.env_prefix + "features_base_dir"] = self.features_base_dir.as_posix()
+        environ[self._prefix + "features_base_dir"] = self.features_base_dir.as_posix()
+        environ[self._prefix + "stash_url"] = "https://overhave.readthedocs.io"
+        environ[self._prefix + "auth_token"] = "secret_token"
+        environ[self._prefix + "repository_name"] = "bdd-features"
+        environ[self._prefix + "project_key"] = "OVH"
 
 
 @click.group(context_settings={'help_option_names': ['-h', '--help']})

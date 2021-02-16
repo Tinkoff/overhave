@@ -1,5 +1,5 @@
 # flake8: noqa
-from overhave.admin import overhave_app
+from overhave.admin import OverhaveAppType, overhave_app
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import OverhaveLoggingSettings
 from overhave.cli import group, set_config_to_context
@@ -19,7 +19,7 @@ from overhave.entities.authorization.settings import (
     OverhaveLdapClientSettings,
 )
 from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
-from overhave.factory import OverhaveContext
+from overhave.factory import OverhaveContext, OverhaveFactoryType
 from overhave.factory import get_proxy_factory as overhave_factory
 from overhave.redis import RedisStream as OverhaveRedisConsumerApp
 from overhave.stash import OverhaveStashClientSettings, OverhaveStashProjectSettings
