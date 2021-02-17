@@ -29,7 +29,7 @@ class TestingUserView(ModelViewConfigured):
     can_view_details = False
     column_list = ['id', 'name', 'feature_type', 'specification', 'created_by']
     column_searchable_list = ['name', 'created_by']
-    form_excluded_columns = ('created_at', 'creator')
+    form_excluded_columns = 'created_at'
     form_overrides = dict(specification=JSONField)
 
     form_extra_fields = {'template': JSONField('Specification format')}
@@ -41,6 +41,7 @@ class TestingUserView(ModelViewConfigured):
         name="Test user name",
         feature_type="Type of scenarios set, where test user will be used",
         specification="Test user specification in JSON format placed below",
+        created_by="Author of test user set",
     )
 
     _feature_type: Optional[str] = None

@@ -54,8 +54,8 @@ class FeatureView(ModelViewConfigured):
     create_template = 'feature_create.html'
     edit_template = 'feature_edit.html'
 
-    column_list = ('id', 'name', 'feature_type', 'task', 'user', 'created_at', 'last_edited_by', 'released')
-    form_excluded_columns = ('created_at', 'user', 'last_edited_by', 'released', 'versions')
+    column_list = ('id', 'name', 'feature_type', 'task', 'author', 'created_at', 'last_edited_by', 'released')
+    form_excluded_columns = ('created_at', 'last_edited_by', 'released', 'versions')
     column_searchable_list = [
         'id',
         'name',

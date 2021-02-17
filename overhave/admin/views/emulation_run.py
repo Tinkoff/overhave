@@ -29,6 +29,16 @@ class EmulationRunView(ModelViewConfigured):
     column_filters = ('emulation.name', 'emulation.created_by', 'status')
     column_searchable_list = ('emulation.name', 'emulation.created_by')
 
+    column_details_list = (
+        'emulation.name',
+        'id',
+        'status',
+        'changed_at',
+        'port',
+        'traceback',
+        'created_at',
+        'initiated_by',
+    )
     column_descriptions = dict(status="Emulation run status", initiated_by="Initiator of emulation start")
 
     def on_model_delete(self, model: db.EmulationRun) -> None:

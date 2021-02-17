@@ -36,7 +36,6 @@ class Feature(Base, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
-    user = so.relationship(UserRole)
 
 
 @su.generic_repr('feature_id')
@@ -53,13 +52,12 @@ class TestRun(Base, PrimaryKeyMixin):
     """ Test runs table. """
 
     scenario_id = sa.Column(INT_TYPE, sa.ForeignKey(Scenario.id), nullable=False, index=True)
-    name = sa.Column(LONG_STR_TYPE, nullable=False)
+    name = sa.Column(LONG_STR_TYPE, sa.ForeignKey(Feature.name), nullable=False)
     start = sa.Column(DATETIME_TYPE, doc="Test start time", nullable=False)
     end = sa.Column(DATETIME_TYPE, doc="Test finish time")
-    executed_by = sa.Column(SHORT_STR_TYPE, doc="Test executor login", nullable=False)
-
     status = sa.Column(sa.Enum(TestRunStatus), doc="Current test status", nullable=False)
     report_status = sa.Column(sa.Enum(TestReportStatus), doc="Report generation result", nullable=False)
+    executed_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Test executor login", nullable=False)
     report = sa.Column(TEXT_TYPE, doc="Relative report URL")
     traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback")
 
@@ -112,7 +110,6 @@ class TestUser(Base, PrimaryKeyMixin):
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
 
     feature_type = so.relationship(FeatureType)
-    creator = so.relationship(UserRole)
 
 
 class Emulation(Base, PrimaryKeyMixin):
@@ -123,7 +120,6 @@ class Emulation(Base, PrimaryKeyMixin):
     command = sa.Column(TEXT_TYPE, nullable=False, doc="Command for emulator's execution")
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
     test_user = so.relationship(TestUser)
-    creator = so.relationship(UserRole)
 
 
 class EmulationRun(Base, PrimaryKeyMixin):

@@ -45,7 +45,7 @@ class ModelViewConfigured(ModelView):
         feature_type="Type of scenarios set",
         task="Tracker tasks converted to web links when viewed",
         last_edited_by="Last editor of scenarios set",
-        user="Author of scenarios set",
+        author="Author of scenarios set",
         released="Features repository publishing status",
         executed_by="Initiator of scenarios set test run",
         status="Test run result",
