@@ -1,11 +1,13 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
 import pytest
 from markupsafe import Markup
 from pytest_mock import MockerFixture
 
-from overhave.admin.views import TestRunView, result_report_formatter
+from overhave.admin.views import TestRunView, datetime_formatter, result_report_formatter
 from overhave.db import TestReportStatus, TestRun, TestRunStatus
+from overhave.utils import get_current_time
 
 
 class TestResultReportFormatter:
@@ -72,3 +74,31 @@ class TestResultReportFormatter:
             "</form>"
             "</a>"
         )
+
+
+class TestDatetimeFormatter:
+    """ Unit tests for datetime_formatter. """
+
+    def test_empty_status(self, test_testrun_view: TestRunView, mocker: MockerFixture):
+        assert datetime_formatter(
+            view=test_testrun_view, context=mocker.MagicMock(), model=TestRun(), name="start"
+        ) == Markup("")
+
+    @pytest.mark.parametrize(
+        ("column_name", "time"),
+        [
+            ("created_at", get_current_time()),
+            ("start", get_current_time() + timedelta(seconds=1)),
+            ("end", get_current_time() + timedelta(seconds=5)),
+        ],
+    )
+    def test_time(
+        self, test_testrun_view, mocker: MockerFixture, test_testrun_id: int, column_name: str, time: datetime
+    ):
+        result = datetime_formatter(
+            view=test_testrun_view,
+            context=mocker.MagicMock(),
+            model=TestRun(**{"id": test_testrun_id, column_name: time}),
+            name=column_name,
+        )
+        assert result == Markup(time.strftime('%d-%m-%Y %H:%M:%S'))
