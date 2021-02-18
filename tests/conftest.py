@@ -1,14 +1,14 @@
 import logging
-from typing import Iterator
+from typing import Callable, Iterator
 
 import pytest
 import sqlalchemy_utils as sau
 from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
-from sqlalchemy_utils import drop_database
 
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
+from overhave.factory import ProxyFactory, get_proxy_factory
 from tests.objects import DataBaseContext, XDistWorkerValueType
 
 
@@ -41,7 +41,7 @@ def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
     db_context = DataBaseContext(metadata=metadata, engine=engine)
     create_metadata(db_context)
     yield db_context
-    drop_database(db_settings.db_url)
+    sau.drop_database(db_settings.db_url)
 
 
 def truncate_all_tables(metadata: MetaData) -> None:
@@ -60,3 +60,9 @@ def database(db_context: DataBaseContext) -> Iterator[None]:
     truncate_all_tables(db_context.metadata)
     yield
     close_all_sessions()
+
+
+@pytest.fixture()
+def clean_proxy_factory() -> Callable[[], ProxyFactory]:
+    get_proxy_factory.cache_clear()
+    return get_proxy_factory

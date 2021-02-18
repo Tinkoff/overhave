@@ -27,7 +27,6 @@ class TestRunView(ModelViewConfigured):
         'end',
         'executed_by',
         'status',
-        'created_at',
     )
     column_filters = (
         'name',

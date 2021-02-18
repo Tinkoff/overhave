@@ -67,6 +67,7 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
 
     _prepare_factory(factory)
     flask_app = _resolved_app(factory=factory, template_dir=template_dir)
+    flask_app.config["FILES_DIR"] = files_dir
 
     @flask_app.teardown_request
     def remove_session(exception: typing.Optional[Exception]) -> None:
@@ -87,5 +88,9 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     @flask_app.route('/files/<path:file>')
     def get_files(file: str) -> Response:
         return typing.cast(Response, send_from_directory(files_dir, file))
+
+    @flask_app.route('/favicon.ico')
+    def favicon() -> Response:
+        return typing.cast(Response, send_from_directory(files_dir, 'favicon.ico', mimetype='image/vnd.microsoft.icon'))
 
     return OverhaveAppType(flask_app)

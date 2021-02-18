@@ -10,7 +10,7 @@ from overhave.db import TestReportStatus, TestRunStatus
 def datetime_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     time: Optional[datetime.datetime] = getattr(model, name)
     if time:
-        return Markup(time.isoformat(sep=' ', timespec='seconds'))
+        return Markup(time.strftime('%d-%m-%Y %H:%M:%S'))
     return Markup("")
 
 
