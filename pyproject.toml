@@ -90,6 +90,7 @@ python_classes = ["*Test", "Test*"]
 python_functions = ["test_*"]
 filterwarnings = ["ignore::DeprecationWarning:sqlalchemy_utils.observer"]
 xfail_strict=true
+bdd_features_base_dir="docs/includes/features_structure_example"
 
 [tool.isort]
 balanced_wrapping = true

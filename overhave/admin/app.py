@@ -88,4 +88,8 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     def get_files(file: str) -> Response:
         return typing.cast(Response, send_from_directory(files_dir, file))
 
+    @flask_app.route('/favicon.ico')
+    def favicon() -> Response:
+        return typing.cast(Response, send_from_directory(files_dir, 'favicon.ico', mimetype='image/vnd.microsoft.icon'))
+
     return OverhaveAppType(flask_app)
