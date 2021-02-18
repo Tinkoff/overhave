@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Optional, cast
+from typing import Any, Callable, Mapping, Optional, cast
 from unittest import mock
 
 import pytest
@@ -10,6 +10,7 @@ from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
+from pytest_mock import MockFixture
 
 from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings
 from overhave.base_settings import OverhaveLoggingSettings
@@ -86,16 +87,6 @@ def test_logging_settings(test_step_context_logs: bool) -> OverhaveLoggingSettin
 @pytest.fixture()
 def test_step_context_runner(test_logging_settings: OverhaveLoggingSettings) -> StepContextRunner:
     return StepContextRunner(logging_settings=test_logging_settings)
-
-
-@pytest.fixture()
-def patched_proxy_factory() -> ProxyFactory:
-    from overhave.factory import get_proxy_factory
-
-    get_proxy_factory.cache_clear()
-    factory = get_proxy_factory()
-    factory.set_context(mock.MagicMock())
-    return factory
 
 
 @pytest.fixture()
@@ -206,3 +197,10 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
     setattr(session, "items", [test_clean_item, test_pytest_bdd_item])
     setattr(session, "config", test_prepared_config)
     return session
+
+
+@pytest.fixture()
+def patched_hook_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory], mocker: MockFixture) -> ProxyFactory:
+    factory = clean_proxy_factory()
+    factory.set_context(mocker.MagicMock())
+    return factory
