@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 def _load_user(user_id: int) -> db.BaseUser:
-    """Return user for overlord. """
     logger.info('Get user %s', user_id)
     with db.create_session(expire_on_commit=False) as s:
         return cast(db.BaseUser, s.query(db.UserRole).filter(db.UserRole.id == user_id).first())

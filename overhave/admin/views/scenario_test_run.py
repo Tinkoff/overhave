@@ -7,7 +7,6 @@ from wtforms import Form, ValidationError
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.admin.views.formatters import result_report_formatter
 
 
 class TestRunView(ModelViewConfigured):
@@ -34,8 +33,6 @@ class TestRunView(ModelViewConfigured):
         'executed_by',
         'status',
     )
-
-    column_formatters = dict(status=result_report_formatter,)
 
     def on_model_change(self, form: Form, model: db.TestRun, is_created: bool) -> None:
         if not is_created and current_user.role != db.Role.admin:
