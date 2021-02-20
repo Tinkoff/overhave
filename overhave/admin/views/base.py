@@ -4,7 +4,7 @@ from flask import redirect, request, url_for
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 
-from overhave.admin.views.formatters import datetime_formatter, task_formatter
+from overhave.admin.views.formatters import datetime_formatter, json_formatter, result_report_formatter, task_formatter
 
 
 class ModelViewConfigured(ModelView):
@@ -38,7 +38,12 @@ class ModelViewConfigured(ModelView):
         initiated_by="Initiator",
     )
     column_formatters = dict(
-        created_at=datetime_formatter, start=datetime_formatter, end=datetime_formatter, task=task_formatter,
+        created_at=datetime_formatter,
+        start=datetime_formatter,
+        end=datetime_formatter,
+        task=task_formatter,
+        status=result_report_formatter,
+        specification=json_formatter,
     )
     column_descriptions = dict(
         name="Feature header for business scenarios",

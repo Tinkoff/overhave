@@ -7,7 +7,6 @@ from wtforms import Form, ValidationError
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.admin.views.formatters import json_formatter
 from overhave.factory import get_proxy_factory
 
 
@@ -34,8 +33,6 @@ class TestingUserView(ModelViewConfigured):
 
     form_extra_fields = {'template': JSONField('Specification format')}
     form_widget_args = {'template': {'readonly': True}}
-
-    column_formatters = dict(specification=json_formatter,)
 
     column_descriptions = dict(
         name="Test user name",
