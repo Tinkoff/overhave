@@ -1,16 +1,12 @@
-from typing import List, Mapping, Optional
-
-from pydantic import validator
-from pydantic.datetime_parse import timedelta
-from yarl import URL
+from typing import List, Mapping
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.feature import FeatureTypeName
-from overhave.stash.errors import NotSpecifiedFeatureTypeError
-from overhave.stash.models import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
+from overhave.entities.stash.errors import NotSpecifiedFeatureTypeError
+from overhave.http import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 
 
-class OverhaveStashProjectSettings(BaseOverhavePrefix):
+class OverhaveStashManagerSettings(BaseOverhavePrefix):
     """ Settings for :class:`StashProjectManager`.
 
     This is a representation of BitBucket project parameters.
@@ -19,7 +15,7 @@ class OverhaveStashProjectSettings(BaseOverhavePrefix):
 
     repository_name: str  # for example 'bdd-features'
     project_key: str  # for example 'PRJ'
-    default_target_branch_name: str = 'master'
+    default_target_branch_name: str = "master"
 
     # Pull-request default reviewers as list
     default_reviewers: List[str] = []
@@ -45,24 +41,3 @@ class OverhaveStashProjectSettings(BaseOverhavePrefix):
         else:
             reviewers = self.default_reviewers
         return [StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in reviewers]
-
-
-class OverhaveStashClientSettings(BaseOverhavePrefix):
-    """ Settings for :class:`StashClient`. """
-
-    stash_url: URL  # for example "https://my.company"
-    pr_path: str = "rest/api/1.0/projects/{project_key}/repos/{repository_name}/pull-requests"
-
-    connect_timeout: timedelta = timedelta(seconds=5)
-    read_timeout: timedelta = timedelta(seconds=10)
-
-    auth_token: str
-
-    @validator('stash_url', pre=True)
-    def make_url(cls, v: Optional[str]) -> Optional[URL]:
-        if v is not None and isinstance(v, str):
-            return URL(v)
-        return v
-
-    def get_pr_url(self, project_key: str, repository_name: str) -> URL:
-        return self.stash_url / self.pr_path.format(project_key=project_key, repository_name=repository_name)

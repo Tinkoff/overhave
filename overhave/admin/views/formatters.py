@@ -10,12 +10,12 @@ from overhave.db import TestReportStatus, TestRunStatus
 def datetime_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     time: Optional[datetime.datetime] = getattr(model, name)
     if time:
-        return Markup(time.strftime('%d-%m-%Y %H:%M:%S'))
+        return Markup(time.strftime("%d-%m-%Y %H:%M:%S"))
     return Markup("")
 
 
 def task_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
-    browse_url = getattr(view, 'browse_url')
+    browse_url = getattr(view, "browse_url")
     tasks = getattr(model, name)
     if not browse_url or not tasks:
         return Markup("")
@@ -37,7 +37,7 @@ def result_report_formatter(view: ModelView, context: Any, model: Any, name: str
     if not status:
         return Markup("")
 
-    report_status = TestReportStatus[getattr(model, 'report_status')]
+    report_status = TestReportStatus[getattr(model, "report_status")]
     if report_status.has_report:
         action = f"href='/reports/{getattr(model, 'report')}' target='_blank'"
         title = "Go to report"

@@ -1,5 +1,5 @@
 from overhave import db
-from overhave.stash.models import StashPrCreationResponse
+from overhave.http.stash_client.models import StashPrCreationResponse
 
 
 def add_pr_url(draft_id: int, response: StashPrCreationResponse) -> None:

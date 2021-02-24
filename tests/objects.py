@@ -13,7 +13,7 @@ from overhave.entities import FeatureExtractor, FeatureTypeName, OverhaveFileSet
 
 _BLOCKS_DELIMITER = "\n\n"
 
-XDistWorkerValueType = NewType('XDistWorkerValueType', str)
+XDistWorkerValueType = NewType("XDistWorkerValueType", str)
 XDistMasterWorker = XDistWorkerValueType("master")
 
 
@@ -27,9 +27,9 @@ class DataBaseContext(NamedTuple):
 @lru_cache(maxsize=None)
 def get_file_settings() -> OverhaveFileSettings:
     """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
-    test_features_dir = Path(__file__).parent.parent / 'docs/includes/features_structure_example'
+    test_features_dir = Path(__file__).parent.parent / "docs/includes/features_structure_example"
     return OverhaveFileSettings(
-        fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / 'tmp'
+        fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / "tmp"
     )
 
 
@@ -39,7 +39,7 @@ def get_feature_extractor() -> FeatureExtractor:
 
     One of class functions is mocked to prevent the creation of additional files in docs includes.
     """
-    with mock.patch.object(FeatureExtractor, '_check_pytest_bdd_scenarios_test_files', return_value=None):
+    with mock.patch.object(FeatureExtractor, "_check_pytest_bdd_scenarios_test_files", return_value=None):
         return FeatureExtractor(file_settings=get_file_settings())
 
 

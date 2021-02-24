@@ -1,6 +1,6 @@
 import abc
 
-from overhave.stash.models import StashPrCreationResponse
+from overhave.http.stash_client.models import StashPrCreationResponse
 
 
 class IStashProjectManager(abc.ABC):

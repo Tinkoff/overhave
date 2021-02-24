@@ -101,4 +101,4 @@ class TestDatetimeFormatter:
             model=TestRun(**{"id": test_testrun_id, column_name: time}),
             name=column_name,
         )
-        assert result == Markup(time.strftime('%d-%m-%Y %H:%M:%S'))
+        assert result == Markup(time.strftime("%d-%m-%Y %H:%M:%S"))

@@ -180,7 +180,7 @@ def getoption_mapping(request: FixtureRequest) -> Mapping[str, Any]:
 @pytest.fixture()
 def getoption_mock(getoption_mapping: Mapping[str, Any], test_prepared_config: Config) -> ConfigGetOptionMock:
     getoption_mock = ConfigGetOptionMock(getoption_mapping)
-    with mock.patch.object(test_prepared_config, 'getoption', new=getoption_mock.getoption):
+    with mock.patch.object(test_prepared_config, "getoption", new=getoption_mock.getoption):
         yield getoption_mock
 
 

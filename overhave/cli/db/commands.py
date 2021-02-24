@@ -13,7 +13,7 @@ def _db_commands(group: click.Group) -> click.Group:
 
 
 @_db_commands
-@overhave.group(short_help='Commands for simple database operations')
+@overhave.group(short_help="Commands for simple database operations")
 @click.pass_context
 def db(ctx: click.Context) -> None:
     """ Commands for simple database operations. """

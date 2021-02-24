@@ -21,13 +21,13 @@ logger = logging.getLogger(__name__)
 class EmulationView(ModelViewConfigured):
     """ View for :class:`Emulation` table. """
 
-    create_template = 'emulation_create.html'
-    edit_template = 'emulation_edit.html'
+    create_template = "emulation_create.html"
+    edit_template = "emulation_edit.html"
 
     can_view_details = False
-    column_list = ['id', 'name', 'test_user.feature_type', 'test_user', 'created_by']
-    column_searchable_list = ['name', 'created_by']
-    form_excluded_columns = ('created_at', 'emulation_runs')
+    column_list = ["id", "name", "test_user.feature_type", "test_user", "created_by"]
+    column_searchable_list = ["name", "created_by"]
+    form_excluded_columns = ("created_at", "emulation_runs")
 
     column_labels = {"test_user.feature_type": "Template type"}
     column_descriptions = {
@@ -47,7 +47,7 @@ class EmulationView(ModelViewConfigured):
 
     def on_model_delete(self, model: db.Emulation) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
-            raise ValidationError('Only emulation item creator or administrator could delete it!')
+            raise ValidationError("Only emulation item creator or administrator could delete it!")
 
     @staticmethod
     def _run_emulation(emulation_id: int) -> Optional[werkzeug.Response]:
@@ -57,25 +57,25 @@ class EmulationView(ModelViewConfigured):
             factory.redis_producer.add(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id)))
             return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
         except Exception as e:
-            flask.flash(str(e), category='error')
-            return flask.redirect(flask.url_for('emulation.edit_view', id=emulation_id))
+            flask.flash(str(e), category="error")
+            return flask.redirect(flask.url_for("emulation.edit_view", id=emulation_id))
 
     @property
     def description_link(self) -> Optional[str]:
         return get_proxy_factory().context.emulation_settings.emulation_desc_link
 
-    @expose('/edit/', methods=('GET', 'POST'))
+    @expose("/edit/", methods=("GET", "POST"))
     def edit_view(self) -> Optional[werkzeug.Response]:
         data = flask.request.form
         logger.debug("Request data:\n%s", json.dumps(data))
 
         rendered: werkzeug.Response = super().edit_view()
 
-        emulation_action = data.get('emulate')
+        emulation_action = data.get("emulate")
         if not emulation_action:
             logger.debug("Show rendered EditView")
             return rendered
-        emulation_id = get_mdict_item_or_list(flask.request.args, 'id')
+        emulation_id = get_mdict_item_or_list(flask.request.args, "id")
         if not emulation_id:
             flask.flash("Please, save emulation template before execution")
             return rendered

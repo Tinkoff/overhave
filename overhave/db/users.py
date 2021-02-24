@@ -11,8 +11,8 @@ from overhave.db.types import LONG_STR_TYPE, SHORT_STR_TYPE
 class Role(str, enum.Enum):
     """ Enum that declares user access roles. """
 
-    user = 'user'
-    admin = 'admin'
+    user = "user"
+    admin = "admin"
 
 
 class BaseUser:
@@ -48,7 +48,7 @@ class BaseUser:
         return cast(str, self.login)
 
 
-@su.generic_repr('login')
+@su.generic_repr("login")
 class UserRole(Base, PrimaryKeyMixin, BaseUser):
     """ User access table. """
 
@@ -58,7 +58,7 @@ class UserRole(Base, PrimaryKeyMixin, BaseUser):
         self.role = role
 
 
-@su.generic_repr('group')
+@su.generic_repr("group")
 class GroupRole(Base, PrimaryKeyMixin):
     """ Group access table. """
 

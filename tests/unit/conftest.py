@@ -16,11 +16,11 @@ def mock_urls(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) 
     old_values = {key: os.environ.get(key) for key in envs_for_mock}
     try:
         for key in envs_for_mock:
-            os.environ[key] = envs_for_mock.get('envs_for_mock') or mock_default_value
+            os.environ[key] = envs_for_mock.get("envs_for_mock") or mock_default_value
         yield
     finally:
         for key, value in old_values.items():
-            os.environ[key] = value or ''
+            os.environ[key] = value or ""
 
 
 @pytest.fixture(scope="session")

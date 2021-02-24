@@ -43,9 +43,9 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
         logger.debug("Try to authorize user '%s'...", username_field.data)
         user_groups = self._ldap_authenticator.get_user_groups(username_field.data, password_field.data)
         if not user_groups:
-            logger.debug('LDAP user does not exist!')
+            logger.debug("LDAP user does not exist!")
             return None
-        logger.debug('LDAP user groups: \n %s', pformat(user_groups))
+        logger.debug("LDAP user groups: \n %s", pformat(user_groups))
         with db.create_session(expire_on_commit=False) as s:
             db_user = s.query(db.UserRole).filter(db.UserRole.login == username_field.data).one_or_none()
             if db_user is not None:
@@ -57,5 +57,5 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
                 db_user = self._create_user(session=s, username=username_field.data)
                 self._reassign_role_if_neccessary(session=s, user=db_user, user_groups=user_groups)
                 return cast(db.BaseUser, db_user)
-            logger.debug('Received groups are not supplied with db_groups: \n %s', db_groups)
+            logger.debug("Received groups are not supplied with db_groups: \n %s", db_groups)
         return None

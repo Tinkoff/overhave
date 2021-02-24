@@ -25,3 +25,4 @@ from .settings import (
     OverhaveScenarioCompilerSettings,
     ProcessorSettings,
 )
+from .stash import IStashProjectManager, OverhaveStashManagerSettings

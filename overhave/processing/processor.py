@@ -15,9 +15,9 @@ import werkzeug
 from overhave import db
 from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.settings import OverhaveFileSettings, ProcessorSettings
+from overhave.entities.stash import IStashProjectManager
 from overhave.processing.abstract import IProcessor
 from overhave.scenario import FileManager
-from overhave.stash import IStashProjectManager
 from overhave.storage import save_draft, set_report, set_run_status, set_traceback
 from overhave.storage.pull_request import add_pr_url
 from overhave.testing import ConfigInjector, PytestRunner
@@ -116,7 +116,7 @@ class Processor(IProcessor):
     def execute_test(self, test_run_id: int) -> werkzeug.Response:
         self._thread_pool.apply_async(self._process_run, args=(test_run_id,))
         logger.debug("Redirect to TestRun details view with run_id %s", test_run_id)
-        return flask.redirect(flask.url_for('testrun.details_view', id=test_run_id))
+        return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 
     def _create_pull_request(self, test_run_id: int) -> None:
         try:
@@ -126,7 +126,7 @@ class Processor(IProcessor):
             add_pr_url(draft_id=draft_id, response=response)
             logger.info("Stash PR result has been written")
         except Exception:
-            logger.exception('Error while trying to create Stash PR!')
+            logger.exception("Error while trying to create Stash PR!")
 
     def create_pull_request(self, test_run_id: int) -> werkzeug.Response:
         self._thread_pool.apply_async(self._create_pull_request, args=(test_run_id,))

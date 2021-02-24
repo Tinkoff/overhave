@@ -14,7 +14,8 @@ from overhave.entities.authorization.settings import (
     OverhaveAuthorizationSettings,
     OverhaveLdapClientSettings,
 )
-from overhave.stash.settings import OverhaveStashClientSettings, OverhaveStashProjectSettings
+from overhave.entities.stash.settings import OverhaveStashManagerSettings
+from overhave.http import OverhaveStashClientSettings
 from overhave.testing import OverhaveDescriptionManagerSettings, OverhaveProjectSettings, OverhaveTestSettings
 
 
@@ -36,7 +37,7 @@ class OverhaveContext:
         processor_settings: Optional[ProcessorSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
         stash_client_settings: Optional[OverhaveStashClientSettings] = None,
-        stash_project_settings: Optional[OverhaveStashProjectSettings] = None,
+        stash_project_settings: Optional[OverhaveStashManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
         logging_settings: Optional[OverhaveLoggingSettings] = None,
         description_manager_settings: Optional[OverhaveDescriptionManagerSettings] = None,
@@ -50,7 +51,7 @@ class OverhaveContext:
         self.processor_settings = processor_settings or ProcessorSettings()
         self.project_settings = project_settings or OverhaveProjectSettings()
         self.stash_client_settings = stash_client_settings or OverhaveStashClientSettings()
-        self.stash_project_settings = stash_project_settings or OverhaveStashProjectSettings()
+        self.stash_project_settings = stash_project_settings or OverhaveStashManagerSettings()
         self.test_settings = test_settings or OverhaveTestSettings()
         self.logging_settings = logging_settings or OverhaveLoggingSettings()
         self.description_manager_settings = description_manager_settings or OverhaveDescriptionManagerSettings()

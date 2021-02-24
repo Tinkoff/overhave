@@ -6,12 +6,13 @@ from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedis
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
 from overhave.entities.emulator import EmulationTask, Emulator
+from overhave.entities.stash import IStashProjectManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
+from overhave.http import StashHttpClient
 from overhave.processing import IProcessor
 from overhave.redis import RedisProducer, RedisStream
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
-from overhave.stash import IStashProjectManager, StashClient
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
 
@@ -94,12 +95,12 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return self._file_manager
 
     @cached_property
-    def _stash_client(self) -> StashClient:
-        return StashClient(settings=self.context.stash_client_settings)
+    def _stash_client(self) -> StashHttpClient:
+        return StashHttpClient(settings=self.context.stash_client_settings)
 
     @cached_property
     def _stash_manager(self) -> IStashProjectManager:
-        from overhave.stash.manager.manager import StashProjectManager
+        from overhave.entities.stash.manager.stash_manager import StashProjectManager
 
         return StashProjectManager(
             stash_project_settings=self.context.stash_project_settings,

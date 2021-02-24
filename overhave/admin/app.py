@@ -13,7 +13,7 @@ from overhave.factory import IOverhaveFactory, ProxyFactory
 
 logger = logging.getLogger(__name__)
 
-OverhaveAppType = typing.NewType('OverhaveAppType', Flask)
+OverhaveAppType = typing.NewType("OverhaveAppType", Flask)
 
 
 def _prepare_factory(factory: ProxyFactory) -> None:
@@ -39,7 +39,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
         UserView,
     )
 
-    index_view = OverhaveIndexView(name='Info', url='/', context=factory.context, auth_manager=factory.auth_manager)
+    index_view = OverhaveIndexView(name="Info", url="/", context=factory.context, auth_manager=factory.auth_manager)
     flask_admin = get_flask_admin(index_view=index_view)
     flask_admin.add_views(
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
@@ -62,8 +62,8 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
 def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
-    template_dir = current_dir / 'templates'
-    files_dir = current_dir / 'files'
+    template_dir = current_dir / "templates"
+    files_dir = current_dir / "files"
 
     _prepare_factory(factory)
     flask_app = _resolved_app(factory=factory, template_dir=template_dir)
@@ -73,24 +73,24 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     def remove_session(exception: typing.Optional[Exception]) -> None:
         db.current_session.remove()
 
-    @flask_app.route('/reports/<path:report>')
+    @flask_app.route("/reports/<path:report>")
     def get_report(report: str) -> Response:
         return typing.cast(Response, send_from_directory(factory.context.file_settings.tmp_reports_dir, report))
 
-    @flask_app.route('/emulations/<path:url>')
+    @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:
         return redirect(factory.context.emulation_settings.get_emulation_url(url))
 
-    @flask_app.route('/pull_request/<int:run_id>')
+    @flask_app.route("/pull_request/<int:run_id>")
     def create_pr(run_id: int) -> werkzeug.Response:
         return factory.processor.create_pull_request(run_id)
 
-    @flask_app.route('/files/<path:file>')
+    @flask_app.route("/files/<path:file>")
     def get_files(file: str) -> Response:
         return typing.cast(Response, send_from_directory(files_dir, file))
 
-    @flask_app.route('/favicon.ico')
+    @flask_app.route("/favicon.ico")
     def favicon() -> Response:
-        return typing.cast(Response, send_from_directory(files_dir, 'favicon.ico', mimetype='image/vnd.microsoft.icon'))
+        return typing.cast(Response, send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon"))
 
     return OverhaveAppType(flask_app)

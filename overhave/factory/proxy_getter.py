@@ -3,7 +3,7 @@ from typing import NewType
 
 from overhave.factory.proxy_factory import ProxyFactory
 
-OverhaveFactoryType = NewType('OverhaveFactoryType', ProxyFactory)
+OverhaveFactoryType = NewType("OverhaveFactoryType", ProxyFactory)
 
 
 @lru_cache(maxsize=None)

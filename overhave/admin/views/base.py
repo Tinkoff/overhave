@@ -10,15 +10,15 @@ from overhave.admin.views.formatters import datetime_formatter, json_formatter, 
 class ModelViewConfigured(ModelView):
     """ Base model view. """
 
-    column_default_sort = ('id', True)
+    column_default_sort = ("id", True)
     column_display_pk = True
     can_view_details = True
     page_size = 100
     simple_list_pager = True
 
-    column_exclude_list = ('meta',)
+    column_exclude_list = ("meta",)
     column_labels = dict(
-        user='Author',
+        user="Author",
         name="Name",
         feature_type="Type",
         task="Tasks",
@@ -61,7 +61,7 @@ class ModelViewConfigured(ModelView):
 
     def inaccessible_callback(self, name: str, **kwargs: Any) -> Any:
         # redirect to login page if user doesn't have access
-        return redirect(url_for('admin.login', next=request.url))
+        return redirect(url_for("admin.login", next=request.url))
 
 
 class ModelViewProtected(ModelViewConfigured):

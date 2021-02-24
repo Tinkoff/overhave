@@ -18,7 +18,7 @@ from overhave.db.types import INT_TYPE
 logger = logging.getLogger(__name__)
 
 convention = {
-    "ix": 'ix_%(column_0_label)s',
+    "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
     "ck": "ck_%(table_name)s_%(constraint_name)s",
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -41,7 +41,7 @@ class PrimaryKeyWithoutDateMixin:
 
     @declared_attr
     def id(cls) -> sa.Column[int]:
-        return sa.Column(f'{cls.__tablename__}_id', INT_TYPE, primary_key=True)  # type: ignore
+        return sa.Column(f"{cls.__tablename__}_id", INT_TYPE, primary_key=True)  # type: ignore
 
 
 class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
@@ -72,14 +72,14 @@ def _classname_to_tablename(name: str) -> str:
     result: List[str] = []
 
     last_index = 0
-    for match in re.finditer(r'(?P<abbreviation>[A-Z]+(?![a-z\d]))|(?P<word>[A-Z][a-z]*)|(?P<digit>\d+)', name):
+    for match in re.finditer(r"(?P<abbreviation>[A-Z]+(?![a-z\d]))|(?P<word>[A-Z][a-z]*)|(?P<digit>\d+)", name):
         if match.start() != last_index:
             raise ValueError(f'Could not translate class name "{name}" to table name')
 
         last_index = match.end()
         result.append(match.group().lower())
 
-    return '_'.join(result)
+    return "_".join(result)
 
 
 Session = sessionmaker(query_cls=_get_query_cls)

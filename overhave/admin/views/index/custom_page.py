@@ -20,7 +20,7 @@ class CustomPageWidget(XEditableWidget):
 
     def __call__(self, field: Field, **kwargs: typing.Any) -> Markup:
         if self.template_path is not None:
-            with self.template_path.open('r') as template:
+            with self.template_path.open("r") as template:
                 return Markup(template.read())
         return Markup("This is Overhave info page.")
 

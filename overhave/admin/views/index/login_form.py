@@ -17,12 +17,12 @@ class LoginForm(Form):
     """ Form for user authorization. """
 
     username: StringField = StringField(
-        'Username',
-        validators=[validators.input_required(message='Field required!')],
+        "Username",
+        validators=[validators.input_required(message="Field required!")],
         render_kw={"placeholder": "Username", "icon": "glyphicon-user"},
     )
     password: PasswordField = PasswordField(
-        'Password', render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
+        "Password", render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
     )
 
     def __init__(self, auth_manager: IAdminAuthorizationManager) -> None:
@@ -37,5 +37,5 @@ class LoginForm(Form):
 
     @staticmethod
     def flash_and_redirect(flash_msg: str) -> Response:
-        flask.flash(flash_msg, category='error')
-        return flask.redirect(flask.url_for('admin.login'))
+        flask.flash(flash_msg, category="error")
+        return flask.redirect(flask.url_for("admin.login"))

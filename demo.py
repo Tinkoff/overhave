@@ -65,12 +65,12 @@ def _demo_files_creator(demo_settings: _OverhaveDemoSettings) -> Iterator[None]:
             click.secho(f"Removed demo pytest file '{file}'.", fg="blue")
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help']})
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def overhave_demo() -> None:
     pass
 
 
-@overhave_demo.command(short_help='Run Overhave web-service in demo mode')
+@overhave_demo.command(short_help="Run Overhave web-service in demo mode")
 def admin() -> None:
     demo_settings = _OverhaveDemoSettings()
     demo_settings.enrich_env()

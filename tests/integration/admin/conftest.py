@@ -26,11 +26,11 @@ def test_app(patched_app_proxy_factory) -> OverhaveAppType:
 
 @pytest.fixture()
 def test_client(test_app: OverhaveAppType) -> FlaskClient:
-    db_fd, test_app.config['DATABASE'] = tempfile.mkstemp()
-    test_app.config['TESTING'] = True
+    db_fd, test_app.config["DATABASE"] = tempfile.mkstemp()
+    test_app.config["TESTING"] = True
 
     with test_app.test_client() as client:
         yield client
 
     os.close(db_fd)
-    os.unlink(test_app.config['DATABASE'])
+    os.unlink(test_app.config["DATABASE"])

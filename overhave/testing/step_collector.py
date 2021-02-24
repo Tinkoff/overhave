@@ -7,8 +7,8 @@ from pytest_bdd import types as default_types
 
 from overhave.entities.language import StepPrefixesModel
 
-_PYTESTBDD_FIXTURE_MARK = 'pytestbdd_'
-_PYTESTBDD_FIXTURE_TRACE_MARK = '_trace'
+_PYTESTBDD_FIXTURE_MARK = "pytestbdd_"
+_PYTESTBDD_FIXTURE_TRACE_MARK = "_trace"
 
 
 class StepCollector:
@@ -36,7 +36,7 @@ class StepCollector:
                     for fx in fx_list
                     if cls._is_bdd_step(fx)
                 ),
-                key=attrgetter('func.step_type'),
+                key=attrgetter("func.step_type"),
                 reverse=True,
             ),
         )

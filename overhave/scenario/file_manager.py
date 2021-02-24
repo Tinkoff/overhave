@@ -67,7 +67,7 @@ class FileManager(FileSavingMixin):
         ) as file:
             data = self._scenario_compiler.compile(context=context)
             logger.debug("Scenario file:\n%s", data)
-            self._write_data(file=file, data=data, entity_name='feature')
+            self._write_data(file=file, data=data, entity_name="feature")
             yield file
 
     @contextmanager
@@ -82,7 +82,7 @@ class FileManager(FileSavingMixin):
             data = joined_content.format(feature_file_path=feature_file.name)
 
             logger.debug("Fixture file:\n%s", data)
-            self._write_data(file=file, data=data, entity_name='fixture')
+            self._write_data(file=file, data=data, entity_name="fixture")
             yield file
 
     def produce_feature_file(self, context: ProcessingContext) -> Path:
@@ -94,7 +94,7 @@ class FileManager(FileSavingMixin):
             logger.info("Create feature file '%s' for commit", feature_file_path.as_posix())
             feature_file_path.touch()
         logger.info("Write scenario to feature file '%s'...", feature_file_path.as_posix())
-        with feature_file_path.open('w') as feature_file:
+        with feature_file_path.open("w") as feature_file:
             scenario_text = self._scenario_compiler.compile(context=context)
             logger.debug(scenario_text)
             feature_file.write(scenario_text)

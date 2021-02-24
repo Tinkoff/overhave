@@ -8,29 +8,29 @@ from overhave import db as database
 from overhave.base_settings import DataBaseSettings
 
 
-@click.command(short_help='Create all metadata tables')
+@click.command(short_help="Create all metadata tables")
 @click.pass_obj
 def create_all(config: Config) -> None:
     """ Create all metadata tables. """
-    click.echo('creating')
+    click.echo("creating")
     config.attributes["metadata"].create_all()
-    click.echo('complete!')
+    click.echo("complete!")
 
 
-@click.command(short_help='Drop all metadata tables, attributes, schema')
+@click.command(short_help="Drop all metadata tables, attributes, schema")
 @click.pass_obj
 def drop_all(config: Config) -> None:
     """ Drop all metadata tables, attributes, schema. """
-    click.confirm('it really need?', abort=True)
-    click.echo('dropping')
+    click.confirm("it really need?", abort=True)
+    click.echo("dropping")
     meta = config.attributes["metadata"]
     engine = config.attributes["engine"]
     for table in meta.tables:
         engine.execute(f'DROP TABLE IF EXISTS "{table}" CASCADE')
-    engine.execute('DROP TABLE IF EXISTS alembic_version')
-    engine.execute('DROP SCHEMA IF EXISTS huey')
+    engine.execute("DROP TABLE IF EXISTS alembic_version")
+    engine.execute("DROP SCHEMA IF EXISTS huey")
     meta.drop_all()
-    click.echo('complete!')
+    click.echo("complete!")
 
 
 def _ensure_database_exists(db_url: URL) -> None:

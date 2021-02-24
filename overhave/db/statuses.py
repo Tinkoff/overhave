@@ -4,11 +4,13 @@ import enum
 class TestRunStatus(str, enum.Enum):
     """ Enum for test run statuses. """
 
-    STARTED = 'STARTED'
-    RUNNING = 'RUNNING'
-    FAILED = 'FAILED'
-    SUCCESS = 'SUCCESS'
-    INTERNAL_ERROR = 'INTERNAL_ERROR'
+    __test__ = False
+
+    STARTED = "STARTED"
+    RUNNING = "RUNNING"
+    FAILED = "FAILED"
+    SUCCESS = "SUCCESS"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
 
     @property
     def finished(self) -> bool:
@@ -18,10 +20,12 @@ class TestRunStatus(str, enum.Enum):
 class TestReportStatus(str, enum.Enum):
     """ Enum for test run statuses. """
 
-    EMPTY = 'EMPTY'
-    GENERATION_FAILED = 'GENERATION_FAILED'
-    GENERATED = 'GENERATED'
-    SAVED = 'SAVED'
+    __test__ = False
+
+    EMPTY = "EMPTY"
+    GENERATION_FAILED = "GENERATION_FAILED"
+    GENERATED = "GENERATED"
+    SAVED = "SAVED"
 
     @property
     def has_report(self) -> bool:
@@ -31,10 +35,10 @@ class TestReportStatus(str, enum.Enum):
 class EmulationStatus(str, enum.Enum):
     """ Enum for emulation statuses. """
 
-    CREATED = 'CREATED'
-    REQUESTED = 'REQUESTED'
-    READY = 'READY'
-    ERROR = 'ERROR'
+    CREATED = "CREATED"
+    REQUESTED = "REQUESTED"
+    READY = "READY"
+    ERROR = "ERROR"
 
     @property
     def processed(self) -> bool:
