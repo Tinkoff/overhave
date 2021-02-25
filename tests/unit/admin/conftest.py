@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, cast
 from uuid import uuid1
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from faker import Faker
 from pytest_mock import MockerFixture
 
@@ -52,3 +53,10 @@ def test_feature_name(faker: Faker) -> str:
 @pytest.fixture(scope="session")
 def test_draft_view(session_mocker: MockerFixture) -> DraftView:
     return session_mocker.create_autospec(DraftView)
+
+
+@pytest.fixture()
+def test_prurl(request: FixtureRequest) -> Optional[str]:
+    if hasattr(request, "param"):
+        return cast(Optional[str], request.param)
+    raise NotImplementedError

@@ -76,7 +76,7 @@ class StashPrCreationResponse(StashBasicPrInfo):
         arbitrary_types_allowed = True
 
     def get_pr_url(self) -> str:
-        if self.pull_request_url is not None:
+        if isinstance(self.pull_request_url, str):
             return self.pull_request_url
         if self.links is not None:
             return self.links["self"][0]["href"]

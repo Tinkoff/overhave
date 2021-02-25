@@ -4,6 +4,7 @@ from typing import Optional, Sequence
 import pytest
 from markupsafe import Markup
 from pytest_mock import MockerFixture
+from yarl import URL
 
 from overhave import db
 from overhave.admin.views import (
@@ -18,6 +19,7 @@ from overhave.admin.views.formatters import (
     _get_feature_link_markup,
     _get_testrun_details_link,
     draft_feature_formatter,
+    draft_prurl_formatter,
     draft_testrun_formatter,
     feature_name_formatter,
 )
@@ -197,3 +199,18 @@ class TestDraftTestRunFormatter:
             model=db.Draft(test_run_id=test_testrun_id),
             name="test_run_id",
         ) == Markup(f"<a {_get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
+
+
+class TestDraftPrUrlFormatter:
+    """ Unit tests for draft_prurl_formatter. """
+
+    def test_empty_url(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_prurl_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="pr_url"
+        ) == Markup("")
+
+    @pytest.mark.parametrize("test_prurl", ["https://overhave.readthedocs.io"], indirect=True)
+    def test_with_url(self, test_draft_view: DraftView, mocker: MockerFixture, test_testrun_id: int, test_prurl: str):
+        assert draft_prurl_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(pr_url=test_prurl), name="pr_url",
+        ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")

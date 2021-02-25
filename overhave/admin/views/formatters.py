@@ -102,10 +102,6 @@ def draft_testrun_formatter(view: ModelView, context: Any, model: Any, name: str
 
 def draft_prurl_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     pr_url = getattr(model, name)
-    if not pr_url:
+    if not pr_url or pr_url == "None":
         return Markup("")
-    try:
-        url = URL(pr_url)
-    except ValueError:
-        return Markup(pr_url)
-    return Markup(f"<a href='{url.human_repr()}'>{pr_url}</a>")
+    return Markup(f"<a href='{URL(pr_url).human_repr()}'>{pr_url}</a>")
