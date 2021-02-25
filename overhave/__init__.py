@@ -9,6 +9,7 @@ from overhave.entities import (
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
     OverhaveScenarioCompilerSettings,
+    OverhaveStashManagerSettings,
     StepPrefixesModel,
     TranslitPack,
 )
@@ -21,6 +22,7 @@ from overhave.entities.authorization.settings import (
 from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
 from overhave.factory import OverhaveContext, OverhaveFactoryType
 from overhave.factory import get_proxy_factory as overhave_factory
+from overhave.http import OverhaveStashClientSettings
 from overhave.redis import RedisStream as OverhaveRedisConsumerApp
 from overhave.testing import (
     OverhaveDescriptionManagerSettings,
