@@ -79,18 +79,17 @@ def _get_feature_link_markup(feature_id: Union[int, str], feature_name: str) -> 
     return Markup(f"<a href='/feature/edit/?id={feature_id}'>{feature_name}</a>")
 
 
-def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
-    name = getattr(model, name)
-    if not name or not isinstance(model, db.Feature):
+def feature_link_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
+    name = getattr(model, name, None)
+    if not name:
         return Markup("")
-    return _get_feature_link_markup(feature_id=model.id, feature_name=name)
-
-
-def draft_feature_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
-    feature_id = getattr(model, name, None)
-    if not feature_id:
-        return Markup("")
-    return _get_feature_link_markup(feature_id=feature_id, feature_name=model.feature.name)
+    if isinstance(model, db.Feature):
+        return _get_feature_link_markup(feature_id=model.id, feature_name=name)
+    if isinstance(model, db.TestRun):
+        return _get_feature_link_markup(feature_id=model.scenario.feature_id, feature_name=name)
+    if isinstance(model, db.Draft):
+        return _get_feature_link_markup(feature_id=model.feature_id, feature_name=model.feature.name)
+    return Markup(name)
 
 
 def draft_testrun_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:

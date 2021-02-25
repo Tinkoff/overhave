@@ -6,10 +6,9 @@ from flask_login import current_user
 
 from overhave.admin.views.formatters import (
     datetime_formatter,
-    draft_feature_formatter,
     draft_prurl_formatter,
     draft_testrun_formatter,
-    feature_name_formatter,
+    feature_link_formatter,
     json_formatter,
     result_report_formatter,
     task_formatter,
@@ -54,8 +53,8 @@ class ModelViewConfigured(ModelView):
         "task": task_formatter,
         "status": result_report_formatter,
         "specification": json_formatter,
-        "name": feature_name_formatter,
-        "feature_id": draft_feature_formatter,
+        "name": feature_link_formatter,
+        "feature_id": feature_link_formatter,
         "test_run_id": draft_testrun_formatter,
         "pr_url": draft_prurl_formatter,
     }

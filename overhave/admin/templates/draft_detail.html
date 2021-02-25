@@ -1,0 +1,8 @@
+{% extends 'admin/model/details.html' %}
+
+{% block tail %}
+    {{ super() }}
+    {% if not model.pr_url  %}
+        <meta http-equiv="refresh" content="5">
+    {% endif %}
+{% endblock %}
