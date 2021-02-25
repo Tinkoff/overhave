@@ -30,6 +30,17 @@ class TestRunView(ModelViewConfigured):
         "executed_by",
         "status",
     )
+    column_details_list = (
+        "id",
+        "name",
+        "start",
+        "end",
+        "executed_by",
+        "status",
+        "report_status",
+        "report",
+        "traceback",
+    )
     column_filters = (
         "name",
         "start",
