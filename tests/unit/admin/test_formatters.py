@@ -154,13 +154,23 @@ class TestFeatureNameFormatter:
             view=test_feature_view, context=mocker.MagicMock(), model=db.Feature(), name="name"
         ) == Markup("")
 
-    def test_with_name(
+    def test_with_feature(
         self, test_feature_view: FeatureView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
     ):
         assert feature_name_formatter(
             view=test_feature_view,
             context=mocker.MagicMock(),
             model=db.Feature(id=test_feature_id, name=test_feature_name),
+            name="name",
+        ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+
+    def test_with_testrun(
+        self, test_feature_view: FeatureView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
+    ):
+        assert feature_name_formatter(
+            view=test_feature_view,
+            context=mocker.MagicMock(),
+            model=db.TestRun(name=test_feature_name, scenario=db.Scenario(feature_id=test_feature_id)),
             name="name",
         ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
 

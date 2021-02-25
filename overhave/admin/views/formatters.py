@@ -81,9 +81,13 @@ def _get_feature_link_markup(feature_id: Union[int, str], feature_name: str) -> 
 
 def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     name = getattr(model, name)
-    if not name or not isinstance(model, db.Feature):
+    if not name:
         return Markup("")
-    return _get_feature_link_markup(feature_id=model.id, feature_name=name)
+    if isinstance(model, db.Feature):
+        return _get_feature_link_markup(feature_id=model.id, feature_name=name)
+    if isinstance(model, db.TestRun):
+        return _get_feature_link_markup(feature_id=model.scenario.feature_id, feature_name=name)
+    return Markup(name)
 
 
 def draft_feature_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
