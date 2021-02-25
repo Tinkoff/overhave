@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
@@ -75,8 +75,8 @@ def json_formatter(view: ModelView, context: Any, model: Any, name: str) -> Mark
     return Markup("<form>" "<fieldset>" f"<div class='json-data'>{info}</div>" "</fieldset>" "</form>")
 
 
-def _get_feature_link_markup(feature_id: str, feature_name: str) -> Markup:
-    return Markup(f"<a href='/feature/edit/?id={feature_id}'>{feature_name}</a>")
+def _get_feature_link_markup(feature_id: Union[int, str], feature_name: str) -> Markup:
+    return Markup(f"<a href='/feature/edit/?id={str(feature_id)}'>{feature_name}</a>")
 
 
 def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
@@ -87,10 +87,10 @@ def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str)
 
 
 def draft_feature_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
-    feature_name = getattr(model, name)
-    if not feature_name:
+    feature_id = getattr(model, name, None)
+    if not feature_id:
         return Markup("")
-    return _get_feature_link_markup(feature_id=model.feature.id, feature_name=feature_name)
+    return _get_feature_link_markup(feature_id=feature_id, feature_name=model.feature.name)
 
 
 def draft_testrun_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:

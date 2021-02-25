@@ -41,11 +41,10 @@ class ModelViewConfigured(ModelView):
         "status": "Status",
         "report": "Report",
         "traceback": "Error traceback",
-        "feature_id": "Feature ID",
+        "feature_id": "Feature",
         "test_run_id": "Test run ID",
         "pr_url": "Pull-request URL",
         "initiated_by": "Initiator",
-        "feature.name": "Feature",
         "published_by": "Publisher",
     }
     column_formatters = {
@@ -56,7 +55,7 @@ class ModelViewConfigured(ModelView):
         "status": result_report_formatter,
         "specification": json_formatter,
         "name": feature_name_formatter,
-        "feature.name": draft_feature_formatter,
+        "feature_id": draft_feature_formatter,
         "test_run_id": draft_testrun_formatter,
         "pr_url": draft_prurl_formatter,
     }

@@ -6,8 +6,15 @@ from markupsafe import Markup
 from pytest_mock import MockerFixture
 
 from overhave import db
-from overhave.admin.views import FeatureView, TestRunView, datetime_formatter, result_report_formatter, task_formatter
-from overhave.admin.views.formatters import feature_name_formatter
+from overhave.admin.views import (
+    DraftView,
+    FeatureView,
+    TestRunView,
+    datetime_formatter,
+    result_report_formatter,
+    task_formatter,
+)
+from overhave.admin.views.formatters import _get_feature_link_markup, draft_feature_formatter, feature_name_formatter
 from overhave.db import TestReportStatus, TestRun, TestRunStatus
 from overhave.utils import get_current_time
 
@@ -134,17 +141,36 @@ class TestTaskFormatter:
 class TestFeatureNameFormatter:
     """ Unit tests for feature_name_formatter. """
 
-    def test_empty_name(self, test_feature_view: TestRunView, mocker: MockerFixture):
+    def test_empty_name(self, test_feature_view: FeatureView, mocker: MockerFixture):
         assert feature_name_formatter(
             view=test_feature_view, context=mocker.MagicMock(), model=db.Feature(), name="name"
         ) == Markup("")
 
     def test_with_name(
-        self, test_feature_view: TestRunView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
+        self, test_feature_view: FeatureView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
     ):
         assert feature_name_formatter(
             view=test_feature_view,
             context=mocker.MagicMock(),
             model=db.Feature(id=test_feature_id, name=test_feature_name),
             name="name",
-        ) == Markup(f"<a href='/feature/edit/?id={test_feature_id}'>{test_feature_name}</a>")
+        ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+
+
+class TestDraftFeatureFormatter:
+    """ Unit tests for feature_name_formatter. """
+
+    def test_empty_id(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_feature_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="feature_id"
+        ) == Markup("")
+
+    def test_with_id(
+        self, test_draft_view: DraftView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
+    ):
+        assert draft_feature_formatter(
+            view=test_draft_view,
+            context=mocker.MagicMock(),
+            model=db.Draft(feature_id=test_feature_id, feature=db.Feature(name=test_feature_name)),
+            name="feature_id",
+        ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)

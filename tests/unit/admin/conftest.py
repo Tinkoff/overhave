@@ -5,7 +5,7 @@ import pytest
 from faker import Faker
 from pytest_mock import MockerFixture
 
-from overhave.admin.views import FeatureView, TestRunView
+from overhave.admin.views import DraftView, FeatureView, TestRunView
 from overhave.admin.views.formatters import _get_button_class_by_status
 from overhave.db import TestReportStatus
 
@@ -47,3 +47,8 @@ def test_feature_id(faker: Faker) -> int:
 @pytest.fixture()
 def test_feature_name(faker: Faker) -> str:
     return faker.word()
+
+
+@pytest.fixture(scope="session")
+def test_draft_view(session_mocker: MockerFixture) -> DraftView:
+    return session_mocker.create_autospec(DraftView)
