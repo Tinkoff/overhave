@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "1.6.0"
+version = "1.6.1"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
