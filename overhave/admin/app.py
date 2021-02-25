@@ -1,9 +1,10 @@
 import logging
 import typing
+from http import HTTPStatus
 from pathlib import Path
 
+import flask
 import werkzeug
-from flask import Flask, Response, redirect, send_from_directory
 
 from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app
@@ -13,7 +14,7 @@ from overhave.factory import IOverhaveFactory, ProxyFactory
 
 logger = logging.getLogger(__name__)
 
-OverhaveAppType = typing.NewType("OverhaveAppType", Flask)
+OverhaveAppType = typing.NewType("OverhaveAppType", flask.Flask)
 
 
 def _prepare_factory(factory: ProxyFactory) -> None:
@@ -25,7 +26,7 @@ def _prepare_factory(factory: ProxyFactory) -> None:
     factory.injector.collect_configs()
 
 
-def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> Flask:
+def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     """ Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`. """
     from overhave.admin.views import (
         DraftView,
@@ -74,23 +75,33 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
         db.current_session.remove()
 
     @flask_app.route("/reports/<path:report>")
-    def get_report(report: str) -> Response:
-        return typing.cast(Response, send_from_directory(factory.context.file_settings.tmp_reports_dir, report))
+    def get_report(report: str) -> flask.Response:
+        return typing.cast(
+            flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, report)
+        )
 
     @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:
-        return redirect(factory.context.emulation_settings.get_emulation_url(url))
+        return flask.redirect(factory.context.emulation_settings.get_emulation_url(url))
 
     @flask_app.route("/pull_request/<int:run_id>")
     def create_pr(run_id: int) -> werkzeug.Response:
-        return factory.processor.create_pull_request(run_id)
+        published_by = flask.request.args.get("published_by")
+        if not isinstance(published_by, str):
+            flask.flash("Parameter 'published_by' should be specified for version's creation!", category="error")
+            return flask.redirect(
+                flask.url_for("testrun.details_view", id=run_id), code=HTTPStatus.UNPROCESSABLE_ENTITY
+            )
+        return factory.processor.create_version(test_run_id=run_id, published_by=published_by)
 
     @flask_app.route("/files/<path:file>")
-    def get_files(file: str) -> Response:
-        return typing.cast(Response, send_from_directory(files_dir, file))
+    def get_files(file: str) -> flask.Response:
+        return typing.cast(flask.Response, flask.send_from_directory(files_dir, file))
 
     @flask_app.route("/favicon.ico")
-    def favicon() -> Response:
-        return typing.cast(Response, send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon"))
+    def favicon() -> flask.Response:
+        return typing.cast(
+            flask.Response, flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
+        )
 
     return OverhaveAppType(flask_app)

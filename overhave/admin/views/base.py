@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from flask import redirect, request, url_for
 from flask_admin.contrib.sqla import ModelView
@@ -75,6 +75,10 @@ class ModelViewConfigured(ModelView):
     def inaccessible_callback(self, name: str, **kwargs: Any) -> Any:
         # redirect to login page if user doesn't have access
         return redirect(url_for("admin.login", next=request.url))
+
+    @property
+    def current_user(self) -> str:
+        return cast(str, current_user.login)
 
 
 class ModelViewProtected(ModelViewConfigured):

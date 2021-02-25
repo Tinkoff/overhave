@@ -1,6 +1,7 @@
 # flake8: noqa
 from .authorization import IAdminAuthorizationManager
 from .converters import (
+    DraftModel,
     EmulationRunModel,
     FeatureModel,
     FeatureTypeModel,

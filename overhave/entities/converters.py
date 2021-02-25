@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic.main import BaseModel
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from overhave.db import (
+    Draft,
     Emulation,
     EmulationRun,
     Feature,
@@ -49,6 +50,15 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     start: datetime
     status: TestRunStatus
     report_status: TestReportStatus
+
+
+class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
+    """ Model for :class:`Draft` row. """
+
+    feature_id: int
+    test_run_id: int
+    pr_url: Optional[str]
+    published_by: str
 
 
 class ProcessingContext(BaseModel):

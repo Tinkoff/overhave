@@ -3,10 +3,10 @@ import subprocess
 import tempfile
 import uuid
 from functools import cached_property
+from http import HTTPStatus
 from multiprocessing.pool import ThreadPool
 from os import makedirs
 from pathlib import Path
-from time import sleep
 from typing import Optional
 
 import flask
@@ -19,7 +19,7 @@ from overhave.entities.stash import IStashProjectManager
 from overhave.processing.abstract import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import save_draft, set_report, set_run_status, set_traceback
-from overhave.storage.pull_request import add_pr_url
+from overhave.storage.version import UniqueDraftCreationError, add_pr_url
 from overhave.testing import ConfigInjector, PytestRunner
 
 logger = logging.getLogger(__name__)
@@ -115,12 +115,11 @@ class Processor(IProcessor):
 
     def execute_test(self, test_run_id: int) -> werkzeug.Response:
         self._thread_pool.apply_async(self._process_run, args=(test_run_id,))
-        logger.debug("Redirect to TestRun details view with run_id %s", test_run_id)
+        logger.debug("Redirect to TestRun details view with test_run_id %s", test_run_id)
         return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 
-    def _create_pull_request(self, test_run_id: int) -> None:
+    def _create_version(self, test_run_id: int, draft_id: int) -> None:
         try:
-            draft_id = save_draft(test_run_id)
             response = self._stash_manager.create_pull_request(test_run_id)
             logger.info("Stash PR response has been gotten")
             add_pr_url(draft_id=draft_id, response=response)
@@ -128,7 +127,15 @@ class Processor(IProcessor):
         except Exception:
             logger.exception("Error while trying to create Stash PR!")
 
-    def create_pull_request(self, test_run_id: int) -> werkzeug.Response:
-        self._thread_pool.apply_async(self._create_pull_request, args=(test_run_id,))
-        sleep(3)
-        return flask.redirect(flask.url_for("draft.details_view"))
+    def create_version(self, test_run_id: int, published_by: str) -> werkzeug.Response:
+        try:
+            draft_id = save_draft(test_run_id=test_run_id, published_by=published_by)
+        except UniqueDraftCreationError:
+            error_msg = "Error while creation draft!"
+            logger.exception(error_msg)
+            flask.flash(error_msg, category="error")
+            return flask.redirect(
+                flask.url_for("testrun.details_view", id=test_run_id), code=HTTPStatus.UNPROCESSABLE_ENTITY
+            )
+        self._thread_pool.apply_async(self._create_version, args=(test_run_id, draft_id))
+        return flask.redirect(flask.url_for("draft.details_view", id=draft_id))

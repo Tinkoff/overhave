@@ -11,5 +11,5 @@ class IProcessor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def create_pull_request(self, test_run_id: int) -> werkzeug.Response:
+    def create_version(self, test_run_id: int, published_by: str) -> werkzeug.Response:
         pass

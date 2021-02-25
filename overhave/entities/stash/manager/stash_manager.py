@@ -10,7 +10,7 @@ from overhave.entities.stash.manager.abstract import IStashProjectManager
 from overhave.entities.stash.settings import OverhaveStashManagerSettings
 from overhave.http import StashBranch, StashErrorResponse, StashHttpClient, StashPrCreationResponse, StashPrRequest
 from overhave.scenario import FileManager, generate_task_info
-from overhave.storage.pull_request import get_last_pr_url
+from overhave.storage.version import get_last_draft
 from overhave.utils.time import get_current_time
 
 logger = logging.getLogger(__name__)
@@ -154,9 +154,8 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
             if isinstance(response, StashPrCreationResponse):
                 return response
             if isinstance(response, StashErrorResponse) and response.duplicate:
-                return self._generate_response(
-                    title=pull_request.title or ctx.feature.name, pr_url=get_last_pr_url(feature_id=ctx.feature.id)
-                )
+                last_draft = get_last_draft(feature_id=ctx.feature.id)
+                return self._generate_response(title=pull_request.title or ctx.feature.name, pr_url=last_draft.pr_url)
             raise StashPrCreationError(response)
         except StashValidationError as e:
             logger.exception("PR has not been created in Stash repository!")

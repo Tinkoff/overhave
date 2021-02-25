@@ -1,8 +1,10 @@
 import os
 import tempfile
 from typing import Callable
+from uuid import uuid1
 
 import pytest
+from faker import Faker
 from flask.testing import FlaskClient
 from pytest_mock import MockFixture
 
@@ -34,3 +36,13 @@ def test_client(test_app: OverhaveAppType) -> FlaskClient:
 
     os.close(db_fd)
     os.unlink(test_app.config["DATABASE"])
+
+
+@pytest.fixture()
+def test_pullrequest_id(faker: Faker) -> int:
+    return faker.random_int()
+
+
+@pytest.fixture()
+def test_pullrequest_published_by() -> str:
+    return uuid1().hex

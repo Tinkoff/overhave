@@ -69,9 +69,11 @@ class TestRun(Base, PrimaryKeyMixin):
 class DraftQuery(so.Query):
     """ Scenario versions table. """
 
-    def as_unique(self, test_run_id: int) -> Draft:
+    def as_unique(self, test_run_id: int, published_by: str) -> Draft:
         with self.session.no_autoflush:
             run = self.session.query(TestRun).get(test_run_id)
+            if run is None:
+                raise RuntimeError(f"Unknown test_run_id={test_run_id}!")
             draft: Optional[Draft] = self.session.query(Draft).filter(
                 Draft.test_run_id == run.id, Draft.text == run.scenario.text
             ).one_or_none()
@@ -80,7 +82,10 @@ class DraftQuery(so.Query):
             return draft
 
         return Draft(  # type: ignore
-            test_run_id=test_run_id, feature_id=run.scenario.feature_id, text=run.scenario.text
+            test_run_id=test_run_id,
+            feature_id=run.scenario.feature_id,
+            text=run.scenario.text,
+            published_by=published_by,
         )
 
 
