@@ -22,4 +22,4 @@ class TranslitPack:
         self._transliterator = pack()
 
     def translate(self, text: str) -> str:
-        return cast(str, self._transliterator.translit(text.strip().lower()).strip('_'))
+        return cast(str, self._transliterator.translit(text.strip().lower()).strip("_"))

@@ -3,18 +3,10 @@ from typing import List, Mapping, Sequence
 import pytest
 from faker import Faker
 
-from overhave.entities import FeatureTypeName, OverhaveFileSettings
+from overhave.entities import FeatureTypeName, OverhaveFileSettings, OverhaveStashManagerSettings
+from overhave.entities.stash.manager.stash_manager import StashProjectManager
+from overhave.http import StashBranch, StashHttpClient, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 from overhave.scenario import FileManager
-from overhave.stash import (
-    OverhaveStashProjectSettings,
-    StashBranch,
-    StashClient,
-    StashProject,
-    StashRepository,
-    StashReviewer,
-    StashReviewerInfo,
-)
-from overhave.stash.manager.manager import StashProjectManager
 from tests.objects import get_file_settings
 
 
@@ -24,9 +16,9 @@ class TestStashProjectManager:
 
     def test_stash_project_settings_basic(
         self,
-        test_stash_project_settings_with_default_reviewers: OverhaveStashProjectSettings,
+        test_stash_project_settings_with_default_reviewers: OverhaveStashManagerSettings,
         test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashClient,
+        mocked_stash_client: StashHttpClient,
         mocked_file_manager: FileManager,
         test_repository_name: str,
         test_project_key: str,
@@ -47,9 +39,9 @@ class TestStashProjectManager:
 
     def test_stash_project_settings_with_default_reviewers(
         self,
-        test_stash_project_settings_with_default_reviewers: OverhaveStashProjectSettings,
+        test_stash_project_settings_with_default_reviewers: OverhaveStashManagerSettings,
         test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashClient,
+        mocked_stash_client: StashHttpClient,
         mocked_file_manager: FileManager,
         test_default_reviewers: Sequence[str],
         faker: Faker,
@@ -67,9 +59,9 @@ class TestStashProjectManager:
 
     def test_stash_project_settings_with_reviewers_mapping(
         self,
-        test_stash_project_settings_with_reviewers_mapping: OverhaveStashProjectSettings,
+        test_stash_project_settings_with_reviewers_mapping: OverhaveStashManagerSettings,
         test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashClient,
+        mocked_stash_client: StashHttpClient,
         mocked_file_manager: FileManager,
         test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
         faker: Faker,

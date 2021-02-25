@@ -29,14 +29,6 @@ def set_run_status(run_id: int, status: db.TestRunStatus) -> None:
             run.end = get_current_time()
 
 
-def save_draft(run_id: int) -> int:
-    with db.create_session() as session:
-        draft = session.query(db.Draft).as_unique(test_run_id=run_id)
-        session.add(draft)
-        session.flush()
-        return cast(int, draft.id)
-
-
 def set_report(run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
     with db.create_session() as session:
         run = cast(db.TestRun, session.query(db.TestRun).filter(db.TestRun.id == run_id).one())

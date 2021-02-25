@@ -14,7 +14,7 @@
         OverhaveLanguageSettings,
         OverhaveProjectSettings,
         OverhaveStashClientSettings,
-        OverhaveStashProjectSettings,
+        OverhaveStashManagerSettings,
     )
     from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
@@ -34,7 +34,7 @@
         ldap_client_settings=OverhaveLdapClientSettings(
             ldap_url="ldap://company.com", ldap_domain="company\\", ldap_dn="dc=company,dc=com"
         ),
-        stash_project_settings=OverhaveStashProjectSettings(
+        stash_project_settings=OverhaveStashManagerSettings(
             repository_name='bdd-features',
             key='PRJ',
             default_target_branch_name='master',

@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 73.1
+MIN_COVERAGE ?= 75
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -39,14 +39,14 @@ test:
 	$(VENV)/bin/poetry run pytest -n auto --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
 lint:
-	$(VENV)/bin/poetry run black --skip-string-normalization --check $(ALL)
+	$(VENV)/bin/poetry run black --check $(ALL)
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
 	$(VENV)/bin/poetry run mypy $(ALL)
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
 
 pretty:
 	$(VENV)/bin/poetry run isort $(ALL)
-	$(VENV)/bin/poetry run black --skip-string-normalization $(ALL)
+	$(VENV)/bin/poetry run black $(ALL)
 
 tag:
 	git tag $(TAG)
@@ -67,12 +67,12 @@ check-package:
 check: test lint check-package build-docs
 
 clear:
-	rm -rf .mypy_cache
-	rm -rf .pytest_cache
-	rm -rf $(BUILD_DIR)
-	rm -rf $(DOCS_BUILD_DIR)
-	rm -rf $(DOCS_REFERENCES_DIR)
-	rm .coverage
+	rm -rf ./.mypy_cache
+	rm -rf ./.pytest_cache
+	rm -rf ./$(BUILD_DIR)
+	rm -rf ./$(DOCS_BUILD_DIR)
+	rm -rf ./$(DOCS_REFERENCES_DIR)
+	rm ./.coverage
 
 build-docker:
 	docker-compose build base

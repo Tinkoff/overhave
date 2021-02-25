@@ -26,7 +26,7 @@
 {%  endmacro %}
 
 {% macro render_pr_button(model) %}
-    <form action="/pull_request/{{ model.id }}" target="_blank">
+    <form action="/pull_request/{{ model.id }}?=published_by={{ admin_view.current_user }}" target="_blank">
         <button class="button request-btn">Create pull-request</button>
     </form>
 {%  endmacro %}

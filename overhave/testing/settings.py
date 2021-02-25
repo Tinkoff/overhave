@@ -43,13 +43,13 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     # Keys for specification mapping are still the same - feature types.
     user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
 
-    @validator('browse_url', pre=True)
+    @validator("browse_url", pre=True)
     def make_browse_url(cls, v: Optional[str]) -> Optional[URL]:
         if v is not None and isinstance(v, str):
             return URL(v)
         return v
 
-    @validator('links_keyword')
+    @validator("links_keyword")
     def validate_links_keyword(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
         if isinstance(v, str) and values.get("browse_url") is None:
             raise ValueError("Browse URL should be specified in case of links keyword usage!")

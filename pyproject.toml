@@ -88,7 +88,9 @@ testpaths = "tests"
 python_files = ["test_*.py"]
 python_classes = ["*Test", "Test*"]
 python_functions = ["test_*"]
-filterwarnings = ["ignore::DeprecationWarning:sqlalchemy_utils.observer"]
+filterwarnings = [
+    "ignore::DeprecationWarning:sqlalchemy_utils.observer",
+]
 xfail_strict=true
 bdd_features_base_dir="docs/includes/features_structure_example"
 

@@ -21,14 +21,14 @@ class BaseOverhavePrefix(BaseSettings):
 class DataBaseSettings(BaseOverhavePrefix):
     """ Overhave database settings. """
 
-    db_url: URL = 'postgresql://postgres:postgres@localhost/overhave'
+    db_url: URL = "postgresql://postgres:postgres@localhost/overhave"
     db_pool_recycle: int = 500
     db_pool_size: int = 6
     db_echo: bool = False
     db_application_name: str = socket.gethostname()
     db_connect_timeout: int = 30
 
-    @validator('db_url', pre=True, always=True)
+    @validator("db_url", pre=True, always=True)
     def validate_url(cls, v: str) -> URL:
         try:
             return make_url(v)
@@ -38,14 +38,14 @@ class DataBaseSettings(BaseOverhavePrefix):
     def create_engine(self) -> Engine:
         return engine_from_config(
             {
-                'url': self.db_url,
+                "url": self.db_url,
                 "pool_recycle": self.db_pool_recycle,
                 "pool_pre_ping": True,
                 "pool_size": self.db_pool_size,
                 "poolclass": SingletonThreadPool,
                 "connect_args": {
-                    'connect_timeout': self.db_connect_timeout,
-                    'application_name': self.db_application_name,
+                    "connect_timeout": self.db_connect_timeout,
+                    "application_name": self.db_application_name,
                 },
             },
             prefix="",
@@ -64,7 +64,7 @@ class OverhaveLoggingSettings(BaseOverhavePrefix):
     log_config: Dict[str, Any] = {}
     step_context_logs: bool = False
 
-    @validator('log_config', each_item=True)
+    @validator("log_config", each_item=True)
     def dict_config_validator(cls, v: Dict[str, Any]) -> Optional[DictConfigurator]:
         if not v:
             return None

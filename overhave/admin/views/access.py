@@ -23,18 +23,18 @@ class AccessModelView(ModelViewConfigured):
         # redirect to login page if user doesn't have access
         if current_user.is_authenticated:
             flask.flash("You have not got access for users and groups management!", category="error")
-            return redirect(url_for('admin.index'))
-        return redirect(url_for('admin.login', next=request.url))
+            return redirect(url_for("admin.index"))
+        return redirect(url_for("admin.login", next=request.url))
 
 
 class UserView(AccessModelView):
     """ View for application user access management. """
 
-    column_list = ['id', 'login', 'role', 'created_at']
-    column_searchable_list = ['login']
+    column_list = ["id", "login", "role", "created_at"]
+    column_searchable_list = ["login"]
 
 
 class GroupView(AccessModelView):
     """ View for application group access management. """
 
-    column_searchable_list = ['group']
+    column_searchable_list = ["group"]

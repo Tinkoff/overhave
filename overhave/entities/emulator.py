@@ -74,7 +74,7 @@ class Emulator(ExternalCommandCheckMixin):
         if isinstance(self._settings.emulation_postfix, str):
             emulation_cmd += self._settings.emulation_postfix.format(
                 name=emulation_run.emulation.test_user.name.replace(" ", "_"),
-                model=json.dumps(emulation_run.emulation.test_user.specification).replace(' ', ''),
+                model=json.dumps(emulation_run.emulation.test_user.specification).replace(" ", ""),
             ).split(" ")
         logger.debug("Emulation command: %s", " ".join(emulation_cmd))
         try:

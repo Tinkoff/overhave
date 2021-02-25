@@ -45,14 +45,14 @@ class OverhaveFileSettings(BaseOverhavePrefix):
 
     @root_validator(pre=True)
     def validate_fixtures_base_dir(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        fixtures_base_dir = values.get('fixtures_base_dir')
+        fixtures_base_dir = values.get("fixtures_base_dir")
         if fixtures_base_dir:
-            values['fixtures_base_dir'] = Path(fixtures_base_dir)
+            values["fixtures_base_dir"] = Path(fixtures_base_dir)
         else:
-            features_base_dir = values.get('features_base_dir')
+            features_base_dir = values.get("features_base_dir")
             if not features_base_dir:
                 raise ValueError("Could not resolve 'fixtures_base_dir'!")
-            values['fixtures_base_dir'] = Path(features_base_dir).parent
+            values["fixtures_base_dir"] = Path(features_base_dir).parent
         return values
 
     @property
@@ -73,7 +73,7 @@ class ProcessorSettings(BaseOverhavePrefix):
 
     report_creation_timeout: int = 120  # sec
     processes_num: int = 5
-    report_creation_error_msg: str = 'not_created'
+    report_creation_error_msg: str = "not_created"
     allure_cmdline: str = "/allure/bin/allure"
 
 
@@ -85,7 +85,7 @@ class OverhaveRedisSettings(BaseOverhavePrefix):
     redis_block_timeout: timedelta = timedelta(seconds=1)
     redis_read_count: int = 1
 
-    @validator('redis_url', pre=True)
+    @validator("redis_url", pre=True)
     def validate_url(cls, v: Union[str, URL]) -> URL:
         if isinstance(v, str):
             return URL(v)
@@ -128,13 +128,13 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     # Wait until emulation become served
     emulation_wait_timeout: timedelta = timedelta(seconds=300)
 
-    @validator('emulation_service_url', pre=True)
+    @validator("emulation_service_url", pre=True)
     def validate_url(cls, v: Union[str, URL]) -> URL:
         if isinstance(v, str):
             return URL(v)
         return v
 
-    @validator('emulation_ports', pre=True)
+    @validator("emulation_ports", pre=True)
     def validate_ports(cls, v: Union[List[int], str]) -> List[int]:
         if isinstance(v, str):
             return [int(x.strip()) for x in v.split(",")]

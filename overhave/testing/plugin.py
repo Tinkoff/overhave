@@ -148,7 +148,7 @@ def pytest_bdd_step_error(
 
 
 def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
-    if tag != 'skip':
+    if tag != "skip":
         return None
     marker = pytest.mark.skip(reason="Scenario manually marked as skipped")
     marker(function)

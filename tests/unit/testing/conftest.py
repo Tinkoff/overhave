@@ -61,13 +61,6 @@ def test_pytest_bdd_step(faker: Faker) -> Step:
 
 
 @pytest.fixture()
-def test_browse_url(request: FixtureRequest) -> Optional[str]:
-    if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
-    raise NotImplementedError
-
-
-@pytest.fixture()
 def test_project_settings(test_browse_url: Optional[str]) -> OverhaveProjectSettings:
     return OverhaveProjectSettings(browse_url=test_browse_url)
 
@@ -180,7 +173,7 @@ def getoption_mapping(request: FixtureRequest) -> Mapping[str, Any]:
 @pytest.fixture()
 def getoption_mock(getoption_mapping: Mapping[str, Any], test_prepared_config: Config) -> ConfigGetOptionMock:
     getoption_mock = ConfigGetOptionMock(getoption_mapping)
-    with mock.patch.object(test_prepared_config, 'getoption', new=getoption_mock.getoption):
+    with mock.patch.object(test_prepared_config, "getoption", new=getoption_mock.getoption):
         yield getoption_mock
 
 

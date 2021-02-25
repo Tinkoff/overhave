@@ -31,7 +31,7 @@ class BaseRedisTask(_IRedisTask):
 
     @property
     def message(self) -> Dict[bytes, bytes]:
-        return {b'data': self.data.json().encode('utf-8')}
+        return {b"data": self.data.json().encode("utf-8")}
 
 
 class TestRunData(BaseModel):
@@ -58,7 +58,7 @@ class EmulationTask(BaseRedisTask):
     data: EmulationData
 
 
-TRedisTask = TypeVar('TRedisTask', TestRunTask, EmulationTask, covariant=True)
+TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, covariant=True)
 
 
 class RedisPendingData(BaseModel):
@@ -79,7 +79,7 @@ class RedisUnreadData:
 
     @property
     def decoded_message(self) -> Dict[str, Any]:
-        return {key.decode(): json.loads(value.decode('utf-8')) for key, value in self.message.items()}
+        return {key.decode(): json.loads(value.decode("utf-8")) for key, value in self.message.items()}
 
 
 class RedisContainer(BaseModel):

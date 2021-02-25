@@ -10,7 +10,7 @@ from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, Scen
 class TestGenerateTaskInfo:
     """ Unit tests for :meth:`generate_task_info`. """
 
-    @pytest.mark.parametrize("tasks", [['EX-1', 'EX-2']])
+    @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", ["tasks_header"])
     def test_generate_task_info(self, tasks: List[str], header: str):
         assert generate_task_info(tasks=tasks, header=header) == f"{header}: {', '.join(tasks)}"
@@ -20,7 +20,7 @@ class TestGenerateTaskInfo:
     def test_generate_task_info_without_tasks(self, tasks: List[str], header: str):
         assert generate_task_info(tasks=tasks, header=header) == ""
 
-    @pytest.mark.parametrize("tasks", [['EX-1', 'EX-2']])
+    @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", [None])
     def test_generate_task_info_without_header(self, tasks: List[str], header: None):
         assert generate_task_info(tasks=tasks, header=header) == ""

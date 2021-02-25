@@ -22,17 +22,17 @@ def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str
 class TestingUserView(ModelViewConfigured):
     """ View for :class:`TestUser` table. """
 
-    create_template = 'test_user_create.html'
-    edit_template = 'test_user_edit.html'
+    create_template = "test_user_create.html"
+    edit_template = "test_user_edit.html"
 
     can_view_details = False
-    column_list = ['id', 'name', 'feature_type', 'specification', 'created_by']
-    column_searchable_list = ['name', 'created_by']
-    form_excluded_columns = 'created_at'
+    column_list = ["id", "name", "feature_type", "specification", "created_by"]
+    column_searchable_list = ["name", "created_by"]
+    form_excluded_columns = "created_at"
     form_overrides = dict(specification=JSONField)
 
-    form_extra_fields = {'template': JSONField('Specification format')}
-    form_widget_args = {'template': {'readonly': True}}
+    form_extra_fields = {"template": JSONField("Specification format")}
+    form_widget_args = {"template": {"readonly": True}}
 
     column_descriptions = dict(
         name="Test user name",
@@ -57,13 +57,13 @@ class TestingUserView(ModelViewConfigured):
     @staticmethod
     def _validate_json(model: db.TestUser) -> None:
         if not isinstance(model.specification, dict):
-            raise ValidationError('Could not convert specified data into correct JSON!')
+            raise ValidationError("Could not convert specified data into correct JSON!")
         parser = get_proxy_factory().context.project_settings.user_spec_template_mapping.get(model.feature_type.name)
         if parser is not None:
             try:
                 parser.parse_obj(model.specification)
             except ValueError:
-                raise ValidationError(f'Could not convert specified data into {parser.__name__} model!')
+                raise ValidationError(f"Could not convert specified data into {parser.__name__} model!")
 
     def on_model_change(self, form: Form, model: db.TestUser, is_created: bool) -> None:
         self._feature_type = model.feature_type.name
@@ -73,4 +73,4 @@ class TestingUserView(ModelViewConfigured):
 
     def on_model_delete(self, model: db.TestUser) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
-            raise ValidationError('Only test user creator or administrator could delete test user!')
+            raise ValidationError("Only test user creator or administrator could delete test user!")

@@ -1,13 +1,58 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Sequence
 
 import pytest
 from markupsafe import Markup
 from pytest_mock import MockerFixture
+from yarl import URL
 
-from overhave.admin.views import TestRunView, datetime_formatter, result_report_formatter
+from overhave import db
+from overhave.admin.views import (
+    DraftView,
+    FeatureView,
+    TestRunView,
+    datetime_formatter,
+    result_report_formatter,
+    task_formatter,
+)
+from overhave.admin.views.formatters import (
+    _get_feature_link_markup,
+    _get_testrun_details_link,
+    draft_feature_formatter,
+    draft_prurl_formatter,
+    draft_testrun_formatter,
+    feature_name_formatter,
+)
 from overhave.db import TestReportStatus, TestRun, TestRunStatus
 from overhave.utils import get_current_time
+
+
+class TestDatetimeFormatter:
+    """ Unit tests for datetime_formatter. """
+
+    def test_empty_status(self, test_testrun_view: TestRunView, mocker: MockerFixture):
+        assert datetime_formatter(
+            view=test_testrun_view, context=mocker.MagicMock(), model=TestRun(), name="start"
+        ) == Markup("")
+
+    @pytest.mark.parametrize(
+        ("column_name", "time"),
+        [
+            ("created_at", get_current_time()),
+            ("start", get_current_time() + timedelta(seconds=1)),
+            ("end", get_current_time() + timedelta(seconds=5)),
+        ],
+    )
+    def test_time(
+        self, test_testrun_view, mocker: MockerFixture, test_testrun_id: int, column_name: str, time: datetime
+    ):
+        result = datetime_formatter(
+            view=test_testrun_view,
+            context=mocker.MagicMock(),
+            model=TestRun(**{"id": test_testrun_id, column_name: time}),
+            name=column_name,
+        )
+        assert result == Markup(time.strftime("%d-%m-%Y %H:%M:%S"))
 
 
 class TestResultReportFormatter:
@@ -76,29 +121,96 @@ class TestResultReportFormatter:
         )
 
 
-class TestDatetimeFormatter:
-    """ Unit tests for datetime_formatter. """
+@pytest.mark.parametrize("tasks", [("TCS-123",), ("TCS-456", "TCS-789")])
+class TestTaskFormatter:
+    """ Unit tests for task_formatter. """
 
-    def test_empty_status(self, test_testrun_view: TestRunView, mocker: MockerFixture):
-        assert datetime_formatter(
-            view=test_testrun_view, context=mocker.MagicMock(), model=TestRun(), name="start"
+    @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+    def test_task_without_url(
+        self, test_browse_url: None, test_feature_view: FeatureView, tasks: Sequence[str], mocker: MockerFixture,
+    ):
+        assert task_formatter(
+            view=test_feature_view, context=mocker.MagicMock(), model=db.Feature(task=tasks), name="task",
+        ) == Markup(", ".join(tasks))
+
+    @pytest.mark.parametrize("test_browse_url", ["https://overhave.readthedocs.io"], indirect=True)
+    def test_task_with_url(
+        self, test_browse_url: str, test_feature_view: FeatureView, tasks: Sequence[str], mocker: MockerFixture,
+    ):
+        task_links = []
+        for task in tasks:
+            task_links.append(f"<a href='{test_browse_url}/{task}' target='blank'>{task}</a>")
+        assert task_formatter(
+            view=test_feature_view, context=mocker.MagicMock(), model=db.Feature(task=tasks), name="task",
+        ) == Markup(", ".join(task_links))
+
+
+@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+class TestFeatureNameFormatter:
+    """ Unit tests for feature_name_formatter. """
+
+    def test_empty_name(self, test_feature_view: FeatureView, mocker: MockerFixture):
+        assert feature_name_formatter(
+            view=test_feature_view, context=mocker.MagicMock(), model=db.Feature(), name="name"
         ) == Markup("")
 
-    @pytest.mark.parametrize(
-        ("column_name", "time"),
-        [
-            ("created_at", get_current_time()),
-            ("start", get_current_time() + timedelta(seconds=1)),
-            ("end", get_current_time() + timedelta(seconds=5)),
-        ],
-    )
-    def test_time(
-        self, test_testrun_view, mocker: MockerFixture, test_testrun_id: int, column_name: str, time: datetime
+    def test_with_name(
+        self, test_feature_view: FeatureView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
     ):
-        result = datetime_formatter(
-            view=test_testrun_view,
+        assert feature_name_formatter(
+            view=test_feature_view,
             context=mocker.MagicMock(),
-            model=TestRun(**{"id": test_testrun_id, column_name: time}),
-            name=column_name,
-        )
-        assert result == Markup(time.strftime('%d-%m-%Y %H:%M:%S'))
+            model=db.Feature(id=test_feature_id, name=test_feature_name),
+            name="name",
+        ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+
+
+class TestDraftFeatureFormatter:
+    """ Unit tests for draft_feature_formatter. """
+
+    def test_empty_id(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_feature_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="feature_id"
+        ) == Markup("")
+
+    def test_with_id(
+        self, test_draft_view: DraftView, mocker: MockerFixture, test_feature_id: int, test_feature_name: str
+    ):
+        assert draft_feature_formatter(
+            view=test_draft_view,
+            context=mocker.MagicMock(),
+            model=db.Draft(feature_id=test_feature_id, feature=db.Feature(name=test_feature_name)),
+            name="feature_id",
+        ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+
+
+class TestDraftTestRunFormatter:
+    """ Unit tests for draft_testrun_formatter. """
+
+    def test_empty_id(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_testrun_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="test_run_id"
+        ) == Markup("")
+
+    def test_with_id(self, test_draft_view: DraftView, mocker: MockerFixture, test_testrun_id: int):
+        assert draft_testrun_formatter(
+            view=test_draft_view,
+            context=mocker.MagicMock(),
+            model=db.Draft(test_run_id=test_testrun_id),
+            name="test_run_id",
+        ) == Markup(f"<a {_get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
+
+
+class TestDraftPrUrlFormatter:
+    """ Unit tests for draft_prurl_formatter. """
+
+    def test_empty_url(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_prurl_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="pr_url"
+        ) == Markup("")
+
+    @pytest.mark.parametrize("test_prurl", ["https://overhave.readthedocs.io"], indirect=True)
+    def test_with_url(self, test_draft_view: DraftView, mocker: MockerFixture, test_testrun_id: int, test_prurl: str):
+        assert draft_prurl_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(pr_url=test_prurl), name="pr_url",
+        ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")

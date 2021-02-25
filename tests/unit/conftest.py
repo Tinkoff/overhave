@@ -16,11 +16,11 @@ def mock_urls(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) 
     old_values = {key: os.environ.get(key) for key in envs_for_mock}
     try:
         for key in envs_for_mock:
-            os.environ[key] = envs_for_mock.get('envs_for_mock') or mock_default_value
+            os.environ[key] = envs_for_mock.get("envs_for_mock") or mock_default_value
         yield
     finally:
         for key, value in old_values.items():
-            os.environ[key] = value or ''
+            os.environ[key] = value or ""
 
 
 @pytest.fixture(scope="session")
@@ -38,3 +38,10 @@ def test_file_settings(request: FixtureRequest) -> OverhaveFileSettings:
 @pytest.fixture()
 def mocked_file_manager(mocker: MockFixture) -> FileManager:
     return cast(FileManager, mocker.create_autospec(FileManager))
+
+
+@pytest.fixture()
+def test_browse_url(request: FixtureRequest) -> Optional[str]:
+    if hasattr(request, "param"):
+        return cast(Optional[str], request.param)
+    raise NotImplementedError

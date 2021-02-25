@@ -30,7 +30,7 @@ def create_metadata(db_context: DataBaseContext) -> None:
     db_context.metadata.create_all()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
     from overhave.db import metadata
 

@@ -1,6 +1,7 @@
 # flake8: noqa
 from .authorization import IAdminAuthorizationManager
 from .converters import (
+    DraftModel,
     EmulationRunModel,
     FeatureModel,
     FeatureTypeModel,
@@ -25,3 +26,4 @@ from .settings import (
     OverhaveScenarioCompilerSettings,
     ProcessorSettings,
 )
+from .stash import IStashProjectManager, OverhaveStashManagerSettings

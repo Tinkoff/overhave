@@ -5,7 +5,7 @@ from overhave.factory import ConsumerFactory, get_proxy_factory
 from overhave.redis import RedisStream
 
 
-@overhave.command(short_help='Run Overhave Redis consumer')
+@overhave.command(short_help="Run Overhave Redis consumer")
 @click.option(
     "-s",
     "--stream",

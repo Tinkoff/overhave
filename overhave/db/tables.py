@@ -16,13 +16,13 @@ from overhave.db.users import UserRole
 class FeatureType(Base, PrimaryKeyWithoutDateMixin):
     """ Feature types table. """
 
-    name = sa.Column(sa.Text, unique=True, nullable=False, doc='Feature types choice')
+    name = sa.Column(sa.Text, unique=True, nullable=False, doc="Feature types choice")
 
     def __repr__(self) -> str:
         return cast(str, self.name.upper())
 
 
-@su.generic_repr('name', 'last_edited_by')
+@su.generic_repr("name", "last_edited_by")
 class Feature(Base, PrimaryKeyMixin):
     """ Features table. """
 
@@ -30,7 +30,7 @@ class Feature(Base, PrimaryKeyMixin):
     author = sa.Column(
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
     )
-    type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc='Feature types choice')
+    type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     task = sa.Column(ARRAY_TYPE, doc="Feature tasks list", nullable=False)
     last_edited_by = sa.Column(SHORT_STR_TYPE, doc="Last feature editor login", nullable=False)
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
@@ -38,7 +38,7 @@ class Feature(Base, PrimaryKeyMixin):
     feature_type = so.relationship(FeatureType)
 
 
-@su.generic_repr('feature_id')
+@su.generic_repr("feature_id")
 class Scenario(Base, PrimaryKeyMixin):
     """ Scenarios table. """
 
@@ -50,6 +50,8 @@ class Scenario(Base, PrimaryKeyMixin):
 
 class TestRun(Base, PrimaryKeyMixin):
     """ Test runs table. """
+
+    __test__ = False
 
     scenario_id = sa.Column(INT_TYPE, sa.ForeignKey(Scenario.id), nullable=False, index=True)
     name = sa.Column(LONG_STR_TYPE, nullable=False)
@@ -67,9 +69,11 @@ class TestRun(Base, PrimaryKeyMixin):
 class DraftQuery(so.Query):
     """ Scenario versions table. """
 
-    def as_unique(self, test_run_id: int) -> Draft:
+    def as_unique(self, test_run_id: int, published_by: str) -> Draft:
         with self.session.no_autoflush:
             run = self.session.query(TestRun).get(test_run_id)
+            if run is None:
+                raise RuntimeError(f"Unknown test_run_id={test_run_id}!")
             draft: Optional[Draft] = self.session.query(Draft).filter(
                 Draft.test_run_id == run.id, Draft.text == run.scenario.text
             ).one_or_none()
@@ -78,7 +82,10 @@ class DraftQuery(so.Query):
             return draft
 
         return Draft(  # type: ignore
-            test_run_id=test_run_id, feature_id=run.scenario.feature_id, text=run.scenario.text
+            test_run_id=test_run_id,
+            feature_id=run.scenario.feature_id,
+            text=run.scenario.text,
+            published_by=published_by,
         )
 
 
@@ -91,6 +98,7 @@ class Draft(Base, PrimaryKeyMixin):
     test_run_id = sa.Column(INT_TYPE, sa.ForeignKey(TestRun.id), nullable=False)
     text = sa.Column(TEXT_TYPE, doc="Released scenario text")
     pr_url = sa.Column(sa.Text, doc="Absolute pull-request URL", nullable=True)
+    published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 
@@ -100,12 +108,12 @@ class Draft(Base, PrimaryKeyMixin):
         return f'<a href="{url_for("draft.details_view", id=self.id)}">Draft: {self.id}</a>'
 
 
-@su.generic_repr('id', 'name', 'created_by')
+@su.generic_repr("id", "name", "created_by")
 class TestUser(Base, PrimaryKeyMixin):
     """ Test users table. """
 
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
-    feature_type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc='Feature types choice')
+    feature_type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     specification = sa.Column(sa.JSON(none_as_null=True))
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
 
@@ -116,7 +124,7 @@ class Emulation(Base, PrimaryKeyMixin):
     """ Emulation templates table. """
 
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
-    test_user_id = sa.Column(INT_TYPE, sa.ForeignKey(TestUser.id), nullable=False, doc='Test user ID')
+    test_user_id = sa.Column(INT_TYPE, sa.ForeignKey(TestUser.id), nullable=False, doc="Test user ID")
     command = sa.Column(TEXT_TYPE, nullable=False, doc="Command for emulator's execution")
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
     test_user = so.relationship(TestUser)
@@ -125,7 +133,7 @@ class Emulation(Base, PrimaryKeyMixin):
 class EmulationRun(Base, PrimaryKeyMixin):
     """ Emulation runs table. """
 
-    __tablename__ = 'emulation_run'  # type: ignore
+    __tablename__ = "emulation_run"  # type: ignore
     emulation_id = sa.Column(INT_TYPE, sa.ForeignKey(Emulation.id), nullable=False, index=True)
     status = sa.Column(sa.Enum(EmulationStatus), doc="Current emulation status", nullable=False)
     changed_at = sa.Column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())

@@ -33,12 +33,15 @@ class _OverhaveDemoSettings(BaseOverhavePrefix):
     def _prefix(self) -> str:
         return self.__config__.env_prefix
 
+    def _get_variable(self, name: str) -> str:
+        return (self._prefix + name).upper()
+
     def enrich_env(self) -> None:
-        environ[self._prefix + "features_base_dir"] = self.features_base_dir.as_posix()
-        environ[self._prefix + "stash_url"] = "https://overhave.readthedocs.io"
-        environ[self._prefix + "auth_token"] = "secret_token"
-        environ[self._prefix + "repository_name"] = "bdd-features"
-        environ[self._prefix + "project_key"] = "OVH"
+        environ[self._get_variable("features_base_dir")] = self.features_base_dir.as_posix()
+        environ[self._get_variable("stash_url")] = "https://overhave.readthedocs.io"
+        environ[self._get_variable("stash_auth_token")] = "secret_token"
+        environ[self._get_variable("repository_name")] = "bdd-features"
+        environ[self._get_variable("project_key")] = "OVH"
 
 
 @contextmanager
@@ -65,12 +68,12 @@ def _demo_files_creator(demo_settings: _OverhaveDemoSettings) -> Iterator[None]:
             click.secho(f"Removed demo pytest file '{file}'.", fg="blue")
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help']})
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def overhave_demo() -> None:
     pass
 
 
-@overhave_demo.command(short_help='Run Overhave web-service in demo mode')
+@overhave_demo.command(short_help="Run Overhave web-service in demo mode")
 def admin() -> None:
     demo_settings = _OverhaveDemoSettings()
     demo_settings.enrich_env()

@@ -22,7 +22,6 @@ from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
 from overhave.factory import OverhaveContext, OverhaveFactoryType
 from overhave.factory import get_proxy_factory as overhave_factory
 from overhave.redis import RedisStream as OverhaveRedisConsumerApp
-from overhave.stash import OverhaveStashClientSettings, OverhaveStashProjectSettings
 from overhave.testing import (
     OverhaveDescriptionManagerSettings,
     OverhaveProjectSettings,

@@ -13,19 +13,19 @@ class StashProject(BaseModel):
 class StashRepository(BaseModel):
     """ Model for Stash pull-request repository. """
 
-    name: str = Field(..., alias='slug')
+    name: str = Field(..., alias="slug")
     project: StashProject
 
 
 class StashBranch(BaseModel):
     """ Model for Stash pull-request branch. """
 
-    branch: str = Field(..., alias='id')
+    branch: str = Field(..., alias="id")
     repository: StashRepository
 
-    @validator('branch')
+    @validator("branch")
     def insert_refs(cls, v: str) -> str:
-        return 'refs/heads/' + v
+        return "refs/heads/" + v
 
 
 class StashReviewerInfo(BaseModel):
@@ -53,8 +53,8 @@ class StashPrRequest(StashBasicPrInfo):
     description: str
     state: str = "OPEN"
     closed: bool = False
-    source_branch: StashBranch = Field(..., alias='fromRef')
-    target_branch: StashBranch = Field(..., alias='toRef')
+    source_branch: StashBranch = Field(..., alias="fromRef")
+    target_branch: StashBranch = Field(..., alias="toRef")
     locked: bool = False
     close_source_branch: bool = True
     reviewers: List[StashReviewer]
@@ -66,8 +66,8 @@ StashLinksType = Dict[str, List[Dict[str, str]]]
 class StashPrCreationResponse(StashBasicPrInfo):
     """ Model for Stash pull-request creation response. """
 
-    created_date: datetime = Field(..., alias='createdDate')
-    updated_date: datetime = Field(..., alias='updatedDate')
+    created_date: datetime = Field(..., alias="createdDate")
+    updated_date: datetime = Field(..., alias="updatedDate")
     pull_request_url: Optional[str]
     traceback: Optional[Exception]
     links: Optional[StashLinksType]
@@ -76,10 +76,10 @@ class StashPrCreationResponse(StashBasicPrInfo):
         arbitrary_types_allowed = True
 
     def get_pr_url(self) -> str:
-        if self.pull_request_url is not None:
+        if isinstance(self.pull_request_url, str):
             return self.pull_request_url
         if self.links is not None:
-            return self.links['self'][0]['href']
+            return self.links["self"][0]["href"]
         raise RuntimeError("Could not get pull-request URL from response!")
 
 
