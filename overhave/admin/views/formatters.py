@@ -36,7 +36,7 @@ def _get_button_class_by_status(status: str) -> str:
     return "default-btn"
 
 
-def _get_testrun_details_link(test_run_id: str) -> str:
+def _get_testrun_details_link(test_run_id: Union[int, str]) -> str:
     return f"href='/testrun/details/?id={test_run_id}'"
 
 
@@ -76,7 +76,7 @@ def json_formatter(view: ModelView, context: Any, model: Any, name: str) -> Mark
 
 
 def _get_feature_link_markup(feature_id: Union[int, str], feature_name: str) -> Markup:
-    return Markup(f"<a href='/feature/edit/?id={str(feature_id)}'>{feature_name}</a>")
+    return Markup(f"<a href='/feature/edit/?id={feature_id}'>{feature_name}</a>")
 
 
 def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:

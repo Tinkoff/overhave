@@ -14,7 +14,13 @@ from overhave.admin.views import (
     result_report_formatter,
     task_formatter,
 )
-from overhave.admin.views.formatters import _get_feature_link_markup, draft_feature_formatter, feature_name_formatter
+from overhave.admin.views.formatters import (
+    _get_feature_link_markup,
+    _get_testrun_details_link,
+    draft_feature_formatter,
+    draft_testrun_formatter,
+    feature_name_formatter,
+)
 from overhave.db import TestReportStatus, TestRun, TestRunStatus
 from overhave.utils import get_current_time
 
@@ -158,7 +164,7 @@ class TestFeatureNameFormatter:
 
 
 class TestDraftFeatureFormatter:
-    """ Unit tests for feature_name_formatter. """
+    """ Unit tests for draft_feature_formatter. """
 
     def test_empty_id(self, test_draft_view: DraftView, mocker: MockerFixture):
         assert draft_feature_formatter(
@@ -174,3 +180,20 @@ class TestDraftFeatureFormatter:
             model=db.Draft(feature_id=test_feature_id, feature=db.Feature(name=test_feature_name)),
             name="feature_id",
         ) == _get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+
+
+class TestDraftTestRunFormatter:
+    """ Unit tests for draft_testrun_formatter. """
+
+    def test_empty_id(self, test_draft_view: DraftView, mocker: MockerFixture):
+        assert draft_testrun_formatter(
+            view=test_draft_view, context=mocker.MagicMock(), model=db.Draft(), name="test_run_id"
+        ) == Markup("")
+
+    def test_with_id(self, test_draft_view: DraftView, mocker: MockerFixture, test_testrun_id: int):
+        assert draft_testrun_formatter(
+            view=test_draft_view,
+            context=mocker.MagicMock(),
+            model=db.Draft(test_run_id=test_testrun_id),
+            name="test_run_id",
+        ) == Markup(f"<a {_get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
