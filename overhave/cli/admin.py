@@ -1,12 +1,14 @@
 import click
 
 from overhave import overhave_app
+from overhave.base_settings import DataBaseSettings
 from overhave.cli.group import overhave
 from overhave.factory import get_proxy_factory
 
 
 def _run_admin(port: int, debug: bool) -> None:
     factory = get_proxy_factory()
+    DataBaseSettings().setup_db()
     overhave_app(factory).run(host="0.0.0.0", port=port, debug=debug)
 
 

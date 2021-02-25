@@ -9,7 +9,6 @@ import werkzeug
 from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app
 from overhave.admin.flask.login_manager import get_flask_login_manager
-from overhave.base_settings import DataBaseSettings
 from overhave.factory import IOverhaveFactory, ProxyFactory
 
 logger = logging.getLogger(__name__)
@@ -19,7 +18,6 @@ OverhaveAppType = typing.NewType("OverhaveAppType", flask.Flask)
 
 def _prepare_factory(factory: ProxyFactory) -> None:
     """ Resolve necessary settings and prepare instance of :class:`ProxyFactory` for usage. """
-    DataBaseSettings().setup_db()
     factory.context.logging_settings.setup_logging()
     factory.patch_pytest()
     factory.supply_injector_for_collection()
