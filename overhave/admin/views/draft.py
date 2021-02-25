@@ -13,5 +13,7 @@ class DraftView(ModelViewProtected):
             raise ValidationError("Only administrator could delete published version of scenario!")
 
     can_delete = True
-    column_list = ("id", "feature_id", "test_run_id", "pr_url", "created_at")
+    column_list = ("id", "feature.name", "test_run_id", "pr_url", "published_by", "created_at")
     column_exclude_list = ("feature", "text")  # type: ignore
+
+    column_sortable_list = ("id", "feature.name")

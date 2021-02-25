@@ -16,6 +16,7 @@ class TestRunView(ModelViewConfigured):
 
     list_template = "test_run_list.html"
     details_template = "test_run_detail.html"
+    can_create = False
     can_edit = True
     column_searchable_list = (
         "name",

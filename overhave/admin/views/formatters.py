@@ -3,7 +3,9 @@ from typing import Any, List, Optional
 
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
+from yarl import URL
 
+from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
 
 
@@ -15,10 +17,12 @@ def datetime_formatter(view: ModelView, context: Any, model: Any, name: str) -> 
 
 
 def task_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
-    browse_url = getattr(view, "browse_url")
     tasks = getattr(model, name)
-    if not browse_url or not tasks:
+    browse_url = getattr(view, "browse_url")
+    if not tasks:
         return Markup("")
+    if not browse_url:
+        return Markup(", ".join(tasks))
     task_links: List[str] = []
     for task in tasks:
         task_links.append(f"<a href='{browse_url}/{task}' target='blank'>{task}</a>")
@@ -32,6 +36,10 @@ def _get_button_class_by_status(status: str) -> str:
     return "default-btn"
 
 
+def _get_testrun_details_link(test_run_id: str) -> str:
+    return f"href='/testrun/details/?id={test_run_id}'"
+
+
 def result_report_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
     status = getattr(model, name)
     if not status:
@@ -42,7 +50,7 @@ def result_report_formatter(view: ModelView, context: Any, model: Any, name: str
         action = f"href='/reports/{getattr(model, 'report')}' target='_blank'"
         title = "Go to report"
     else:
-        action = f"href='/testrun/details/?id={model.id}'"
+        action = _get_testrun_details_link(model.id)
         title = "Show details"
 
     return Markup(
@@ -65,3 +73,39 @@ def json_formatter(view: ModelView, context: Any, model: Any, name: str) -> Mark
         if value:
             info += f"<b>{key}</b>:&nbsp;&nbsp;{value}<br>"
     return Markup("<form>" "<fieldset>" f"<div class='json-data'>{info}</div>" "</fieldset>" "</form>")
+
+
+def _get_feature_link_markup(feature_id: str, feature_name: str) -> Markup:
+    return Markup(f"<a href='/feature/edit/?id={feature_id}'>{feature_name}</a>")
+
+
+def feature_name_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
+    name = getattr(model, name)
+    if not name or not isinstance(model, db.Feature):
+        return Markup("")
+    return _get_feature_link_markup(feature_id=model.id, feature_name=name)
+
+
+def draft_feature_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
+    feature_name = getattr(model, name)
+    if not feature_name:
+        return Markup("")
+    return _get_feature_link_markup(feature_id=model.feature.id, feature_name=feature_name)
+
+
+def draft_testrun_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
+    test_run = getattr(model, name)
+    if not test_run:
+        return Markup("")
+    return Markup(f"<a {_get_testrun_details_link(test_run)}>{test_run}</a>")
+
+
+def draft_prurl_formatter(view: ModelView, context: Any, model: Any, name: str) -> Markup:
+    pr_url = getattr(model, name)
+    if not pr_url:
+        return Markup("")
+    try:
+        url = URL(pr_url)
+    except ValueError:
+        return Markup(pr_url)
+    return Markup(f"<a href='{url.human_repr()}'>{pr_url}</a>")

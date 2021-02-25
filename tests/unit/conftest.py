@@ -38,3 +38,10 @@ def test_file_settings(request: FixtureRequest) -> OverhaveFileSettings:
 @pytest.fixture()
 def mocked_file_manager(mocker: MockFixture) -> FileManager:
     return cast(FileManager, mocker.create_autospec(FileManager))
+
+
+@pytest.fixture()
+def test_browse_url(request: FixtureRequest) -> Optional[str]:
+    if hasattr(request, "param"):
+        return cast(Optional[str], request.param)
+    raise NotImplementedError

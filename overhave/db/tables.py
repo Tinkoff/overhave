@@ -93,6 +93,7 @@ class Draft(Base, PrimaryKeyMixin):
     test_run_id = sa.Column(INT_TYPE, sa.ForeignKey(TestRun.id), nullable=False)
     text = sa.Column(TEXT_TYPE, doc="Released scenario text")
     pr_url = sa.Column(sa.Text, doc="Absolute pull-request URL", nullable=True)
+    published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 
