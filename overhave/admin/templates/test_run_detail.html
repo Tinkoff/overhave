@@ -11,11 +11,11 @@
         {% if model.status != 'INTERNAL_ERROR' and model.report != 'not_created' %}
             {{ render_allure_button(model) }}
         {% endif %}
-        {% if model.status == 'SUCCESS' %}
-            {{ render_pr_button(model) }}
-        {% endif %}
     {% else %}
         <meta http-equiv="refresh" content="5">
+    {% endif %}
+    {% if model.status == 'SUCCESS' %}
+        {{ render_pr_button(model) }}
     {% endif %}
 {% endblock %}
 
