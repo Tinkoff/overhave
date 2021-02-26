@@ -5,8 +5,15 @@ from faker import Faker
 
 from overhave.entities import FeatureTypeName, OverhaveFileSettings, OverhaveStashManagerSettings
 from overhave.entities.stash.manager.stash_manager import StashProjectManager
-from overhave.http import StashBranch, StashHttpClient, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 from overhave.scenario import FileManager
+from overhave.transport import (
+    StashBranch,
+    StashHttpClient,
+    StashProject,
+    StashRepository,
+    StashReviewer,
+    StashReviewerInfo,
+)
 from tests.objects import get_file_settings
 
 

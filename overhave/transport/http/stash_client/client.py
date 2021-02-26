@@ -1,9 +1,9 @@
 import logging
 from typing import cast
 
-from overhave.http.base_client import BaseHttpClient, BearerAuth, HttpClientValidationError, HttpMethod
-from overhave.http.stash_client.models import STASH_RESPONSE_MODELS, AnyStashResponseModel, StashPrRequest
-from overhave.http.stash_client.settings import OverhaveStashClientSettings
+from overhave.transport.http.base_client import BaseHttpClient, BearerAuth, HttpClientValidationError, HttpMethod
+from overhave.transport.http.stash_client.models import STASH_RESPONSE_MODELS, AnyStashResponseModel, StashPrRequest
+from overhave.transport.http.stash_client.settings import OverhaveStashClientSettings
 
 logger = logging.getLogger(__name__)
 

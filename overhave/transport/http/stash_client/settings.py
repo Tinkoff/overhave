@@ -1,6 +1,6 @@
 from yarl import URL
 
-from overhave.http.base_client import BaseHttpClientSettings
+from overhave.transport.http.base_client import BaseHttpClientSettings
 
 
 class OverhaveStashClientSettings(BaseHttpClientSettings):

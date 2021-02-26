@@ -3,7 +3,7 @@ from typing import List, Mapping
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.feature import FeatureTypeName
 from overhave.entities.stash.errors import NotSpecifiedFeatureTypeError
-from overhave.http import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
+from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 
 
 class OverhaveStashManagerSettings(BaseOverhavePrefix):

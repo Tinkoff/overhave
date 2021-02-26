@@ -9,12 +9,12 @@ from overhave.entities.emulator import EmulationTask, Emulator
 from overhave.entities.stash import IStashProjectManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
-from overhave.http import StashHttpClient
 from overhave.processing import IProcessor
 from overhave.redis import RedisProducer, RedisStream
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
+from overhave.transport import StashHttpClient
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
