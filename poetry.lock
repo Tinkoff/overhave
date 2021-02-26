@@ -142,6 +142,14 @@ jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
 [[package]]
+name = "boto3-type-annotations"
+version = "0.3.1"
+description = "Type annotations for boto3. Adds code completion in IDEs such as PyCharm."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "botocore"
 version = "1.20.16"
 description = "Low-level, data-driven core of boto 3."
@@ -1722,7 +1730,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9cebda69af9869a3e967d0fb5814214779debc46e4a6029cef02c9c4fb696eca"
+content-hash = "73438e3d23b9812c4e4adaa80c2e10742a7841c036a599a5d4b016759c8de2e5"
 
 [metadata.files]
 alabaster = [
@@ -1771,6 +1779,10 @@ bleach = [
 boto3 = [
     {file = "boto3-1.17.16-py2.py3-none-any.whl", hash = "sha256:602eadaef665f49090344e0f87aa6a98dbe1ccdd2f20069a372ed35f2706c63c"},
     {file = "boto3-1.17.16.tar.gz", hash = "sha256:7d52ae25baeef79151147c729051a790b7a8b3858a126d59c9ab957815a6d4e7"},
+]
+boto3-type-annotations = [
+    {file = "boto3_type_annotations-0.3.1-py3-none-any.whl", hash = "sha256:52e007ac2ab792abee42aaac3019c2acc9781a84e79e1283a5bc64164225435e"},
+    {file = "boto3_type_annotations-0.3.1.tar.gz", hash = "sha256:e5682093d035e935c8189f24c601ef6eaccedfcd1e642ba7922429d093b1b885"},
 ]
 botocore = [
     {file = "botocore-1.20.16-py2.py3-none-any.whl", hash = "sha256:48350c0524fafcc6f1cf792a80080eeaf282c4ceed016e9296f1ebfda7c34fb3"},
