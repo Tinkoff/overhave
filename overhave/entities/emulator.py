@@ -8,8 +8,8 @@ from typing import Pattern
 from overhave import db
 from overhave.entities.converters import EmulationRunModel
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.redis import EmulationTask
 from overhave.storage import EmulationStorageError, IEmulationStorage
+from overhave.transport import EmulationTask
 
 logger = logging.getLogger(__name__)
 

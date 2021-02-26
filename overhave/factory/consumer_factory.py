@@ -3,9 +3,9 @@ from typing import Callable, Dict, Type
 
 from overhave.base_settings import DataBaseSettings
 from overhave.factory import IOverhaveFactory
-from overhave.redis.consumer import RedisConsumer
-from overhave.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
-from overhave.redis.runner import RedisConsumerRunner
+from overhave.transport.redis.consumer import RedisConsumer
+from overhave.transport.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
+from overhave.transport.redis.runner import RedisConsumerRunner
 
 
 class ConsumerFactory:

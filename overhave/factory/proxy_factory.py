@@ -3,10 +3,10 @@ from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.base_factory import OverhaveBaseFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
-from overhave.redis import RedisProducer
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner
+from overhave.transport import RedisProducer
 
 
 class ProxyFactory(IOverhaveFactory):

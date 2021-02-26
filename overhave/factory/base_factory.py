@@ -10,11 +10,10 @@ from overhave.entities.stash import IStashProjectManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
-from overhave.redis import RedisProducer, RedisStream
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
-from overhave.transport import StashHttpClient
+from overhave.transport import RedisProducer, RedisStream, StashHttpClient
 
 
 class OverhaveBaseFactory(IOverhaveFactory):

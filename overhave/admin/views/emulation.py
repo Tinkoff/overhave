@@ -12,8 +12,8 @@ from wtforms import Form, ValidationError
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_proxy_factory
-from overhave.redis import EmulationTask
-from overhave.redis.objects import EmulationData
+from overhave.transport import EmulationTask
+from overhave.transport.redis.objects import EmulationData
 
 logger = logging.getLogger(__name__)
 

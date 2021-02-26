@@ -11,3 +11,13 @@ from .http import (
     StashReviewer,
     StashReviewerInfo,
 )
+from .redis import (
+    BaseRedisTask,
+    EmulationTask,
+    RedisConsumer,
+    RedisConsumerRunner,
+    RedisProducer,
+    RedisStream,
+    TestRunTask,
+    TRedisTask,
+)
