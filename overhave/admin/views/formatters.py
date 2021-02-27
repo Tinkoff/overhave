@@ -44,6 +44,8 @@ def result_report_formatter(view: ModelView, context: Any, model: Any, name: str
     status = getattr(model, name)
     if not status:
         return Markup("")
+    if not isinstance(model, db.TestRun):
+        return Markup(status)
 
     report_status = TestReportStatus[getattr(model, "report_status")]
     if report_status.has_report:

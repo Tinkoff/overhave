@@ -22,7 +22,7 @@ from overhave.admin.views.formatters import (
     draft_testrun_formatter,
     feature_link_formatter,
 )
-from overhave.db import TestReportStatus, TestRun, TestRunStatus
+from overhave.db import EmulationRun, EmulationStatus, TestReportStatus, TestRun, TestRunStatus
 from overhave.utils import get_current_time
 
 
@@ -61,6 +61,14 @@ class TestResultReportFormatter:
         assert result_report_formatter(
             view=test_testrun_view, context=mocker.MagicMock(), model=TestRun(), name="status"
         ) == Markup("")
+
+    def test_with_emulation_run(self, test_testrun_view: TestRunView, mocker: MockerFixture):
+        assert result_report_formatter(
+            view=test_testrun_view,
+            context=mocker.MagicMock(),
+            model=EmulationRun(emulation_id=1, initiated_by="overlord"),
+            name="status",
+        ) == Markup(EmulationStatus.CREATED)
 
     @pytest.mark.parametrize("status", list(TestRunStatus))
     @pytest.mark.parametrize("report_status", [x for x in list(TestReportStatus) if not x.has_report])
