@@ -28,7 +28,7 @@ metadata = MetaData(naming_convention=convention)
 
 
 @as_declarative(metadata=metadata)
-class Base:
+class BaseTable:
     """ Base table class with __tablename__. """
 
     @declared_attr
@@ -52,7 +52,7 @@ class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
         return sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
 
 
-def _get_query_cls(mapper: Type[Base], session: SessionClass) -> Query:
+def _get_query_cls(mapper: Type[BaseTable], session: SessionClass) -> Query:
     if mapper:
         m = mapper
         if isinstance(m, tuple):

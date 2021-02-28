@@ -33,8 +33,8 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         FeatureView,
         GroupView,
         OverhaveIndexView,
-        TestingUserView,
         TestRunView,
+        TestUserView,
         UserView,
     )
 
@@ -45,7 +45,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         TestRunView(db.TestRun, db.current_session, category="Scenarios", name="Test runs"),
         DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
         EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),
-        TestingUserView(db.TestUser, db.current_session, category="Emulation", name="Test users"),
+        TestUserView(db.TestUser, db.current_session, category="Emulation", name="Test users"),
         EmulationRunView(db.EmulationRun, db.current_session, category="Emulation", name="Emulation runs"),
         UserView(db.UserRole, db.current_session, category="Access", name="Users"),
         GroupView(db.GroupRole, db.current_session, category="Access", name="Groups"),

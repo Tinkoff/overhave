@@ -16,7 +16,7 @@ from overhave.entities.authorization.settings import (
 )
 from overhave.entities.stash.settings import OverhaveStashManagerSettings
 from overhave.testing import OverhaveDescriptionManagerSettings, OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveStashClientSettings
+from overhave.transport import OverhaveStashClientSettings, S3ManagerSettings
 
 
 class OverhaveContext:
@@ -41,6 +41,7 @@ class OverhaveContext:
         test_settings: Optional[OverhaveTestSettings] = None,
         logging_settings: Optional[OverhaveLoggingSettings] = None,
         description_manager_settings: Optional[OverhaveDescriptionManagerSettings] = None,
+        s3_manager_settings: Optional[S3ManagerSettings] = None,
     ) -> None:
         self.admin_settings = admin_settings or OverhaveAdminSettings()
         self.auth_settings = auth_settings or OverhaveAuthorizationSettings()
@@ -55,6 +56,6 @@ class OverhaveContext:
         self.test_settings = test_settings or OverhaveTestSettings()
         self.logging_settings = logging_settings or OverhaveLoggingSettings()
         self.description_manager_settings = description_manager_settings or OverhaveDescriptionManagerSettings()
-
+        self.s3_manager_settings = s3_manager_settings or S3ManagerSettings()
         if self.auth_settings.auth_strategy is AuthorizationStrategy.LDAP:
             self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()

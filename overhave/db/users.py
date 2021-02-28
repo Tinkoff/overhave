@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional, cast
 import sqlalchemy as sa
 import sqlalchemy_utils as su
 
-from overhave.db.base import Base, PrimaryKeyMixin
+from overhave.db.base import BaseTable, PrimaryKeyMixin
 from overhave.db.types import LONG_STR_TYPE, SHORT_STR_TYPE
 
 
@@ -49,7 +49,7 @@ class BaseUser:
 
 
 @su.generic_repr("login")
-class UserRole(Base, PrimaryKeyMixin, BaseUser):
+class UserRole(BaseTable, PrimaryKeyMixin, BaseUser):
     """ User access table. """
 
     def __init__(self, login: str, password: Optional[str], role: Role) -> None:
@@ -59,7 +59,7 @@ class UserRole(Base, PrimaryKeyMixin, BaseUser):
 
 
 @su.generic_repr("group")
-class GroupRole(Base, PrimaryKeyMixin):
+class GroupRole(BaseTable, PrimaryKeyMixin):
     """ Group access table. """
 
     group = sa.Column(SHORT_STR_TYPE, nullable=False, unique=True)

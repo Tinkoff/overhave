@@ -4,8 +4,9 @@ from flask import redirect, request, url_for
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 
-from overhave.admin.views.formatters import (
+from overhave.admin.views.formatters.formatters import (
     datetime_formatter,
+    draft_feature_formatter,
     draft_prurl_formatter,
     draft_testrun_formatter,
     feature_link_formatter,
@@ -54,7 +55,7 @@ class ModelViewConfigured(ModelView):
         "status": result_report_formatter,
         "specification": json_formatter,
         "name": feature_link_formatter,
-        "feature_id": feature_link_formatter,
+        "feature_id": draft_feature_formatter,
         "test_run_id": draft_testrun_formatter,
         "pr_url": draft_prurl_formatter,
     }

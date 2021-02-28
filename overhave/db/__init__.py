@@ -1,5 +1,5 @@
 # flake8: noqa
-from .base import current_session, metadata
+from .base import BaseTable, current_session, metadata
 from .statuses import EmulationStatus, TestReportStatus, TestRunStatus
 from .tables import Draft, Emulation, EmulationRun, Feature, FeatureType, Scenario, TestRun, TestUser
 from .users import BaseUser, GroupRole, Role, UserRole

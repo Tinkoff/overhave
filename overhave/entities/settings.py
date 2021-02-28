@@ -74,7 +74,7 @@ class ProcessorSettings(BaseOverhavePrefix):
     report_creation_timeout: int = 120  # sec
     processes_num: int = 5
     report_creation_error_msg: str = "not_created"
-    allure_cmdline: str = "/allure/bin/allure"
+    allure_cmdline: str = "allure"
 
 
 class OverhaveRedisSettings(BaseOverhavePrefix):

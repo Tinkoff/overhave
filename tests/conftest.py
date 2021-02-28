@@ -1,12 +1,14 @@
 import logging
-from typing import Callable, Iterator
+from typing import Callable, Iterator, cast
 
 import pytest
 import sqlalchemy_utils as sau
+from pytest_mock import MockFixture
 from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
+from overhave import AuthorizationStrategy, OverhaveContext
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
 from overhave.factory import ProxyFactory, get_proxy_factory
 from tests.objects import DataBaseContext, XDistWorkerValueType
@@ -66,3 +68,11 @@ def database(db_context: DataBaseContext) -> Iterator[None]:
 def clean_proxy_factory() -> Callable[[], ProxyFactory]:
     get_proxy_factory.cache_clear()
     return get_proxy_factory
+
+
+@pytest.fixture(scope="class")
+def mocked_context(session_mocker: MockFixture) -> OverhaveContext:
+    context_mock = session_mocker.MagicMock()
+    context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
+    context_mock.s3_manager_settings.enabled = False
+    return cast(OverhaveContext, context_mock)

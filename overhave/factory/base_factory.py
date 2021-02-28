@@ -3,6 +3,7 @@ from os import makedirs
 from typing import Any, Dict, Optional
 
 from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
+from overhave.entities.archiver import ArchiveManager
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
 from overhave.entities.emulator import EmulationTask, Emulator
@@ -13,7 +14,7 @@ from overhave.processing import IProcessor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
-from overhave.transport import RedisProducer, RedisStream, StashHttpClient
+from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
@@ -110,6 +111,14 @@ class OverhaveBaseFactory(IOverhaveFactory):
         )
 
     @cached_property
+    def _archive_manager(self) -> ArchiveManager:
+        return ArchiveManager(file_settings=self.context.file_settings)
+
+    @cached_property
+    def s3_manager(self) -> S3Manager:
+        return S3Manager(self.context.s3_manager_settings)
+
+    @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor
 
@@ -120,6 +129,8 @@ class OverhaveBaseFactory(IOverhaveFactory):
             file_manager=self._file_manager,
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
+            archive_manager=self._archive_manager,
+            s3_manager=self.s3_manager,
         )
 
     @property
