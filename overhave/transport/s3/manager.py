@@ -115,8 +115,10 @@ class S3Manager:
         self._ensured_client.create_bucket(**kwargs)
         logger.info("Bucket %s successfully created.", bucket)
 
-    @_s3_error
     def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> None:
         logger.info("Start uploading file '%s'...", file.name)
-        self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
-        logger.info("File '%s' successfully uploaded", file.name)
+        try:
+            self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
+            logger.info("File '%s' successfully uploaded", file.name)
+        except botocore.exceptions.ClientError:
+            logger.exception("Could not upload file to s3 cloud!")
