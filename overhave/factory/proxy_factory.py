@@ -21,12 +21,8 @@ class ProxyFactory(IOverhaveFactory):
         self._pytest_patched = False
         self._collection_prepared = False
 
-    def _resolve_deps(self) -> None:
-        self._factory.s3_manager.initialize()
-
     def set_context(self, context: OverhaveContext) -> None:
         self._factory.set_context(context)
-        self._resolve_deps()
 
     @property
     def context(self) -> OverhaveContext:

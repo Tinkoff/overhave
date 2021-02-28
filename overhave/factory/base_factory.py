@@ -1,6 +1,6 @@
 from functools import cached_property
 from os import makedirs
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
 from overhave.entities.archiver import ArchiveManager
@@ -25,6 +25,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     def set_context(self, context: OverhaveContext) -> None:
         self._context = context
+        self._resolve_deps()
 
     @property
     def has_context(self) -> bool:
@@ -33,8 +34,11 @@ class OverhaveBaseFactory(IOverhaveFactory):
     @property
     def context(self) -> OverhaveContext:
         if self._context is None:
-            self._context = OverhaveContext()
-        return self._context
+            self.set_context(OverhaveContext())
+        return cast(OverhaveContext, self._context)
+
+    def _resolve_deps(self) -> None:
+        self._s3_manager.initialize()
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
@@ -115,7 +119,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return ArchiveManager(file_settings=self.context.file_settings)
 
     @cached_property
-    def s3_manager(self) -> S3Manager:
+    def _s3_manager(self) -> S3Manager:
         return S3Manager(self.context.s3_manager_settings)
 
     @cached_property
@@ -130,7 +134,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
             archive_manager=self._archive_manager,
-            s3_manager=self.s3_manager,
+            s3_manager=self._s3_manager,
         )
 
     @property

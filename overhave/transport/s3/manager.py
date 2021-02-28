@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import boto3
+import botocore.exceptions
 import urllib3
 from boto3_type_annotations.s3 import Client
 
@@ -19,6 +20,18 @@ class BaseS3ManagerException(Exception):
 
 class UndefinedClientException(BaseS3ManagerException):
     """ Exception for situation with not initialized client in :class:`S3Manager`. """
+
+
+class InvalidEndpointError(BaseS3ManagerException):
+    """ Exception for ValueError with invalid endpoint from boto3. """
+
+
+class InvalidCredentialsError(BaseS3ManagerException):
+    """ Exception for situation with invalid credentials from boto3. """
+
+
+class EndpointConnectionError(BaseS3ManagerException):
+    """ Exception for situation with endpoint connection error from boto3. """
 
 
 class S3Manager:
@@ -43,16 +56,23 @@ class S3Manager:
         if not settings.verify:
             logger.warning("Verification disabled in '%s', so ignore 'urllib3' warnings.", type(settings).__name__)
             urllib3.disable_warnings()
-        client = boto3.client(
-            "s3",
-            region_name=settings.region_name,
-            verify=settings.verify,
-            endpoint_url=settings.url,
-            aws_access_key_id=settings.access_key,
-            aws_secret_access_key=settings.secret_key,
-        )
-        logger.info("s3 client successfully initialized.")
-        return client  # noqa: R504
+        try:
+            client = boto3.client(
+                "s3",
+                region_name=settings.region_name,
+                verify=settings.verify,
+                endpoint_url=settings.url,
+                aws_access_key_id=settings.access_key,
+                aws_secret_access_key=settings.secret_key,
+            )
+            logger.info("s3 client successfully initialized.")
+            return client  # noqa: R504
+        except ValueError as e:
+            raise InvalidEndpointError("Incorrect specified URL for s3 client!") from e
+        except botocore.exceptions.ClientError as e:
+            raise InvalidCredentialsError("Invalid credentials for s3 client!") from e
+        except botocore.exceptions.EndpointConnectionError as e:
+            raise EndpointConnectionError(f"Could not connect to '{settings.url}'!") from e
 
     @property
     def _ensured_client(self) -> Client:

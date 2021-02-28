@@ -1,9 +1,9 @@
 from typing import Any, Dict, Optional
 
-from pydantic import root_validator
+from pydantic import BaseSettings, root_validator
 
 
-class S3ManagerSettings:
+class S3ManagerSettings(BaseSettings):
     """ Settings for S3Client. """
 
     enabled: bool = False
@@ -16,7 +16,7 @@ class S3ManagerSettings:
     class Config:
         env_prefix = "OVERHAVE_S3_"
 
-    @root_validator()
+    @root_validator
     def validate_enabling(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         enabled = values.get("enabled")
         if enabled and not all(
