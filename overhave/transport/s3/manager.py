@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Dict, Optional
 
 import boto3
 import botocore.exceptions
@@ -32,6 +32,20 @@ class InvalidCredentialsError(BaseS3ManagerException):
 
 class EndpointConnectionError(BaseS3ManagerException):
     """ Exception for situation with endpoint connection error from boto3. """
+
+
+class ClientError(BaseS3ManagerException):
+    """ Exception for situation with client error from boto3. """
+
+
+def _s3_error(func: Callable[..., Any]) -> Callable[..., Any]:
+    def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except botocore.exceptions.ClientError as e:
+            raise ClientError from e
+
+    return wrapper
 
 
 class S3Manager:
@@ -88,9 +102,11 @@ class S3Manager:
             self._create_bucket(bucket)
         logger.info("Successfully ensured existence of Overhave service buckets.")
 
+    @_s3_error
     def _get_buckets(self) -> BucketsListModel:
         return BucketsListModel.parse_obj(self._ensured_client.list_buckets().get("Buckets"))
 
+    @_s3_error
     def _create_bucket(self, bucket: OverhaveS3Bucket) -> None:
         logger.info("Creating bucket %s...", bucket)
         kwargs = {"Bucket": bucket.value}
@@ -99,9 +115,8 @@ class S3Manager:
         self._ensured_client.create_bucket(**kwargs)
         logger.info("Bucket %s successfully created.", bucket)
 
-    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> Any:
+    @_s3_error
+    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> None:
         logger.info("Start uploading file '%s'...", file.name)
-        result = self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
-        logger.info("Result: %s", result)
+        self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
         logger.info("File '%s' successfully uploaded", file.name)
-        return result
