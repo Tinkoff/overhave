@@ -89,6 +89,7 @@ class Processor(IProcessor):
         if not self._s3_manager.enabled:
             return
         self._s3_manager.upload_file(file=zip_report, bucket=OverhaveS3Bucket.REPORTS)
+        set_report(run_id=run_id, status=db.TestReportStatus.SAVED)
 
     def _process_run(self, run_id: int) -> None:
         set_run_status(run_id=run_id, status=db.TestRunStatus.RUNNING)
