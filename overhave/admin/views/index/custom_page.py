@@ -22,7 +22,15 @@ class CustomPageWidget(XEditableWidget):
         if self.template_path is not None:
             with self.template_path.open("r") as template:
                 return Markup(template.read())
-        return Markup("This is Overhave info page.")
+        return Markup(
+            """
+            <h1>Overhave index</h1>
+            <p>This is Overhave info page. You could replace this page with your own HTML template.</p>
+            <p>It is possible via <a href="https://overhave.readthedocs.io/en/latest/#context-setting" target="_blank">
+            setting context</a> with <b>OverhaveAdminSettings</b>(index_template_path=<i>&lt;MY_TEMPLATE.html&gt;</i>)
+            or through environment variable <b>OVERHAVE_INDEX_TEMPLATE_PATH</b>=<i>&lt;MY_TEMPLATE.html&gt;</i>.
+            """
+        )
 
 
 class CustomPageField(Field):

@@ -8,9 +8,9 @@ from overhave.entities.settings import OverhaveFileSettings
 from overhave.entities.stash.errors import StashPrCreationError, StashValidationError
 from overhave.entities.stash.manager.abstract import IStashProjectManager
 from overhave.entities.stash.settings import OverhaveStashManagerSettings
-from overhave.http import StashBranch, StashErrorResponse, StashHttpClient, StashPrCreationResponse, StashPrRequest
 from overhave.scenario import FileManager, generate_task_info
 from overhave.storage.version import get_last_draft
+from overhave.transport import StashBranch, StashErrorResponse, StashHttpClient, StashPrCreationResponse, StashPrRequest
 from overhave.utils.time import get_current_time
 
 logger = logging.getLogger(__name__)

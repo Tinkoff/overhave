@@ -13,6 +13,7 @@ import flask
 import werkzeug
 
 from overhave import db
+from overhave.entities.archiver import ArchiveManager
 from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.settings import OverhaveFileSettings, ProcessorSettings
 from overhave.entities.stash import IStashProjectManager
@@ -21,6 +22,7 @@ from overhave.scenario import FileManager
 from overhave.storage import save_draft, set_report, set_run_status, set_traceback
 from overhave.storage.version import UniqueDraftCreationError, add_pr_url
 from overhave.testing import ConfigInjector, PytestRunner
+from overhave.transport import OverhaveS3Bucket, S3Manager
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +38,8 @@ class Processor(IProcessor):
         file_manager: FileManager,
         test_runner: PytestRunner,
         stash_manager: IStashProjectManager,
+        archive_manager: ArchiveManager,
+        s3_manager: S3Manager,
     ):
         self._settings = settings
         self._file_settings = file_settings
@@ -43,6 +47,8 @@ class Processor(IProcessor):
         self._file_manager = file_manager
         self._test_runner = test_runner
         self._stash_manager = stash_manager
+        self._archive_manager = archive_manager
+        self._s3_manager = s3_manager
 
     @cached_property
     def _thread_pool(self) -> ThreadPool:
@@ -76,6 +82,15 @@ class Processor(IProcessor):
             logger.exception("Error while generating Allure report!")
             return None
 
+    def _process_generated_report(self, run_id: int, report_dir: Path) -> None:
+        set_report(run_id=run_id, status=db.TestReportStatus.GENERATED, report=f"{report_dir.name}/index.html")
+        zip_report = self._archive_manager.zip_path(report_dir)
+        logger.info("Zip Allure report: %s", zip_report)
+        if not self._s3_manager.enabled:
+            return
+        self._s3_manager.upload_file(file=zip_report, bucket=OverhaveS3Bucket.REPORTS)
+        set_report(run_id=run_id, status=db.TestReportStatus.SAVED)
+
     def _process_run(self, run_id: int) -> None:
         set_run_status(run_id=run_id, status=db.TestRunStatus.RUNNING)
         try:
@@ -98,15 +113,11 @@ class Processor(IProcessor):
             report_dir = self._file_settings.tmp_reports_dir / allure_tmpdir_name
 
             report_generation_returncode = self._generate_report(alluredir=allure_dir, report_dir=report_dir)
-            if report_generation_returncode == 0:
-                logger.debug(
-                    "Allure report successfully generated to directory: %s", report_dir.as_posix(),
-                )
-                set_report(
-                    run_id=run_id, status=db.TestReportStatus.GENERATED, report=f"{allure_tmpdir_name}/index.html"
-                )
-            else:
+            if report_generation_returncode != 0:
                 set_report(run_id=run_id, status=db.TestReportStatus.GENERATION_FAILED)
+                return
+            logger.debug("Allure report successfully generated to directory: %s", report_dir.as_posix())
+            self._process_generated_report(run_id=run_id, report_dir=report_dir)
 
         except Exception as e:
             logger.exception("Error!")

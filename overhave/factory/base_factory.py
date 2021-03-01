@@ -1,20 +1,20 @@
 from functools import cached_property
 from os import makedirs
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
+from overhave.entities.archiver import ArchiveManager
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
 from overhave.entities.emulator import EmulationTask, Emulator
 from overhave.entities.stash import IStashProjectManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
-from overhave.http import StashHttpClient
 from overhave.processing import IProcessor
-from overhave.redis import RedisProducer, RedisStream
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
+from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
@@ -25,6 +25,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     def set_context(self, context: OverhaveContext) -> None:
         self._context = context
+        self._resolve_deps()
 
     @property
     def has_context(self) -> bool:
@@ -33,8 +34,11 @@ class OverhaveBaseFactory(IOverhaveFactory):
     @property
     def context(self) -> OverhaveContext:
         if self._context is None:
-            self._context = OverhaveContext()
-        return self._context
+            self.set_context(OverhaveContext())
+        return cast(OverhaveContext, self._context)
+
+    def _resolve_deps(self) -> None:
+        self._s3_manager.initialize()
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
@@ -111,6 +115,14 @@ class OverhaveBaseFactory(IOverhaveFactory):
         )
 
     @cached_property
+    def _archive_manager(self) -> ArchiveManager:
+        return ArchiveManager(file_settings=self.context.file_settings)
+
+    @cached_property
+    def _s3_manager(self) -> S3Manager:
+        return S3Manager(self.context.s3_manager_settings)
+
+    @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor
 
@@ -121,6 +133,8 @@ class OverhaveBaseFactory(IOverhaveFactory):
             file_manager=self._file_manager,
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
+            archive_manager=self._archive_manager,
+            s3_manager=self._s3_manager,
         )
 
     @property

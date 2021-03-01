@@ -1,8 +1,8 @@
 import logging
 from typing import Callable, Dict, Type
 
-from overhave.redis.consumer import RedisConsumer
-from overhave.redis.objects import BaseRedisTask, RedisContainer, RedisUnreadData, TRedisTask
+from overhave.transport.redis.consumer import RedisConsumer
+from overhave.transport.redis.objects import BaseRedisTask, RedisContainer, RedisUnreadData, TRedisTask
 
 logger = logging.getLogger(__name__)
 

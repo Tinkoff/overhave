@@ -6,22 +6,19 @@ from uuid import uuid1
 import pytest
 from faker import Faker
 from flask.testing import FlaskClient
-from pytest_mock import MockFixture
 
-from overhave import AuthorizationStrategy, OverhaveAppType, overhave_app
+from overhave import OverhaveAppType, overhave_app
 from overhave.base_settings import DataBaseSettings
 from overhave.factory import ProxyFactory
 
 
 @pytest.fixture()
 def patched_app_proxy_factory(
-    db_settings: DataBaseSettings, database: None, clean_proxy_factory: Callable[[], ProxyFactory], mocker: MockFixture
+    db_settings: DataBaseSettings, database: None, mocked_context, clean_proxy_factory: Callable[[], ProxyFactory]
 ) -> ProxyFactory:
     db_settings.setup_db()
     factory = clean_proxy_factory()
-    context_mock = mocker.MagicMock()
-    context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
-    factory.set_context(context_mock)
+    factory.set_context(mocked_context)
     return factory
 
 

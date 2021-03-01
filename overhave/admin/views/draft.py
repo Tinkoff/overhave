@@ -16,9 +16,9 @@ class DraftView(ModelViewProtected):
 
     column_sortable_list = ("id", "feature_id")
     column_searchable_list = (
-        "feature_id",
         "test_run_id",
         "published_by",
+        "pr_url",
     )
     column_filters = ("feature_id", "published_by", "created_at")
 

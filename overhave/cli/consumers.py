@@ -2,7 +2,7 @@ import click
 
 from overhave.cli.group import overhave
 from overhave.factory import ConsumerFactory, get_proxy_factory
-from overhave.redis import RedisStream
+from overhave.transport import RedisStream
 
 
 @overhave.command(short_help="Run Overhave Redis consumer")

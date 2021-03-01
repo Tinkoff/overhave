@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 
 from overhave.entities import FeatureTypeName
 from overhave.entities.stash import OverhaveStashManagerSettings
-from overhave.http import StashHttpClient
+from overhave.transport import StashHttpClient
 from tests.objects import get_feature_extractor
 
 

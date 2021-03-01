@@ -9,8 +9,8 @@ from pydantic.main import ModelMetaclass
 from requests.auth import AuthBase
 from yarl import URL
 
-from overhave.http.base_client.objects import HttpMethod
-from overhave.http.base_client.settings import HttpSettingsType
+from overhave.transport.http.base_client.objects import HttpMethod
+from overhave.transport.http.base_client.settings import HttpSettingsType
 
 logger = logging.getLogger(__name__)
 

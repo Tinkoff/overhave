@@ -6,8 +6,8 @@ from typing import Iterator, List, Sequence, Type
 import walrus
 
 from overhave.entities.settings import OverhaveRedisSettings
-from overhave.redis.objects import RedisPendingData, RedisStream, RedisUnreadData
-from overhave.redis.template import RedisTemplate
+from overhave.transport.redis.objects import RedisPendingData, RedisStream, RedisUnreadData
+from overhave.transport.redis.template import RedisTemplate
 
 logger = logging.getLogger(__name__)
 

@@ -3,10 +3,10 @@ import abc
 from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
-from overhave.redis import RedisProducer
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner
+from overhave.transport import RedisProducer
 
 
 class IOverhaveFactory(abc.ABC):

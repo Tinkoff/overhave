@@ -56,6 +56,8 @@ Jinja2 = "^2.11.2"
 httptools = "^0.1.1"
 python-dateutil = "^2.8.1"
 alembic = "^1.4.3"
+boto3 = "^1.17.16"
+boto3-type-annotations = "^0.3.1"
 
 
 [tool.poetry.dev-dependencies]

@@ -7,13 +7,13 @@ import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
 
-from overhave.db.base import Base, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
+from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
 from overhave.db.users import UserRole
 
 
-class FeatureType(Base, PrimaryKeyWithoutDateMixin):
+class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
     """ Feature types table. """
 
     name = sa.Column(sa.Text, unique=True, nullable=False, doc="Feature types choice")
@@ -23,7 +23,7 @@ class FeatureType(Base, PrimaryKeyWithoutDateMixin):
 
 
 @su.generic_repr("name", "last_edited_by")
-class Feature(Base, PrimaryKeyMixin):
+class Feature(BaseTable, PrimaryKeyMixin):
     """ Features table. """
 
     name = sa.Column(LONG_STR_TYPE, doc="Feature name", nullable=False, unique=True)
@@ -39,7 +39,7 @@ class Feature(Base, PrimaryKeyMixin):
 
 
 @su.generic_repr("feature_id")
-class Scenario(Base, PrimaryKeyMixin):
+class Scenario(BaseTable, PrimaryKeyMixin):
     """ Scenarios table. """
 
     feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
@@ -48,7 +48,7 @@ class Scenario(Base, PrimaryKeyMixin):
     feature = so.relationship(Feature, backref=so.backref("scenario", cascade="all, delete-orphan"))
 
 
-class TestRun(Base, PrimaryKeyMixin):
+class TestRun(BaseTable, PrimaryKeyMixin):
     """ Test runs table. """
 
     __test__ = False
@@ -89,7 +89,7 @@ class DraftQuery(so.Query):
         )
 
 
-class Draft(Base, PrimaryKeyMixin):
+class Draft(BaseTable, PrimaryKeyMixin):
     """ Scenario versions table. """
 
     __query_cls__ = DraftQuery
@@ -109,8 +109,10 @@ class Draft(Base, PrimaryKeyMixin):
 
 
 @su.generic_repr("id", "name", "created_by")
-class TestUser(Base, PrimaryKeyMixin):
+class TestUser(BaseTable, PrimaryKeyMixin):
     """ Test users table. """
+
+    __test__ = False
 
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
     feature_type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
@@ -120,7 +122,7 @@ class TestUser(Base, PrimaryKeyMixin):
     feature_type = so.relationship(FeatureType)
 
 
-class Emulation(Base, PrimaryKeyMixin):
+class Emulation(BaseTable, PrimaryKeyMixin):
     """ Emulation templates table. """
 
     name = sa.Column(LONG_STR_TYPE, nullable=False, unique=True)
@@ -130,7 +132,7 @@ class Emulation(Base, PrimaryKeyMixin):
     test_user = so.relationship(TestUser)
 
 
-class EmulationRun(Base, PrimaryKeyMixin):
+class EmulationRun(BaseTable, PrimaryKeyMixin):
     """ Emulation runs table. """
 
     __tablename__ = "emulation_run"  # type: ignore

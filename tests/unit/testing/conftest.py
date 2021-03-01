@@ -10,9 +10,8 @@ from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
-from pytest_mock import MockFixture
 
-from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings
+from overhave import OverhaveContext, OverhaveDescriptionManagerSettings, OverhaveProjectSettings
 from overhave.base_settings import OverhaveLoggingSettings
 from overhave.factory import ProxyFactory
 from overhave.testing.plugin import pytest_addoption
@@ -193,7 +192,9 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 
 @pytest.fixture()
-def patched_hook_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory], mocker: MockFixture) -> ProxyFactory:
+def patched_hook_proxy_factory(
+    mocked_context: OverhaveContext, clean_proxy_factory: Callable[[], ProxyFactory]
+) -> ProxyFactory:
     factory = clean_proxy_factory()
-    factory.set_context(mocker.MagicMock())
+    factory.set_context(mocked_context)
     return factory

@@ -2,8 +2,8 @@ import logging
 from typing import Dict, Type
 
 from overhave.entities.settings import OverhaveRedisSettings
-from overhave.redis.objects import BaseRedisTask, RedisStream
-from overhave.redis.template import RedisTemplate
+from overhave.transport.redis.objects import BaseRedisTask, RedisStream
+from overhave.transport.redis.template import RedisTemplate
 
 logger = logging.getLogger(__name__)
 

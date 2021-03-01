@@ -2,7 +2,7 @@ from typing import cast
 
 from overhave import db
 from overhave.entities import DraftModel
-from overhave.http import StashPrCreationResponse
+from overhave.transport import StashPrCreationResponse
 
 
 class UniqueDraftCreationError(RuntimeError):
