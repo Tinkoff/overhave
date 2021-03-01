@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, cast
 from unittest import mock
 
@@ -6,6 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave.transport import S3Manager, S3ManagerSettings
+from overhave.utils import get_current_time
 
 
 @pytest.fixture()
@@ -56,3 +58,13 @@ def mocked_boto3_client_getter(
 @pytest.fixture()
 def test_s3_manager(test_s3_manager_settings: S3ManagerSettings, mocked_boto3_client_getter) -> S3Manager:
     return S3Manager(test_s3_manager_settings)
+
+
+@pytest.fixture()
+def test_bucket_name(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
+def test_bucket_creation_date() -> datetime:
+    return get_current_time()

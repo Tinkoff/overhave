@@ -1022,18 +1022,6 @@ pytest = ">=4.3"
 six = ">=1.9.0"
 
 [[package]]
-name = "pytest-catchlog"
-version = "1.2.2"
-description = "py.test plugin to catch log messages. This is a fork of pytest-capturelog."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-py = ">=1.1.1"
-pytest = ">=2.6"
-
-[[package]]
 name = "pytest-cov"
 version = "2.11.1"
 description = "Pytest plugin for measuring coverage."
@@ -1744,7 +1732,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e2c642c0aba32daa937dc28d257acdd3ef72e0cfa966104bbfebd5568c98e406"
+content-hash = "73438e3d23b9812c4e4adaa80c2e10742a7841c036a599a5d4b016759c8de2e5"
 
 [metadata.files]
 alabaster = [
@@ -2349,10 +2337,6 @@ pytest = [
 pytest-bdd = [
     {file = "pytest-bdd-4.0.2.tar.gz", hash = "sha256:982489f2f036c7561affe4eeb5b392a37e1ace2a9f260cad747b1c8119e63cfd"},
     {file = "pytest_bdd-4.0.2-py2.py3-none-any.whl", hash = "sha256:74ea5a147ea558c99ae83d838e6acbe5c9e6843884a958f8231615d96838733d"},
-]
-pytest-catchlog = [
-    {file = "pytest-catchlog-1.2.2.zip", hash = "sha256:4be15dc5ac1750f83960897f591453040dff044b5966fe24a91c2f7d04ecfcf0"},
-    {file = "pytest_catchlog-1.2.2-py2.py3-none-any.whl", hash = "sha256:a692966da726b918197cabd20dc0ad4da5503fbdc99baaa192e62579c8a45773"},
 ]
 pytest-cov = [
     {file = "pytest-cov-2.11.1.tar.gz", hash = "sha256:359952d9d39b9f822d9d29324483e7ba04a3a17dd7d05aa6beb7ea01e359e5f7"},
