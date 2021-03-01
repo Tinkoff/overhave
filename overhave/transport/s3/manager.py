@@ -57,6 +57,7 @@ class S3Manager:
 
     def initialize(self) -> None:
         if not self._settings.enabled:
+            logger.info("S3Manager disabled and has not been initialized.")
             return
         self._client = self._get_client(self._settings)
         self._ensure_buckets_exists()
@@ -104,7 +105,8 @@ class S3Manager:
 
     @_s3_error
     def _get_buckets(self) -> BucketsListModel:
-        return BucketsListModel.parse_obj(self._ensured_client.list_buckets().get("Buckets"))
+        response = self._ensured_client.list_buckets()
+        return BucketsListModel.parse_obj(response.get("Buckets"))
 
     @_s3_error
     def _create_bucket(self, bucket: OverhaveS3Bucket) -> None:
