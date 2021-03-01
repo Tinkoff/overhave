@@ -49,9 +49,12 @@ class TestS3Manager:
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
-    def test_upload_file(self, test_s3_manager: S3Manager, bucket: OverhaveS3Bucket, tmp_path: Path):
+    def test_upload_file(
+        self, mocked_boto3_client: mock.MagicMock, test_s3_manager: S3Manager, bucket: OverhaveS3Bucket, tmp_path: Path
+    ):
         test_s3_manager.initialize()
         test_s3_manager.upload_file(tmp_path, bucket=bucket)
+        mocked_boto3_client.upload_file.assert_called_once_with(tmp_path.as_posix(), bucket.value, tmp_path.name)
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
@@ -59,5 +62,7 @@ class TestS3Manager:
         self, mocked_boto3_client: mock.MagicMock, test_s3_manager: S3Manager, bucket: OverhaveS3Bucket, tmp_path: Path
     ):
         test_s3_manager.initialize()
+        mocked_boto3_client.upload_file.side_effect = botocore.exceptions.ClientError(
+            mock.MagicMock(), mock.MagicMock()
+        )
         test_s3_manager.upload_file(tmp_path, bucket=bucket)
-        mocked_boto3_client.upload_file.assert_called_once_with(tmp_path.as_posix(), bucket.value, tmp_path.name)
