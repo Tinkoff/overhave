@@ -59,10 +59,16 @@ class TestS3Manager:
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
     def test_error_when_upload_file(
-        self, mocked_boto3_client: mock.MagicMock, test_s3_manager: S3Manager, bucket: OverhaveS3Bucket, tmp_path: Path
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+        tmp_path: Path,
+        caplog,
     ):
         test_s3_manager.initialize()
         mocked_boto3_client.upload_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )
         test_s3_manager.upload_file(tmp_path, bucket=bucket)
+        assert "Could not upload file to s3 cloud!" in caplog.text

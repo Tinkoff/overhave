@@ -83,6 +83,7 @@ pytest-xdist = "^2.2.0"
 tox = "^3.20.1"
 twine = "^3.3.0"
 Sphinx = "^3.4.3"
+pytest-catchlog = "^1.2.2"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
