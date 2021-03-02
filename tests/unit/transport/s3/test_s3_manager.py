@@ -8,6 +8,7 @@ from overhave.transport import OverhaveS3Bucket, S3Manager, S3ManagerSettings
 from overhave.transport.s3.manager import EndpointConnectionError, InvalidCredentialsError, InvalidEndpointError
 
 
+@pytest.mark.parametrize("test_s3_autocreate_buckets", [False, True], indirect=True)
 class TestS3Manager:
     """ Unit tests for :class:`S3Manager`. """
 
@@ -19,7 +20,10 @@ class TestS3Manager:
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     def test_initialize_enabled(
-        self, mocked_boto3_client_getter, test_s3_manager_settings: S3ManagerSettings, test_s3_manager: S3Manager,
+        self,
+        mocked_boto3_client_getter: mock.MagicMock,
+        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager: S3Manager,
     ):
         test_s3_manager.initialize()
         mocked_boto3_client_getter.assert_called_once_with(
@@ -31,6 +35,19 @@ class TestS3Manager:
             aws_secret_access_key=test_s3_manager_settings.secret_key,
         )
         assert test_s3_manager._client
+
+    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
+    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
+    def test_create_bucket(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+    ):
+        test_s3_manager.initialize()
+        test_s3_manager.create_bucket(bucket.value)
+        mocked_boto3_client.create_bucket.assert_called()
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize(
@@ -72,3 +89,16 @@ class TestS3Manager:
         )
         test_s3_manager.upload_file(tmp_path, bucket=bucket)
         assert "Could not upload file to s3 cloud!" in caplog.text
+
+    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
+    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
+    def test_delete_bucket(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+    ):
+        test_s3_manager.initialize()
+        test_s3_manager.delete_bucket(bucket.value)
+        mocked_boto3_client.delete_bucket.assert_called_once_with(Bucket=bucket.value)

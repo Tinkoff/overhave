@@ -45,4 +45,4 @@ def create(name: str) -> None:
 def delete(name: str) -> None:
     """ Delete s3 bucket. """
     _check_bucket_registered(name)
-    _get_s3_manager().create_bucket(name)
+    _get_s3_manager().delete_bucket(name)

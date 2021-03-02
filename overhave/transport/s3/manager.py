@@ -60,7 +60,8 @@ class S3Manager:
             logger.info("S3Manager disabled and has not been initialized.")
             return
         self._client = self._get_client(self._settings)
-        self._ensure_buckets_exists()
+        if self._settings.autocreate_buckets:
+            self._ensure_buckets_exists()
 
     @property
     def enabled(self) -> bool:
@@ -128,5 +129,5 @@ class S3Manager:
     @_s3_error
     def delete_bucket(self, bucket: str) -> None:
         logger.info("Deleting bucket '%s'...", bucket)
-        self._ensured_client.delete_bucket(bucket)
+        self._ensured_client.delete_bucket(Bucket=bucket)
         logger.info("Bucket '%s' successfully deleted", bucket)
