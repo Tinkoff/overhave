@@ -6,7 +6,7 @@ from overhave.processing import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
 from overhave.testing import ConfigInjector, PytestRunner
-from overhave.transport import RedisProducer
+from overhave.transport import RedisProducer, S3Manager
 
 
 class IOverhaveFactory(abc.ABC):
@@ -69,4 +69,9 @@ class IOverhaveFactory(abc.ABC):
     @property
     @abc.abstractmethod
     def emulator(self) -> Emulator:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def s3_manager(self) -> S3Manager:
         pass

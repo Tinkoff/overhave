@@ -38,7 +38,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return cast(OverhaveContext, self._context)
 
     def _resolve_deps(self) -> None:
-        self._s3_manager.initialize()
+        self.s3_manager.initialize()
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
@@ -122,6 +122,10 @@ class OverhaveBaseFactory(IOverhaveFactory):
     def _s3_manager(self) -> S3Manager:
         return S3Manager(self.context.s3_manager_settings)
 
+    @property
+    def s3_manager(self) -> S3Manager:
+        return self._s3_manager
+
     @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor
@@ -134,7 +138,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
             archive_manager=self._archive_manager,
-            s3_manager=self._s3_manager,
+            s3_manager=self.s3_manager,
         )
 
     @property

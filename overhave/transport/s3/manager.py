@@ -100,7 +100,7 @@ class S3Manager:
         logger.info("Existing remote s3 buckets: %s", remote_buckets.items)
         bucket_names = [model.name for model in remote_buckets.items]
         for bucket in list(filter(lambda x: x.value not in bucket_names, OverhaveS3Bucket)):
-            self._create_bucket(bucket)
+            self.create_bucket(bucket.value)
         logger.info("Successfully ensured existence of Overhave service buckets.")
 
     @_s3_error
@@ -109,9 +109,9 @@ class S3Manager:
         return BucketsListModel.parse_obj(response.get("Buckets"))
 
     @_s3_error
-    def _create_bucket(self, bucket: OverhaveS3Bucket) -> None:
+    def create_bucket(self, bucket: str) -> None:
         logger.info("Creating bucket %s...", bucket)
-        kwargs = {"Bucket": bucket.value}
+        kwargs: Dict[str, Any] = {"Bucket": bucket}
         if isinstance(self._settings.region_name, str):
             kwargs["CreateBucketConfiguration"] = {"LocationConstraint": self._settings.region_name}
         self._ensured_client.create_bucket(**kwargs)
@@ -124,3 +124,9 @@ class S3Manager:
             logger.info("File '%s' successfully uploaded", file.name)
         except botocore.exceptions.ClientError:
             logger.exception("Could not upload file to s3 cloud!")
+
+    @_s3_error
+    def delete_bucket(self, bucket: str) -> None:
+        logger.info("Deleting bucket '%s'...", bucket)
+        self._ensured_client.delete_bucket(bucket)
+        logger.info("Bucket '%s' successfully deleted", bucket)

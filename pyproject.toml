@@ -96,6 +96,13 @@ filterwarnings = [
 xfail_strict=true
 bdd_features_base_dir="docs/includes/features_structure_example"
 
+[tool.coverage.run]
+omit = [
+    "**/__main__.py",
+    "*_cache/*",
+    "overhave/cli/*"
+]
+
 [tool.isort]
 balanced_wrapping = true
 default_section = "THIRDPARTY"
