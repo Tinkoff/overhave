@@ -6,6 +6,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
@@ -27,6 +28,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     """ Features table. """
 
     name = sa.Column(LONG_STR_TYPE, doc="Feature name", nullable=False, unique=True)
+    # Понадобавим
     author = sa.Column(
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
     )
@@ -36,6 +38,17 @@ class Feature(BaseTable, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
+    tags = so.relationship("FeatureTags", collection_class=attribute_mapped_collection('tags'))
+
+
+class FeatureTags(BaseTable, PrimaryKeyMixin):
+    """ Feature tags table. """
+# добавил
+    feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
+    tags = sa.Column(ARRAY_TYPE, nullable=True, doc="Feature tags choice")
+    created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
+    feature = so.relationship(Feature)
+
 
 
 @su.generic_repr("feature_id")
@@ -44,7 +57,6 @@ class Scenario(BaseTable, PrimaryKeyMixin):
 
     feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
     text = sa.Column(TEXT_TYPE, doc="Text storage for scenarios in feature")
-
     feature = so.relationship(Feature, backref=so.backref("scenario", cascade="all, delete-orphan"))
 
 

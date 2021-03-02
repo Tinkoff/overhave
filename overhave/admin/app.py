@@ -33,6 +33,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         FeatureView,
         GroupView,
         OverhaveIndexView,
+        TagsView,
         TestRunView,
         TestUserView,
         UserView,
@@ -42,6 +43,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     flask_admin = get_flask_admin(index_view=index_view)
     flask_admin.add_views(
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
+        TagsView(db.FeatureTags, db.current_session, category="Scenarios", name="Tag"),
         TestRunView(db.TestRun, db.current_session, category="Scenarios", name="Test runs"),
         DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
         EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),

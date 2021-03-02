@@ -36,6 +36,11 @@ class ScenarioTextAreaField(TextAreaField):
 
     widget = ScenarioTextWidget()
 
+class FeatureTagsInlineModelForm(InlineFormAdmin):
+    # form_overrides = dict(text=ScenarioTextAreaField)
+    form_columns = ("tags",)
+    # form_excluded_columns = ("id",)
+
 
 class ScenarioInlineModelForm(InlineFormAdmin):
     """ Form to override scenario view. """
@@ -49,11 +54,12 @@ class FeatureView(ModelViewConfigured):
 
     can_view_details = False
 
-    inline_models = (ScenarioInlineModelForm(db.Scenario),)
+    inline_models = (ScenarioInlineModelForm(db.Scenario), FeatureTagsInlineModelForm(db.FeatureTags),)
+
     create_template = "feature_create.html"
     edit_template = "feature_edit.html"
 
-    column_list = ("id", "name", "feature_type", "task", "author", "created_at", "last_edited_by", "released")
+    column_list = ("id", "tags", "name", "feature_type", "task", "author", "created_at", "last_edited_by", "released")
     form_excluded_columns = ("created_at", "last_edited_by", "released", "versions")
     column_searchable_list = [
         "id",
@@ -84,6 +90,8 @@ class FeatureView(ModelViewConfigured):
         self._validate_tasks(model.task)
         if is_created:
             model.author = current_user.login
+            #  имя того кто создал тегу
+            # model.tags.created_by = current_user.login
         model.last_edited_by = current_user.login
         model.released = False
 

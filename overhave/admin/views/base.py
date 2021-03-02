@@ -52,6 +52,8 @@ class ModelViewConfigured(ModelView):
         "start": datetime_formatter,
         "end": datetime_formatter,
         "task": task_formatter,
+        # повоевать с форматом
+        "tags": task_formatter,
         "status": result_report_formatter,
         "specification": json_formatter,
         "name": feature_link_formatter,
