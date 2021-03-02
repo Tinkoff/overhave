@@ -63,7 +63,7 @@ class FeatureView(ModelViewConfigured):
         "author",
         "last_edited_by",
     ]
-    column_filters = ("name", "feature_type", "last_edited_by")
+    column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at")
     column_sortable_list = ("id", "name", "author", "last_edited_by")
 
     _task_pattern = re.compile(r"\w+[-]\d+")
