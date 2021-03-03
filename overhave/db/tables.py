@@ -47,7 +47,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     tags_id = sa.Column(INT_TYPE, sa.ForeignKey(Tags.id), nullable=True, doc="Feature tags choice", index=True)
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags)
+    feature_tags = so.relationship(Tags, uselist=True)
 
 
 @su.generic_repr("feature_id")
@@ -56,6 +56,7 @@ class Scenario(BaseTable, PrimaryKeyMixin):
 
     feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
     text = sa.Column(TEXT_TYPE, doc="Text storage for scenarios in feature")
+
     feature = so.relationship(Feature, backref=so.backref("scenario", cascade="all, delete-orphan"))
 
 

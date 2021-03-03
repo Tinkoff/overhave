@@ -56,8 +56,8 @@ class FeatureView(ModelViewConfigured):
 
     column_list = (
         "id",
-        "feature_tags.value",
         "name",
+        "feature_tags.value",
         "feature_type",
         "task",
         "author",
