@@ -7,7 +7,7 @@ import botocore.exceptions
 import urllib3
 from boto3_type_annotations.s3 import Client
 
-from overhave.transport.s3.models import BucketsListModel
+from overhave.transport.s3.models import BucketsListModel, DeletionResultModel, ObjectsList
 from overhave.transport.s3.objects import OverhaveS3Bucket
 from overhave.transport.s3.settings import S3ManagerSettings
 
@@ -38,14 +38,17 @@ class ClientError(BaseS3ManagerException):
     """ Exception for situation with client error from boto3. """
 
 
-def _s3_error(func: Callable[..., Any]) -> Callable[..., Any]:
-    def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
-        try:
-            return func(*args, **kwargs)
-        except botocore.exceptions.ClientError as e:
-            raise ClientError from e
+def _s3_error(msg: str):  # type: ignore
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except botocore.exceptions.ClientError as e:
+                raise ClientError(msg) from e
 
-    return wrapper
+        return wrapper
+
+    return decorator
 
 
 class S3Manager:
@@ -104,12 +107,12 @@ class S3Manager:
             self.create_bucket(bucket.value)
         logger.info("Successfully ensured existence of Overhave service buckets.")
 
-    @_s3_error
+    @_s3_error(msg="Error while getting buckets list!")
     def _get_buckets(self) -> BucketsListModel:
         response = self._ensured_client.list_buckets()
         return BucketsListModel.parse_obj(response.get("Buckets"))
 
-    @_s3_error
+    @_s3_error(msg="Error while creating bucket!")
     def create_bucket(self, bucket: str) -> None:
         logger.info("Creating bucket %s...", bucket)
         kwargs: Dict[str, Any] = {"Bucket": bucket}
@@ -126,8 +129,36 @@ class S3Manager:
         except botocore.exceptions.ClientError:
             logger.exception("Could not upload file to s3 cloud!")
 
-    @_s3_error
-    def delete_bucket(self, bucket: str) -> None:
+    @_s3_error(msg="Error while getting bucket objects list!")
+    def _get_bucket_objects(self, bucket: str) -> ObjectsList:
+        response = self._ensured_client.list_objects(Bucket=bucket)
+        logger.debug("List objects response:\n%s", response)
+        return ObjectsList.parse_obj(response.get("Contents"))
+
+    @_s3_error(msg="Error while deleting bucket objects!")
+    def _delete_bucket_objects(self, bucket: str, objects: ObjectsList) -> DeletionResultModel:
+        logger.info("Deleting items %s...", [obj.name for obj in objects.items])
+        response = self._ensured_client.delete_objects(
+            Bucket=bucket, Delete={"Objects": [{"Key": obj.name} for obj in objects.items]},
+        )
+        logger.debug("Delete objects response:\n%s", response)
+        return DeletionResultModel.parse_obj(response)
+
+    def _ensure_bucket_clean(self, bucket: str) -> None:
+        objects = self._get_bucket_objects(bucket)
+        if not objects.items:
+            logger.info("Has not got any objects in bucket '%s'.", bucket)
+            return
+        deletion_result = self._delete_bucket_objects(bucket=bucket, objects=objects)
+        if len(deletion_result.deleted) != len(objects):
+            logger.warning("Expected %s deleted objects, got %s!", len(objects), len(deletion_result.deleted))
+            logger.warning("Errors while deleted items:\n%s", deletion_result.errors)
+        logger.info("Items %s successfully deleted.", [obj.name for obj in deletion_result.deleted])
+
+    @_s3_error("Error while deleting bucket!")
+    def delete_bucket(self, bucket: str, force: bool = False) -> None:
+        if force:
+            self._ensure_bucket_clean(bucket)
         logger.info("Deleting bucket '%s'...", bucket)
         self._ensured_client.delete_bucket(Bucket=bucket)
         logger.info("Bucket '%s' successfully deleted", bucket)

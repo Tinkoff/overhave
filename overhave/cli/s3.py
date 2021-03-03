@@ -23,7 +23,7 @@ def _check_bucket_registered(name: str) -> None:
 
 def _get_s3_manager() -> S3Manager:
     OverhaveLoggingSettings().setup_logging()
-    manager = S3Manager(S3ManagerSettings())
+    manager = S3Manager(S3ManagerSettings(autocreate_buckets=False))
     manager.initialize()
     return manager
 
@@ -42,7 +42,10 @@ def create(name: str) -> None:
 @click.option(
     "-n", "--name", type=str, help="Overhave declared s3 bucket",
 )
-def delete(name: str) -> None:
+@click.option(
+    "-f", "--force", is_flag=True, help="Delete all files in bucket, then delete bucket",
+)
+def delete(name: str, force: bool) -> None:
     """ Delete s3 bucket. """
     _check_bucket_registered(name)
-    _get_s3_manager().delete_bucket(name)
+    _get_s3_manager().delete_bucket(name, force=force)
