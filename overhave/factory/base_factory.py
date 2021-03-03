@@ -2,7 +2,7 @@ from functools import cached_property
 from os import makedirs
 from typing import Any, Dict, Optional, cast
 
-from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
+from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings, ReportManager
 from overhave.entities.archiver import ArchiveManager
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
@@ -127,18 +127,25 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return self._s3_manager
 
     @cached_property
+    def _report_manager(self) -> ReportManager:
+        return ReportManager(
+            settings=self.context.report_manager_settings,
+            file_settings=self.context.file_settings,
+            archive_manager=self._archive_manager,
+            s3_manager=self._s3_manager,
+        )
+
+    @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor
 
         return Processor(
             settings=self.context.processor_settings,
-            file_settings=self.context.file_settings,
             injector=self._injector,
             file_manager=self._file_manager,
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
-            archive_manager=self._archive_manager,
-            s3_manager=self.s3_manager,
+            report_manager=self._report_manager,
         )
 
     @property

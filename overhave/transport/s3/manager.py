@@ -162,3 +162,13 @@ class S3Manager:
         logger.info("Deleting bucket '%s'...", bucket)
         self._ensured_client.delete_bucket(Bucket=bucket)
         logger.info("Bucket '%s' successfully deleted", bucket)
+
+    def download_file(self, filename: str, dir_to_save: Path, bucket: str) -> None:
+        logger.info("Start downloading file '%s'...", filename)
+        try:
+            self._ensured_client.download_file(
+                Bucket=bucket, Key=filename, Filename=(dir_to_save / filename).as_posix()
+            )
+            logger.info("File '%s' successfully downloaded", filename)
+        except botocore.exceptions.ClientError:
+            logger.exception("Could not downloading file from s3 cloud!")
