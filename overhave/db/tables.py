@@ -47,7 +47,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     tags_id = sa.Column(INT_TYPE, sa.ForeignKey(Tags.id), nullable=True, doc="Feature tags choice", index=True)
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags, uselist=True)
+    feature_tags = so.relationship(Tags)
 
 
 @su.generic_repr("feature_id")
