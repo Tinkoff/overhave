@@ -26,6 +26,7 @@ from overhave.db import TestReportStatus
         db.TestUser,
         db.Emulation,
         db.EmulationRun,
+        db.Tags,
     ),
 )
 def datetime_formatter(view: ModelView, context: Any, model: db.BaseTable, value: datetime) -> Markup:

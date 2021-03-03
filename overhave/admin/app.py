@@ -42,8 +42,8 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     index_view = OverhaveIndexView(name="Info", url="/", context=factory.context, auth_manager=factory.auth_manager)
     flask_admin = get_flask_admin(index_view=index_view)
     flask_admin.add_views(
+        TagsView(db.Tags, db.current_session, category="Scenarios", name="Tag"),
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
-        TagsView(db.FeatureTags, db.current_session, category="Scenarios", name="Tag"),
         TestRunView(db.TestRun, db.current_session, category="Scenarios", name="Test runs"),
         DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
         EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),

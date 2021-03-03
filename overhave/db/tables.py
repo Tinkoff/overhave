@@ -6,7 +6,6 @@ import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
-from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
@@ -23,12 +22,18 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
         return cast(str, self.name.upper())
 
 
+class Tags(BaseTable, PrimaryKeyMixin):
+    """ Tags table. """
+
+    value = sa.Column(SHORT_STR_TYPE, nullable=True, doc="Feature tags choice")
+    created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
+
+
 @su.generic_repr("name", "last_edited_by")
 class Feature(BaseTable, PrimaryKeyMixin):
     """ Features table. """
 
     name = sa.Column(LONG_STR_TYPE, doc="Feature name", nullable=False, unique=True)
-    # Понадобавим
     author = sa.Column(
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
     )
@@ -36,19 +41,10 @@ class Feature(BaseTable, PrimaryKeyMixin):
     task = sa.Column(ARRAY_TYPE, doc="Feature tasks list", nullable=False)
     last_edited_by = sa.Column(SHORT_STR_TYPE, doc="Last feature editor login", nullable=False)
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
+    tags_id = sa.Column(INT_TYPE, sa.ForeignKey(Tags.id), nullable=True, doc="Feature tags choice", index=True)
 
     feature_type = so.relationship(FeatureType)
-    tags = so.relationship("FeatureTags", collection_class=attribute_mapped_collection('tags'))
-
-
-class FeatureTags(BaseTable, PrimaryKeyMixin):
-    """ Feature tags table. """
-# добавил
-    feature_id = sa.Column(INT_TYPE, sa.ForeignKey(Feature.id), nullable=False, unique=True)
-    tags = sa.Column(ARRAY_TYPE, nullable=True, doc="Feature tags choice")
-    created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
-    feature = so.relationship(Feature)
-
+    feature_tags = so.relationship(Tags)
 
 
 @su.generic_repr("feature_id")

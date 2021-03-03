@@ -1,9 +1,10 @@
 import logging
 
 from flask_login import current_user
+from wtforms import Form, ValidationError
+
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.admin.views.feature import ScenarioInlineModelForm
 
 logger = logging.getLogger(__name__)
 
@@ -13,18 +14,20 @@ class TagsView(ModelViewConfigured):
 
     can_view_details = False
 
-    # inline_models = (ScenarioInlineModelForm(db.Feature),)
-    # create_template = "tag.html"
-    # edit_template = ".html"
-
     column_list = (
         "id",
-        "tags",
+        "value",
         "created_at",
-        "feature_id",
         "created_by",
     )
 
-    def on_model_change(self, form, model: db.FeatureTags, is_created) -> None:  # type: ignore
+    form_excluded_columns = "created_at"
+
+    def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
+        if not is_created and current_user.role != db.Role.admin:
+            raise ValidationError("Only administrator could change test run data!")
         model.created_by = current_user.login
 
+    def on_model_delete(self, model: Form) -> None:
+        if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
+            raise ValidationError("Only feature author or administrator could delete feature!")
