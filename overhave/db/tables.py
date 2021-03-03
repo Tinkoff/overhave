@@ -28,6 +28,9 @@ class Tags(BaseTable, PrimaryKeyMixin):
     value = sa.Column(SHORT_STR_TYPE, nullable=True, doc="Feature tags choice")
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
 
+    def __repr__(self) -> str:
+        return cast(str, self.value)
+
 
 @su.generic_repr("name", "last_edited_by")
 class Feature(BaseTable, PrimaryKeyMixin):
