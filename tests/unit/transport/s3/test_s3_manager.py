@@ -92,13 +92,21 @@ class TestS3Manager:
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
+    @pytest.mark.parametrize("force", [False, True])
     def test_delete_bucket(
         self,
         mocked_boto3_client: mock.MagicMock,
         test_s3_manager_settings: S3ManagerSettings,
         test_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
+        force: bool,
     ):
         test_s3_manager.initialize()
-        test_s3_manager.delete_bucket(bucket.value)
+        test_s3_manager.delete_bucket(bucket.value, force=force)
+        if force:
+            mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
+            mocked_boto3_client.delete_objects.assert_called_once()
+        else:
+            mocked_boto3_client.list_objects.assert_not_called()
+            mocked_boto3_client.delete_objects.assert_not_called()
         mocked_boto3_client.delete_bucket.assert_called_once_with(Bucket=bucket.value)

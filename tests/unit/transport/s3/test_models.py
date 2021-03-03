@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Dict
 
 from overhave.transport.s3.models import (
     BucketModel,
@@ -28,70 +29,25 @@ class TestBoto3Models:
         assert len(model.items) == 1
         assert model.items[0].dict(by_alias=True) == item
 
-    def test_object_list(self):
-        model = ObjectsList.parse_obj(
-            [
-                {
-                    "Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip",
-                    "LastModified": datetime(2021, 2, 28, 18, 37, 40, 219000),
-                    "ETag": '"3b2874d7dceb0f5622fcd5621c8382f2"',
-                    "Size": 971457,
-                    "StorageClass": "STANDARD",
-                    "Owner": {"DisplayName": "hello-friend", "ID": "hello-friend"},
-                },
-                {
-                    "Key": "d770f754-79f0-11eb-bbe4-acde48001122.zip",
-                    "LastModified": datetime(2021, 2, 28, 18, 12, 35, 735000),
-                    "ETag": '"9d5d01b6328a08d156c18e1b0287d846"',
-                    "Size": 971447,
-                    "StorageClass": "STANDARD",
-                    "Owner": {"DisplayName": "hello-friend", "ID": "hello-friend"},
-                },
-            ]
-        )
-        assert len(model) == 2
+    def test_object_list(self, test_object_dict: Dict[str, Any]):
+        model = ObjectsList.parse_obj([test_object_dict])
+        assert len(model) == 1
+        assert model.items[0].dict(by_alias=True) == test_object_dict
 
-    def test_object_model(self):
-        item = {
-            "Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip",
-            "LastModified": datetime(2021, 2, 28, 18, 37, 40, 219000),
-            "ETag": '"3b2874d7dceb0f5622fcd5621c8382f2"',
-            "Size": 971457,
-            "StorageClass": "STANDARD",
-            "Owner": {"DisplayName": "hello-friend", "ID": "hello-friend"},
-        }
-        model = ObjectModel.parse_obj(item)
-        assert model.name == item["Key"]
-        assert model.modified_at == item["LastModified"]
-        assert model.etag == item["ETag"]
-        assert model.owner == OwnerModel.parse_obj(item["Owner"])
+    def test_object_model(self, test_object_dict: Dict[str, Any]):
+        model = ObjectModel.parse_obj(test_object_dict)
+        assert model.name == test_object_dict["Key"]
+        assert model.modified_at == test_object_dict["LastModified"]
+        assert model.etag == test_object_dict["ETag"]
+        assert model.owner == OwnerModel.parse_obj(test_object_dict["Owner"])
 
-    def test_owner_model(self):
-        item = {"DisplayName": "hello-friend", "ID": "hello-friend"}
-        model = OwnerModel.parse_obj(item)
-        assert model.name == item["DisplayName"]
-        assert model.owner_id == item["ID"]
+    def test_owner_model(self, test_object_owner: Dict[str, str]):
+        model = OwnerModel.parse_obj(test_object_owner)
+        assert model.name == test_object_owner["DisplayName"]
+        assert model.owner_id == test_object_owner["ID"]
 
-    def test_objects_deletion_list(self):
-        item = {
-            "ResponseMetadata": {
-                "RequestId": "tx000000000000002f6d78a-00603f2f05-3380ab-m1-tst",
-                "HostId": "",
-                "HTTPStatusCode": 200,
-                "HTTPHeaders": {
-                    "transfer-encoding": "chunked",
-                    "x-amz-request-id": "tx000000000000002f6d78a-00603f2f05-3380ab-m1-tst",
-                    "content-type": "application/xml",
-                    "date": "Wed, 03 Mar 2021 06:39:01 GMT",
-                },
-                "RetryAttempts": 0,
-            },
-            "Deleted": [
-                {"Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip", "VersionId": '"3b2874d7dceb0f5622fcd5621c8382f2"'},
-                {"Key": "d770f754-79f0-11eb-bbe4-acde48001122.zip", "VersionId": '"9d5d01b6328a08d156c18e1b0287d846"'},
-            ],
-        }
-        model = DeletionResultModel.parse_obj(item)
+    def test_objects_deletion_list(self, test_deletion_result: Dict[str, Any]):
+        model = DeletionResultModel.parse_obj(test_deletion_result)
         assert model.deleted
         assert not model.errors
         assert not model.requester
