@@ -19,8 +19,14 @@
     {% endif %}
 {% endblock %}
 
+{% macro render_edit_button(model) %}
+    <a href="{{ url_for('feature.edit_view', id=model.scenario.feature_id) }}">
+        <button class="button edit-btn">Edit feature</button>
+    </a>
+{%  endmacro %}
+
 {% macro render_allure_button(model) %}
-    <form action="/reports/{{ model.report }}" target="_blank">
+    <form action="/reports/{{ model.report }}/index.html" target="_blank">
         <button class="button default-btn">Allure report</button>
     </form>
 {%  endmacro %}
@@ -30,10 +36,4 @@
         <input type="hidden" name="published_by" value="{{ admin_view.current_user }}" />
         <button class="button request-btn" type="submit">Create pull-request</button>
     </form>
-{%  endmacro %}
-
-{% macro render_edit_button(model) %}
-    <a href="{{ url_for('feature.edit_view', id=model.scenario.feature_id) }}">
-        <button class="button edit-btn">Edit feature</button>
-    </a>
 {%  endmacro %}

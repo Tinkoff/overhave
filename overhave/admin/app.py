@@ -58,7 +58,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     return flask_app
 
 
-def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
+def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / "templates"
@@ -74,9 +74,15 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
 
     @flask_app.route("/reports/<path:report>")
     def get_report(report: str) -> flask.Response:
-        return typing.cast(
-            flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, report)
-        )
+        tmp_reports_dir = factory.context.file_settings.tmp_reports_dir
+        report_index = Path(tmp_reports_dir / report)
+        if not report_index.parent.exists() or not report_index.exists():
+            if not report_index.parent.exists():
+                logger.error("Report '%s' does not exist!", report_index.parent.name)
+            if not report_index.exists():
+                logger.error("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
+            return flask.abort(status=HTTPStatus.NOT_FOUND)
+        return typing.cast(flask.Response, flask.send_from_directory(tmp_reports_dir, report))
 
     @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:

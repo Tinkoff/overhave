@@ -53,7 +53,7 @@ class ReportManager:
             return None
 
     def _process_generated_report(self, test_run_id: int, report_dir: Path) -> None:
-        set_report(run_id=test_run_id, status=TestReportStatus.GENERATED, report=f"{report_dir.name}/index.html")
+        set_report(run_id=test_run_id, status=TestReportStatus.GENERATED, report=report_dir.name)
         zip_report = self._archive_manager.zip_path(report_dir)
         logger.info("Zip Allure report: %s", zip_report)
         if not self._s3_manager.enabled:
@@ -64,9 +64,8 @@ class ReportManager:
         set_report(run_id=test_run_id, status=TestReportStatus.SAVED)
 
     def create_allure_report(self, test_run_id: int, results_dir: Path) -> None:
-        allure_tmpdir_name = uuid1().hex
-        logger.debug("Allure report directory: %s", allure_tmpdir_name)
-        report_dir = self._file_settings.tmp_reports_dir / allure_tmpdir_name
+        report_dir = self._file_settings.tmp_reports_dir / uuid1().hex
+        logger.debug("Allure report directory: %s", report_dir)
 
         report_generation_returncode = self._generate_report(alluredir=results_dir, report_dir=report_dir)
         if report_generation_returncode != 0:
