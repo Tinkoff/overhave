@@ -32,7 +32,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
     @staticmethod
     def _parse_or_raise(response: requests.Response, model: ModelMetaclass) -> BaseModel:
         try:
-            return cast(BaseModel, model).parse_obj(response)
+            return cast(BaseModel, model).parse_obj(response.json())
         except (ValueError, ValidationError, JSONDecodeError) as e:
             url = getattr(response, "raw_url", response.url)
             raise HttpClientValidationError(f'Response validation error for "{url}"') from e
