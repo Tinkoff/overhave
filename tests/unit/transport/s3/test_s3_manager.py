@@ -10,7 +10,7 @@ from overhave.transport.s3.manager import EndpointConnectionError, InvalidCreden
 
 @pytest.mark.parametrize("test_s3_autocreate_buckets", [False, True], indirect=True)
 class TestS3Manager:
-    """ Unit tests for :class:`S3Manager`. """
+    """ Unit tests for :class:`S3Manager` with non-bucket defs. """
 
     @pytest.mark.parametrize("test_s3_enabled", [False], indirect=True)
     def test_initialize_disabled(self, mocked_boto3_client_getter, test_s3_manager: S3Manager):
@@ -37,19 +37,6 @@ class TestS3Manager:
         assert test_s3_manager._client
 
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
-    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
-    def test_create_bucket(
-        self,
-        mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
-        test_s3_manager: S3Manager,
-        bucket: OverhaveS3Bucket,
-    ):
-        test_s3_manager.initialize()
-        test_s3_manager.create_bucket(bucket.value)
-        mocked_boto3_client.create_bucket.assert_called()
-
-    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
     @pytest.mark.parametrize(
         ("test_side_effect", "test_exception"),
         [
@@ -64,45 +51,57 @@ class TestS3Manager:
             test_s3_manager.initialize()
         mocked_boto3_client_getter.assert_called_once()
 
-    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
-    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
-    def test_upload_file(
-        self, mocked_boto3_client: mock.MagicMock, test_s3_manager: S3Manager, bucket: OverhaveS3Bucket, tmp_path: Path
+
+@pytest.mark.parametrize("test_s3_autocreate_buckets", [False, True], indirect=True)
+@pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
+@pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
+class TestInitializedS3Manager:
+    """ Unit tests for initialized :class:`S3Manager`. """
+
+    def test_create_bucket(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_s3_manager_settings: S3ManagerSettings,
+        test_initialized_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
     ):
-        test_s3_manager.initialize()
-        test_s3_manager.upload_file(tmp_path, bucket=bucket)
+        test_initialized_s3_manager.create_bucket(bucket.value)
+        mocked_boto3_client.create_bucket.assert_called()
+
+    def test_upload_file(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_initialized_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+        tmp_path: Path,
+    ):
+        test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
         mocked_boto3_client.upload_file.assert_called_once_with(tmp_path.as_posix(), bucket.value, tmp_path.name)
 
-    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
-    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
     def test_error_when_upload_file(
         self,
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager: S3Manager,
+        test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
         caplog,
     ):
-        test_s3_manager.initialize()
         mocked_boto3_client.upload_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )
-        test_s3_manager.upload_file(tmp_path, bucket=bucket)
+        test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
         assert "Could not upload file to s3 cloud!" in caplog.text
 
-    @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
-    @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
     @pytest.mark.parametrize("force", [False, True])
     def test_delete_bucket(
         self,
         mocked_boto3_client: mock.MagicMock,
         test_s3_manager_settings: S3ManagerSettings,
-        test_s3_manager: S3Manager,
+        test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         force: bool,
     ):
-        test_s3_manager.initialize()
-        test_s3_manager.delete_bucket(bucket.value, force=force)
+        test_initialized_s3_manager.delete_bucket(bucket.value, force=force)
         if force:
             mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
             mocked_boto3_client.delete_objects.assert_called_once()
@@ -110,3 +109,31 @@ class TestS3Manager:
             mocked_boto3_client.list_objects.assert_not_called()
             mocked_boto3_client.delete_objects.assert_not_called()
         mocked_boto3_client.delete_bucket.assert_called_once_with(Bucket=bucket.value)
+
+    def test_download_file(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_initialized_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+        tmp_path: Path,
+        test_filename: str,
+    ):
+        test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
+        mocked_boto3_client.download_file.assert_called_once_with(
+            Bucket=bucket, Key=test_filename, Filename=(tmp_path / test_filename).as_posix()
+        )
+
+    def test_error_when_download_file(
+        self,
+        mocked_boto3_client: mock.MagicMock,
+        test_initialized_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+        tmp_path: Path,
+        test_filename: str,
+        caplog,
+    ):
+        mocked_boto3_client.download_file.side_effect = botocore.exceptions.ClientError(
+            mock.MagicMock(), mock.MagicMock()
+        )
+        test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
+        assert "Could not download file from s3 cloud!" in caplog.text

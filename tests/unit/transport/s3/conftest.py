@@ -115,6 +115,12 @@ def test_s3_manager(test_s3_manager_settings: S3ManagerSettings, mocked_boto3_cl
 
 
 @pytest.fixture()
+def test_initialized_s3_manager(test_s3_manager: S3Manager) -> S3Manager:
+    test_s3_manager.initialize()
+    return test_s3_manager
+
+
+@pytest.fixture()
 def test_bucket_name(faker: Faker) -> str:
     return faker.word()
 
@@ -122,3 +128,8 @@ def test_bucket_name(faker: Faker) -> str:
 @pytest.fixture()
 def test_bucket_creation_date() -> datetime:
     return get_current_time()
+
+
+@pytest.fixture()
+def test_filename(faker: Faker) -> str:
+    return faker.word()

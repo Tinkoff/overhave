@@ -171,4 +171,4 @@ class S3Manager:
             )
             logger.info("File '%s' successfully downloaded", filename)
         except botocore.exceptions.ClientError:
-            logger.exception("Could not downloading file from s3 cloud!")
+            logger.exception("Could not download file from s3 cloud!")
