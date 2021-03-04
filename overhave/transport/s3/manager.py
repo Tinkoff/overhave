@@ -121,13 +121,15 @@ class S3Manager:
         self._ensured_client.create_bucket(**kwargs)
         logger.info("Bucket %s successfully created.", bucket)
 
-    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> None:
+    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> bool:
         logger.info("Start uploading file '%s'...", file.name)
         try:
             self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
             logger.info("File '%s' successfully uploaded", file.name)
+            return True
         except botocore.exceptions.ClientError:
             logger.exception("Could not upload file to s3 cloud!")
+            return False
 
     @_s3_error(msg="Error while getting bucket objects list!")
     def _get_bucket_objects(self, bucket: str) -> ObjectsList:
@@ -163,12 +165,14 @@ class S3Manager:
         self._ensured_client.delete_bucket(Bucket=bucket)
         logger.info("Bucket '%s' successfully deleted", bucket)
 
-    def download_file(self, filename: str, dir_to_save: Path, bucket: str) -> None:
+    def download_file(self, filename: str, dir_to_save: Path, bucket: str) -> bool:
         logger.info("Start downloading file '%s'...", filename)
         try:
             self._ensured_client.download_file(
                 Bucket=bucket, Key=filename, Filename=(dir_to_save / filename).as_posix()
             )
             logger.info("File '%s' successfully downloaded", filename)
+            return True
         except botocore.exceptions.ClientError:
             logger.exception("Could not download file from s3 cloud!")
+            return False

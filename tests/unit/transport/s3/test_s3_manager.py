@@ -75,7 +75,7 @@ class TestInitializedS3Manager:
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
     ):
-        test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
+        assert test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
         mocked_boto3_client.upload_file.assert_called_once_with(tmp_path.as_posix(), bucket.value, tmp_path.name)
 
     def test_error_when_upload_file(
@@ -89,7 +89,7 @@ class TestInitializedS3Manager:
         mocked_boto3_client.upload_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )
-        test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
+        assert not test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
         assert "Could not upload file to s3 cloud!" in caplog.text
 
     @pytest.mark.parametrize("force", [False, True])
@@ -118,7 +118,7 @@ class TestInitializedS3Manager:
         tmp_path: Path,
         test_filename: str,
     ):
-        test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
+        assert test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
         mocked_boto3_client.download_file.assert_called_once_with(
             Bucket=bucket, Key=test_filename, Filename=(tmp_path / test_filename).as_posix()
         )
@@ -135,5 +135,7 @@ class TestInitializedS3Manager:
         mocked_boto3_client.download_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )
-        test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
+        assert not test_initialized_s3_manager.download_file(
+            filename=test_filename, dir_to_save=tmp_path, bucket=bucket
+        )
         assert "Could not download file from s3 cloud!" in caplog.text

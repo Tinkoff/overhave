@@ -58,7 +58,9 @@ class ReportManager:
         logger.info("Zip Allure report: %s", zip_report)
         if not self._s3_manager.enabled:
             return
-        self._s3_manager.upload_file(file=zip_report, bucket=OverhaveS3Bucket.REPORTS)
+        upload_result = self._s3_manager.upload_file(file=zip_report, bucket=OverhaveS3Bucket.REPORTS)
+        if not upload_result:
+            return
         set_report(run_id=test_run_id, status=TestReportStatus.SAVED)
 
     def create_allure_report(self, test_run_id: int, results_dir: Path) -> None:
