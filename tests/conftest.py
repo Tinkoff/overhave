@@ -1,6 +1,8 @@
 import logging
+from pathlib import Path
 from typing import Callable, Iterator, cast
 
+import py
 import pytest
 import sqlalchemy_utils as sau
 from pytest_mock import MockFixture
@@ -70,9 +72,20 @@ def clean_proxy_factory() -> Callable[[], ProxyFactory]:
     return get_proxy_factory
 
 
-@pytest.fixture(scope="class")
-def mocked_context(session_mocker: MockFixture) -> OverhaveContext:
+@pytest.fixture()
+def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> OverhaveContext:
     context_mock = session_mocker.MagicMock()
     context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False
+
+    root_tmp_dir = Path(tmpdir)
+    features_dir = root_tmp_dir / "features"
+    fixtures_dir = root_tmp_dir / "fixtures"
+    reports_dir = root_tmp_dir / "reports"
+    for path in (features_dir, fixtures_dir, reports_dir):
+        path.mkdir()
+    context_mock.file_settings.tmp_features_dir = features_dir
+    context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
+    context_mock.file_settings.tmp_reports_dir = reports_dir
+
     return cast(OverhaveContext, context_mock)

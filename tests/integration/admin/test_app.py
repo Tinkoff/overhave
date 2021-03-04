@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from pathlib import Path
 
+from faker import Faker
 from flask import Response
 from flask.testing import FlaskClient
 
@@ -37,3 +38,16 @@ class TestApp:
             f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}"
         )
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+    def test_app_get_report_notexists(self, test_client: FlaskClient, faker: Faker):
+        response: Response = test_client.get(f"/reports/{faker.word()}/index.html")
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    def test_app_get_report_noindex(self, test_client: FlaskClient, test_report_without_index: Path):
+        response: Response = test_client.get(f"/reports/{test_report_without_index.name}/index.html")
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    def test_app_get_report(self, test_client: FlaskClient, test_report_with_index: Path):
+        response: Response = test_client.get(f"/reports/{test_report_with_index.name}/index.html")
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == (test_report_with_index / "index.html").read_bytes()
