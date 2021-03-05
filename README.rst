@@ -46,6 +46,7 @@ Features
   through `Walrus`_ (partially integrated)
 * Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
 * Simple command-line interface, provided with `Click`_
+* Integrated interaction for files storage with s3-cloud based on `boto3`_
 
 ------------
 Installation
@@ -73,21 +74,34 @@ The web-interface is a basic tool for BDD features management. It consists of:
     * `Features`
         gives an interface for features records management and provides info
         about id, name author, time, editor and publishing status; it is possible
-        to search, edit or delete items through interface;
+        to search, edit or delete items through Script panel.
+
+        .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/label_img.png
+          :width: 500
+          :align: center
+          :alt: Features list
+
     * `Test runs`
-        gives an interface for test runs management and provides info about
+        gives an interface for test runs management and provides info about.
 
         .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/test_runs_img.png
           :width: 500
           :align: center
-          :alt: Script panel
+          :alt: Test runs list
+
     * Versions
-        contains feature versions for corresponding to test runs.
+        contains feature versions in corresponding to test runs; versions contains PR-links to
+        the remote Git repository (only Stash is supported now).
+
+        .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/versions_img.png
+          :width: 500
+          :align: center
+          :alt: Feature published versions list
 
 * `Access` - section for access management, contains `Users` and
     `Groups` subsections;
 * `Emulation` - experimental section for alternative tools implementation
-    (in developing).
+    (in development).
 
 **Overhave** features could be created and/or edited through special
 *script panel* in feature edit mode. Feature should have type registered by the
@@ -121,8 +135,22 @@ This report contains scenarios descriptions as they are described in features.
 
   Example of generated `Allure`_ report after execution of **Overhave**'s feature
 
+Demo-mode (Quickstart)
+----------------------
+
+**Overhave** has special demo-mode (in development), which could be possibly
+used for framework demonstration and manual debugging / testing. The framework
+provides a CLI entrypoints for easy server run in debug mode:
+
+.. code-block:: shell
+
+    docker-compose up -d db  # start PostgreSQL database
+    overhave db create-all  # create Overhave database schema
+    overhave-demo admin
+
 Command-line interface
 ----------------------
+
 **Overhave** has a CLI that provides a simple way to start service web-interface,
 run consumer and execute basic database operations. Examples are below:
 
@@ -316,6 +344,31 @@ configured like this:
         auth_strategy=AuthorizationStrategy.LDAP, admin_group="admin"
     )
 
+S3 cloud
+--------
+
+**Overhave** implements functionality for *s3* cloud interactions, such as
+bucket creation and deletion, files uploading, downloading and deletion.
+The framework provides an ability to store reports and other files in
+the remote s3 cloud storage. You should enrich your environment with following
+settings:
+
+.. code-block:: shell
+
+    OVERHAVE_S3_ENABLED=true
+    OVERHAVE_S3_URL=https://s3.example.com
+    OVERHAVE_S3_ACCESS_KEY=<MY_ACCESS_KEY>
+    OVERHAVE_S3_SECRET_KEY=<MY_SECRET_KEY>
+
+Optionally, you could change default settings also:
+
+.. code-block:: shell
+
+    OVERHAVE_S3_VERIFY=false
+    OVERHAVE_S3_AUTOCREATE_BUCKETS=true
+
+The framework with enabled ```OVERHAVE_S3_AUTOCREATE_BUCKETS``` flag will create
+application buckets in remote storage if buckets don't exist.
 
 ------------
 Contributing
@@ -399,5 +452,6 @@ with a detailed description.
 .. _`Docker-compose`: https://docs.docker.com/compose
 .. _`Click`: https://github.com/pallets/click
 .. _`Sphinx`: https://github.com/sphinx-doc/sphinx
+.. _`boto3`: https://github.com/boto/boto3
 .. _`context_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/context_example.rst
 .. _`feature_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/features_structure_example/feature_type_1/full_feature_example_en.feature
