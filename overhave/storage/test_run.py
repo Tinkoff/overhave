@@ -2,6 +2,7 @@ import abc
 from typing import Optional, cast
 
 from overhave import db
+from overhave.entities import TestRunModel
 from overhave.utils.time import get_current_time
 
 
@@ -20,14 +21,18 @@ class ITestRunStorage(abc.ABC):
     def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
         pass
 
+    @abc.abstractmethod
+    def get_test_run_by_report(self, report: str) -> Optional[TestRunModel]:
+        pass
+
 
 class TestRunStorage(ITestRunStorage):
     """ Class for test runs storage. """
 
     def create_test_run(self, scenario_id: int, executed_by: str) -> int:
         with db.create_session() as session:
-            scenario = cast(db.Scenario, session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one())
-            feature = cast(db.Feature, session.query(db.Feature).filter(db.Feature.id == scenario.feature_id).one())
+            scenario: db.Scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
+            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario.feature_id).one()
             run = db.TestRun(  # type: ignore
                 scenario_id=scenario_id,
                 name=feature.name,
@@ -42,7 +47,7 @@ class TestRunStorage(ITestRunStorage):
 
     def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
         with db.create_session() as session:
-            run = cast(db.TestRun, session.query(db.TestRun).filter(db.TestRun.id == run_id).one())
+            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
             run.status = status
             if status.finished:
                 run.end = get_current_time()
@@ -51,7 +56,14 @@ class TestRunStorage(ITestRunStorage):
 
     def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
         with db.create_session() as session:
-            run = cast(db.TestRun, session.query(db.TestRun).filter(db.TestRun.id == run_id).one())
+            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
             run.report_status = status
             if isinstance(report, str):
                 run.report = report
+
+    def get_test_run_by_report(self, report: str) -> Optional[TestRunModel]:
+        with db.create_session() as session:
+            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.report == report).one_or_none()
+            if run is not None:
+                return cast(TestRunModel, TestRunModel.from_orm(run))
+            return None

@@ -56,10 +56,10 @@ class ReportManager:
 
     def _process_generated_report(self, test_run_id: int, report_dir: Path) -> None:
         self._test_run_storage.set_report(run_id=test_run_id, status=TestReportStatus.GENERATED, report=report_dir.name)
-        zip_report = self._archive_manager.zip_path(report_dir)
-        logger.info("Zip Allure report: %s", zip_report)
         if not self._s3_manager.enabled:
             return
+        zip_report = self._archive_manager.archive_path(path=report_dir, extension=self._settings.archive_extension)
+        logger.info("Zip Allure report: %s", zip_report)
         upload_result = self._s3_manager.upload_file(file=zip_report, bucket=OverhaveS3Bucket.REPORTS)
         if not upload_result:
             return
@@ -75,3 +75,32 @@ class ReportManager:
             return
         logger.debug("Allure report successfully generated to directory: %s", report_dir.as_posix())
         self._process_generated_report(test_run_id=test_run_id, report_dir=report_dir)
+
+    def ensure_allure_report_exists(self, report: str) -> Optional[Path]:
+        report_index = Path(self._file_settings.tmp_reports_dir / report)
+        report_dir = report_index.parent
+        if report_dir.exists() and report_index.exists():
+            return report_dir
+        if not report_dir.exists():
+            logger.warning("Report '%s' does not exist!", report_index.parent.name)
+        if not report_index.exists():
+            logger.warning("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
+        test_run = self._test_run_storage.get_test_run_by_report(report_dir.name)
+        if test_run is None:
+            logger.warning("No one test run with report '%s' exists!", report_dir.name)
+            return None
+        zip_report_path = self._file_settings.tmp_reports_dir / (
+            report_dir.name + f".{self._settings.archive_extension}"
+        )
+        download_success = self._s3_manager.download_file(
+            filename=zip_report_path.name, dir_to_save=zip_report_path.parent, bucket=OverhaveS3Bucket.REPORTS.value
+        )
+        if not download_success:
+            logger.error("Report archive '%s' is not available on s3 cloud!", zip_report_path.name)
+            return None
+        unpacked_report = self._archive_manager.unpack_path(
+            path=zip_report_path, extension=self._settings.archive_extension
+        )
+        zip_report_path.unlink()
+        logger.info("Unpacked Allure report: %s", unpacked_report)
+        return unpacked_report

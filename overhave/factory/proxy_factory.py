@@ -1,4 +1,4 @@
-from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
+from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor, ReportManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.base_factory import OverhaveBaseFactory
 from overhave.factory.context import OverhaveContext
@@ -93,3 +93,7 @@ class ProxyFactory(IOverhaveFactory):
     @property
     def s3_manager(self) -> S3Manager:
         return self._factory.s3_manager
+
+    @property
+    def report_manager(self) -> ReportManager:
+        return self._factory.report_manager

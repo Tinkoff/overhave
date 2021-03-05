@@ -147,6 +147,10 @@ class OverhaveBaseFactory(IOverhaveFactory):
             s3_manager=self._s3_manager,
         )
 
+    @property
+    def report_manager(self) -> ReportManager:
+        return self._report_manager
+
     @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor

@@ -74,15 +74,10 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
 
     @flask_app.route("/reports/<path:report>")
     def get_report(report: str) -> flask.Response:
-        tmp_reports_dir = factory.context.file_settings.tmp_reports_dir
-        report_index = Path(tmp_reports_dir / report)
-        if not report_index.parent.exists() or not report_index.exists():
-            if not report_index.parent.exists():
-                logger.error("Report '%s' does not exist!", report_index.parent.name)
-            if not report_index.exists():
-                logger.error("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
+        report_dir = factory.report_manager.ensure_allure_report_exists(report)
+        if report_dir is None:
             return flask.abort(status=HTTPStatus.NOT_FOUND)
-        return typing.cast(flask.Response, flask.send_from_directory(tmp_reports_dir, report))
+        return typing.cast(flask.Response, flask.send_from_directory(report_dir.parent, report))
 
     @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:

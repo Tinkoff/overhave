@@ -163,7 +163,7 @@ class S3Manager:
             self._ensure_bucket_clean(bucket)
         logger.info("Deleting bucket '%s'...", bucket)
         self._ensured_client.delete_bucket(Bucket=bucket)
-        logger.info("Bucket '%s' successfully deleted", bucket)
+        logger.info("Bucket '%s' successfully deleted.", bucket)
 
     def download_file(self, filename: str, dir_to_save: Path, bucket: str) -> bool:
         logger.info("Start downloading file '%s'...", filename)

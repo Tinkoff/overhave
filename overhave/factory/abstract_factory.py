@@ -1,6 +1,6 @@
 import abc
 
-from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
+from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor, ReportManager
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
@@ -74,4 +74,9 @@ class IOverhaveFactory(abc.ABC):
     @property
     @abc.abstractmethod
     def s3_manager(self) -> S3Manager:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def report_manager(self) -> ReportManager:
         pass
