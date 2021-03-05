@@ -22,7 +22,7 @@ class ITestRunStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_test_run_by_report(self, report: str) -> Optional[TestRunModel]:
+    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
         pass
 
 
@@ -61,9 +61,9 @@ class TestRunStorage(ITestRunStorage):
             if isinstance(report, str):
                 run.report = report
 
-    def get_test_run_by_report(self, report: str) -> Optional[TestRunModel]:
+    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
         with db.create_session() as session:
-            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.report == report).one_or_none()
+            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one_or_none()
             if run is not None:
                 return cast(TestRunModel, TestRunModel.from_orm(run))
             return None

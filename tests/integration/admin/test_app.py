@@ -1,6 +1,8 @@
 from http import HTTPStatus
 from pathlib import Path
+from typing import Dict, Optional
 
+import pytest
 from faker import Faker
 from flask import Response
 from flask.testing import FlaskClient
@@ -8,7 +10,7 @@ from flask.testing import FlaskClient
 from overhave import OverhaveAppType
 
 
-class TestApp:
+class TestAppCommon:
     """ Integration tests for OverhaveApp. """
 
     def test_app_root_get(self, test_client: FlaskClient):
@@ -39,6 +41,10 @@ class TestApp:
         )
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
+
+class TestAppReport:
+    """ Integration tests for OverhaveApp::get_report. """
+
     def test_app_get_report_notexists(self, test_client: FlaskClient, faker: Faker):
         response: Response = test_client.get(f"/reports/{faker.word()}/index.html")
         assert response.status_code == HTTPStatus.NOT_FOUND
@@ -49,5 +55,19 @@ class TestApp:
 
     def test_app_get_report(self, test_client: FlaskClient, test_report_with_index: Path):
         response: Response = test_client.get(f"/reports/{test_report_with_index.name}/index.html")
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == (test_report_with_index / "index.html").read_bytes()
+
+    @pytest.mark.parametrize("data", [None, {"run_id": "123"}])
+    def test_app_post_report_notexists(
+        self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
+    ):
+        response: Response = test_client.post(f"/reports/{test_report_without_index.name}/index.html", data=data)
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    def test_app_post_report(self, test_client: FlaskClient, test_report_with_index: Path, faker: Faker):
+        response: Response = test_client.post(
+            f"/reports/{test_report_with_index.name}/index.html", data={"run_id": faker.random_int()}
+        )
         assert response.status_code == HTTPStatus.OK
         assert response.data == (test_report_with_index / "index.html").read_bytes()

@@ -64,6 +64,7 @@ class ReportManager:
         if not upload_result:
             return
         self._test_run_storage.set_report(run_id=test_run_id, status=TestReportStatus.SAVED)
+        zip_report.unlink()
 
     def create_allure_report(self, test_run_id: int, results_dir: Path) -> None:
         report_dir = self._file_settings.tmp_reports_dir / uuid1().hex
@@ -76,19 +77,21 @@ class ReportManager:
         logger.debug("Allure report successfully generated to directory: %s", report_dir.as_posix())
         self._process_generated_report(test_run_id=test_run_id, report_dir=report_dir)
 
-    def ensure_allure_report_exists(self, report: str) -> Optional[Path]:
+    def ensure_allure_report_exists(self, report: str, run_id: int) -> bool:
         report_index = Path(self._file_settings.tmp_reports_dir / report)
         report_dir = report_index.parent
         if report_dir.exists() and report_index.exists():
-            return report_dir
+            return True
+
         if not report_dir.exists():
             logger.warning("Report '%s' does not exist!", report_index.parent.name)
         if not report_index.exists():
             logger.warning("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
-        test_run = self._test_run_storage.get_test_run_by_report(report_dir.name)
+        test_run = self._test_run_storage.get_test_run(run_id)
         if test_run is None:
-            logger.warning("No one test run with report '%s' exists!", report_dir.name)
-            return None
+            logger.warning("No one test run with id=%s exists!", run_id)
+            return False
+
         zip_report_path = self._file_settings.tmp_reports_dir / (
             report_dir.name + f".{self._settings.archive_extension}"
         )
@@ -97,10 +100,11 @@ class ReportManager:
         )
         if not download_success:
             logger.error("Report archive '%s' is not available on s3 cloud!", zip_report_path.name)
-            return None
+            return False
+
         unpacked_report = self._archive_manager.unpack_path(
             path=zip_report_path, extension=self._settings.archive_extension
         )
         zip_report_path.unlink()
         logger.info("Unpacked Allure report: %s", unpacked_report)
-        return unpacked_report
+        return True

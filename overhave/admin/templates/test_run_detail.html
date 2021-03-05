@@ -26,8 +26,9 @@
 {%  endmacro %}
 
 {% macro render_allure_button(model) %}
-    <form action="/reports/{{ model.report }}/index.html" target="_blank">
-        <button class="button default-btn">Allure report</button>
+    <form action="/reports/{{ model.report }}/index.html" method="POST" target="_blank">
+        <input type="hidden" name="run_id" value="{{ model.id }}" />
+        <button class="button default-btn" type="submit">Allure report</button>
     </form>
 {%  endmacro %}
 
