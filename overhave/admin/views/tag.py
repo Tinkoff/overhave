@@ -24,9 +24,11 @@ class TagsView(ModelViewConfigured):
     form_excluded_columns = "created_at"
 
     def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
-        if not is_created and current_user.role != db.Role.admin:
-            raise ValidationError("Only administrator could change tegs!")
-        model.created_by = current_user.login
+        if is_created:
+            model.created_by = current_user.login
+        if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
+            raise ValidationError("Only emulation item creator or administrator could delete it!")
+
 
     def on_model_delete(self, model: Form) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
