@@ -76,7 +76,7 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
         return "\n".join(
             (
                 f"Feature ID: {context.feature.id}. Type: '{context.feature.feature_type.name}'.",
-                f"Created by: @{context.feature.author} at {context.feature.created_at}.",
+                f"Created by: @{context.feature.author} at {context.feature.created_at.strftime('%d-%m-%Y %H:%M:%S')}.",
                 f"Last edited by: @{context.feature.last_edited_by}.",
                 generate_task_info(tasks=context.feature.task, header=self._task_links_keyword),
                 f"PR from Test Run ID: {context.test_run.id}. Executed by: @{context.test_run.executed_by}",
