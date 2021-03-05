@@ -12,7 +12,14 @@ from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
-from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
+from overhave.storage import (
+    EmulationStorage,
+    FeatureTypeStorage,
+    IEmulationStorage,
+    IFeatureTypeStorage,
+    ITestRunStorage,
+    TestRunStorage,
+)
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
 from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
 
@@ -127,10 +134,15 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return self._s3_manager
 
     @cached_property
+    def _test_run_storage(self) -> ITestRunStorage:
+        return TestRunStorage()
+
+    @cached_property
     def _report_manager(self) -> ReportManager:
         return ReportManager(
             settings=self.context.report_manager_settings,
             file_settings=self.context.file_settings,
+            test_run_storage=self._test_run_storage,
             archive_manager=self._archive_manager,
             s3_manager=self._s3_manager,
         )
@@ -141,6 +153,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
         return Processor(
             settings=self.context.processor_settings,
+            test_run_storage=self._test_run_storage,
             injector=self._injector,
             file_manager=self._file_manager,
             test_runner=self._test_runner,
