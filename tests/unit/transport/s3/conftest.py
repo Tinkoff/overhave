@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, cast
+from typing import Any, Dict, Optional, cast
 from unittest import mock
 
 import pytest
@@ -18,9 +18,22 @@ def test_s3_enabled(request: FixtureRequest) -> bool:
 
 
 @pytest.fixture()
-def test_s3_manager_settings(test_s3_enabled: bool, faker: Faker) -> S3ManagerSettings:
+def test_s3_autocreate_buckets(request: FixtureRequest) -> bool:
+    if hasattr(request, "param"):
+        return cast(bool, request.param)
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_s3_manager_settings(
+    test_s3_enabled: bool, test_s3_autocreate_buckets: bool, faker: Faker
+) -> S3ManagerSettings:
     return S3ManagerSettings(
-        enabled=test_s3_enabled, url="https://overhave.readthedocs.io", access_key=faker.word(), secret_key=faker.word()
+        enabled=test_s3_enabled,
+        url="https://overhave.readthedocs.io",
+        access_key=faker.word(),
+        secret_key=faker.word(),
+        autocreate_buckets=test_s3_autocreate_buckets,
     )
 
 
@@ -38,10 +51,51 @@ def test_exception(request: FixtureRequest) -> Optional[Exception]:
     return None
 
 
+@pytest.fixture(scope="class")
+def test_object_owner() -> Dict[str, str]:
+    return {"DisplayName": "hello-friend", "ID": "hello-friend"}
+
+
+@pytest.fixture(scope="class")
+def test_object_dict(test_object_owner: Dict[str, str]) -> Dict[str, Any]:
+    return {
+        "Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip",
+        "LastModified": datetime(2021, 2, 28, 18, 37, 40, 219000),
+        "ETag": '"3b2874d7dceb0f5622fcd5621c8382f2"',
+        "Size": 971457,
+        "StorageClass": "STANDARD",
+        "Owner": test_object_owner,
+    }
+
+
+@pytest.fixture(scope="class")
+def test_deletion_result() -> Dict[str, Any]:
+    return {
+        "ResponseMetadata": {
+            "RequestId": "tx000000000000002f6d78a-00603f2f05-3380ab-m1-tst",
+            "HostId": "",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "tx000000000000002f6d78a-00603f2f05-3380ab-m1-tst",
+                "content-type": "application/xml",
+                "date": "Wed, 03 Mar 2021 06:39:01 GMT",
+            },
+            "RetryAttempts": 0,
+        },
+        "Deleted": [
+            {"Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip", "VersionId": '"3b2874d7dceb0f5622fcd5621c8382f2"'},
+            {"Key": "d770f754-79f0-11eb-bbe4-acde48001122.zip", "VersionId": '"9d5d01b6328a08d156c18e1b0287d846"'},
+        ],
+    }
+
+
 @pytest.fixture()
-def mocked_boto3_client() -> mock.MagicMock:
+def mocked_boto3_client(test_object_dict: Dict[str, Any], test_deletion_result: Dict[str, Any]) -> mock.MagicMock:
     mocked_client = mock.MagicMock()
     mocked_client.list_buckets.return_value = {"Buckets": []}
+    mocked_client.list_objects.return_value = {"Contents": [test_object_dict]}
+    mocked_client.delete_objects.return_value = test_deletion_result
     return mocked_client
 
 
@@ -61,6 +115,12 @@ def test_s3_manager(test_s3_manager_settings: S3ManagerSettings, mocked_boto3_cl
 
 
 @pytest.fixture()
+def test_initialized_s3_manager(test_s3_manager: S3Manager) -> S3Manager:
+    test_s3_manager.initialize()
+    return test_s3_manager
+
+
+@pytest.fixture()
 def test_bucket_name(faker: Faker) -> str:
     return faker.word()
 
@@ -68,3 +128,8 @@ def test_bucket_name(faker: Faker) -> str:
 @pytest.fixture()
 def test_bucket_creation_date() -> datetime:
     return get_current_time()
+
+
+@pytest.fixture()
+def test_filename(faker: Faker) -> str:
+    return faker.word()

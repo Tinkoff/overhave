@@ -20,10 +20,14 @@ class TestS3ManagerSettings:
         with pytest.raises(ValidationError):
             S3ManagerSettings(enabled=test_s3_enabled)
 
+    @pytest.mark.parametrize("test_s3_autocreate_buckets", [False, True], indirect=True)
     @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
-    def test_correct_enabled(self, test_s3_enabled: bool, test_s3_manager_settings: S3ManagerSettings):
+    def test_correct_enabled(
+        self, test_s3_enabled: bool, test_s3_autocreate_buckets: bool, test_s3_manager_settings: S3ManagerSettings
+    ):
         assert test_s3_manager_settings.enabled == test_s3_enabled
         assert test_s3_manager_settings.url
         assert test_s3_manager_settings.access_key
         assert test_s3_manager_settings.secret_key
         assert test_s3_manager_settings.verify
+        assert test_s3_manager_settings.autocreate_buckets == test_s3_autocreate_buckets

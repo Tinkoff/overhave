@@ -64,7 +64,7 @@ class ModelViewConfigured(ModelView):
         task="Tracker tasks converted to web links when viewed",
         last_edited_by="Last editor of scenarios set",
         author="Author of scenarios set",
-        released="Feature's publishing status relative to remote repository",
+        released="Feature's last version publishing status",
         executed_by="Initiator of scenarios set test run",
         status="Test run result",
     )

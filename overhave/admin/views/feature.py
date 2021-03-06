@@ -16,7 +16,6 @@ from wtforms.widgets import HiddenInput
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_proxy_factory
-from overhave.storage.scenario_test_run import create_test_run
 
 logger = logging.getLogger(__name__)
 
@@ -116,8 +115,10 @@ class FeatureView(ModelViewConfigured):
             logger.debug("Not found scenario for execution!")
             return rendered
 
-        test_run_id = create_test_run(scenario_id=int(scenario_id), executed_by=current_user.login)
-        return cast(werkzeug.Response, get_proxy_factory().processor.execute_test(test_run_id))
+        return cast(
+            werkzeug.Response,
+            get_proxy_factory().processor.execute_test(scenario_id=int(scenario_id), executed_by=current_user.login),
+        )
 
     @expose("/edit/", methods=("GET", "POST"))
     def edit_view(self) -> werkzeug.Response:

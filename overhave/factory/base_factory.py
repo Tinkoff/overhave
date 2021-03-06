@@ -2,7 +2,7 @@ from functools import cached_property
 from os import makedirs
 from typing import Any, Dict, Optional, cast
 
-from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings
+from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings, ReportManager
 from overhave.entities.archiver import ArchiveManager
 from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
@@ -12,7 +12,14 @@ from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
-from overhave.storage import EmulationStorage, FeatureTypeStorage, IEmulationStorage, IFeatureTypeStorage
+from overhave.storage import (
+    EmulationStorage,
+    FeatureTypeStorage,
+    IEmulationStorage,
+    IFeatureTypeStorage,
+    ITestRunStorage,
+    TestRunStorage,
+)
 from overhave.testing import ConfigInjector, PytestRunner, StepCollector
 from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
 
@@ -38,7 +45,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return cast(OverhaveContext, self._context)
 
     def _resolve_deps(self) -> None:
-        self._s3_manager.initialize()
+        self.s3_manager.initialize()
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
@@ -122,19 +129,40 @@ class OverhaveBaseFactory(IOverhaveFactory):
     def _s3_manager(self) -> S3Manager:
         return S3Manager(self.context.s3_manager_settings)
 
+    @property
+    def s3_manager(self) -> S3Manager:
+        return self._s3_manager
+
+    @cached_property
+    def _test_run_storage(self) -> ITestRunStorage:
+        return TestRunStorage()
+
+    @cached_property
+    def _report_manager(self) -> ReportManager:
+        return ReportManager(
+            settings=self.context.report_manager_settings,
+            file_settings=self.context.file_settings,
+            test_run_storage=self._test_run_storage,
+            archive_manager=self._archive_manager,
+            s3_manager=self._s3_manager,
+        )
+
+    @property
+    def report_manager(self) -> ReportManager:
+        return self._report_manager
+
     @cached_property
     def _processor(self) -> IProcessor:
         from overhave.processing.processor import Processor
 
         return Processor(
             settings=self.context.processor_settings,
-            file_settings=self.context.file_settings,
+            test_run_storage=self._test_run_storage,
             injector=self._injector,
             file_manager=self._file_manager,
             test_runner=self._test_runner,
             stash_manager=self._stash_manager,
-            archive_manager=self._archive_manager,
-            s3_manager=self._s3_manager,
+            report_manager=self._report_manager,
         )
 
     @property

@@ -68,13 +68,19 @@ class OverhaveFileSettings(BaseOverhavePrefix):
         return self.tmp_dir / "reports"
 
 
-class ProcessorSettings(BaseOverhavePrefix):
-    """ Settings for Overhave Processor, which processes test requests from front. """
+class OverhaveReportManagerSettings(BaseOverhavePrefix):
+    """ Settings for :class:`ReportManager`. """
 
     report_creation_timeout: int = 120  # sec
-    processes_num: int = 5
     report_creation_error_msg: str = "not_created"
     allure_cmdline: str = "allure"
+    archive_extension: str = "zip"
+
+
+class ProcessorSettings(BaseOverhavePrefix):
+    """ Settings for :class:`Processor`. """
+
+    processes_num: int = 5
 
 
 class OverhaveRedisSettings(BaseOverhavePrefix):
