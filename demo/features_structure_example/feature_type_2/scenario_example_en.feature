@@ -1,4 +1,4 @@
-@feature_type_1
+@feature_type_2
 Feature: What can assistant do
 
 Background:
