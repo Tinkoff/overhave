@@ -3,8 +3,10 @@ from pathlib import Path
 
 import click
 
+from overhave import OverhaveContext, OverhaveLanguageSettings, overhave_factory
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.cli.admin import _run_admin
+from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
 
 class _OverhaveDemoSettings(BaseOverhavePrefix):
@@ -36,6 +38,13 @@ class _OverhaveDemoSettings(BaseOverhavePrefix):
         environ[self._get_variable("project_key")] = "OVH"
 
 
+def _set_custom_context() -> None:
+    context = OverhaveContext(
+        language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES, translit_pack=RUSSIAN_TRANSLIT_PACK,)
+    )
+    overhave_factory().set_context(context)
+
+
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def overhave_demo() -> None:
     pass
@@ -45,4 +54,5 @@ def overhave_demo() -> None:
 def admin() -> None:
     demo_settings = _OverhaveDemoSettings()
     demo_settings.enrich_env()
+    _set_custom_context()
     _run_admin(port=8076, debug=True)
