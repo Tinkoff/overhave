@@ -21,3 +21,8 @@ class TestOverhaveDemo:
         assert factory._factory.has_context
         assert factory.pytest_patched
         assert set(factory.feature_extractor.feature_types) == {"feature_type_1", "feature_type_2", "feature_type_3"}
+
+        # TODO: check steps content
+        assert factory.injector.get_steps("feature_type_1")
+        assert factory.injector.get_steps("feature_type_2")
+        assert factory.injector.get_steps("feature_type_3")
