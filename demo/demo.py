@@ -9,6 +9,11 @@ from overhave.cli.admin import _run_admin
 from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
 
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
+def overhave_demo() -> None:
+    pass
+
+
 class _OverhaveDemoSettings(BaseOverhavePrefix):
     """ Settings for application demo mode configuration. """
 
@@ -45,14 +50,13 @@ def _set_custom_context() -> None:
     overhave_factory().set_context(context)
 
 
-@click.group(context_settings={"help_option_names": ["-h", "--help"]})
-def overhave_demo() -> None:
-    pass
-
-
-@overhave_demo.command(short_help="Run Overhave web-service in demo mode")
-def admin() -> None:
+def _run_demo_admin() -> None:
     demo_settings = _OverhaveDemoSettings()
     demo_settings.enrich_env()
     _set_custom_context()
     _run_admin(port=8076, debug=True)
+
+
+@overhave_demo.command(short_help="Run Overhave web-service in demo mode")
+def admin() -> None:
+    _run_demo_admin()
