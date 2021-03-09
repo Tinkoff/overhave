@@ -1,12 +1,11 @@
 import logging
 from pathlib import Path
-from typing import Callable, Iterator, cast
+from typing import Callable, Dict, Iterator, Optional, cast
 
 import py
 import pytest
 import sqlalchemy_utils as sau
 from pytest_mock import MockFixture
-from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
@@ -28,12 +27,6 @@ def db_settings(worker_id: XDistWorkerValueType) -> DataBaseSettings:
     return settings
 
 
-def create_metadata(db_context: DataBaseContext) -> None:
-    db_context.metadata.bind = db_context.engine
-    db_context.metadata.drop_all()
-    db_context.metadata.create_all()
-
-
 @pytest.fixture(scope="session")
 def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
     from overhave.db import metadata
@@ -43,27 +36,31 @@ def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
     sau.create_database(db_settings.db_url)
     engine = create_engine(db_settings.db_url, echo=db_settings.db_echo, pool_pre_ping=True)
     db_context = DataBaseContext(metadata=metadata, engine=engine)
-    create_metadata(db_context)
+    db_context.metadata.bind = db_context.engine
     yield db_context
     sau.drop_database(db_settings.db_url)
 
 
-def truncate_all_tables(metadata: MetaData) -> None:
-    connection = metadata.bind.connect()
-    transaction = connection.begin()
-
-    for table in metadata.sorted_tables:
-        connection.execute(table.delete())
-
-    transaction.commit()
-    connection.close()
-
-
 @pytest.fixture()
 def database(db_context: DataBaseContext) -> Iterator[None]:
-    truncate_all_tables(db_context.metadata)
+    db_context.metadata.drop_all()
+    db_context.metadata.create_all()
     yield
     close_all_sessions()
+
+
+@pytest.fixture(scope="module")
+def mock_envs(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) -> Iterator[None]:
+    import os
+
+    old_values = {key: os.environ.get(key) for key in envs_for_mock}
+    try:
+        for key in envs_for_mock:
+            os.environ[key] = envs_for_mock.get(key) or mock_default_value
+        yield
+    finally:
+        for key, value in old_values.items():
+            os.environ[key] = value or ""
 
 
 @pytest.fixture()

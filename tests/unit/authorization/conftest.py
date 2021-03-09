@@ -7,7 +7,7 @@ from overhave.entities.authorization.manager import LDAPAuthenticator
 from overhave.entities.authorization.settings import OverhaveLdapClientSettings
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def envs_for_mock() -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_LDAP_URL": "ldap://mydomain.ru",
@@ -16,13 +16,13 @@ def envs_for_mock() -> Dict[str, Optional[str]]:
     }
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def mock_default_value() -> str:
     return "http://dummy"
 
 
 @pytest.fixture()
-def test_ldap_client_settings(mock_urls: None) -> OverhaveLdapClientSettings:
+def test_ldap_client_settings(mock_envs) -> OverhaveLdapClientSettings:
     return OverhaveLdapClientSettings()
 
 
