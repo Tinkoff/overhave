@@ -94,7 +94,6 @@ filterwarnings = [
     "ignore::DeprecationWarning:sqlalchemy_utils.observer",
 ]
 xfail_strict=true
-bdd_features_base_dir="docs/includes/features_structure_example"
 
 [tool.coverage.run]
 omit = [
@@ -107,7 +106,7 @@ omit = [
 balanced_wrapping = true
 default_section = "THIRDPARTY"
 include_trailing_comma = true
-known_first_party = ["docker", "docs", "overhave", "tests"]
+known_first_party = ["docker", "docs", "overhave", "tests", "demo"]
 line_length = 120
 multi_line_output = 3
 
