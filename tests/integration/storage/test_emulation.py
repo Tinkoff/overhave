@@ -17,6 +17,7 @@ class TestEmulation:
     def test_emulation_storage(self, test_emulation_settings) -> e.EmulationStorage:
         return e.EmulationStorage(test_emulation_settings)
 
+    @pytest.fixture()
     def test_add_emulation_to_db(self):
         # TRASH????????
         emulation: db.tables.Emulation = db.tables.Emulation()
@@ -39,26 +40,26 @@ class TestEmulation:
             session.add(emulation)
             session.flush()
 
-    def test_raise_exception_for_not_existing_id(self, test_emulation_storage):
+    def test_raise_exception_for_not_existing_id(self, test_emulation_storage, test_add_emulation_to_db):
         test_emulation_storage.create_emulation_run(1, "admin")
         with pytest.raises(e.NotFoundEmulationError):
             test_emulation_storage.get_requested_emulation_run(-1)
 
-    def test_create_emulation_run(self, test_emulation_storage):
+    def test_create_emulation_run(self, test_emulation_storage, test_add_emulation_to_db):
         emulation_run: db.EmulationRun = test_emulation_storage.create_emulation_run(1, "admin")
         assert emulation_run.status == EmulationStatus.CREATED
         assert emulation_run.emulation_id == 1
         assert emulation_run.initiated_by == "admin"
         # Checking port?
 
-    def test_get_requested_emulation_run(self, test_emulation_storage):
+    def test_get_requested_emulation_run(self, test_emulation_storage, test_add_emulation_to_db):
         test_emulation_storage.create_emulation_run(1, "admin")
         requested_emulation_run: db.EmulationRun = test_emulation_storage.get_requested_emulation_run(1)
         assert requested_emulation_run.status == EmulationStatus.REQUESTED
         assert requested_emulation_run.emulation_id == 1
         # Checking port?
 
-    def test_set_error_run_status(self, test_emulation_storage):
+    def test_set_error_run_status(self, test_emulation_storage, test_add_emulation_to_db):
         emulation_run: db.EmulationRun = test_emulation_storage.create_emulation_run(1, "admin")
         assert emulation_run.status == EmulationStatus.CREATED
         test_emulation_storage.set_error_emulation_run(1, "admin")
