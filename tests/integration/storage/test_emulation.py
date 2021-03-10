@@ -24,7 +24,7 @@ class TestEmulation:
         emulation.name = 'test'
         emulation.command = 'test'
         emulation.created_by = 'test'
-        emulation.test_user_id = 'test'
+        emulation.test_user_id = 0
         with db.create_session() as session:
             session.add(emulation)
             session.flush()
