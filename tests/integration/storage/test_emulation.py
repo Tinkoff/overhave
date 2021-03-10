@@ -21,6 +21,8 @@ class TestEmulation:
     def test_add_emulation_to_db(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
         emulation.id = 1
+        emulation.name = 'test'
+        emulation.command = 'test'
         with db.create_session() as session:
             session.add(emulation)
             session.flush()
