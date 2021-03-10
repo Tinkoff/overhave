@@ -19,13 +19,24 @@ class TestEmulation:
 
     @pytest.fixture
     def test_add_emulation_to_db(self):
+        # TRASH????????
         emulation: db.tables.Emulation = db.tables.Emulation()
         emulation.id = 1
         emulation.name = 'test'
         emulation.command = 'test'
         emulation.created_by = 'test'
         emulation.test_user_id = 0
+        test_user = db.tables.TestUser()
+        test_user.id = 0
+        test_user.created_by = 'test'
+        test_user.feature_type_id = 0
+        test_user.name = 'test'
+        feature_type = db.tables.FeatureType()
+        feature_type.name = 'test'
+        feature_type.id = 0
         with db.create_session() as session:
+            session.add(feature_type)
+            session.add(test_user)
             session.add(emulation)
             session.flush()
 
