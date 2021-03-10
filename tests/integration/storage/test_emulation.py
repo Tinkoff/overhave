@@ -9,38 +9,43 @@ from overhave.entities.settings import OverhaveEmulationSettings
 class TestEmulation:
     """Integration tests for emulation"""
 
-    def test_raise_exception_for_not_existing_id(self):
-        emulation: db.tables.Emulation = db.tables.Emulation()
-        emulation.id = 1
-        emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
-        emulation_run: db.EmulationRun = emulation_storage.create_emulation_run(1, "test")
-        with pytest.raises(e.NotFoundEmulationError):
-            emulation_storage.get_requested_emulation_run(-1)
+    @pytest.fixture()
+    def test_emulation_settings(self) -> OverhaveEmulationSettings:
+        return OverhaveEmulationSettings()
 
-    def test_create_emulation_run(self):
+    @pytest.fixture()
+    def test_emulation_storage(self, test_emulation_settings) -> e.EmulationStorage:
+        return e.EmulationStorage(test_emulation_settings)
+
+    @pytest.fixture
+    def test_add_emulation_to_db(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
         emulation.id = 1
-        emulation_run: db.EmulationRun = e.EmulationStorage(OverhaveEmulationSettings()).create_emulation_run(1, "test")
+        with db.create_session() as session:
+            session.add(emulation)
+            session.flush()
+
+    def test_raise_exception_for_not_existing_id(self, test_emulation_storage, test_add_emulation_to_db):
+        test_emulation_storage.create_emulation_run(1, "test")
+        with pytest.raises(e.NotFoundEmulationError):
+            test_emulation_storage.get_requested_emulation_run(-1)
+
+    def test_create_emulation_run(self, test_emulation_storage, test_add_emulation_to_db):
+        emulation_run: db.EmulationRun = test_emulation_storage.create_emulation_run(1, "test")
         assert emulation_run.status == EmulationStatus.CREATED
         assert emulation_run.emulation_id == 1
         assert emulation_run.initiated_by == "test"
         # Checking port?
 
-    def test_get_requested_emulation_run(self):
-        emulation: db.tables.Emulation = db.tables.Emulation()
-        emulation.id = 1
-        emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
-        emulation_storage.create_emulation_run(1, "test")
-        requested_emulation_run: db.EmulationRun = emulation_storage.get_requested_emulation_run(1)
+    def test_get_requested_emulation_run(self, test_emulation_storage, test_add_emulation_to_db):
+        test_emulation_storage.create_emulation_run(1, "test")
+        requested_emulation_run: db.EmulationRun = test_emulation_storage.get_requested_emulation_run(1)
         assert requested_emulation_run.status == EmulationStatus.REQUESTED
         assert requested_emulation_run.emulation_id == 1
         # Checking port?
 
-    def test_set_error_run_status(self):
-        emulation: db.tables.Emulation = db.tables.Emulation()
-        emulation.id = 1
-        emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
-        emulation_run: db.EmulationRun = emulation_storage.create_emulation_run(1, "test")
+    def test_set_error_run_status(self, test_emulation_storage, test_add_emulation_to_db):
+        emulation_run: db.EmulationRun = test_emulation_storage.create_emulation_run(1, "test")
         assert emulation_run.status == EmulationStatus.CREATED
-        emulation_storage.set_error_emulation_run(1, "test set_error_emulation_run")
+        test_emulation_storage.set_error_emulation_run(1, "test set_error_emulation_run")
         assert emulation_run.status == EmulationStatus.ERROR
