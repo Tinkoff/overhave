@@ -24,11 +24,11 @@ class TestEmulation:
         emulation.id = 1
         emulation.name = 'test'
         emulation.command = 'test'
-        emulation.created_by = 'test'
+        emulation.created_by = 'admin'
         emulation.test_user_id = 0
         test_user = db.tables.TestUser()
         test_user.id = 0
-        test_user.created_by = 'test'
+        test_user.created_by = 'admin'
         test_user.feature_type_id = 0
         test_user.name = 'test'
         feature_type = db.tables.FeatureType()
