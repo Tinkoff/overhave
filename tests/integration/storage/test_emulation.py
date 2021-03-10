@@ -11,12 +11,15 @@ class TestEmulation:
 
     def test_raise_exception_for_not_existing_id(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
+        emulation.id = 1
         emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
+        emulation_run: db.EmulationRun = emulation_storage.create_emulation_run(1, "test")
         with pytest.raises(e.NotFoundEmulationError):
             emulation_storage.get_requested_emulation_run(-1)
 
     def test_create_emulation_run(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
+        emulation.id = 1
         emulation_run: db.EmulationRun = e.EmulationStorage(OverhaveEmulationSettings()).create_emulation_run(1, "test")
         assert emulation_run.status == EmulationStatus.CREATED
         assert emulation_run.emulation_id == 1
@@ -25,6 +28,7 @@ class TestEmulation:
 
     def test_get_requested_emulation_run(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
+        emulation.id = 1
         emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
         emulation_storage.create_emulation_run(1, "test")
         requested_emulation_run: db.EmulationRun = emulation_storage.get_requested_emulation_run(1)
@@ -34,6 +38,7 @@ class TestEmulation:
 
     def test_set_error_run_status(self):
         emulation: db.tables.Emulation = db.tables.Emulation()
+        emulation.id = 1
         emulation_storage = e.EmulationStorage(OverhaveEmulationSettings())
         emulation_run: db.EmulationRun = emulation_storage.create_emulation_run(1, "test")
         assert emulation_run.status == EmulationStatus.CREATED
