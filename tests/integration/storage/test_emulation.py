@@ -23,6 +23,8 @@ class TestEmulation:
         emulation.id = 1
         emulation.name = 'test'
         emulation.command = 'test'
+        emulation.created_by = 'test'
+        emulation.test_user_id = 'test'
         with db.create_session() as session:
             session.add(emulation)
             session.flush()
