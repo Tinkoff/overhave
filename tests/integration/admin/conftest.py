@@ -1,9 +1,15 @@
+import os
+import tempfile
 from pathlib import Path
+from typing import Callable
 from uuid import uuid1
 
 import pytest
 from faker import Faker
+from flask.testing import FlaskClient
 
+from overhave import OverhaveAppType, OverhaveContext, overhave_app
+from overhave.base_settings import DataBaseSettings
 from overhave.factory import ProxyFactory
 
 
@@ -30,3 +36,33 @@ def test_report_with_index(test_report_without_index: Path, faker: Faker) -> Pat
     report_index.write_text(faker.word())
     yield test_report_without_index
     report_index.unlink()
+
+
+@pytest.fixture()
+def patched_app_proxy_factory(
+    db_settings: DataBaseSettings,
+    database: None,
+    mocked_context: OverhaveContext,
+    clean_proxy_factory: Callable[[], ProxyFactory],
+) -> ProxyFactory:
+    db_settings.setup_db()
+    factory = clean_proxy_factory()
+    factory.set_context(mocked_context)
+    return factory
+
+
+@pytest.fixture()
+def test_app(patched_app_proxy_factory) -> OverhaveAppType:
+    return overhave_app(factory=patched_app_proxy_factory)
+
+
+@pytest.fixture()
+def test_client(test_app: OverhaveAppType) -> FlaskClient:
+    db_fd, test_app.config["DATABASE"] = tempfile.mkstemp()
+    test_app.config["TESTING"] = True
+
+    with test_app.test_client() as client:
+        yield client
+
+    os.close(db_fd)
+    os.unlink(test_app.config["DATABASE"])
