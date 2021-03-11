@@ -75,6 +75,18 @@ class TestInitializedS3Manager:
         test_initialized_s3_manager.create_bucket(bucket.value)
         mocked_boto3_client.create_bucket.assert_called()
 
+    def test_get_bucket_objects(
+        self,
+        test_object_dict: Dict[str, Any],
+        mocked_boto3_client: mock.MagicMock,
+        test_s3_manager_settings: S3ManagerSettings,
+        test_initialized_s3_manager: S3Manager,
+        bucket: OverhaveS3Bucket,
+    ):
+        objects = test_initialized_s3_manager.get_bucket_objects(bucket.value)
+        mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
+        assert objects == [ObjectModel.parse_obj(test_object_dict)]
+
     def test_upload_file(
         self,
         mocked_boto3_client: mock.MagicMock,
