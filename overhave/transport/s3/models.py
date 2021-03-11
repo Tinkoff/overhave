@@ -1,19 +1,8 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 from pydantic import Extra, Field, root_validator
 from pydantic.main import BaseModel
-
-
-class BaseListModel(BaseModel):
-    """ Base model for list models. """
-
-    @property
-    def items(self) -> List[Any]:
-        return cast(List[Any], self.__root__)
-
-    def __len__(self) -> int:
-        return cast(int, self.__root__.__len__())
 
 
 class BucketModel(BaseModel):
@@ -21,12 +10,6 @@ class BucketModel(BaseModel):
 
     name: str = Field(alias="Name")
     created_at: datetime = Field(alias="CreationDate")
-
-
-class BucketsListModel(BaseListModel):
-    """ Model for list of BucketModels. """
-
-    __root__: List[BucketModel]
 
 
 class OwnerModel(BaseModel):
@@ -48,12 +31,6 @@ class ObjectModel(BaseModel):
 
     class Config:
         extra = Extra.allow
-
-
-class ObjectsList(BaseListModel):
-    """ Model for list of ObjectModels. """
-
-    __root__: Optional[List[ObjectModel]]
 
 
 class BaseObjectToDeletionModel(BaseModel):
