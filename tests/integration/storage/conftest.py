@@ -29,4 +29,5 @@ def test_add_emulation_to_db():
         session.add(feature_type)
         session.add(test_user)
         session.add(emulation)
+        session.flush()
     return emulation.id
