@@ -4,7 +4,9 @@ from faker import Faker
 import overhave.storage.emulation as e
 from overhave import db
 from overhave.db.statuses import EmulationStatus
-from conftest import ADMIN
+
+
+ADMIN = 'admin'
 
 
 class TestEmulationStorage:
