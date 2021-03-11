@@ -1,18 +1,16 @@
 import logging
 import os
-import tempfile
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, Optional, cast
+from typing import Callable, Dict, Iterator, Optional, cast
 
 import py
 import pytest
 import sqlalchemy_utils as sau
 from pytest_mock import MockFixture
-from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
-from overhave import AuthorizationStrategy, OverhaveAppType, OverhaveContext, overhave_app
+from overhave import AuthorizationStrategy, OverhaveContext
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
 from overhave.factory import ProxyFactory, get_proxy_factory
 from tests.objects import DataBaseContext, XDistWorkerValueType
@@ -42,16 +40,6 @@ def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
     db_context.metadata.bind = db_context.engine
     yield db_context
     sau.drop_database(db_settings.db_url)
-
-
-def truncate_all_tables(metadata: MetaData) -> None:
-    connection = metadata.bind.connect()
-    transaction = connection.begin()
-    for table in metadata.sorted_tables:
-        connection.execute(table.delete())
-
-    transaction.commit()
-    connection.close()
 
 
 @pytest.fixture()
@@ -97,33 +85,3 @@ def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> Overha
     context_mock.file_settings.tmp_reports_dir = reports_dir
 
     return cast(OverhaveContext, context_mock)
-
-
-@pytest.fixture()
-def patched_app_proxy_factory(
-    db_settings: DataBaseSettings,
-    database: None,
-    mocked_context: OverhaveContext,
-    clean_proxy_factory: Callable[[], ProxyFactory],
-) -> ProxyFactory:
-    db_settings.setup_db()
-    factory = clean_proxy_factory()
-    factory.set_context(mocked_context)
-    return factory
-
-
-@pytest.fixture()
-def test_app(patched_app_proxy_factory: ProxyFactory) -> OverhaveAppType:
-    return overhave_app(factory=patched_app_proxy_factory)
-
-
-@pytest.fixture()
-def test_client(test_app: OverhaveAppType) -> Any:
-    db_fd, test_app.config["DATABASE"] = tempfile.mkstemp()
-    test_app.config["TESTING"] = True
-
-    with test_app.test_client() as client:
-        yield client
-
-    os.close(db_fd)
-    os.unlink(test_app.config["DATABASE"])
