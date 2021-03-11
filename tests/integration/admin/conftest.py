@@ -1,8 +1,9 @@
-from uuid import uuid1
 from pathlib import Path
+from uuid import uuid1
 
 import pytest
 from faker import Faker
+
 from overhave.factory import ProxyFactory
 
 

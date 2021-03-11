@@ -1,8 +1,9 @@
 import logging
-from pathlib import Path
-from typing import Callable, Dict, Iterator, Optional, cast, Any
 import os
 import tempfile
+from pathlib import Path
+from typing import Any, Callable, Dict, Iterator, Optional, cast
+
 import py
 import pytest
 import sqlalchemy_utils as sau
@@ -11,7 +12,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
-from overhave import AuthorizationStrategy, OverhaveContext, OverhaveAppType, overhave_app
+from overhave import AuthorizationStrategy, OverhaveAppType, OverhaveContext, overhave_app
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
 from overhave.factory import ProxyFactory, get_proxy_factory
 from tests.objects import DataBaseContext, XDistWorkerValueType
