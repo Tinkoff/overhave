@@ -1,14 +1,14 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from pydantic.tools import parse_obj_as
 
 from overhave.transport.s3.models import (
     BucketModel,
-    BucketsListModel,
     DeletedObjectModel,
     DeletionResultModel,
     NotDeletedObjectModel,
     ObjectModel,
-    ObjectsList,
     OwnerModel,
 )
 
@@ -25,14 +25,14 @@ class TestBoto3Models:
 
     def test_bucket_list(self, test_bucket_name: str, test_bucket_creation_date: datetime):
         item = {"Name": test_bucket_name, "CreationDate": test_bucket_creation_date}
-        model = BucketsListModel.parse_obj([item])
-        assert len(model.items) == 1
-        assert model.items[0].dict(by_alias=True) == item
+        model = parse_obj_as(List[BucketModel], [item])
+        assert len(model) == 1
+        assert model[0].dict(by_alias=True) == item
 
     def test_object_list(self, test_object_dict: Dict[str, Any]):
-        model = ObjectsList.parse_obj([test_object_dict])
+        model = parse_obj_as(List[ObjectModel], [test_object_dict])
         assert len(model) == 1
-        assert model.items[0].dict(by_alias=True) == test_object_dict
+        assert model[0].dict(by_alias=True) == test_object_dict
 
     def test_object_model(self, test_object_dict: Dict[str, Any]):
         model = ObjectModel.parse_obj(test_object_dict)

@@ -95,6 +95,7 @@ class ReportManager:
         zip_report_path = self._file_settings.tmp_reports_dir / (
             report_dir.name + f".{self._settings.archive_extension}"
         )
+        zip_report_path.parent.mkdir(exist_ok=True)
         download_success = self._s3_manager.download_file(
             filename=zip_report_path.name, dir_to_save=zip_report_path.parent, bucket=OverhaveS3Bucket.REPORTS.value
         )

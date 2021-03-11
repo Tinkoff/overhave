@@ -64,12 +64,12 @@ class Processor(IProcessor):
             return
 
         logger.debug("Test returncode: %s", test_return_code)
-        if test_return_code != 0:
+        if test_return_code == 0:
+            self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.SUCCESS)
+        else:
             self._test_run_storage.set_run_status(
                 run_id=run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
             )
-        else:
-            self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.SUCCESS)
         self._report_manager.create_allure_report(test_run_id=run_id, results_dir=results_dir)
 
     def execute_test(self, scenario_id: int, executed_by: str) -> werkzeug.Response:
