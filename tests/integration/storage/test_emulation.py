@@ -1,10 +1,10 @@
 import pytest
+from faker import Faker
 
 import overhave.storage.emulation as e
 from overhave import db
-from faker import Faker
 from overhave.db.statuses import EmulationStatus
-from tests.integration.storage.conftest import ADMIN
+from conftest import ADMIN
 
 
 class TestEmulationStorage:
