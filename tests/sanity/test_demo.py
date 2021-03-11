@@ -1,6 +1,7 @@
 from typing import Callable
 from unittest import mock
 
+from demo.demo import _run_demo_admin
 from overhave.factory import ProxyFactory
 
 
@@ -8,8 +9,6 @@ class TestOverhaveDemo:
     """ Sanity tests for application demo mode. """
 
     def test_demo_admin(self, flask_run_mock: mock.MagicMock, clean_proxy_factory: Callable[[], ProxyFactory]):
-        from demo.demo import _run_demo_admin
-
         factory = clean_proxy_factory()
 
         flask_run_mock.assert_not_called()

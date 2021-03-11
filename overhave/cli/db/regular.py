@@ -8,20 +8,20 @@ from overhave import db as database
 from overhave.base_settings import DataBaseSettings
 
 
-@click.command(short_help="Create all metadata tables")
-@click.pass_obj
-def create_all(config: Config) -> None:
-    """ Create all metadata tables. """
+def _create_all(config: Config) -> None:
     click.echo("creating")
     config.attributes["metadata"].create_all()
     click.echo("complete!")
 
 
-@click.command(short_help="Drop all metadata tables, attributes, schema")
+@click.command(short_help="Create all metadata tables")
 @click.pass_obj
-def drop_all(config: Config) -> None:
-    """ Drop all metadata tables, attributes, schema. """
-    click.confirm("it really need?", abort=True)
+def create_all(config: Config) -> None:
+    """ Create all metadata tables. """
+    _create_all(config)
+
+
+def _drop_all(config: Config) -> None:
     click.echo("dropping")
     meta = config.attributes["metadata"]
     engine = config.attributes["engine"]
@@ -31,6 +31,14 @@ def drop_all(config: Config) -> None:
     engine.execute("DROP SCHEMA IF EXISTS huey")
     meta.drop_all()
     click.echo("complete!")
+
+
+@click.command(short_help="Drop all metadata tables, attributes, schema")
+@click.pass_obj
+def drop_all(config: Config) -> None:
+    """ Drop all metadata tables, attributes, schema. """
+    click.confirm("it really need?", abort=True)
+    _drop_all(config)
 
 
 def _ensure_database_exists(db_url: URL) -> None:
