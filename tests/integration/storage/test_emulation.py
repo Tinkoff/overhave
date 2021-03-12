@@ -3,9 +3,9 @@ from typing import cast
 import pytest
 from faker import Faker
 
-import overhave.storage.emulation as e
 from overhave import db
 from overhave.db.statuses import EmulationStatus
+from overhave.storage.emulation import NotFoundEmulationError
 from tests.integration.storage.conftest import commit_emulation_run
 
 
@@ -13,7 +13,7 @@ class TestEmulationStorage:
     """ Integration tests for :class:`EmulationStorage`. """
 
     def test_raise_exception_for_not_existing_id(self, test_emulation_storage, faker: Faker):
-        with pytest.raises(e.NotFoundEmulationError):
+        with pytest.raises(NotFoundEmulationError):
             test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
     def test_create_emulation_run(self, test_emulation_id, test_emulation_run):

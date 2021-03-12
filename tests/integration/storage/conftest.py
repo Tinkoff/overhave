@@ -21,7 +21,6 @@ def test_emulation_storage(test_emulation_settings) -> EmulationStorage:
 def add_table_to_db_and_take_id(table):
     with db.create_session() as session:
         session.add(table)
-        session.flush()
         session.commit()
     return table.id
 
@@ -58,5 +57,4 @@ def test_emulation_run(test_emulation_storage: EmulationStorage, test_emulation_
 def commit_emulation_run(emulation_run) -> None:
     with db.create_session() as session:
         session.add(emulation_run)
-        session.flush()
         session.commit()
