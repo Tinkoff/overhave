@@ -1,11 +1,9 @@
 import pytest
 from faker import Faker
 
-import overhave.storage.emulation as e
 from overhave import db
 from overhave.entities.settings import OverhaveEmulationSettings
-
-ADMIN = "admin"
+from overhave.storage.emulation import EmulationStorage
 
 
 @pytest.fixture()
@@ -14,20 +12,46 @@ def test_emulation_settings() -> OverhaveEmulationSettings:
 
 
 @pytest.fixture()
-def test_emulation_storage(test_emulation_settings) -> e.EmulationStorage:
-    return e.EmulationStorage(test_emulation_settings)
+def test_emulation_storage(test_emulation_settings) -> EmulationStorage:
+    return EmulationStorage(test_emulation_settings)
+
+
+def create_table_and_give_id(table):
+    with db.create_session() as session:
+        session.add(table)
+        session.flush()
+        session.commit()
+    return table.id
 
 
 @pytest.fixture()
-def test_add_emulation_to_db():
-    faker = Faker()
-    with db.create_session() as session:
-        feature_type = db.tables.FeatureType(name=faker.word())
-        session.add(feature_type)
-        test_user = db.tables.TestUser(created_by=ADMIN, feature_type_id=feature_type.id, name=faker.word())
-        session.add(test_user)
-        emulation: db.tables.Emulation = db.tables.Emulation(
-            name=faker.word(), command=faker.word(), created_by=ADMIN, test_user_id=test_user.id
+def test_feature_type_id(faker: Faker) -> int:
+    return create_table_and_give_id(db.tables.FeatureType(name=faker.word()))
+
+
+@pytest.fixture()
+def test_user_id(faker: Faker) -> int:
+    return create_table_and_give_id(
+        db.tables.TestUser(created_by=db.Role.admin, feature_type_id=test_feature_type_id, name=faker.word())
+    )
+
+
+@pytest.fixture()
+def test_emulation_id(faker: Faker) -> int:
+    return create_table_and_give_id(
+        db.tables.Emulation(
+            name=faker.word(), command=faker.word(), created_by=db.Role.admin, test_user_id=test_user_id
         )
-        session.add(emulation)
-    return emulation.id
+    )
+
+
+@pytest.fixture()
+def test_emulation_run(test_emulation_storage: EmulationStorage, test_emulation_id: int) -> db.EmulationRun:
+    return test_emulation_storage.create_emulation_run(emulation_id=test_emulation_id, initiated_by=db.Role.admin)
+
+
+def commit_emulation_run(emulation_run) -> None:
+    with db.create_session() as session:
+        session.add(emulation_run)
+        session.flush()
+        session.commit()
