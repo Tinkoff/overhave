@@ -1,3 +1,5 @@
+from typing import cast
+
 import pytest
 from faker import Faker
 
@@ -26,13 +28,13 @@ def create_table_and_give_id(table):
 
 @pytest.fixture()
 def test_feature_type_id(faker: Faker) -> int:
-    return create_table_and_give_id(db.tables.FeatureType(name=faker.word()))
+    return create_table_and_give_id(db.tables.FeatureType(name=cast(str, faker.word())))
 
 
 @pytest.fixture()
 def test_user_id(faker: Faker) -> int:
     return create_table_and_give_id(
-        db.tables.TestUser(created_by=db.Role.admin, feature_type_id=test_feature_type_id, name=faker.word())
+        db.tables.TestUser(created_by=db.Role.admin, feature_type_id=test_feature_type_id, name=cast(str, faker.word()))
     )
 
 
@@ -40,14 +42,12 @@ def test_user_id(faker: Faker) -> int:
 def test_emulation_id(faker: Faker) -> int:
     return create_table_and_give_id(
         db.tables.Emulation(
-            name=faker.word(), command=faker.word(), created_by=db.Role.admin, test_user_id=test_user_id
+            name=cast(str, faker.word()),
+            command=cast(str, faker.word()),
+            created_by=db.Role.admin,
+            test_user_id=test_user_id,
         )
     )
-
-
-@pytest.fixture()
-def test_emulation_run(test_emulation_storage: EmulationStorage, test_emulation_id: int) -> db.EmulationRun:
-    return test_emulation_storage.create_emulation_run(emulation_id=test_emulation_id, initiated_by=db.Role.admin)
 
 
 def commit_emulation_run(emulation_run) -> None:

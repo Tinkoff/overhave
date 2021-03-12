@@ -1,3 +1,5 @@
+from typing import cast
+
 import pytest
 from faker import Faker
 
@@ -12,7 +14,7 @@ class TestEmulationStorage:
 
     def test_raise_exception_for_not_existing_id(self, test_emulation_storage, faker: Faker):
         with pytest.raises(e.NotFoundEmulationError):
-            test_emulation_storage.get_requested_emulation_run(faker.random_int())
+            test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
     def test_create_emulation_run(self, test_emulation_storage, test_emulation_id, test_emulation_run):
         assert test_emulation_run.status == EmulationStatus.CREATED
@@ -33,7 +35,7 @@ class TestEmulationStorage:
         commit_emulation_run(test_emulation_run)
         assert test_emulation_run.status == EmulationStatus.CREATED
         test_emulation_storage.set_error_emulation_run(
-            emulation_run_id=test_emulation_run.id, traceback=faker.sentence()
+            emulation_run_id=test_emulation_run.id, traceback=cast(str, faker.sentence())
         )
         assert test_emulation_run.status == EmulationStatus.ERROR
         assert test_emulation_storage._is_port_in_use(test_emulation_run.port)
