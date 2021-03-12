@@ -27,8 +27,12 @@ def current_user_mock(user_role_mock, faker: Faker) -> mock.MagicMock:
 @pytest.fixture()
 def session_mock():
     with UnifiedAlchemyMagicMock() as session:
-        tag_view = TagsView(model=db.Tags, session=session.add(db.Tags()))
-        yield tag_view
+        yield session
+
+
+@pytest.fixture()
+def test_tags_view(session_mock) -> TagsView:
+    return TagsView(model=db.Tags, session=session_mock.add(db.Tags()))
 
 
 @pytest.fixture()
