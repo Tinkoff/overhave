@@ -49,6 +49,11 @@ def test_emulation_id(faker: Faker) -> int:
     )
 
 
+@pytest.fixture()
+def test_emulation_run(test_emulation_storage: EmulationStorage, test_emulation_id: int) -> db.EmulationRun:
+    return test_emulation_storage.create_emulation_run(emulation_id=test_emulation_id, initiated_by=db.Role.admin)
+
+
 def commit_emulation_run(emulation_run) -> None:
     with db.create_session() as session:
         session.add(emulation_run)
