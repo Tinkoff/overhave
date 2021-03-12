@@ -1,21 +1,33 @@
+import enum
 from unittest import mock
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from alchemy_mock.mocking import UnifiedAlchemyMagicMock
+from faker import Faker
 
 from overhave import db
+from overhave.admin.views import TagsView
 
 
 @pytest.fixture()
-def current_admin_user_mock() -> mock.MagicMock:
+def user_role_mock(request: FixtureRequest) -> enum.Enum:
+    if hasattr(request, "param"):
+        if request.param == "admin":
+            return db.Role.admin
+    return db.Role.user
+
+
+@pytest.fixture()
+def current_user_mock(user_role_mock, faker: Faker) -> mock.MagicMock:
     with mock.patch("overhave.admin.views.tag.current_user", return_value=mock.MagicMock()) as mocked:
-        mocked.login = "test_admin_user"
-        mocked.role = db.Role.admin
+        mocked.login = faker.word()
+        mocked.role = user_role_mock
         yield mocked
 
 
 @pytest.fixture()
-def current_user_mock() -> mock.MagicMock:
-    with mock.patch("overhave.admin.views.tag.current_user", return_value=mock.MagicMock()) as mocked:
-        mocked.login = "test_user"
-        mocked.role = db.Role.user
-        yield mocked
+def session_mock():
+    with UnifiedAlchemyMagicMock() as session:
+        tag_view = TagsView(model=db.Tags, session=session.add(db.Tags()))
+        yield tag_view
