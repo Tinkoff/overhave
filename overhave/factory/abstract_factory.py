@@ -5,7 +5,7 @@ from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
-from overhave.testing import ConfigInjector, PytestRunner
+from overhave.testing import ConfigInjector, PluginResolver, PytestRunner
 from overhave.transport import RedisProducer, S3Manager
 
 
@@ -79,4 +79,9 @@ class IOverhaveFactory(abc.ABC):
     @property
     @abc.abstractmethod
     def report_manager(self) -> ReportManager:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def plugin_resolver(self) -> PluginResolver:
         pass

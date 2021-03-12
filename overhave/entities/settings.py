@@ -38,6 +38,9 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     features_base_dir: Path
     # Base directory where pytest files with template mask placed
     fixtures_base_dir: Path
+    # Base directory where pytest-bdd steps placed
+    steps_base_dir: Path
+
     # Template mask for fixtures pytest files which contain `feature_type` key
     fixtures_file_template_mask: str = "test_{feature_type}.py"
     # Temporary directory for scenarios test runs
@@ -53,6 +56,11 @@ class OverhaveFileSettings(BaseOverhavePrefix):
             if not features_base_dir:
                 raise ValueError("Could not resolve 'fixtures_base_dir'!")
             values["fixtures_base_dir"] = Path(features_base_dir).parent
+        steps_base_dir = values.get("steps_base_dir")
+        if steps_base_dir:
+            values["steps_base_dir"] = Path(steps_base_dir)
+        else:
+            values["steps_base_dir"] = values["fixtures_base_dir"]
         return values
 
     @property

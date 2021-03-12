@@ -22,10 +22,7 @@ class PytestRunner:
         cmd.extend(addoptions.split(" "))
 
     def run(self, fixture_file: str, alluredir: str) -> int:
-        pytest_cmd = [
-            fixture_file,
-            f"--alluredir={alluredir}",
-        ]
+        pytest_cmd = [fixture_file, f"--alluredir={alluredir}", f"--rootdir={self._test_settings.pytest_rootdir}"]
         for addoptions in (self._test_settings.default_pytest_addoptions, self._test_settings.extra_pytest_addoptions):
             self._extend_cmd_args(cmd=pytest_cmd, addoptions=addoptions)
         if self._test_settings.workers is not None:
