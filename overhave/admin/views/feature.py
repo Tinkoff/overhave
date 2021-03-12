@@ -50,20 +50,40 @@ class FeatureView(ModelViewConfigured):
     can_view_details = False
 
     inline_models = (ScenarioInlineModelForm(db.Scenario),)
+
     create_template = "feature_create.html"
     edit_template = "feature_edit.html"
 
-    column_list = ("id", "name", "feature_type", "task", "author", "created_at", "last_edited_by", "released")
-    form_excluded_columns = ("created_at", "last_edited_by", "released", "versions")
+    column_list = (
+        "id",
+        "name",
+        "feature_tags",
+        "feature_type",
+        "task",
+        "author",
+        "created_at",
+        "last_edited_by",
+        "released",
+    )
+    form_excluded_columns = (
+        "created_at",
+        "last_edited_by",
+        "released",
+        "versions",
+        "feature_tags.value",
+    )
+
     column_searchable_list = [
         "id",
         "name",
         "task",
         "author",
         "last_edited_by",
+        "feature_tags.value",
     ]
-    column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at")
+    column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
     column_sortable_list = ("id", "name", "author", "last_edited_by")
+    column_labels = {"feature_tags.value": "Tags"}
 
     _task_pattern = re.compile(r"\w+[-]\d+")
 

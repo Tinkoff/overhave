@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Callable, Dict, Iterator, Optional, cast
 
@@ -51,8 +52,6 @@ def database(db_context: DataBaseContext) -> Iterator[None]:
 
 @pytest.fixture(scope="module")
 def mock_envs(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) -> Iterator[None]:
-    import os
-
     old_values = {key: os.environ.get(key) for key in envs_for_mock}
     try:
         for key in envs_for_mock:

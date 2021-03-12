@@ -7,10 +7,18 @@ import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
 
-from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
+from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
 from overhave.db.users import UserRole
+
+tags_association_table = sa.Table(
+    "feature_tags",
+    metadata,
+    sa.Column("tags_id", INT_TYPE, sa.ForeignKey("tags.tags_id")),
+    sa.Column("feature_id", INT_TYPE, sa.ForeignKey("feature.feature_id")),
+    extend_existing=True,
+)
 
 
 class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
@@ -20,6 +28,16 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
 
     def __repr__(self) -> str:
         return cast(str, self.name.upper())
+
+
+class Tags(BaseTable, PrimaryKeyMixin):
+    """ Tags table. """
+
+    value = sa.Column(SHORT_STR_TYPE, nullable=False, doc="Feature tags choice", unique=True)
+    created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
+
+    def __str__(self) -> str:
+        return cast(str, self.value)
 
 
 @su.generic_repr("name", "last_edited_by")
@@ -36,6 +54,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
+    feature_tags = so.relationship(Tags, secondary=tags_association_table)
 
 
 @su.generic_repr("feature_id")
