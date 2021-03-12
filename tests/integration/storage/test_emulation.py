@@ -16,7 +16,7 @@ class TestEmulationStorage:
         with pytest.raises(e.NotFoundEmulationError):
             test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
-    def test_create_emulation_run(self, test_emulation_storage, test_emulation_id, test_emulation_run):
+    def test_create_emulation_run(self, test_emulation_id, test_emulation_run):
         assert test_emulation_run.status == EmulationStatus.CREATED
         assert test_emulation_run.emulation_id == test_emulation_id
         assert test_emulation_run.initiated_by == db.Role.admin

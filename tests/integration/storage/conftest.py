@@ -18,7 +18,7 @@ def test_emulation_storage(test_emulation_settings) -> EmulationStorage:
     return EmulationStorage(test_emulation_settings)
 
 
-def create_table_and_give_id(table):
+def give_id_of_table(table):
     with db.create_session() as session:
         session.add(table)
         session.flush()
@@ -28,23 +28,22 @@ def create_table_and_give_id(table):
 
 @pytest.fixture()
 def test_feature_type_id(faker: Faker) -> int:
-    return create_table_and_give_id(db.tables.FeatureType(name=cast(str, faker.word())))
+    return give_id_of_table(db.tables.FeatureType(name=cast(str, faker.word())))
 
 
 @pytest.fixture()
 def test_user_id(faker: Faker) -> int:
-    return create_table_and_give_id(
-        db.tables.TestUser(created_by=db.Role.admin, feature_type_id=test_feature_type_id, name=cast(str, faker.word()))
+    return give_id_of_table(
+        db.tables.TestUser(feature_type_id=test_feature_type_id, name=cast(str, faker.word()))
     )
 
 
 @pytest.fixture()
 def test_emulation_id(faker: Faker) -> int:
-    return create_table_and_give_id(
+    return give_id_of_table(
         db.tables.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
-            created_by=db.Role.admin,
             test_user_id=test_user_id,
         )
     )
