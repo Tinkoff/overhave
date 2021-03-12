@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from unittest import mock
 
 import click
@@ -35,3 +35,8 @@ def click_ctx_mock() -> click.Context:
 @pytest.fixture()
 def set_config_to_ctx(db_settings: DataBaseSettings, database: None, click_ctx_mock: click.Context) -> None:
     set_config_to_context(context=click_ctx_mock, settings=db_settings)
+
+
+@pytest.fixture(scope="session")
+def test_feature_types() -> List[str]:
+    return ["feature_type_1", "feature_type_2", "feature_type_3"]
