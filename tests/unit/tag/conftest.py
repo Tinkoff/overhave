@@ -29,3 +29,8 @@ def session_mock():
     with UnifiedAlchemyMagicMock() as session:
         tag_view = TagsView(model=db.Tags, session=session.add(db.Tags()))
         yield tag_view
+
+
+@pytest.fixture()
+def test_tags_row() -> db.Tags:
+    return db.Tags()
