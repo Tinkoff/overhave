@@ -1,4 +1,3 @@
-import enum
 from unittest import mock
 
 import pytest
@@ -11,11 +10,10 @@ from overhave.admin.views import TagsView
 
 
 @pytest.fixture()
-def user_role_mock(request: FixtureRequest) -> enum.Enum:
+def user_role_mock(request: FixtureRequest) -> db.Role:
     if hasattr(request, "param"):
-        if request.param == "admin":
-            return db.Role.admin
-    return db.Role.user
+        return request.param
+    raise NotImplementedError
 
 
 @pytest.fixture()
