@@ -1,8 +1,9 @@
 import logging
+from os import getcwd
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
-from overhave.testing.settings import OverhaveTestSettings
+from overhave.entities import OverhaveFileSettings
 
 logger = logging.getLogger(__name__)
 
@@ -10,11 +11,11 @@ logger = logging.getLogger(__name__)
 class PluginResolver:
     """ Class for custom pytest-bdd steps modules resolution. """
 
-    def __init__(self, test_settings: OverhaveTestSettings, steps_base_dir: Path):
-        self._test_settings = test_settings
-        self._steps_base_dir = steps_base_dir
-        self._plugins = self._resolve_plugins(directory=steps_base_dir)
-        logger.info("Available Overhave pytest plugin modules: %s", self._plugins)
+    def __init__(self, file_settings: OverhaveFileSettings):
+        self._workdir = getcwd()
+        self._file_settings = file_settings
+        self._plugins = self._resolve_plugins(directory=self._file_settings.steps_dir)
+        logger.debug("Available Overhave pytest plugin modules: %s", self._plugins)
 
     @staticmethod
     def _check_dir_compliance(path: Path) -> bool:
@@ -50,7 +51,7 @@ class PluginResolver:
         return plugin_dict
 
     def _format_path(self, path: Path) -> str:
-        relative_path = path.relative_to(self._test_settings.pytest_rootdir).as_posix()
+        relative_path = path.relative_to(self._workdir).as_posix()
         return relative_path.replace("/", ".").rstrip(".py")
 
     def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:

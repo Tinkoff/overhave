@@ -27,10 +27,8 @@ class DataBaseContext(NamedTuple):
 @lru_cache(maxsize=None)
 def get_file_settings() -> OverhaveFileSettings:
     """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
-    test_features_dir = Path(__file__).parent.parent / "demo/features_structure_example"
-    return OverhaveFileSettings(
-        fixtures_base_dir=test_features_dir, features_base_dir=test_features_dir, tmp_dir=test_features_dir / "tmp"
-    )
+    root_dir = Path(__file__).parent.parent / "demo"
+    return OverhaveFileSettings(root_dir=root_dir)
 
 
 @lru_cache(maxsize=None)

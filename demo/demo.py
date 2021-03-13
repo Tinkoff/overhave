@@ -1,7 +1,7 @@
 import click
 
 from demo.settings import OverhaveDemoSettings
-from overhave import OverhaveContext, OverhaveLanguageSettings, OverhaveTestSettings, overhave_factory
+from overhave import OverhaveContext, OverhaveLanguageSettings, overhave_factory
 from overhave.cli.admin import _run_admin
 from overhave.extra import RUSSIAN_PREFIXES
 
@@ -12,12 +12,8 @@ def overhave_demo() -> None:
 
 
 def _set_custom_context() -> None:
-    # set application context with enabled Overhave plugin and "--enable-injection" option
     # context enriched with russian `pytest_bdd` prefixes
-    context = OverhaveContext(
-        test_settings=OverhaveTestSettings(extra_pytest_addoptions="-p overhave --enable-injection"),
-        language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES),
-    )
+    context = OverhaveContext(language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES))
     overhave_factory().set_context(context)
 
 

@@ -49,7 +49,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
-        return PytestRunner(test_settings=self.context.test_settings)
+        return PytestRunner(test_settings=self.context.test_settings, file_settings=self.context.file_settings)
 
     @property
     def test_runner(self) -> PytestRunner:
@@ -157,6 +157,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
         return Processor(
             settings=self.context.processor_settings,
+            file_settings=self.context.file_settings,
             test_run_storage=self._test_run_storage,
             injector=self._injector,
             file_manager=self._file_manager,
@@ -215,9 +216,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _plugin_resolver(self) -> PluginResolver:
-        return PluginResolver(
-            test_settings=self.context.test_settings, steps_base_dir=self.context.file_settings.steps_base_dir
-        )
+        return PluginResolver(file_settings=self.context.file_settings)
 
     @property
     def plugin_resolver(self) -> PluginResolver:

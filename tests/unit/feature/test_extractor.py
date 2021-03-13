@@ -23,9 +23,9 @@ class TestFeatureExtractor:
 
     @pytest.mark.parametrize("test_file_settings", [get_incorrect_test_file_settings()], indirect=True)
     def test_scenarios_test_file_not_found_error(self, test_file_settings: OverhaveFileSettings, faker: Faker):
+        extractor = FeatureExtractor(file_settings=test_file_settings)
+        extractor._feature_types = [faker.word()]
         with pytest.raises(ScenariosTestFileNotFound):  # noqa: PT012
-            extractor = FeatureExtractor(file_settings=test_file_settings)
-            extractor._feature_types = [faker.word()]
             extractor._check_pytest_bdd_scenarios_test_files()
 
     @pytest.mark.parametrize("test_feature_extractor", [get_feature_extractor()], indirect=True)

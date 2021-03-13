@@ -66,7 +66,6 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
 class OverhaveTestSettings(BaseOverhavePrefix):
     """ Settings for PytestRunner, which runs scenario tests with specified addoptions. """
 
-    pytest_rootdir: str
     default_pytest_addoptions: str = "--disable-warnings"
     extra_pytest_addoptions: Optional[str]
 

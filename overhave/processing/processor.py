@@ -11,7 +11,7 @@ import werkzeug
 from overhave.db import TestRunStatus
 from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.report_manager import ReportManager
-from overhave.entities.settings import ProcessorSettings
+from overhave.entities.settings import OverhaveFileSettings, ProcessorSettings
 from overhave.entities.stash import IStashProjectManager
 from overhave.processing.abstract import IProcessor
 from overhave.scenario import FileManager
@@ -27,6 +27,7 @@ class Processor(IProcessor):
     def __init__(
         self,
         settings: ProcessorSettings,
+        file_settings: OverhaveFileSettings,
         test_run_storage: ITestRunStorage,
         injector: ConfigInjector,
         file_manager: FileManager,
@@ -35,6 +36,7 @@ class Processor(IProcessor):
         report_manager: ReportManager,
     ):
         self._settings = settings
+        self._file_settings = file_settings
         self._test_run_storage = test_run_storage
         self._injector = injector
         self._file_manager = file_manager
@@ -49,7 +51,7 @@ class Processor(IProcessor):
     def _run_test(self, context: ProcessingContext, alluredir: Path) -> int:
         with self._file_manager.tmp_feature_file(context=context) as feature_file:
             with self._file_manager.tmp_fixture_file(context=context, feature_file=feature_file) as fixture_file:
-                return self._test_runner.run(fixture_file=fixture_file.name, alluredir=alluredir.as_posix(),)
+                return self._test_runner.run(fixture_file=fixture_file.name, alluredir=alluredir.as_posix())
 
     def _process_run(self, run_id: int) -> None:
         self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.RUNNING)

@@ -12,7 +12,7 @@ from tests.objects import FeatureTestContainer, get_test_feature_containers
 @lru_cache(maxsize=None)
 def get_incorrect_test_file_settings() -> OverhaveFileSettings:
     path = Path(__file__).parent
-    return OverhaveFileSettings(features_base_dir=path, fixtures_base_dir=path, tmp_dir=path)
+    return OverhaveFileSettings(root_dir=path)
 
 
 @pytest.fixture()

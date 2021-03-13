@@ -127,7 +127,7 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
     def create_pull_request(self, test_run_id: int) -> StashPrCreationResponse:
         ctx = get_context_by_test_run_id(test_run_id)
 
-        repository = git.Repo(self._file_settings.features_base_dir)
+        repository = git.Repo(self._file_settings.features_dir)
         logger.info("Repository: %s", repository)
         logger.info("Working dir: %s", repository.working_dir)
         logger.info("Active head: %s", repository.active_branch)
