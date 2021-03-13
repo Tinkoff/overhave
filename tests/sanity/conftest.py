@@ -1,12 +1,14 @@
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 from unittest import mock
 
 import click
 import pytest
 from flask import Flask
 
+from demo.demo import _run_demo_admin
 from overhave import set_config_to_context
 from overhave.base_settings import DataBaseSettings
+from overhave.factory import ProxyFactory
 
 
 @pytest.fixture(scope="module")
@@ -37,6 +39,17 @@ def set_config_to_ctx(db_settings: DataBaseSettings, database: None, click_ctx_m
     set_config_to_context(context=click_ctx_mock, settings=db_settings)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def test_feature_types() -> List[str]:
     return ["feature_type_1", "feature_type_2", "feature_type_3"]
+
+
+@pytest.fixture()
+def test_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory]) -> ProxyFactory:
+    return clean_proxy_factory()
+
+
+@pytest.fixture()
+def test_resolved_factory(flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory) -> ProxyFactory:
+    _run_demo_admin()
+    return test_proxy_factory
