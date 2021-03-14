@@ -7,6 +7,7 @@ from .converters import (
     FeatureTypeModel,
     ProcessingContext,
     ScenarioModel,
+    SystemUserModel,
     TestRunModel,
 )
 from .emulator import Emulator

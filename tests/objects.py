@@ -16,6 +16,8 @@ _BLOCKS_DELIMITER = "\n\n"
 XDistWorkerValueType = NewType("XDistWorkerValueType", str)
 XDistMasterWorker = XDistWorkerValueType("master")
 
+PROJECT_WORKDIR = Path(__file__).parent.parent
+
 
 class DataBaseContext(NamedTuple):
     """ Class for easy database entities management through `PyTest` fixtures. """

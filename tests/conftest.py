@@ -1,11 +1,12 @@
 import logging
 import os
 from pathlib import Path
-from typing import Callable, Dict, Iterator, Optional, cast
+from typing import Callable, Dict, Iterator, Optional, Sequence, cast
 
 import py
 import pytest
 import sqlalchemy_utils as sau
+from _pytest.python import Metafunc
 from pytest_mock import MockFixture
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
@@ -13,7 +14,7 @@ from sqlalchemy.orm import close_all_sessions
 from overhave import AuthorizationStrategy, OverhaveContext
 from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
 from overhave.factory import ProxyFactory, get_proxy_factory
-from tests.objects import DataBaseContext, XDistWorkerValueType
+from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -85,3 +86,14 @@ def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> Overha
     context_mock.file_settings.tmp_reports_dir = reports_dir
 
     return cast(OverhaveContext, context_mock)
+
+
+@pytest.fixture(scope="session")
+def test_feature_containers() -> Sequence[FeatureTestContainer]:
+    return cast(Sequence[FeatureTestContainer], get_test_feature_containers())
+
+
+def pytest_generate_tests(metafunc: Metafunc) -> None:
+    test_feature_container_name = "test_feature_container"
+    if test_feature_container_name in metafunc.fixturenames:
+        metafunc.parametrize(test_feature_container_name, get_test_feature_containers())

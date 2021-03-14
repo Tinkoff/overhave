@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from pydantic.main import BaseModel
+from pydantic.types import SecretStr
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from overhave.db import (
@@ -10,14 +11,24 @@ from overhave.db import (
     EmulationRun,
     Feature,
     FeatureType,
+    Role,
     Scenario,
     TestReportStatus,
     TestRun,
     TestRunStatus,
     TestUser,
+    UserRole,
     create_session,
 )
 from overhave.entities.feature import FeatureTypeName
+
+
+class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
+    """ Model for :class:`UserRole`. """
+
+    login: str
+    password: SecretStr
+    role: Role
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
@@ -39,17 +50,24 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
     """ Model for :class:`Scenario` row. """
 
+    id: int
     text: str
 
 
 class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     """ Model for :class:`TestRun` row. """
 
+    __test__ = False
+
     id: int
+    name: str
     executed_by: str
     start: datetime
+    end: Optional[datetime]
     status: TestRunStatus
     report_status: TestReportStatus
+    report: Optional[str]
+    traceback: Optional[str]
 
 
 class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore

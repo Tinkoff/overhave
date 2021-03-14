@@ -1,11 +1,13 @@
 from typing import List
 from unittest import mock
 
+from overhave import db
+from overhave.entities import FeatureTypeModel
 from overhave.factory import ProxyFactory
 
 
-class TestOverhaveDemo:
-    """ Sanity tests for application demo mode. """
+class TestOverhaveRunAdmin:
+    """ Sanity tests for application admin mode. """
 
     def test_clean_factory(
         self, flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory,
@@ -25,6 +27,16 @@ class TestOverhaveDemo:
         self, test_feature_types: List[str], test_resolved_factory: ProxyFactory,
     ):
         assert set(test_resolved_factory.feature_extractor.feature_types) == set(test_feature_types)
+
+    def test_db_feature_types_exists(
+        self, test_feature_types: List[str], test_resolved_factory: ProxyFactory,
+    ):
+        feature_type_models: List[FeatureTypeModel] = []
+        with db.create_session() as session:
+            db_feature_types = session.query(db.FeatureType).all()
+            feature_type_models.extend([FeatureTypeModel.from_orm(feature_type) for feature_type in db_feature_types])
+        assert len(feature_type_models) == len(test_feature_types)
+        assert {model.name for model in feature_type_models} == set(test_feature_types)
 
     def test_injector_collect_steps(
         self, test_feature_types: List[str], test_resolved_factory: ProxyFactory,
