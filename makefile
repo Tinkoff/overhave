@@ -72,7 +72,7 @@ clear:
 	rm -rf ./$(BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
-	rm ./.coverage
+	rm ./.coverage*
 
 build-docker:
 	docker-compose build base
