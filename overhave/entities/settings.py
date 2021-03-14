@@ -53,7 +53,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     tmp_dir: Path = Path("/tmp/overhave")
 
     # Current workdir, used for :class:`PluginResolver` for creating of relative pytest plugins' paths
-    workdir = getcwd()
+    workdir: Path = Path(getcwd())
 
     @root_validator(pre=True)
     def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:

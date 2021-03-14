@@ -7,6 +7,10 @@ from overhave.entities import OverhaveFileSettings
 logger = logging.getLogger(__name__)
 
 
+class IncorrectWorkDirError(Exception):
+    """ Exception for situation with ValueError while resolving plugin relative path to workdir. """
+
+
 class PluginResolver:
     """ Class for custom pytest-bdd steps modules resolution. """
 
@@ -49,8 +53,11 @@ class PluginResolver:
         return plugin_dict
 
     def _format_path(self, path: Path) -> str:
-        relative_path = path.relative_to(self._file_settings.workdir).as_posix()
-        return relative_path.replace("/", ".").rstrip(".py")
+        try:
+            relative_path = path.relative_to(self._file_settings.workdir).as_posix()
+            return relative_path.replace("/", ".").rstrip(".py")
+        except ValueError as e:
+            raise IncorrectWorkDirError("Could not resolve plugin relative path!") from e
 
     def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:
         if isinstance(plugin_type, str):

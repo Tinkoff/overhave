@@ -1,5 +1,4 @@
 from multiprocessing.pool import CLOSE
-from os import chdir
 from typing import Callable, Dict, List, Optional, cast
 from unittest import mock
 
@@ -20,6 +19,7 @@ from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
 def envs_for_mock(db_settings: DataBaseSettings) -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_DB_URL": str(db_settings.db_url),
+        "OVERHAVE_WORKDIR": PROJECT_WORKDIR.as_posix(),
     }
 
 
@@ -58,7 +58,6 @@ def test_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory]) -> Proxy
 def test_resolved_factory(
     flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory, mock_envs: None, database: None
 ) -> ProxyFactory:
-    chdir(PROJECT_WORKDIR)
     _run_demo_admin()
     return test_proxy_factory
 
