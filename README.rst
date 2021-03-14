@@ -229,24 +229,37 @@ Specified module will be imported before tests start-up (with
 ```pytest_configure``` `PyTest`_ hook).
 
 
-Features structure
-------------------
+Project structure
+-----------------
 
-**Overhave** supports it's own special structure of features storage:
+**Overhave** supports it's own special project structure:
 
-.. image:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/features_structure_img.png
+.. image:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/project_structure.png
   :width: 400
-  :alt: Features structure example
+  :alt: **Overhave** project structure
 
-**Base features directory** could contain different feature types as
+The right approach is to create a **root directory** (like "demo" inside the current
+repository) that contains **features**, **fixtures** and **steps** directories.
+
+The **Features** directory contains different feature types as
 separate directories, each of them corresponds to predefined `pytest-bdd`_
-set of steps. It is possible to create your own horizontal structure of
+set of steps.
+
+The **Fixtures** directory contains typical `PyTest`_ modules splitted by different
+feature types. These modules are used for `pytest-bdd`_ isolated test runs. It is
+necessary because of special mechanism of `pytest-bdd`_ steps collection.
+
+The **Steps** directory contains `pytest-bdd`_ steps packages splitted by differrent
+feature types also. Each steps subdirectory has it's own declared steps in according
+to supported feature type.
+
+So, it is possible to create your own horizontal structure of
 different product directions with unique steps and `PyTest`_ fixtures.
 
 **Note**: this structure is used in **Overhave** application. The formed data
 gives a possibility to specify registered feature type in the web-interface
 *script panel*. Also, this structure defines which steps will be displayed in
-the rigth side of *script panel*.
+the right side of *script panel*.
 
 Feature format
 --------------
