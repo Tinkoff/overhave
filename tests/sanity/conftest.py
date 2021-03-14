@@ -1,3 +1,4 @@
+from multiprocessing.pool import CLOSE
 from os import chdir
 from typing import Callable, Dict, List, Optional, cast
 from unittest import mock
@@ -28,7 +29,7 @@ def mock_default_value() -> str:
 
 
 @pytest.fixture()
-def flask_run_mock(mock_envs: None, database: None) -> mock.MagicMock:
+def flask_run_mock() -> mock.MagicMock:
     with mock.patch.object(Flask, "run", return_value=mock.MagicMock()) as flask_run_handler:
         yield flask_run_handler
 
@@ -54,7 +55,9 @@ def test_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory]) -> Proxy
 
 
 @pytest.fixture()
-def test_resolved_factory(flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory) -> ProxyFactory:
+def test_resolved_factory(
+    flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory, mock_envs: None, database: None
+) -> ProxyFactory:
     chdir(PROJECT_WORKDIR)
     _run_demo_admin()
     return test_proxy_factory
@@ -107,6 +110,7 @@ def patched_threadpool_apply_async(test_resolved_factory: ProxyFactory) -> mock.
         processor._thread_pool, "apply_async", new_callable=lambda: synchronous_apply
     ) as patched_threadpool:
         yield patched_threadpool
+    processor._thread_pool._state = CLOSE
 
 
 @pytest.fixture(scope="module")
