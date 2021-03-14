@@ -1,3 +1,4 @@
+from os import getcwd
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -50,6 +51,9 @@ class OverhaveFileSettings(BaseOverhavePrefix):
 
     # Temporary directory for scenarios test runs
     tmp_dir: Path = Path("/tmp/overhave")
+
+    # Current workdir, used for :class:`PluginResolver` for creating of relative pytest plugins' paths
+    workdir = getcwd()
 
     @root_validator(pre=True)
     def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
