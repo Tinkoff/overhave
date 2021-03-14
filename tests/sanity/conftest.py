@@ -109,8 +109,17 @@ def patched_threadpool_apply_async(test_resolved_factory: ProxyFactory) -> mock.
         yield patched_threadpool
 
 
+@pytest.fixture(scope="module")
+def subprocess_run_mock() -> mock.MagicMock:
+    returncode_mock = mock.MagicMock()
+    returncode_mock.returncode = 0
+    with mock.patch("subprocess.run", return_value=returncode_mock) as mocked_subprocess_run:
+        yield mocked_subprocess_run
+
+
 @pytest.fixture()
 def test_factory_after_run(
+    subprocess_run_mock: mock.MagicMock,
     test_resolved_factory: ProxyFactory,
     test_db_user: SystemUserModel,
     test_db_scenario: ScenarioModel,
