@@ -35,7 +35,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     fixture_suffix: str = ".py"
 
     # Root project directory with features, fixtures and steps packages
-    root_dir: Path
+    root_dir: Optional[Path]
 
     # Base directory for feature files, by default - root_dir / 'features'
     features_dir: Path
@@ -54,12 +54,11 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     @root_validator(pre=True)
     def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         root_dir = values.get("root_dir")
-        if not root_dir:
-            raise ValueError("'root_dir' should be specified!")
-        for directory in ("features_dir", "fixtures_dir", "steps_dir"):
-            if values.get(directory):
-                continue
-            values[directory] = Path(root_dir) / directory.replace("_dir", "")
+        if root_dir:
+            for directory in ("features_dir", "fixtures_dir", "steps_dir"):
+                if values.get(directory):
+                    continue
+                values[directory] = Path(root_dir) / directory.replace("_dir", "")
         return values
 
     @property

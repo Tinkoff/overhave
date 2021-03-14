@@ -49,7 +49,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
-        return PytestRunner(test_settings=self.context.test_settings, file_settings=self.context.file_settings)
+        return PytestRunner(settings=self.context.test_settings)
 
     @property
     def test_runner(self) -> PytestRunner:
