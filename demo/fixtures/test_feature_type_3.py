@@ -1,25 +1,8 @@
-from pytest_bdd import given, scenarios, then, when
+from pytest_bdd import scenarios
 
-from demo.fixtures.parser import step_with_args
+from overhave import overhave_factory
 
-scenarios("../features_structure_example/feature_type_3")
+FEATURE_TYPE = "feature_type_3"
+pytest_plugins = overhave_factory().plugin_resolver.get_plugins(FEATURE_TYPE)
 
-
-@given("Я клиент банка")
-def set_client(name: str) -> None:
-    pass
-
-
-@when(step_with_args("я надиктовываю {phrase:Str}"))
-def when_user_say(phrase: str):
-    pass
-
-
-@then(step_with_args("бот говорит {phrase:Str}"))
-def then_bot_responds(phrase: str):
-    pass
-
-
-@then("бот показывает виджет")
-def then_bot_shows_widget():
-    pass
+scenarios(FEATURE_TYPE)

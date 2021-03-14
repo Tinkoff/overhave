@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 79.2
+MIN_COVERAGE ?= 82.2
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -72,7 +72,7 @@ clear:
 	rm -rf ./$(BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
-	rm ./.coverage
+	rm ./.coverage*
 
 build-docker:
 	docker-compose build base

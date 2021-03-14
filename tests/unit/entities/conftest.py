@@ -11,8 +11,8 @@ from overhave.entities.archiver import ArchiveManager
 
 @pytest.fixture()
 def test_file_settings(tmpdir: py.path.local) -> OverhaveFileSettings:
-    settings = OverhaveFileSettings(features_base_dir=tmpdir, tmp_dir=tmpdir)
-    settings.tmp_reports_dir.mkdir()
+    settings = OverhaveFileSettings(root_dir=tmpdir, tmp_dir=tmpdir / "tmp")
+    settings.tmp_reports_dir.mkdir(parents=True)
     return settings
 
 

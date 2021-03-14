@@ -1,3 +1,4 @@
+from os import getcwd
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -34,25 +35,34 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     feature_suffix: str = ".feature"
     fixture_suffix: str = ".py"
 
-    # Base directory where feature files placed
-    features_base_dir: Path
-    # Base directory where pytest files with template mask placed
-    fixtures_base_dir: Path
+    # Root project directory with features, fixtures and steps packages
+    root_dir: Optional[Path]
+
+    # Base directory for feature files, by default - root_dir / 'features'
+    features_dir: Path
+
+    # Base directory for pytest files with template mask, by default - root_dir / 'fixtures'
+    fixtures_dir: Path
     # Template mask for fixtures pytest files which contain `feature_type` key
     fixtures_file_template_mask: str = "test_{feature_type}.py"
+
+    # Base directory for pytest-bdd steps, , by default - root_dir / 'steps'
+    steps_dir: Path
+
     # Temporary directory for scenarios test runs
     tmp_dir: Path = Path("/tmp/overhave")
 
+    # Current workdir, used for :class:`PluginResolver` for creating of relative pytest plugins' paths
+    workdir: Path = Path(getcwd())
+
     @root_validator(pre=True)
-    def validate_fixtures_base_dir(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        fixtures_base_dir = values.get("fixtures_base_dir")
-        if fixtures_base_dir:
-            values["fixtures_base_dir"] = Path(fixtures_base_dir)
-        else:
-            features_base_dir = values.get("features_base_dir")
-            if not features_base_dir:
-                raise ValueError("Could not resolve 'fixtures_base_dir'!")
-            values["fixtures_base_dir"] = Path(features_base_dir).parent
+    def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        root_dir = values.get("root_dir")
+        if root_dir:
+            for directory in ("features_dir", "fixtures_dir", "steps_dir"):
+                if values.get(directory):
+                    continue
+                values[directory] = Path(root_dir) / directory.replace("_dir", "")
         return values
 
     @property

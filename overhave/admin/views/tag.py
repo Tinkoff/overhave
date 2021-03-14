@@ -30,6 +30,6 @@ class TagsView(ModelViewConfigured):
             raise ValidationError("Only tag creator or administrator could edit it!")
         model.created_by = current_user.login
 
-    def on_model_delete(self, model: Form) -> None:
+    def on_model_delete(self, model: db.Tags) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
             raise ValidationError("Only author or administrator could delete tags!")

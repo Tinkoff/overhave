@@ -37,7 +37,7 @@ def test_pytest_bdd_scenario(test_scenario_name: str) -> Scenario:
     setattr(
         scenario.feature,
         "filename",
-        get_file_settings().features_base_dir / "feature_type_1" / "full_feature_example_en.feature",
+        get_file_settings().features_dir / "feature_type_1" / "full_feature_example_en.feature",
     )
     setattr(scenario, "name", test_scenario_name)
     return scenario

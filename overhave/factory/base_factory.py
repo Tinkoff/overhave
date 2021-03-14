@@ -20,7 +20,7 @@ from overhave.storage import (
     ITestRunStorage,
     TestRunStorage,
 )
-from overhave.testing import ConfigInjector, PytestRunner, StepCollector
+from overhave.testing import ConfigInjector, PluginResolver, PytestRunner, StepCollector
 from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
 
 
@@ -49,7 +49,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _test_runner(self) -> PytestRunner:
-        return PytestRunner(test_settings=self.context.test_settings)
+        return PytestRunner(settings=self.context.test_settings)
 
     @property
     def test_runner(self) -> PytestRunner:
@@ -157,6 +157,7 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
         return Processor(
             settings=self.context.processor_settings,
+            file_settings=self.context.file_settings,
             test_run_storage=self._test_run_storage,
             injector=self._injector,
             file_manager=self._file_manager,
@@ -212,3 +213,11 @@ class OverhaveBaseFactory(IOverhaveFactory):
     @property
     def emulation_storage(self) -> IEmulationStorage:
         return self._emulation_storage
+
+    @cached_property
+    def _plugin_resolver(self) -> PluginResolver:
+        return PluginResolver(file_settings=self.context.file_settings)
+
+    @property
+    def plugin_resolver(self) -> PluginResolver:
+        return self._plugin_resolver

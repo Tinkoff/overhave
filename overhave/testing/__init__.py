@@ -1,5 +1,6 @@
 # flake8: noqa
 from .config_injector import ConfigInjector
+from .plugin_resolver import PluginResolver
 from .plugin_utils import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
