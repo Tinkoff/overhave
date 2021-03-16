@@ -37,7 +37,8 @@ class TestEmulationStorage:
         test_emulation_storage.set_error_emulation_run(
             emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
         )
-        updated_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        with db.create_session() as session:
+            updated_emulation_run = test_emulation_storage._get_emulation_run(session, emulation_run.id)
         assert updated_emulation_run.status == EmulationStatus.ERROR
         assert not test_emulation_storage._is_port_in_use(updated_emulation_run.port)
 
@@ -50,5 +51,6 @@ class TestEmulationStorage:
     ):
         emulation_run = test_emulation_storage.create_emulation_run(test_emulation.id, db.Role.admin)
         test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
-        updated_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        with db.create_session() as session:
+            updated_emulation_run = test_emulation_storage._get_emulation_run(session, emulation_run.id)
         assert updated_emulation_run.status == emulation_status
