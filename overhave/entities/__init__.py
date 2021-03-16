@@ -7,6 +7,7 @@ from .converters import (
     FeatureTypeModel,
     ProcessingContext,
     ScenarioModel,
+    SystemUserModel,
     TestRunModel,
 )
 from .emulator import Emulator
@@ -18,11 +19,13 @@ from .feature import (
     ScenariosTestFileNotFound,
 )
 from .language import StepPrefixesModel, TranslitPack
+from .report_manager import ReportManager
 from .settings import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
+    OverhaveReportManagerSettings,
     OverhaveScenarioCompilerSettings,
     ProcessorSettings,
 )

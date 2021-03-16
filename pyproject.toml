@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "1.6.7"
+version = "1.8.0"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -58,6 +58,7 @@ python-dateutil = "^2.8.1"
 alembic = "^1.4.3"
 boto3 = "^1.17.16"
 boto3-type-annotations = "^0.3.1"
+alchemy-mock = "^0.4.3"
 
 
 [tool.poetry.dev-dependencies]
@@ -94,13 +95,20 @@ filterwarnings = [
     "ignore::DeprecationWarning:sqlalchemy_utils.observer",
 ]
 xfail_strict=true
-bdd_features_base_dir="docs/includes/features_structure_example"
+
+[tool.coverage.run]
+omit = [
+    "**/__main__.py",
+    "*_cache/*",
+    ".pytest_cache",
+    "overhave/cli/*"
+]
 
 [tool.isort]
 balanced_wrapping = true
 default_section = "THIRDPARTY"
 include_trailing_comma = true
-known_first_party = ["docker", "docs", "overhave", "tests"]
+known_first_party = ["docker", "docs", "overhave", "tests", "demo"]
 line_length = 120
 multi_line_output = 3
 

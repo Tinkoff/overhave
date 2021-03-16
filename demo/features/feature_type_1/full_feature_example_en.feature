@@ -15,4 +15,4 @@ Scenario: The bot answers the caller as an answering machine
   Then bot says "Ok I'll pass it on. Anything else?"
 
   When I hang up
-  Then the call ends
+  Then call ends

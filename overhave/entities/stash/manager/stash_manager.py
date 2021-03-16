@@ -76,7 +76,7 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
         return "\n".join(
             (
                 f"Feature ID: {context.feature.id}. Type: '{context.feature.feature_type.name}'.",
-                f"Created by: @{context.feature.author} at {context.feature.created_at}.",
+                f"Created by: @{context.feature.author} at {context.feature.created_at.strftime('%d-%m-%Y %H:%M:%S')}.",
                 f"Last edited by: @{context.feature.last_edited_by}.",
                 generate_task_info(tasks=context.feature.task, header=self._task_links_keyword),
                 f"PR from Test Run ID: {context.test_run.id}. Executed by: @{context.test_run.executed_by}",
@@ -127,7 +127,7 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
     def create_pull_request(self, test_run_id: int) -> StashPrCreationResponse:
         ctx = get_context_by_test_run_id(test_run_id)
 
-        repository = git.Repo(self._file_settings.features_base_dir)
+        repository = git.Repo(self._file_settings.features_dir)
         logger.info("Repository: %s", repository)
         logger.info("Working dir: %s", repository.working_dir)
         logger.info("Active head: %s", repository.active_branch)

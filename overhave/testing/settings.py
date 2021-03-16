@@ -31,6 +31,8 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     # Fixture content in list format, which would be compiled into formatted string.
     fixture_content: List[str] = [
         "from pytest_bdd import scenarios",
+        "from overhave import overhave_factory",
+        "pytest_plugins = overhave_factory().plugin_resolver.get_plugins()",
         "scenarios('{feature_file_path}')",
     ]
 
@@ -64,8 +66,8 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
 class OverhaveTestSettings(BaseOverhavePrefix):
     """ Settings for PytestRunner, which runs scenario tests with specified addoptions. """
 
-    default_pytest_addoptions: Optional[str]
-    extra_pytest_addoptions: str = "--disable-warnings"
+    default_pytest_addoptions: str = "--disable-warnings"
+    extra_pytest_addoptions: Optional[str]
 
     workers: Optional[int]  # Number of xdist workers, `None` by default
 

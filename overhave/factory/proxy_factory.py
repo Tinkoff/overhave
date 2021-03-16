@@ -1,12 +1,12 @@
-from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor
+from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor, ReportManager
 from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.factory.base_factory import OverhaveBaseFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage
-from overhave.testing import ConfigInjector, PytestRunner
-from overhave.transport import RedisProducer
+from overhave.testing import ConfigInjector, PluginResolver, PytestRunner
+from overhave.transport import RedisProducer, S3Manager
 
 
 class ProxyFactory(IOverhaveFactory):
@@ -89,3 +89,15 @@ class ProxyFactory(IOverhaveFactory):
     @property
     def emulation_storage(self) -> IEmulationStorage:
         return self._factory.emulation_storage
+
+    @property
+    def s3_manager(self) -> S3Manager:
+        return self._factory.s3_manager
+
+    @property
+    def report_manager(self) -> ReportManager:
+        return self._factory.report_manager
+
+    @property
+    def plugin_resolver(self) -> PluginResolver:
+        return self._factory.plugin_resolver

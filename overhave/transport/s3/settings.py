@@ -7,11 +7,14 @@ class S3ManagerSettings(BaseSettings):
     """ Settings for S3Client. """
 
     enabled: bool = False
+
     url: Optional[str]
     region_name: Optional[str]
     access_key: Optional[str]
     secret_key: Optional[str]
     verify: bool = True
+
+    autocreate_buckets: bool = False
 
     class Config:
         env_prefix = "OVERHAVE_S3_"
