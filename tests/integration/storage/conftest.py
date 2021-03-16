@@ -7,6 +7,7 @@ from overhave import db
 from overhave.entities.converters import EmulationModel, FeatureTypeModel, TestUserModel
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage.emulation import EmulationStorage
+from overhave.storage.feature_type import FeatureTypeStorage
 
 
 @pytest.fixture()
@@ -49,3 +50,8 @@ def test_emulation(test_user, faker: Faker) -> EmulationModel:
         session.add(emulation)
         session.flush()
         return cast(EmulationModel, EmulationModel.from_orm(emulation))
+
+
+@pytest.fixture()
+def test_feature_type_storage():
+    return FeatureTypeStorage()
