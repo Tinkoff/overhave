@@ -44,7 +44,7 @@ class TestEmulationStorage:
                 EmulationRunModel.from_orm(test_emulation_storage._get_emulation_run(session, emulation_run.id)),
             )
         assert updated_emulation_run.status == EmulationStatus.ERROR
-        assert not test_emulation_storage._is_port_in_use(updated_emulation_run.port)
+        assert updated_emulation_run.port is None
 
     @pytest.mark.parametrize(
         "emulation_status",
