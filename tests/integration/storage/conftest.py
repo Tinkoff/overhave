@@ -39,7 +39,7 @@ def test_system_user(faker: Faker) -> SystemUserModel:
 
 
 @pytest.fixture()
-def test_user(test_system_user, faker: Faker, feature_type: FeatureTypeModel) -> TestUserModel:
+def test_user(test_system_user: SystemUserModel, faker: Faker, feature_type: FeatureTypeModel) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
             feature_type_id=feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
@@ -49,7 +49,7 @@ def test_user(test_system_user, faker: Faker, feature_type: FeatureTypeModel) ->
         return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, faker: Faker) -> EmulationModel:
     with db.create_session() as session:
         emulation = db.Emulation(
