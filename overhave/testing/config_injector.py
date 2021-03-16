@@ -35,7 +35,7 @@ class ConfigInjector:
         """ Def for patch pytestbdd STEP_PREFIXES. """
         if custom_step_prefixes is not None:
             step_prefixes = custom_step_prefixes.extend_defaults()
-            logger.debug("Successfully extended pytestbdd step prefixes with custom prefixes:\n%s", step_prefixes)
+            logger.debug("Successfully extended pytest-bdd step prefixes with custom prefixes:\n%s", step_prefixes)
 
     def supplement_on_fly(
         self,
@@ -64,7 +64,7 @@ class ConfigInjector:
                 self._current_type = feature_type
                 self._test_runner.collect_only(
                     fixture_file=(
-                        self._file_settings.fixtures_base_dir
+                        self._file_settings.fixtures_dir
                         / self._file_settings.fixtures_file_template_mask.format(feature_type=feature_type)
                     ),
                 )

@@ -33,6 +33,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         FeatureView,
         GroupView,
         OverhaveIndexView,
+        TagsView,
         TestRunView,
         TestUserView,
         UserView,
@@ -44,6 +45,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
         TestRunView(db.TestRun, db.current_session, category="Scenarios", name="Test runs"),
         DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
+        TagsView(db.Tags, db.current_session, category="Scenarios", name="Tags"),
         EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),
         TestUserView(db.TestUser, db.current_session, category="Emulation", name="Test users"),
         EmulationRunView(db.EmulationRun, db.current_session, category="Emulation", name="Emulation runs"),
@@ -58,7 +60,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     return flask_app
 
 
-def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
+def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / "templates"
@@ -72,10 +74,16 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:
     def remove_session(exception: typing.Optional[Exception]) -> None:
         db.current_session.remove()
 
-    @flask_app.route("/reports/<path:report>")
-    def get_report(report: str) -> flask.Response:
+    @flask_app.route("/reports/<path:request>", methods=["GET", "POST"])
+    def get_report(request: str) -> flask.Response:
+        if flask.request.method == "POST":
+            test_run_id = flask.request.form.get("run_id")
+            if test_run_id is None or not factory.report_manager.ensure_allure_report_exists(
+                report=request, run_id=int(test_run_id)
+            ):
+                return flask.abort(status=HTTPStatus.NOT_FOUND)
         return typing.cast(
-            flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, report)
+            flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)
         )
 
     @flask_app.route("/emulations/<path:url>")

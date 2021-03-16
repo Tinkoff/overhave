@@ -7,7 +7,7 @@ class IProcessor(abc.ABC):
     """ Abstract class for application processor. """
 
     @abc.abstractmethod
-    def execute_test(self, test_run_id: int) -> werkzeug.Response:
+    def execute_test(self, scenario_id: int, executed_by: str) -> werkzeug.Response:
         pass
 
     @abc.abstractmethod

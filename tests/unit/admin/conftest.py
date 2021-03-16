@@ -5,6 +5,7 @@ from uuid import uuid1
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.python import Metafunc
+from alchemy_mock.mocking import UnifiedAlchemyMagicMock
 from faker import Faker
 from pytest_mock import MockerFixture
 
@@ -90,3 +91,28 @@ def test_prurl(request: FixtureRequest) -> Optional[str]:
     if hasattr(request, "param"):
         return cast(Optional[str], request.param)
     raise NotImplementedError
+
+
+@pytest.fixture()
+def user_role(request: FixtureRequest) -> db.Role:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def current_user_mock(user_role: db.Role, faker: Faker) -> mock.MagicMock:
+    with mock.patch("overhave.admin.views.tag.current_user", return_value=mock.MagicMock()) as mocked:
+        mocked.login = faker.word()
+        mocked.role = user_role
+        yield mocked
+
+
+@pytest.fixture()
+def test_tags_view() -> views.TagsView:
+    return views.TagsView(model=db.Tags, session=UnifiedAlchemyMagicMock)
+
+
+@pytest.fixture()
+def test_tags_row() -> db.Tags:
+    return db.Tags()

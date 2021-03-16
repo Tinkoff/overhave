@@ -1,6 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
+
 MIN_COVERAGE ?= 83.4
 BUILD_DIR ?= dist
 
@@ -11,7 +12,7 @@ DOCS_INCLUDES_DIR = $(DOCS_DIR)/includes
 DOCS_REFERENCES_DIR = $(DOCS_INCLUDES_DIR)/_references
 SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
 
-ALL = $(CODE) $(DOCS_DIR) tests demo.py
+ALL = $(CODE) $(DOCS_DIR) tests demo
 
 pre-init:
 	sudo apt install python3.8 python3.8-venv python3.8-dev python3.8-distutils gcc\
@@ -72,7 +73,7 @@ clear:
 	rm -rf ./$(BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
-	rm ./.coverage
+	rm ./.coverage*
 
 build-docker:
 	docker-compose build base

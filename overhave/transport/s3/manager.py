@@ -1,13 +1,14 @@
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import boto3
 import botocore.exceptions
 import urllib3
 from boto3_type_annotations.s3 import Client
+from pydantic.tools import parse_obj_as
 
-from overhave.transport.s3.models import BucketsListModel
+from overhave.transport.s3.models import BucketModel, DeletionResultModel, ObjectModel
 from overhave.transport.s3.objects import OverhaveS3Bucket
 from overhave.transport.s3.settings import S3ManagerSettings
 
@@ -38,14 +39,21 @@ class ClientError(BaseS3ManagerException):
     """ Exception for situation with client error from boto3. """
 
 
-def _s3_error(func: Callable[..., Any]) -> Callable[..., Any]:
-    def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
-        try:
-            return func(*args, **kwargs)
-        except botocore.exceptions.ClientError as e:
-            raise ClientError from e
+class EmptyObjectsListError(BaseS3ManagerException):
+    """ Exception for situation with empty object list. """
 
-    return wrapper
+
+def _s3_error(msg: str):  # type: ignore
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except botocore.exceptions.ClientError as e:
+                raise ClientError(msg) from e
+
+        return wrapper
+
+    return decorator
 
 
 class S3Manager:
@@ -60,7 +68,8 @@ class S3Manager:
             logger.info("S3Manager disabled and has not been initialized.")
             return
         self._client = self._get_client(self._settings)
-        self._ensure_buckets_exists()
+        if self._settings.autocreate_buckets:
+            self._ensure_buckets_exists()
 
     @property
     def enabled(self) -> bool:
@@ -97,30 +106,80 @@ class S3Manager:
 
     def _ensure_buckets_exists(self) -> None:
         remote_buckets = self._get_buckets()
-        logger.info("Existing remote s3 buckets: %s", remote_buckets.items)
-        bucket_names = [model.name for model in remote_buckets.items]
+        logger.info("Existing remote s3 buckets: %s", remote_buckets)
+        bucket_names = [model.name for model in remote_buckets]
         for bucket in list(filter(lambda x: x.value not in bucket_names, OverhaveS3Bucket)):
-            self._create_bucket(bucket)
+            self.create_bucket(bucket.value)
         logger.info("Successfully ensured existence of Overhave service buckets.")
 
-    @_s3_error
-    def _get_buckets(self) -> BucketsListModel:
+    @_s3_error(msg="Error while getting buckets list!")
+    def _get_buckets(self) -> List[BucketModel]:
         response = self._ensured_client.list_buckets()
-        return BucketsListModel.parse_obj(response.get("Buckets"))
+        return parse_obj_as(List[BucketModel], response.get("Buckets"))
 
-    @_s3_error
-    def _create_bucket(self, bucket: OverhaveS3Bucket) -> None:
+    @_s3_error(msg="Error while creating bucket!")
+    def create_bucket(self, bucket: str) -> None:
         logger.info("Creating bucket %s...", bucket)
-        kwargs = {"Bucket": bucket.value}
+        kwargs: Dict[str, Any] = {"Bucket": bucket}
         if isinstance(self._settings.region_name, str):
             kwargs["CreateBucketConfiguration"] = {"LocationConstraint": self._settings.region_name}
         self._ensured_client.create_bucket(**kwargs)
         logger.info("Bucket %s successfully created.", bucket)
 
-    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> None:
+    def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> bool:
         logger.info("Start uploading file '%s'...", file.name)
         try:
             self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
             logger.info("File '%s' successfully uploaded", file.name)
+            return True
         except botocore.exceptions.ClientError:
             logger.exception("Could not upload file to s3 cloud!")
+            return False
+
+    @_s3_error(msg="Error while getting bucket objects list!")
+    def get_bucket_objects(self, bucket: str) -> List[ObjectModel]:
+        response = self._ensured_client.list_objects(Bucket=bucket)
+        logger.debug("List objects response:\n%s", response)
+        return parse_obj_as(List[ObjectModel], response.get("Contents"))
+
+    @_s3_error(msg="Error while deleting bucket objects!")
+    def delete_bucket_objects(self, bucket: str, objects: List[ObjectModel]) -> DeletionResultModel:
+        if not objects:
+            raise EmptyObjectsListError("No one object specified for deletion!")
+        logger.info("Deleting items %s...", [obj.name for obj in objects])
+        response = self._ensured_client.delete_objects(
+            Bucket=bucket, Delete={"Objects": [{"Key": obj.name} for obj in objects]},
+        )
+        logger.debug("Delete objects response:\n%s", response)
+        return DeletionResultModel.parse_obj(response)
+
+    def _ensure_bucket_clean(self, bucket: str) -> None:
+        objects = self.get_bucket_objects(bucket)
+        if not objects:
+            logger.info("Has not got any objects in bucket '%s'.", bucket)
+            return
+        deletion_result = self.delete_bucket_objects(bucket=bucket, objects=objects)
+        if len(deletion_result.deleted) != len(objects):
+            logger.warning("Expected %s deleted objects, got %s!", len(objects), len(deletion_result.deleted))
+            logger.warning("Errors while deleted items:\n%s", deletion_result.errors)
+        logger.info("Items %s successfully deleted.", [obj.name for obj in deletion_result.deleted])
+
+    @_s3_error("Error while deleting bucket!")
+    def delete_bucket(self, bucket: str, force: bool = False) -> None:
+        if force:
+            self._ensure_bucket_clean(bucket)
+        logger.info("Deleting bucket '%s'...", bucket)
+        self._ensured_client.delete_bucket(Bucket=bucket)
+        logger.info("Bucket '%s' successfully deleted.", bucket)
+
+    def download_file(self, filename: str, dir_to_save: Path, bucket: str) -> bool:
+        logger.info("Start downloading file '%s'...", filename)
+        try:
+            self._ensured_client.download_file(
+                Bucket=bucket, Key=filename, Filename=(dir_to_save / filename).as_posix()
+            )
+            logger.info("File '%s' successfully downloaded", filename)
+            return True
+        except botocore.exceptions.ClientError:
+            logger.exception("Could not download file from s3 cloud!")
+            return False
