@@ -116,3 +116,10 @@ class EmulationStorage(IEmulationStorage):
             emulation_run.status = db.EmulationStatus.ERROR
             emulation_run.traceback = traceback
             emulation_run.changed_at = get_current_time()
+
+    def get_emulation_run_by_id(self, emulation_run_id: int) -> EmulationRunModel:
+        with db.create_session() as session:
+            emulation_run: EmulationRunModel = EmulationRunModel.from_orm(
+                self._get_emulation_run(session, emulation_run_id)
+            )
+            return emulation_run
