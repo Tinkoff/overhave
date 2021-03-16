@@ -20,7 +20,7 @@ def test_emulation_storage(test_emulation_settings: OverhaveEmulationSettings) -
 
 
 @pytest.fixture()
-def _feature_type(faker: Faker) -> db.FeatureType:
+def feature_type(faker: Faker) -> db.FeatureType:
     with db.create_session() as session:
         feature_type = db.FeatureType(name=cast(str, faker.word()))
         session.add(feature_type)
@@ -29,23 +29,21 @@ def _feature_type(faker: Faker) -> db.FeatureType:
 
 
 @pytest.fixture()
-def _test_user(faker: Faker, _feature_type: db.FeatureType) -> TestUserModel:
+def test_user(faker: Faker, feature_type) -> TestUserModel:
     with db.create_session() as session:
-        test_user = db.TestUser(
-            feature_type_id=_feature_type.id, name=cast(str, faker.word()), created_by=db.Role.admin
-        )
+        test_user = db.TestUser(feature_type_id=feature_type.id, name=cast(str, faker.word()), created_by=db.Role.admin)
         session.add(test_user)
         session.flush()
         return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
 
 @pytest.fixture()
-def test_emulation(_test_user: db.TestUser, faker: Faker) -> EmulationModel:
+def test_emulation(test_user, faker: Faker) -> EmulationModel:
     with db.create_session() as session:
         emulation = db.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
-            test_user_id=_test_user.id,
+            test_user_id=test_user.id,
             created_by=db.Role.admin,
         )
         session.add(emulation)
