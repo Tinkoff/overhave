@@ -195,10 +195,11 @@ class TestResultReportFormatter:
             name=column_name,
         )
         assert result == Markup(
-            f"<a href='/reports/{test_testrun_report_link}' target='_blank'"
+            f"<a href='/reports/{test_testrun_report_link}/index.html' method='POST' target='_blank'"
             f"<form action='#'>"
+            f"<input type='hidden' name='run_id' value='{test_testrun_id}' />"
             f"<fieldset title='Go to report'>"
-            f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
+            f"<button class='link-button {test_testrun_button_css_class}' type='submit'>{status}</button>"
             "</fieldset>"
             "</form>"
             "</a>"
