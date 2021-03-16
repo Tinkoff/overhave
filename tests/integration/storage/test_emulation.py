@@ -5,6 +5,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.db.statuses import EmulationStatus
+from overhave.entities import EmulationRunModel
 from overhave.storage.emulation import EmulationStorage, NotFoundEmulationError
 
 
@@ -38,7 +39,10 @@ class TestEmulationStorage:
             emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
         )
         with db.create_session() as session:
-            updated_emulation_run = test_emulation_storage._get_emulation_run(session, emulation_run.id)
+            updated_emulation_run = cast(
+                EmulationRunModel,
+                EmulationRunModel.from_orm(test_emulation_storage._get_emulation_run(session, emulation_run.id)),
+            )
         assert updated_emulation_run.status == EmulationStatus.ERROR
         assert not test_emulation_storage._is_port_in_use(updated_emulation_run.port)
 
@@ -52,5 +56,8 @@ class TestEmulationStorage:
         emulation_run = test_emulation_storage.create_emulation_run(test_emulation.id, db.Role.admin)
         test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
         with db.create_session() as session:
-            updated_emulation_run = test_emulation_storage._get_emulation_run(session, emulation_run.id)
+            updated_emulation_run = cast(
+                EmulationRunModel,
+                EmulationRunModel.from_orm(test_emulation_storage._get_emulation_run(session, emulation_run.id)),
+            )
         assert updated_emulation_run.status == emulation_status
