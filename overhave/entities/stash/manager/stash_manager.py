@@ -2,15 +2,23 @@ import logging
 from typing import Optional
 
 import git
+from requests import HTTPError
 
 from overhave.entities.converters import ProcessingContext, get_context_by_test_run_id
 from overhave.entities.settings import OverhaveFileSettings
-from overhave.entities.stash.errors import StashPrCreationError, StashValidationError
+from overhave.entities.stash.errors import StashPrCreationError
 from overhave.entities.stash.manager.abstract import IStashProjectManager
 from overhave.entities.stash.settings import OverhaveStashManagerSettings
 from overhave.scenario import FileManager, generate_task_info
-from overhave.storage.version import get_last_draft
-from overhave.transport import StashBranch, StashErrorResponse, StashHttpClient, StashPrCreationResponse, StashPrRequest
+from overhave.storage import get_last_draft, get_previous_draft
+from overhave.transport import (
+    StashBranch,
+    StashErrorResponse,
+    StashHttpClient,
+    StashHttpClientConflictError,
+    StashPrCreationResponse,
+    StashPrRequest,
+)
 from overhave.utils.time import get_current_time
 
 logger = logging.getLogger(__name__)
@@ -149,15 +157,19 @@ class StashProjectManager(StashCommonMixin, IStashProjectManager):
             reviewers=self._stash_project_settings.get_reviewers(feature_type=ctx.feature.feature_type.name),
         )
         logger.info("Prepared PR: %s", pull_request.json(by_alias=True))
+        last_draft = get_last_draft(feature_id=ctx.feature.id)
         try:
             response = self._client.send_pr(pull_request)
             if isinstance(response, StashPrCreationResponse):
                 return response
             if isinstance(response, StashErrorResponse) and response.duplicate:
-                last_draft = get_last_draft(feature_id=ctx.feature.id)
                 return self._generate_response(title=pull_request.title or ctx.feature.name, pr_url=last_draft.pr_url)
             raise StashPrCreationError(response)
-        except StashValidationError as e:
+        except StashHttpClientConflictError:
+            logger.exception("Gotten conflict. Try to return last PR for TestRun with id=%s...", test_run_id)
+            previous_draft = get_previous_draft(feature_id=ctx.feature.id)
+            return self._generate_response(title=pull_request.title or ctx.feature.name, pr_url=previous_draft.pr_url)
+        except HTTPError as e:
             logger.exception("PR has not been created in Stash repository!")
             fake_response = self._generate_response(title=pull_request.title, traceback=e)  # type: ignore
             logger.warning("Created fail response: %s", fake_response)
