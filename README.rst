@@ -3,7 +3,7 @@ Overhave
 ========
 
 .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/label_img.png
-  :width: 600
+  :width: 700
   :align: center
   :alt: Overhave framework
 
