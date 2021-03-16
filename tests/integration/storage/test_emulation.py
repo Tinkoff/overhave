@@ -39,9 +39,8 @@ class TestEmulationStorage:
             emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
         )
         with db.create_session() as session:
-            updated_emulation_run = cast(
-                EmulationRunModel,
-                EmulationRunModel.from_orm(test_emulation_storage._get_emulation_run(session, emulation_run.id)),
+            updated_emulation_run: EmulationRunModel = EmulationRunModel.from_orm(
+                test_emulation_storage._get_emulation_run(session, emulation_run.id)
             )
         assert updated_emulation_run.status == EmulationStatus.ERROR
         assert updated_emulation_run.port is None
@@ -56,8 +55,7 @@ class TestEmulationStorage:
         emulation_run = test_emulation_storage.create_emulation_run(test_emulation.id, db.Role.admin)
         test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
         with db.create_session() as session:
-            updated_emulation_run = cast(
-                EmulationRunModel,
-                EmulationRunModel.from_orm(test_emulation_storage._get_emulation_run(session, emulation_run.id)),
+            updated_emulation_run: EmulationRunModel = EmulationRunModel.from_orm(
+                test_emulation_storage._get_emulation_run(session, emulation_run.id)
             )
         assert updated_emulation_run.status == emulation_status
