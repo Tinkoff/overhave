@@ -27,7 +27,7 @@ class TestEmulationStorage:
         requested_emulation_run: db.EmulationRun = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
         assert requested_emulation_run.status == EmulationStatus.REQUESTED
         assert requested_emulation_run.emulation_id == test_emulation.id
-        assert test_emulation_storage._is_port_in_use(requested_emulation_run.port)
+        assert not test_emulation_storage._is_port_in_use(requested_emulation_run.port)
 
     def test_set_error_run_status(
         self, test_emulation_storage: EmulationStorage, faker: Faker, test_emulation: db.Emulation
@@ -37,8 +37,9 @@ class TestEmulationStorage:
         test_emulation_storage.set_error_emulation_run(
             emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
         )
-        assert emulation_run.status == EmulationStatus.ERROR
-        assert test_emulation_storage._is_port_in_use(emulation_run.port)
+        updated_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        assert updated_emulation_run.status == EmulationStatus.ERROR
+        assert not test_emulation_storage._is_port_in_use(updated_emulation_run.port)
 
     @pytest.mark.parametrize(
         "emulation_status",
@@ -49,4 +50,5 @@ class TestEmulationStorage:
     ):
         emulation_run = test_emulation_storage.create_emulation_run(test_emulation.id, db.Role.admin)
         test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
-        assert emulation_run.status == emulation_status
+        updated_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        assert updated_emulation_run.status == emulation_status
