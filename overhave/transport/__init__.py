@@ -4,6 +4,7 @@ from .http import (
     StashBranch,
     StashErrorResponse,
     StashHttpClient,
+    StashHttpClientConflictError,
     StashPrCreationResponse,
     StashProject,
     StashPrRequest,

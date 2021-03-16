@@ -1,10 +1,10 @@
-class StashValidationError(ValueError):
-    """ Exception for stash response validation error. """
+class BaseStashManagerException(Exception):
+    """ Base exception for :class:`StashManager`. """
 
 
-class StashPrCreationError(RuntimeError):
+class StashPrCreationError(BaseStashManagerException):
     """ Exception for pull-request creation error. """
 
 
-class NotSpecifiedFeatureTypeError(RuntimeError):
+class NotSpecifiedFeatureTypeError(BaseStashManagerException):
     """ Exception for incorrect feature type error. """

@@ -1,5 +1,5 @@
 # flake8: noqa
-from .client import StashHttpClient
+from .client import StashHttpClient, StashHttpClientConflictError
 from .models import (
     StashBranch,
     StashErrorResponse,
