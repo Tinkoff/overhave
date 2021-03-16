@@ -5,6 +5,7 @@ from .stash_client import (
     StashBranch,
     StashErrorResponse,
     StashHttpClient,
+    StashHttpClientConflictError,
     StashPrCreationResponse,
     StashProject,
     StashPrRequest,

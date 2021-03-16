@@ -52,6 +52,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[str, bytes, Mapping[Any, Any]]] = None,
         auth: Optional[AuthBase] = None,
+        raise_for_status: bool = True,
     ) -> requests.Response:
         response = requests.request(
             method=method.value,
@@ -62,5 +63,6 @@ class BaseHttpClient(Generic[HttpSettingsType]):
             auth=auth,
             timeout=self._settings.timeout,
         )
-        response.raise_for_status()
+        if raise_for_status:
+            response.raise_for_status()
         return response

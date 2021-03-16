@@ -3,7 +3,7 @@ Overhave
 ========
 
 .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/label_img.png
-  :width: 600
+  :width: 700
   :align: center
   :alt: Overhave framework
 
@@ -235,7 +235,7 @@ Project structure
 **Overhave** supports it's own special project structure:
 
 .. image:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/project_structure.png
-  :width: 400
+  :width: 300
   :alt: **Overhave** project structure
 
 The right approach is to create a **root directory** (like "demo" inside the current
