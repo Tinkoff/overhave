@@ -1,4 +1,3 @@
-from os import getcwd
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -35,6 +34,9 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     feature_suffix: str = ".feature"
     fixture_suffix: str = ".py"
 
+    # Current workdir, used for :class:`PluginResolver` for creating of relative pytest plugins' paths
+    work_dir: Path = Path.cwd()
+
     # Root project directory with features, fixtures and steps packages
     root_dir: Optional[Path]
 
@@ -52,9 +54,6 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     # Temporary directory for scenarios test runs
     tmp_dir: Path = Path("/tmp/overhave")
 
-    # Current workdir, used for :class:`PluginResolver` for creating of relative pytest plugins' paths
-    workdir: Path = Path(getcwd())
-
     @root_validator(pre=True)
     def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         root_dir = values.get("root_dir")
@@ -64,6 +63,12 @@ class OverhaveFileSettings(BaseOverhavePrefix):
                     continue
                 values[directory] = Path(root_dir) / directory.replace("_dir", "")
         return values
+
+    @validator("steps_dir")
+    def validate_nesting(cls, v: Path, values: Dict[str, Any]) -> Path:
+        work_dir: Path = values["work_dir"]
+        v.relative_to(work_dir)
+        return v
 
     @property
     def tmp_features_dir(self) -> Path:
