@@ -31,11 +31,6 @@ def feature_type(database: None, faker: Faker) -> db.FeatureType:
 
 
 @pytest.fixture()
-def app_user(faker: Faker) -> db.UserRole:
-    return db.UserRole(login=faker.word(), password=faker.word(), role=db.Role.user)
-
-
-@pytest.fixture()
 def test_user_role(request: FixtureRequest) -> db.Role:
     if hasattr(request, "param"):
         return request.param
