@@ -6,11 +6,11 @@ from faker import Faker
 from overhave import db
 from overhave.entities.converters import (
     EmulationModel,
+    FeatureModel,
     FeatureTypeModel,
+    ScenarioModel,
     SystemUserModel,
     TestUserModel,
-    FeatureModel,
-    ScenarioModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage.emulation import EmulationStorage

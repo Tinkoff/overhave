@@ -2,7 +2,7 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.db import TestRunStatus, TestReportStatus
+from overhave.db import TestReportStatus, TestRunStatus
 from overhave.entities import ScenarioModel, SystemUserModel
 from overhave.storage.test_run import TestRunStorage
 
