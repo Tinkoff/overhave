@@ -4,7 +4,14 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.entities.converters import EmulationModel, FeatureTypeModel, SystemUserModel, TestUserModel
+from overhave.entities.converters import (
+    EmulationModel,
+    FeatureTypeModel,
+    SystemUserModel,
+    TestUserModel,
+    FeatureModel,
+    ScenarioModel,
+)
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage.emulation import EmulationStorage
 
@@ -60,3 +67,28 @@ def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, 
         session.add(emulation)
         session.flush()
         return cast(EmulationModel, EmulationModel.from_orm(emulation))
+
+
+@pytest.fixture()
+def test_feature(faker: Faker, test_system_user: SystemUserModel, feature_type: FeatureTypeModel) -> FeatureModel:
+    with db.create_session() as session:
+        feature = db.Feature(
+            name=faker.word(),
+            author=test_system_user.login,
+            type_id=feature_type.id,
+            task=[faker.sentence()],
+            last_edited_by=test_system_user.login,
+            released=False,
+        )
+        session.add(feature)
+        session.flush()
+        return cast(FeatureModel, feature)
+
+
+@pytest.fixture()
+def test_scenario(faker: Faker, test_feature: FeatureModel) -> ScenarioModel:
+    with db.create_session() as session:
+        scenario = db.Scenario(feature_id=test_feature.id, text=faker.sentence())
+        session.add(scenario)
+        session.flush()
+        return cast(ScenarioModel, scenario)
