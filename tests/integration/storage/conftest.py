@@ -30,9 +30,14 @@ def feature_type(database: None, faker: Faker) -> db.FeatureType:
 
 
 @pytest.fixture()
-def test_system_user(faker: Faker) -> SystemUserModel:
+def app_user(faker: Faker) -> db.UserRole:
+    return db.UserRole(login=faker.word(), password=faker.word(), role=db.Role.user)
+
+
+@pytest.fixture()
+@pytest.mark.parametrize('app_user', indirect=True)
+def test_system_user(faker: Faker, app_user: db.UserRole) -> SystemUserModel:
     with db.create_session() as session:
-        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=db.Role.user)
         session.add(app_user)
         session.flush()
         return cast(SystemUserModel, SystemUserModel.from_orm(app_user))
