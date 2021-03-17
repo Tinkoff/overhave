@@ -53,10 +53,10 @@ def test_testrun_id(faker: Faker) -> int:
 
 
 @pytest.fixture()
-def test_testrun_report_link(report_status: db.TestReportStatus, faker: Faker) -> Optional[str]:
+def test_testrun_report(report_status: db.TestReportStatus, faker: Faker) -> Optional[str]:
     if report_status.has_report:
-        return None
-    return uuid1().hex
+        return uuid1().hex
+    return None
 
 
 @pytest.fixture()
