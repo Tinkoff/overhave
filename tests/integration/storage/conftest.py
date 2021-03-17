@@ -35,7 +35,7 @@ def app_user(faker: Faker) -> db.UserRole:
 
 
 @pytest.fixture()
-@pytest.mark.parametrize('app_user', indirect=True)
+@pytest.mark.parametrize("app_user", indirect=True)
 def test_system_user(faker: Faker, app_user: db.UserRole) -> SystemUserModel:
     with db.create_session() as session:
         session.add(app_user)
