@@ -3,6 +3,7 @@ from typing import cast
 import pytest
 from faker import Faker
 
+from _pytest.fixtures import FixtureRequest
 from overhave import db
 from overhave.entities.converters import EmulationModel, FeatureTypeModel, SystemUserModel, TestUserModel
 from overhave.entities.settings import OverhaveEmulationSettings
@@ -35,9 +36,17 @@ def app_user(faker: Faker) -> db.UserRole:
 
 
 @pytest.fixture()
-@pytest.mark.parametrize("app_user", indirect=True)
-def test_system_user(faker: Faker, app_user: db.UserRole) -> SystemUserModel:
+def test_user_role(request: FixtureRequest) -> db.Role:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+@pytest.mark.parametrize('test_user_role', db.UserRole, indirect=True)
+def test_system_user(faker: Faker, test_user_role: db.Role) -> SystemUserModel:
     with db.create_session() as session:
+        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
         session.add(app_user)
         session.flush()
         return cast(SystemUserModel, SystemUserModel.from_orm(app_user))
