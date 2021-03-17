@@ -1,9 +1,9 @@
 from typing import cast
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
-from _pytest.fixtures import FixtureRequest
 from overhave import db
 from overhave.entities.converters import EmulationModel, FeatureTypeModel, SystemUserModel, TestUserModel
 from overhave.entities.settings import OverhaveEmulationSettings
