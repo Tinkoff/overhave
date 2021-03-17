@@ -43,7 +43,7 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-@pytest.mark.parametrize('test_user_role', db.UserRole, indirect=True)
+@pytest.mark.parametrize('test_user_role', [db.UserRole], indirect=True)
 def test_system_user(faker: Faker, test_user_role: db.Role) -> SystemUserModel:
     with db.create_session() as session:
         app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
