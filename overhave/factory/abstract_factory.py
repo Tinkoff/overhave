@@ -4,7 +4,7 @@ from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtr
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
-from overhave.storage import IEmulationStorage, IFeatureTypeStorage
+from overhave.storage import IEmulationStorage, IFeatureTypeStorage, ITestRunStorage
 from overhave.testing import ConfigInjector, PluginResolver, PytestRunner
 from overhave.transport import RedisProducer, S3Manager
 
@@ -39,6 +39,11 @@ class IOverhaveFactory(abc.ABC):
     @property
     @abc.abstractmethod
     def injector(self) -> ConfigInjector:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def test_run_storage(self) -> ITestRunStorage:
         pass
 
     @property

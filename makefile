@@ -80,3 +80,8 @@ build-docker:
 
 test-docker: build-docker
 	docker-compose run code
+
+
+up:
+	docker-compose up -d db
+	docker-compose up -d redis

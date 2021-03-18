@@ -12,8 +12,7 @@ from wtforms import Form, ValidationError
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_proxy_factory
-from overhave.transport import EmulationTask
-from overhave.transport.redis.objects import EmulationData
+from overhave.transport import EmulationData, EmulationTask
 
 logger = logging.getLogger(__name__)
 
@@ -50,10 +49,12 @@ class EmulationView(ModelViewConfigured):
             raise ValidationError("Only emulation item creator or administrator could delete it!")
 
     @staticmethod
-    def _run_emulation(emulation_id: int) -> Optional[werkzeug.Response]:
+    def _run_emulation(emulation_id: int) -> werkzeug.Response:
         try:
             factory = get_proxy_factory()
-            emulation_run = factory.emulation_storage.create_emulation_run(emulation_id, current_user.login)
+            emulation_run = factory.emulation_storage.create_emulation_run(
+                emulation_id=emulation_id, initiated_by=current_user.login
+            )
             factory.redis_producer.add(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id)))
             return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
         except Exception as e:
@@ -77,7 +78,7 @@ class EmulationView(ModelViewConfigured):
             return rendered
         emulation_id = get_mdict_item_or_list(flask.request.args, "id")
         if not emulation_id:
-            flask.flash("Please, save emulation template before execution")
+            flask.flash("Please, save emulation template before execution.")
             return rendered
 
         logger.debug("Seen emulation request")

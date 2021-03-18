@@ -14,11 +14,13 @@ from .http import (
 )
 from .redis import (
     BaseRedisTask,
+    EmulationData,
     EmulationTask,
     RedisConsumer,
     RedisConsumerRunner,
     RedisProducer,
     RedisStream,
+    TestRunData,
     TestRunTask,
     TRedisTask,
 )

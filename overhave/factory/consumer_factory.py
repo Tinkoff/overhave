@@ -25,8 +25,8 @@ class ConsumerFactory:
     @cached_property
     def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]:
         return {
+            TestRunTask: self._factory.processor.execute_test,  # type: ignore
             EmulationTask: self._factory.emulator.start_emulation,  # type: ignore
-            TestRunTask: lambda _: None,
         }
 
     @cached_property

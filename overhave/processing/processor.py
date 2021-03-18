@@ -17,6 +17,7 @@ from overhave.processing.abstract import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import ITestRunStorage, UniqueDraftCreationError, add_pr_url, save_draft
 from overhave.testing import ConfigInjector, PytestRunner
+from overhave.transport import TestRunTask
 
 logger = logging.getLogger(__name__)
 
@@ -53,32 +54,29 @@ class Processor(IProcessor):
             with self._file_manager.tmp_fixture_file(context=context, feature_file=feature_file) as fixture_file:
                 return self._test_runner.run(fixture_file=fixture_file.name, alluredir=alluredir.as_posix())
 
-    def _process_run(self, run_id: int) -> None:
-        self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.RUNNING)
-        ctx = get_context_by_test_run_id(run_id)
+    def execute_test(self, task: TestRunTask) -> None:
+        test_run_id = task.data.test_run_id
+        self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.RUNNING)
+        ctx = get_context_by_test_run_id(test_run_id)
         results_dir = Path(tempfile.mkdtemp())
         logger.debug("Allure results directory path: %s", results_dir.as_posix())
         try:
             test_return_code = self._run_test(context=ctx, alluredir=results_dir)
         except Exception as e:
             logger.exception("Error!")
-            self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.INTERNAL_ERROR, traceback=str(e))
+            self._test_run_storage.set_run_status(
+                run_id=test_run_id, status=TestRunStatus.INTERNAL_ERROR, traceback=str(e)
+            )
             return
 
         logger.debug("Test returncode: %s", test_return_code)
         if test_return_code == 0:
-            self._test_run_storage.set_run_status(run_id=run_id, status=TestRunStatus.SUCCESS)
+            self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.SUCCESS)
         else:
             self._test_run_storage.set_run_status(
-                run_id=run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
+                run_id=test_run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
             )
-        self._report_manager.create_allure_report(test_run_id=run_id, results_dir=results_dir)
-
-    def execute_test(self, scenario_id: int, executed_by: str) -> werkzeug.Response:
-        test_run_id = self._test_run_storage.create_test_run(scenario_id=scenario_id, executed_by=executed_by)
-        self._thread_pool.apply_async(self._process_run, args=(test_run_id,))
-        logger.debug("Redirect to TestRun details view with test_run_id %s", test_run_id)
-        return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
+        self._report_manager.create_allure_report(test_run_id=test_run_id, results_dir=results_dir)
 
     def _create_version(self, test_run_id: int, draft_id: int) -> None:
         try:

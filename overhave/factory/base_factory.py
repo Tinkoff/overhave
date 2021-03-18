@@ -21,7 +21,7 @@ from overhave.storage import (
     TestRunStorage,
 )
 from overhave.testing import ConfigInjector, PluginResolver, PytestRunner, StepCollector
-from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient
+from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient, TestRunTask
 
 
 class OverhaveBaseFactory(IOverhaveFactory):
@@ -134,8 +134,12 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return self._s3_manager
 
     @cached_property
-    def _test_run_storage(self) -> ITestRunStorage:
+    def _test_run_storage(self) -> TestRunStorage:
         return TestRunStorage()
+
+    @property
+    def test_run_storage(self) -> ITestRunStorage:
+        return self._test_run_storage
 
     @cached_property
     def _report_manager(self) -> ReportManager:
@@ -200,7 +204,10 @@ class OverhaveBaseFactory(IOverhaveFactory):
 
     @cached_property
     def _redis_producer(self) -> RedisProducer:
-        return RedisProducer(settings=OverhaveRedisSettings(), mapping={EmulationTask: RedisStream.EMULATION})
+        return RedisProducer(
+            settings=OverhaveRedisSettings(),
+            mapping={TestRunTask: RedisStream.TEST, EmulationTask: RedisStream.EMULATION},
+        )
 
     @property
     def redis_producer(self) -> RedisProducer:

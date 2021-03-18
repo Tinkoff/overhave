@@ -2,12 +2,14 @@ import abc
 
 import werkzeug
 
+from overhave.transport import TestRunTask
+
 
 class IProcessor(abc.ABC):
     """ Abstract class for application processor. """
 
     @abc.abstractmethod
-    def execute_test(self, scenario_id: int, executed_by: str) -> werkzeug.Response:
+    def execute_test(self, task: TestRunTask) -> None:
         pass
 
     @abc.abstractmethod

@@ -16,6 +16,8 @@ from wtforms.widgets import HiddenInput
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_proxy_factory
+from overhave.transport import TestRunData, TestRunTask
+from overhave.transport.redis.errors import BaseRedisException
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +59,8 @@ class FeatureView(ModelViewConfigured):
     column_list = (
         "id",
         "name",
-        "feature_tags",
         "feature_type",
+        "feature_tags",
         "task",
         "author",
         "created_at",
@@ -132,13 +134,22 @@ class FeatureView(ModelViewConfigured):
         scenario_id = data.get(f"{prefix}-id")
         scenario_text = data.get(f"{prefix}-text")
         if not scenario_id or not scenario_text:
-            logger.debug("Not found scenario for execution!")
+            flask.flash("Scenario does not exist, so could not run test.", category="warning")
             return rendered
 
-        return cast(
-            werkzeug.Response,
-            get_proxy_factory().processor.execute_test(scenario_id=int(scenario_id), executed_by=current_user.login),
+        factory = get_proxy_factory()
+        test_run_id = factory.test_run_storage.create_test_run(
+            scenario_id=int(scenario_id), executed_by=current_user.login
         )
+        try:
+            factory.redis_producer.add(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
+        except BaseRedisException:
+            logger.exception("Could not add TestRunTask to Redis!")
+            flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
+            return rendered
+
+        logger.debug("Redirect to TestRun details view with test_run_id='%s'...", test_run_id)
+        return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 
     @expose("/edit/", methods=("GET", "POST"))
     def edit_view(self) -> werkzeug.Response:

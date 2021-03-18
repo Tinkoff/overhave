@@ -5,6 +5,12 @@ from overhave.factory import ConsumerFactory, get_proxy_factory
 from overhave.transport import RedisStream
 
 
+def _run_consumer(stream: RedisStream) -> None:
+    factory = get_proxy_factory()
+    factory.context.logging_settings.setup_logging()
+    ConsumerFactory(factory=factory, stream=stream).runner.run()
+
+
 @overhave.command(short_help="Run Overhave Redis consumer")
 @click.option(
     "-s",
@@ -15,6 +21,4 @@ from overhave.transport import RedisStream
 )
 def consumer(stream: RedisStream) -> None:
     """ Run Overhave Redis consumer. """
-    factory = get_proxy_factory()
-    factory.context.logging_settings.setup_logging()
-    ConsumerFactory(factory=factory, stream=stream).runner.run()
+    _run_consumer(stream)

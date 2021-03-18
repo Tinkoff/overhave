@@ -4,7 +4,7 @@ from overhave.factory.base_factory import OverhaveBaseFactory
 from overhave.factory.context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
-from overhave.storage import IEmulationStorage, IFeatureTypeStorage
+from overhave.storage import IEmulationStorage, IFeatureTypeStorage, ITestRunStorage
 from overhave.testing import ConfigInjector, PluginResolver, PytestRunner
 from overhave.transport import RedisProducer, S3Manager
 
@@ -65,6 +65,10 @@ class ProxyFactory(IOverhaveFactory):
                 feature_types=self._factory.feature_extractor.feature_types,
             )
             self._collection_prepared = True
+
+    @property
+    def test_run_storage(self) -> ITestRunStorage:
+        return self._factory.test_run_storage
 
     @property
     def processor(self) -> IProcessor:
