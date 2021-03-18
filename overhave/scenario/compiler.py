@@ -1,4 +1,4 @@
-from typing import List, Optional, cast
+from typing import List, Optional, Union, cast
 
 from pytest_bdd import types as default_types
 
@@ -14,6 +14,12 @@ def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
     return ""
 
 
+def generate_feature_tags_list(context: ProcessingContext) -> Optional[List[str]]:
+    if feature_tags := [i.value for i in context.feature.feature_tags]:
+        return feature_tags
+    return None
+
+
 class ScenarioCompiler(PrefixMixin):
     """ Class for scenario compilation from text view into pytest_bdd feature format. """
 
@@ -27,8 +33,12 @@ class ScenarioCompiler(PrefixMixin):
         self._language_settings = language_settings
         self._task_links_keyword = task_links_keyword
 
-    def _get_tag_if_not_specified(self, scenario_text: str, tag: str) -> str:
+    def _get_tag_if_not_specified(self, scenario_text: str, tag: Union[str, Optional[List[str]]]) -> str:
         if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
+            return ""
+        if isinstance(tag, list):
+            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{i}' for i in tag)}"
+        if tag is None:
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
 
@@ -67,7 +77,8 @@ class ScenarioCompiler(PrefixMixin):
         blocks_delimiter = f" {self._compilation_settings.blocks_delimiter} "
         return "\n".join(
             (
-                self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name),
+                f"{self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name)} "
+                f"{self._get_tag_if_not_specified(scenario_text=text, tag=generate_feature_tags_list(context))}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 (
                     f"{self._compilation_settings.created_by_prefix} {context.feature.author}"

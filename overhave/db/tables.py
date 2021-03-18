@@ -54,7 +54,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags, secondary=tags_association_table)
+    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary=tags_association_table)
 
 
 @su.generic_repr("feature_id")
