@@ -111,11 +111,3 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         session.add(db_scenario)
         session.flush()
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
-
-
-def get_feature_by_id(feature_id: int) -> Optional[FeatureModel]:
-    with db.create_session() as session:
-        feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == feature_id).one_or_none()
-        if feature is not None:
-            return cast(FeatureModel, FeatureModel.from_orm(feature))
-        return None

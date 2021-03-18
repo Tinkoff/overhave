@@ -5,7 +5,6 @@ from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
 from overhave.entities import ScenarioModel
 from overhave.storage.test_run import TestRunStorage
-from tests.integration.storage.conftest import get_feature_by_id
 
 
 class TestTestRunStorage:
@@ -18,7 +17,7 @@ class TestTestRunStorage:
         test_scenario: ScenarioModel,
         faker: Faker,
     ):
-        feature = get_feature_by_id(test_scenario.feature_id)
+        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
         assert isinstance(test_run_id, int)
 
@@ -39,7 +38,7 @@ class TestTestRunStorage:
         test_scenario: ScenarioModel,
         run_status: TestRunStatus,
     ):
-        feature = get_feature_by_id(test_scenario.feature_id)
+        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
         test_test_run_storage.set_run_status(test_run_id, run_status)
         test_run = test_test_run_storage.get_test_run(test_run_id)
@@ -61,7 +60,7 @@ class TestTestRunStorage:
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
     ):
-        feature = get_feature_by_id(test_scenario.feature_id)
+        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
         test_test_run_storage.set_report(test_run_id, report_status)
         test_run = test_test_run_storage.get_test_run(test_run_id)
@@ -69,7 +68,7 @@ class TestTestRunStorage:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(self, test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel):
-        feature = get_feature_by_id(test_scenario.feature_id)
+        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.id == test_run_id
