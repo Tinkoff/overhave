@@ -47,7 +47,7 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_system_user(faker: Faker, test_user_role: db.Role) -> SystemUserModel:
+def test_system_user(database: None, faker: Faker, test_user_role: db.Role) -> SystemUserModel:
     with db.create_session() as session:
         app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
         session.add(app_user)
@@ -81,30 +81,34 @@ def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, 
 
 
 @pytest.fixture(scope="class")
-def test_test_run_storage():
+def test_test_run_storage() -> TestRunStorage:
     return TestRunStorage()
 
 
 @pytest.fixture(scope="class")
-def test_feature_type_storage():
+def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 
 
 @pytest.fixture()
-def test_scenario(
-    test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker
-) -> ScenarioModel:
+def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
     with db.create_session() as session:
-        db_feature = db.Feature(
+        feature = db.Feature(
             name=faker.word(),
             author=test_system_user.login,
             type_id=test_feature_type.id,
             task=[faker.word()],
             last_edited_by=test_system_user.login,
         )
-        session.add(db_feature)
+        session.add(feature)
         session.flush()
-        db_scenario = db.Scenario(feature_id=db_feature.id, text=faker.word())
+        return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
+    with db.create_session() as session:
+        db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
         session.add(db_scenario)
         session.flush()
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
