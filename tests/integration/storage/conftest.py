@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Optional, cast
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -88,7 +88,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             type_id=test_feature_type.id,
             task=[faker.word()],
             last_edited_by=test_system_user.login,
-            released=False,
+            released=True,
         )
         session.add(feature)
         session.flush()
@@ -112,3 +112,11 @@ def test_test_run_storage():
 @pytest.fixture(scope="class")
 def test_feature_type_storage():
     return FeatureTypeStorage()
+
+
+def get_feature_by_id(feature_id: int) -> Optional[FeatureModel]:
+    with db.create_session() as session:
+        feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == feature_id).one_or_none()
+        if feature is not None:
+            return cast(FeatureModel, FeatureModel.from_orm(feature))
+        return None
