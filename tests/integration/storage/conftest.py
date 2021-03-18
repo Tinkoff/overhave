@@ -92,7 +92,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
         )
         session.add(feature)
         session.flush()
-        return cast(FeatureModel, feature)
+        return cast(FeatureModel, FeatureModel.from_orm(feature))
 
 
 @pytest.fixture()
@@ -101,7 +101,7 @@ def test_scenario(faker: Faker, test_feature: FeatureModel) -> ScenarioModel:
         scenario = db.Scenario(feature_id=test_feature.id, text=faker.sentence())
         session.add(scenario)
         session.flush()
-        return cast(ScenarioModel, scenario)
+        return cast(ScenarioModel, ScenarioModel.from_orm(scenario))
 
 
 @pytest.fixture(scope="class")
