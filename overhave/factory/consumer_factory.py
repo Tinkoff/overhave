@@ -2,7 +2,7 @@ from functools import cached_property
 from typing import Callable, Dict, Type
 
 from overhave.base_settings import DataBaseSettings
-from overhave.factory import IOverhaveFactory
+from overhave.factory.abstract_factory import IOverhaveFactory
 from overhave.transport.redis.consumer import RedisConsumer
 from overhave.transport.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
 from overhave.transport.redis.runner import RedisConsumerRunner

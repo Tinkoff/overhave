@@ -1,7 +1,7 @@
 import abc
 
 from overhave.entities import Emulator, IAdminAuthorizationManager, IFeatureExtractor, ReportManager
-from overhave.factory.context import OverhaveContext
+from overhave.factory.context.base_context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager
 from overhave.storage import IEmulationStorage, IFeatureTypeStorage, ITestRunStorage

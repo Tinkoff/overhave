@@ -9,7 +9,7 @@ from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAP
 from overhave.entities.emulator import EmulationTask, Emulator
 from overhave.entities.stash import IStashProjectManager
 from overhave.factory.abstract_factory import IOverhaveFactory
-from overhave.factory.context import OverhaveContext
+from overhave.factory.context.base_context import OverhaveContext
 from overhave.processing import IProcessor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import (
