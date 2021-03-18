@@ -80,12 +80,12 @@ def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, 
 
 
 @pytest.fixture()
-def test_feature(faker: Faker, test_system_user: SystemUserModel, feature_type: FeatureTypeModel) -> FeatureModel:
+def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
             name=faker.word(),
             author=test_system_user.login,
-            type_id=feature_type.id,
+            type_id=test_feature_type.id,
             task=[faker.sentence()],
             last_edited_by=test_system_user.login,
             released=False,

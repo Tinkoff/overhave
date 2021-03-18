@@ -53,6 +53,7 @@ class TestTestRunStorage:
             TestReportStatus.EMPTY,
         ],
     )
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_set_report(
         self,
         test_test_run_storage: TestRunStorage,
