@@ -86,7 +86,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             name=faker.word(),
             author=test_system_user.login,
             type_id=test_feature_type.id,
-            task=[faker.sentence()],
+            task=[faker.word()],
             last_edited_by=test_system_user.login,
             released=False,
         )
