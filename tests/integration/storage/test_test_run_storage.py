@@ -11,7 +11,7 @@ from tests.integration.storage.conftest import get_feature_by_id
 class TestTestRunStorage:
     """ Integration tests for :class:`TestRunStorage`. """
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_create_test_run(
         self,
         test_test_run_storage: TestRunStorage,
@@ -22,7 +22,7 @@ class TestTestRunStorage:
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
         assert isinstance(test_run_id, int)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         "run_status",
         [
@@ -45,7 +45,7 @@ class TestTestRunStorage:
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.status == run_status
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         "report_status",
         [
@@ -67,7 +67,7 @@ class TestTestRunStorage:
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(self, test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel):
         feature = get_feature_by_id(test_scenario.feature_id)
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
