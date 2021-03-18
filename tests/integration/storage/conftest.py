@@ -5,7 +5,6 @@ from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave import db
-from overhave.db.base import Session
 from overhave.entities.converters import (
     EmulationModel,
     FeatureModel,
