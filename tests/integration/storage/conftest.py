@@ -91,7 +91,7 @@ def test_feature_type_storage():
 
 
 @pytest.fixture()
-def test_db_scenario(
+def test_scenario(
     test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker
 ) -> ScenarioModel:
     with db.create_session() as session:
