@@ -1,6 +1,7 @@
 from typing import cast
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave import db
@@ -14,6 +15,7 @@ from overhave.entities.converters import (
 )
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage.emulation import EmulationStorage
+from overhave.storage.feature_type import FeatureTypeStorage
 
 
 @pytest.fixture(scope="class")
@@ -27,7 +29,7 @@ def test_emulation_storage(test_emulation_settings: OverhaveEmulationSettings) -
 
 
 @pytest.fixture()
-def feature_type(database: None, faker: Faker) -> db.FeatureType:
+def test_feature_type(database: None, faker: Faker) -> db.FeatureType:
     with db.create_session() as session:
         feature_type = db.FeatureType(name=cast(str, faker.word()))
         session.add(feature_type)
@@ -36,19 +38,26 @@ def feature_type(database: None, faker: Faker) -> db.FeatureType:
 
 
 @pytest.fixture()
-def test_system_user(faker: Faker) -> SystemUserModel:
+def test_user_role(request: FixtureRequest) -> db.Role:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_system_user(faker: Faker, test_user_role: db.Role) -> SystemUserModel:
     with db.create_session() as session:
-        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=db.Role.user)
+        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
         session.add(app_user)
         session.flush()
         return cast(SystemUserModel, SystemUserModel.from_orm(app_user))
 
 
 @pytest.fixture()
-def test_user(test_system_user, faker: Faker, feature_type: FeatureTypeModel) -> TestUserModel:
+def test_user(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
-            feature_type_id=feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
+            feature_type_id=test_feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
         )
         session.add(test_user)
         session.flush()
@@ -92,3 +101,9 @@ def test_scenario(faker: Faker, test_feature: FeatureModel) -> ScenarioModel:
         session.add(scenario)
         session.flush()
         return cast(ScenarioModel, scenario)
+
+
+@pytest.fixture(scope="class")
+def test_feature_type_storage():
+    return FeatureTypeStorage()
+
