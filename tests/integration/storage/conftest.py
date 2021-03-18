@@ -3,6 +3,7 @@ from typing import cast
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
+from overhave.storage import TestRunStorage
 
 from overhave import db
 from overhave.entities.converters import (
@@ -104,6 +105,10 @@ def test_scenario(faker: Faker, test_feature: FeatureModel) -> ScenarioModel:
 
 
 @pytest.fixture(scope="class")
+def test_test_run_storage():
+    return TestRunStorage()
+
+
+@pytest.fixture(scope="class")
 def test_feature_type_storage():
     return FeatureTypeStorage()
-
