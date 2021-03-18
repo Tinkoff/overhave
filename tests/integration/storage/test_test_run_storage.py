@@ -3,7 +3,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
-from overhave.entities import ScenarioModel, SystemUserModel
+from overhave.entities import ScenarioModel
 from overhave.storage.test_run import TestRunStorage
 from tests.integration.storage.conftest import get_feature_by_id
 

@@ -5,6 +5,7 @@ from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave import db
+from overhave.db.base import Session
 from overhave.entities.converters import (
     EmulationModel,
     FeatureModel,
@@ -79,31 +80,6 @@ def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, 
         return cast(EmulationModel, EmulationModel.from_orm(emulation))
 
 
-@pytest.fixture()
-def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
-    with db.create_session() as session:
-        feature = db.Feature(
-            name=faker.word(),
-            author=test_system_user.login,
-            type_id=test_feature_type.id,
-            task=[faker.word()],
-            last_edited_by=test_system_user.login,
-            released=True,
-        )
-        session.add(feature)
-        session.flush()
-        return cast(FeatureModel, FeatureModel.from_orm(feature))
-
-
-@pytest.fixture()
-def test_scenario(faker: Faker, test_feature: FeatureModel) -> ScenarioModel:
-    with db.create_session() as session:
-        scenario = db.Scenario(feature_id=test_feature.id, text=faker.sentence())
-        session.add(scenario)
-        session.flush()
-        return cast(ScenarioModel, ScenarioModel.from_orm(scenario))
-
-
 @pytest.fixture(scope="class")
 def test_test_run_storage():
     return TestRunStorage()
@@ -112,6 +88,26 @@ def test_test_run_storage():
 @pytest.fixture(scope="class")
 def test_feature_type_storage():
     return FeatureTypeStorage()
+
+
+@pytest.fixture()
+def test_db_scenario(
+    test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker
+) -> ScenarioModel:
+    with db.create_session() as session:
+        db_feature = db.Feature(
+            name=faker.word(),
+            author=test_system_user.login,
+            type_id=test_feature_type.id,
+            task=[faker.word()],
+            last_edited_by=test_system_user.login,
+        )
+        session.add(db_feature)
+        session.flush()
+        db_scenario = db.Scenario(feature_id=db_feature.id, text=faker.word())
+        session.add(db_scenario)
+        session.flush()
+        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
 
 
 def get_feature_by_id(feature_id: int) -> Optional[FeatureModel]:
