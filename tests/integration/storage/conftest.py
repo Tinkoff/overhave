@@ -3,7 +3,6 @@ from typing import cast
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
-from overhave.storage import TestRunStorage
 
 from overhave import db
 from overhave.entities.converters import (
@@ -15,6 +14,7 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
+from overhave.storage import TestRunStorage
 from overhave.storage.emulation import EmulationStorage
 from overhave.storage.feature_type import FeatureTypeStorage
 
