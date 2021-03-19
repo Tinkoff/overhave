@@ -47,25 +47,22 @@ class TestTestRunStorage:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
-        "report_status,report",
+        "report_status",
         [
-            (status, report)
-            for status in [
-                TestReportStatus.GENERATED,
-                TestReportStatus.GENERATION_FAILED,
-                TestReportStatus.EMPTY,
-                TestReportStatus.SAVED,
-            ]
-            for report in [None, str(uuid1().hex)]
+            TestReportStatus.GENERATED,
+            TestReportStatus.GENERATION_FAILED,
+            TestReportStatus.EMPTY,
+            TestReportStatus.SAVED,
         ],
     )
+    @pytest.mark.parametrize("report", [None, uuid1().hex])
     def test_set_report(
         self,
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
         test_feature: FeatureModel,
-        report: Optional[str] = None,
+        report: Optional[str],
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=report)
