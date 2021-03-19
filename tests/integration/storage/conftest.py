@@ -89,7 +89,7 @@ def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
@@ -104,7 +104,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
         return cast(FeatureModel, FeatureModel.from_orm(feature))
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
     with db.create_session() as session:
         db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
