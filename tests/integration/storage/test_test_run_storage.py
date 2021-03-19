@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import uuid1
 
 import pytest
@@ -46,8 +47,7 @@ class TestTestRunStorage:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
-        "report_status",
-        "report",
+        "report_status,report",
         [
             (status, report)
             for status in [
@@ -65,7 +65,7 @@ class TestTestRunStorage:
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
         test_feature: FeatureModel,
-        report: str,
+        report: Optional[str] = None,
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=report)
