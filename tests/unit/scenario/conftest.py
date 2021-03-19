@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -45,7 +45,7 @@ def test_feature() -> FeatureModel:
         last_edited_by="overlord",
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
-        feature_tags=[TagsTypeModel(id=1, value='tag1', created_by="qqq", created_at=get_current_time())]
+        feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],
     )
 
 
