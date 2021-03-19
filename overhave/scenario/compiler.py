@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, cast
+from typing import List, Optional, cast
 
 from pytest_bdd import types as default_types
 
@@ -14,7 +14,7 @@ def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
     return ""
 
 
-def generate_feature_tags_list(context: ProcessingContext) -> Optional[List[str]]:
+def generate_tags_list(context: ProcessingContext) -> Optional[List[str]]:
     if feature_tags := [i.value for i in context.feature.feature_tags]:
         return feature_tags
     return None
@@ -38,11 +38,11 @@ class ScenarioCompiler(PrefixMixin):
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
 
-    def _get_feature_tag_if_not_specified(self, scenario_text: str, feature_tag: Optional[List[str]]) -> str:
-        if f"{self._compilation_settings.tag_prefix}{feature_tag}" in scenario_text:
+    def _get_feature_tag_if_not_specified(self, scenario_text: str, tag: Optional[List[str]]) -> str:
+        if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
             return ""
-        if feature_tag is not None:
-            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{tag}' for tag in feature_tag)}"
+        if tag is not None:
+            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{tag}' for tag in tag)}"
         return ""
 
     def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:
@@ -81,7 +81,7 @@ class ScenarioCompiler(PrefixMixin):
         return "\n".join(
             (
                 f"{self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name)} "
-                f"{self._get_feature_tag_if_not_specified(scenario_text=text, feature_tag=generate_feature_tags_list(context))}",
+                f"{self._get_feature_tag_if_not_specified(scenario_text=text, tag=generate_tags_list(context))}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 (
                     f"{self._compilation_settings.created_by_prefix} {context.feature.author}"
