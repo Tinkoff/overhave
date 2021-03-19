@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 import pytest
 from _pytest.fixtures import FixtureRequest
