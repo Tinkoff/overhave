@@ -1,5 +1,6 @@
+from uuid import uuid1
+
 import pytest
-from faker import Faker
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
@@ -15,7 +16,6 @@ class TestTestRunStorage:
         self,
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
-        faker: Faker,
         test_feature: FeatureModel,
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
@@ -54,17 +54,20 @@ class TestTestRunStorage:
             TestReportStatus.EMPTY,
         ],
     )
+    @pytest.mark.parametrize("report", [None, str(uuid1().hex)])
     def test_set_report(
         self,
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
         test_feature: FeatureModel,
+        report: str,
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
-        test_test_run_storage.set_report(test_run_id, report_status)
+        test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=report)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
+        assert test_run.report is report
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(
