@@ -33,14 +33,17 @@ class ScenarioCompiler(PrefixMixin):
         self._language_settings = language_settings
         self._task_links_keyword = task_links_keyword
 
-    def _get_tag_if_not_specified(self, scenario_text: str, tag: Union[str, Optional[List[str]]]) -> str:
+    def _get_tag_if_not_specified(self, scenario_text: str, tag: str) -> str:
         if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
             return ""
-        if isinstance(tag, list):
-            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{i}' for i in tag)}"
-        if tag is None:
-            return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
+
+    def _get_feature_tag_if_not_specified(self, scenario_text: str, feature_tag: Optional[List[str]]) -> str:
+        if f"{self._compilation_settings.tag_prefix}{feature_tag}" in scenario_text:
+            return ""
+        if feature_tag is not None:
+            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{tag}' for tag in feature_tag)}"
+        return ""
 
     def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:
         keywords: List[str] = [default_types.FEATURE]
@@ -78,7 +81,7 @@ class ScenarioCompiler(PrefixMixin):
         return "\n".join(
             (
                 f"{self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name)} "
-                f"{self._get_tag_if_not_specified(scenario_text=text, tag=generate_feature_tags_list(context))}",
+                f"{self._get_feature_tag_if_not_specified(scenario_text=text, feature_tag=generate_feature_tags_list(context))}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 (
                     f"{self._compilation_settings.created_by_prefix} {context.feature.author}"
