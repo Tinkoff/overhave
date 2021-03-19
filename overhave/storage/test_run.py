@@ -67,11 +67,3 @@ class TestRunStorage(ITestRunStorage):
             if run is not None:
                 return cast(TestRunModel, TestRunModel.from_orm(run))
             return None
-
-    @staticmethod
-    def _get_feature_by_id(feature_id: int) -> Optional[FeatureModel]:
-        with db.create_session() as session:
-            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == feature_id).one_or_none()
-            if feature is not None:
-                return cast(FeatureModel, FeatureModel.from_orm(feature))
-            return None

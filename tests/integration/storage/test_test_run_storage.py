@@ -3,7 +3,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
-from overhave.entities import ScenarioModel
+from overhave.entities import FeatureModel, ScenarioModel
 from overhave.storage.test_run import TestRunStorage
 
 
@@ -16,9 +16,9 @@ class TestTestRunStorage:
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
         faker: Faker,
+        test_feature: FeatureModel,
     ):
-        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
-        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
+        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         assert isinstance(test_run_id, int)
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -37,9 +37,9 @@ class TestTestRunStorage:
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
         run_status: TestRunStatus,
+        test_feature: FeatureModel,
     ):
-        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
-        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
+        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_test_run_storage.set_run_status(test_run_id, run_status)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.status == run_status
@@ -59,19 +59,20 @@ class TestTestRunStorage:
         test_test_run_storage: TestRunStorage,
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
+        test_feature: FeatureModel,
     ):
-        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
-        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
+        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_test_run_storage.set_report(test_run_id, report_status)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
-    def test_get_test_run(self, test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel):
-        feature = test_test_run_storage._get_feature_by_id(test_scenario.feature_id)
-        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, feature.author)
+    def test_get_test_run(
+        self, test_test_run_storage: TestRunStorage, test_feature: FeatureModel, test_scenario: ScenarioModel
+    ):
+        test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.id == test_run_id
         assert test_run.status == TestRunStatus.STARTED
-        assert test_run.executed_by == feature.author
+        assert test_run.executed_by == test_feature.author
         assert test_run.report_status == db.TestReportStatus.EMPTY
