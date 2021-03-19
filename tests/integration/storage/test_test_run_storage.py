@@ -55,7 +55,7 @@ class TestTestRunStorage:
             TestReportStatus.SAVED,
         ],
     )
-    @pytest.mark.parametrize("report", [None, uuid1().hex])
+    @pytest.mark.parametrize("report", [uuid1().hex])
     def test_set_report(
         self,
         test_test_run_storage: TestRunStorage,
@@ -65,6 +65,8 @@ class TestTestRunStorage:
         report: Optional[str],
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+        test_run = test_test_run_storage.get_test_run(test_run_id)
+        assert test_run.report is None
         test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=report)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
