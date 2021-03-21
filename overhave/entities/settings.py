@@ -175,3 +175,15 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     @property
     def enabled(self) -> bool:
         return isinstance(self.emulation_base_cmd, str)
+
+
+class OverhaveStepContextSettings(BaseOverhavePrefix):
+    """ Settings for :class:`StepContextRunner`. """
+
+    step_context_logs: bool = False
+
+
+class OverhaveDescriptionManagerSettings(BaseOverhavePrefix):
+    """ Settings for DescriptionManager, which sets the description to Allure report dynamically after test. """
+
+    blocks_delimiter: str = ""

@@ -2,7 +2,7 @@ from unittest import mock
 
 from faker import Faker
 
-from overhave.testing.plugin_utils import DescriptionManager
+from overhave.pytest_plugin import DescriptionManager
 
 
 class TestDescriptionManager:

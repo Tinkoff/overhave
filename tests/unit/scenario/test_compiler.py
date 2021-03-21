@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pytest
 
-from overhave.entities import FeatureModel, OverhaveLanguageSettings, ProcessingContext, ScenarioModel
+from overhave.entities import FeatureModel, OverhaveLanguageSettings, ScenarioModel, TestExecutorContext
 from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 
@@ -39,7 +39,10 @@ class TestScenarioCompiler:
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_processing_ctx: ProcessingContext,
+        self,
+        test_scenario_compiler: ScenarioCompiler,
+        test_scenario_text: str,
+        test_processing_ctx: TestExecutorContext,
     ):
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_processing_ctx)
@@ -51,7 +54,7 @@ class TestScenarioCompiler:
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,
         test_scenario: ScenarioModel,
-        test_processing_ctx: ProcessingContext,
+        test_processing_ctx: TestExecutorContext,
     ):
         feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)

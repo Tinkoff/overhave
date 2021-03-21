@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from overhave.base_settings import OverhaveLoggingSettings
+from overhave.base_settings import LoggingSettings
 from overhave.cli.group import overhave
 from overhave.transport import OverhaveS3Bucket, S3Manager, S3ManagerSettings
 from overhave.utils import get_current_time
@@ -26,7 +26,7 @@ def _check_bucket_registered(name: str) -> None:
 
 
 def _get_s3_manager() -> S3Manager:
-    OverhaveLoggingSettings().setup_logging()
+    LoggingSettings().setup_logging()
     manager = S3Manager(S3ManagerSettings(autocreate_buckets=False))
     manager.initialize()
     return manager

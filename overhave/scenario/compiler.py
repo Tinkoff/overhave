@@ -2,8 +2,7 @@ from typing import List, Optional, cast
 
 from pytest_bdd import types as default_types
 
-from overhave.entities.converters import ProcessingContext
-from overhave.entities.settings import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings, TestExecutorContext
 from overhave.scenario.errors import IncorrectScenarioTextError
 from overhave.scenario.mixin import PrefixMixin
 
@@ -59,7 +58,7 @@ class ScenarioCompiler(PrefixMixin):
             "Could not find any scenario prefix in scenario text, so could not compile feature header!"
         )
 
-    def _compile_header(self, context: ProcessingContext) -> str:
+    def _compile_header(self, context: TestExecutorContext) -> str:
         text = context.scenario.text
         feature_prefix = self._get_feature_prefix_if_specified(scenario_text=text)
         if not feature_prefix:
@@ -83,5 +82,5 @@ class ScenarioCompiler(PrefixMixin):
             )
         )
 
-    def compile(self, context: ProcessingContext) -> str:
+    def compile(self, context: TestExecutorContext) -> str:
         return self._compile_header(context=context) + "\n" + context.scenario.text.strip("\n") + "\n"

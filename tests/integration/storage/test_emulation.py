@@ -6,7 +6,7 @@ from faker import Faker
 from overhave import db
 from overhave.db.statuses import EmulationStatus
 from overhave.entities import SystemUserModel
-from overhave.storage.emulation import EmulationStorage, NotFoundEmulationError
+from overhave.storage.emulation_storage import EmulationStorage, NotFoundEmulationError
 
 
 @pytest.mark.usefixtures("database")

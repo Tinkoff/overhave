@@ -118,6 +118,7 @@ class Draft(BaseTable, PrimaryKeyMixin):
     text = sa.Column(TEXT_TYPE, doc="Released scenario text")
     pr_url = sa.Column(sa.Text, doc="Absolute pull-request URL", nullable=True)
     published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
+    published_at = sa.Column(DATETIME_TYPE, doc="Publication time")
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 

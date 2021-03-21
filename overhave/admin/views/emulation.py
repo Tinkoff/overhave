@@ -11,7 +11,7 @@ from wtforms import Form, ValidationError
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import get_proxy_factory
+from overhave.factory import get_admin_factory
 from overhave.transport import EmulationData, EmulationTask
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class EmulationView(ModelViewConfigured):
 
     @property
     def additional_cmd_description(self) -> Optional[str]:
-        return get_proxy_factory().context.emulation_settings.emulation_desc_link
+        return get_admin_factory().context.emulation_settings.emulation_desc_link
 
     def on_model_change(self, form: Form, model: db.Emulation, is_created: bool) -> None:
         if is_created:
@@ -50,20 +50,18 @@ class EmulationView(ModelViewConfigured):
 
     @staticmethod
     def _run_emulation(emulation_id: int) -> werkzeug.Response:
-        try:
-            factory = get_proxy_factory()
-            emulation_run = factory.emulation_storage.create_emulation_run(
-                emulation_id=emulation_id, initiated_by=current_user.login
-            )
-            factory.redis_producer.add(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id)))
-            return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
-        except Exception as e:
-            flask.flash(str(e), category="error")
+        factory = get_admin_factory()
+        emulation_run = factory.emulation_storage.create_emulation_run(
+            emulation_id=emulation_id, initiated_by=current_user.login
+        )
+        if not factory.redis_producer.add_task(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id))):
+            flask.flash("Problems with Redis service! EmulationTask has not been sent.", category="error")
             return flask.redirect(flask.url_for("emulation.edit_view", id=emulation_id))
+        return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
 
     @property
     def description_link(self) -> Optional[str]:
-        return get_proxy_factory().context.emulation_settings.emulation_desc_link
+        return get_admin_factory().context.emulation_settings.emulation_desc_link
 
     @expose("/edit/", methods=("GET", "POST"))
     def edit_view(self) -> Optional[werkzeug.Response]:

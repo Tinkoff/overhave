@@ -7,7 +7,7 @@ from wtforms import Form, ValidationError
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import get_proxy_factory
+from overhave.factory import get_admin_factory
 
 
 def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str, Union[int, str]]]:
@@ -50,7 +50,7 @@ class TestUserView(ModelViewConfigured):
             self._feature_type = form._obj.feature_type.name
 
     def get_specification_template(self) -> Optional[Dict[str, Union[int, str]]]:
-        factory = get_proxy_factory()
+        factory = get_admin_factory()
         if self._feature_type is None:
             self._feature_type = factory.feature_type_storage.get_default_feature_type().name
         parser = factory.context.project_settings.user_spec_template_mapping.get(self._feature_type)
@@ -60,7 +60,7 @@ class TestUserView(ModelViewConfigured):
     def _validate_json(model: db.TestUser) -> None:
         if not isinstance(model.specification, dict):
             raise ValidationError("Could not convert specified data into correct JSON!")
-        parser = get_proxy_factory().context.project_settings.user_spec_template_mapping.get(model.feature_type.name)
+        parser = get_admin_factory().context.project_settings.user_spec_template_mapping.get(model.feature_type.name)
         if parser is not None:
             try:
                 parser.parse_obj(model.specification)

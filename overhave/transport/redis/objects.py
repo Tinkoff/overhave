@@ -10,6 +10,7 @@ class RedisStream(str, enum.Enum):
     """ Enum that declares Redis streams. """
 
     TEST = "test-stream"
+    PUBLICATION = "publication-stream"
     EMULATION = "emulation-stream"
 
     @property
@@ -46,6 +47,18 @@ class TestRunTask(BaseRedisTask):
     data: TestRunData
 
 
+class PublicationData(BaseModel):
+    """ Specific data for test run. """
+
+    draft_id: int
+
+
+class PublicationTask(BaseRedisTask):
+    """ Redis stream task for test run. """
+
+    data: PublicationData
+
+
 class EmulationData(BaseModel):
     """ Specific data for emulation run. """
 
@@ -58,7 +71,7 @@ class EmulationTask(BaseRedisTask):
     data: EmulationData
 
 
-TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, covariant=True)
+TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, PublicationTask, covariant=True)
 
 
 class RedisPendingData(BaseModel):

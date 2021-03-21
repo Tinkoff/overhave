@@ -1,79 +1,122 @@
+import abc
 from functools import cached_property
-from os import makedirs
-from typing import Any, Dict, Optional, cast
+from typing import Generic, Optional, Type, cast
 
-from overhave.entities import FeatureExtractor, IFeatureExtractor, OverhaveRedisSettings, ReportManager
-from overhave.entities.archiver import ArchiveManager
-from overhave.entities.authorization.manager import IAdminAuthorizationManager, LDAPAuthenticator
-from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING, AuthorizationStrategy
-from overhave.entities.emulator import EmulationTask, Emulator
-from overhave.entities.stash import IStashProjectManager
-from overhave.factory.abstract_factory import IOverhaveFactory
-from overhave.factory.context.base_context import OverhaveContext
-from overhave.processing import IProcessor
-from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
+from overhave.entities import ArchiveManager, FeatureExtractor, IFeatureExtractor, ReportManager
+from overhave.factory.context import TApplicationContext
+from overhave.scenario import FileManager, ScenarioCompiler
 from overhave.storage import (
+    DraftStorage,
     EmulationStorage,
+    FeatureStorage,
     FeatureTypeStorage,
+    IDraftStorage,
     IEmulationStorage,
+    IFeatureStorage,
     IFeatureTypeStorage,
+    IScenarioStorage,
     ITestRunStorage,
     TestRunStorage,
 )
-from overhave.testing import ConfigInjector, PluginResolver, PytestRunner, StepCollector
-from overhave.transport import RedisProducer, RedisStream, S3Manager, StashHttpClient, TestRunTask
+from overhave.test_execution import PytestRunner, StepCollector
+from overhave.transport import S3Manager
 
 
-class OverhaveBaseFactory(IOverhaveFactory):
+class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
+    """ Factory interface for application entities resolution and usage. """
+
+    @abc.abstractmethod
+    def set_context(self, context: TApplicationContext) -> None:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def context(self) -> TApplicationContext:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def draft_storage(self) -> IDraftStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def emulation_storage(self) -> IEmulationStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def feature_extractor(self) -> IFeatureExtractor:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def step_collector(self) -> StepCollector:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def test_run_storage(self) -> ITestRunStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def test_runner(self) -> PytestRunner:
+        pass
+
+
+class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     """ Base factory for application entities resolution and usage. """
 
+    context_cls = Type[TApplicationContext]
+
     def __init__(self) -> None:
-        self._context: Optional[OverhaveContext] = None
+        self._context: Optional[TApplicationContext] = None
 
-    def set_context(self, context: OverhaveContext) -> None:
+    def set_context(self, context: TApplicationContext) -> None:
         self._context = context
-        self._resolve_deps()
 
     @property
-    def has_context(self) -> bool:
-        return self._context is not None
-
-    @property
-    def context(self) -> OverhaveContext:
+    def context(self) -> TApplicationContext:
         if self._context is None:
-            self.set_context(OverhaveContext())
-        return cast(OverhaveContext, self._context)
-
-    def _resolve_deps(self) -> None:
-        self.s3_manager.initialize()
+            self.set_context(self.context_cls())
+        return cast(TApplicationContext, self._context)
 
     @cached_property
-    def _test_runner(self) -> PytestRunner:
-        return PytestRunner(settings=self.context.test_settings)
-
-    @property
-    def test_runner(self) -> PytestRunner:
-        return self._test_runner
-
-    @property
-    def step_collector(self) -> StepCollector:
-        return StepCollector(step_prefixes=self.context.language_settings.step_prefixes)
+    def _archive_manager(self) -> ArchiveManager:
+        return ArchiveManager(file_settings=self.context.file_settings)
 
     @cached_property
-    def _injector(self) -> ConfigInjector:
-        return ConfigInjector()
+    def _draft_storage(self) -> DraftStorage:
+        return DraftStorage()
 
     @property
-    def injector(self) -> ConfigInjector:
-        return self._injector
+    def draft_storage(self) -> IDraftStorage:
+        return self._draft_storage
 
     @cached_property
-    def _feature_extractor(self) -> IFeatureExtractor:
+    def _emulation_storage(self) -> EmulationStorage:
+        return EmulationStorage(settings=self.context.emulation_settings)
+
+    @property
+    def emulation_storage(self) -> IEmulationStorage:
+        return self._emulation_storage
+
+    @cached_property
+    def _feature_extractor(self) -> FeatureExtractor:
         return FeatureExtractor(file_settings=self.context.file_settings)
 
     @property
     def feature_extractor(self) -> IFeatureExtractor:
         return self._feature_extractor
+
+    @cached_property
+    def _feature_storage(self) -> IFeatureStorage:
+        return FeatureStorage()
+
+    @cached_property
+    def _feature_type_storage(self) -> IFeatureTypeStorage:
+        return FeatureTypeStorage()
 
     @cached_property
     def _file_manager(self) -> FileManager:
@@ -82,64 +125,14 @@ class OverhaveBaseFactory(IOverhaveFactory):
             self.context.file_settings.tmp_fixtures_dir,
             self.context.file_settings.tmp_reports_dir,
         ):
-            makedirs(path.as_posix(), exist_ok=True)
+            path.mkdir(parents=True, exist_ok=True)
         return FileManager(
             project_settings=self.context.project_settings,
             file_settings=self.context.file_settings,
             language_settings=self.context.language_settings,
             feature_extractor=self._feature_extractor,
-            scenario_compiler=ScenarioCompiler(
-                compilation_settings=self.context.compilation_settings,
-                language_settings=self.context.language_settings,
-                task_links_keyword=self.context.project_settings.links_keyword,
-            ),
-            scenario_parser=ScenarioParser(
-                compilation_settings=self.context.compilation_settings,
-                language_settings=self.context.language_settings,
-                feature_extractor=self._feature_extractor,
-                task_links_keyword=self.context.project_settings.links_keyword,
-            ),
+            scenario_compiler=self._scenario_compiler,
         )
-
-    @property
-    def file_manager(self) -> FileManager:
-        return self._file_manager
-
-    @cached_property
-    def _stash_client(self) -> StashHttpClient:
-        return StashHttpClient(settings=self.context.stash_client_settings)
-
-    @cached_property
-    def _stash_manager(self) -> IStashProjectManager:
-        from overhave.entities.stash.manager.stash_manager import StashProjectManager
-
-        return StashProjectManager(
-            stash_project_settings=self.context.stash_project_settings,
-            file_settings=self.context.file_settings,
-            client=self._stash_client,
-            file_manager=self._file_manager,
-            task_links_keyword=self.context.project_settings.links_keyword,
-        )
-
-    @cached_property
-    def _archive_manager(self) -> ArchiveManager:
-        return ArchiveManager(file_settings=self.context.file_settings)
-
-    @cached_property
-    def _s3_manager(self) -> S3Manager:
-        return S3Manager(self.context.s3_manager_settings)
-
-    @property
-    def s3_manager(self) -> S3Manager:
-        return self._s3_manager
-
-    @cached_property
-    def _test_run_storage(self) -> TestRunStorage:
-        return TestRunStorage()
-
-    @property
-    def test_run_storage(self) -> ITestRunStorage:
-        return self._test_run_storage
 
     @cached_property
     def _report_manager(self) -> ReportManager:
@@ -156,75 +149,41 @@ class OverhaveBaseFactory(IOverhaveFactory):
         return self._report_manager
 
     @cached_property
-    def _processor(self) -> IProcessor:
-        from overhave.processing.processor import Processor
+    def _s3_manager(self) -> S3Manager:
+        return S3Manager(self.context.s3_manager_settings)
 
-        return Processor(
-            settings=self.context.processor_settings,
-            file_settings=self.context.file_settings,
-            test_run_storage=self._test_run_storage,
-            injector=self._injector,
-            file_manager=self._file_manager,
-            test_runner=self._test_runner,
-            stash_manager=self._stash_manager,
-            report_manager=self._report_manager,
+    @cached_property
+    def _scenario_compiler(self) -> ScenarioCompiler:
+        return ScenarioCompiler(
+            compilation_settings=self.context.compilation_settings,
+            language_settings=self.context.language_settings,
+            task_links_keyword=self.context.project_settings.links_keyword,
         )
 
+    @cached_property
+    def _step_collector(self) -> StepCollector:
+        return StepCollector(step_prefixes=self.context.language_settings.step_prefixes)
+
     @property
-    def processor(self) -> IProcessor:
-        return self._processor
+    def step_collector(self) -> StepCollector:
+        return self._step_collector
 
     @cached_property
-    def _auth_manager(self) -> IAdminAuthorizationManager:
-        settings = self.context.auth_settings
-        kwargs: Dict[str, Any] = dict(settings=settings)
-        if settings.auth_strategy is AuthorizationStrategy.LDAP:
-            kwargs["ldap_authenticator"] = LDAPAuthenticator(settings=self.context.ldap_client_settings)
-        return AUTH_STRATEGY_TO_MANAGER_MAPPING[settings.auth_strategy](**kwargs)  # type: ignore
-
-    @property
-    def auth_manager(self) -> IAdminAuthorizationManager:
-        return self._auth_manager
+    def _scenario_storage(self) -> IScenarioStorage:
+        return self._scenario_storage
 
     @cached_property
-    def _emulator(self) -> Emulator:
-        return Emulator(storage=self._emulation_storage, settings=self.context.emulation_settings)
+    def _test_run_storage(self) -> TestRunStorage:
+        return TestRunStorage()
 
     @property
-    def emulator(self) -> Emulator:
-        return self._emulator
+    def test_run_storage(self) -> ITestRunStorage:
+        return self._test_run_storage
 
     @cached_property
-    def _feature_type_storage(self) -> IFeatureTypeStorage:
-        return FeatureTypeStorage()
+    def _test_runner(self) -> PytestRunner:
+        return PytestRunner(settings=self.context.test_settings)
 
     @property
-    def feature_type_storage(self) -> IFeatureTypeStorage:
-        return self._feature_type_storage
-
-    @cached_property
-    def _redis_producer(self) -> RedisProducer:
-        return RedisProducer(
-            settings=OverhaveRedisSettings(),
-            mapping={TestRunTask: RedisStream.TEST, EmulationTask: RedisStream.EMULATION},
-        )
-
-    @property
-    def redis_producer(self) -> RedisProducer:
-        return self._redis_producer
-
-    @cached_property
-    def _emulation_storage(self) -> IEmulationStorage:
-        return EmulationStorage(settings=self.context.emulation_settings)
-
-    @property
-    def emulation_storage(self) -> IEmulationStorage:
-        return self._emulation_storage
-
-    @cached_property
-    def _plugin_resolver(self) -> PluginResolver:
-        return PluginResolver(file_settings=self.context.file_settings)
-
-    @property
-    def plugin_resolver(self) -> PluginResolver:
-        return self._plugin_resolver
+    def test_runner(self) -> PytestRunner:
+        return self._test_runner

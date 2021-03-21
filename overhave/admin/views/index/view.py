@@ -1,6 +1,6 @@
 import logging
-import typing
-from typing import Any
+from pathlib import Path
+from typing import Any, Optional
 
 import flask
 import ldap
@@ -13,7 +13,6 @@ from wtforms.validators import ValidationError
 from overhave.admin.views.index.custom_page import CustomPageForm
 from overhave.admin.views.index.login_form import LoginForm
 from overhave.entities.authorization.manager import IAdminAuthorizationManager
-from overhave.factory import OverhaveContext
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +20,14 @@ logger = logging.getLogger(__name__)
 class OverhaveIndexView(AdminIndexView):
     """ View for index. """
 
-    def __init__(self, name: str, url: str, context: OverhaveContext, auth_manager: IAdminAuthorizationManager) -> None:
+    def __init__(
+        self, name: str, url: str, auth_manager: IAdminAuthorizationManager, index_template_path: Optional[Path]
+    ) -> None:
         super().__init__(
             name=name, url=url,
         )
-        self._context = context
         self._auth_manager = auth_manager
+        self._index_template_path = index_template_path
 
     @expose("/login", methods=["GET", "POST"])
     def login(self) -> Any:  # noqa: C901
@@ -63,7 +64,5 @@ class OverhaveIndexView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])  # noqa: C901
     @login_required
-    def index(self) -> typing.Any:  # noqa: C901
-        return self.render(
-            "index.html", form=CustomPageForm(template_path=self._context.admin_settings.index_template_path)
-        )
+    def index(self) -> Any:  # noqa: C901
+        return self.render("index.html", form=CustomPageForm(template_path=self._index_template_path))

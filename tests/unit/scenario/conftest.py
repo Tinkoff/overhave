@@ -8,8 +8,8 @@ from overhave.entities import (
     FeatureTypeModel,
     OverhaveLanguageSettings,
     OverhaveScenarioCompilerSettings,
-    ProcessingContext,
     ScenarioModel,
+    TestExecutorContext,
     TestRunModel,
 )
 from overhave.scenario import ScenarioCompiler, ScenarioParser
@@ -71,8 +71,8 @@ def test_scenario(test_scenario_text: str) -> ScenarioModel:
 @pytest.fixture()
 def test_processing_ctx(
     test_feature: FeatureModel, test_scenario: ScenarioModel, test_testrun: TestRunModel
-) -> ProcessingContext:
-    return ProcessingContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
+) -> TestExecutorContext:
+    return TestExecutorContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
 
 
 @pytest.fixture()

@@ -6,7 +6,7 @@ from faker import Faker
 from overhave import db
 from overhave.entities.converters import EmulationModel, FeatureTypeModel, SystemUserModel, TestUserModel
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage.emulation import EmulationStorage
+from overhave.storage.emulation_storage import EmulationStorage
 
 
 @pytest.fixture(scope="class")

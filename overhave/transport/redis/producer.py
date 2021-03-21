@@ -4,7 +4,6 @@ from typing import Dict, Type
 import redis
 
 from overhave.entities.settings import OverhaveRedisSettings
-from overhave.transport.redis.errors import RedisConnectionError
 from overhave.transport.redis.objects import BaseRedisTask, RedisStream
 from overhave.transport.redis.template import RedisTemplate
 
@@ -21,10 +20,12 @@ class RedisProducer(RedisTemplate):
         super().__init__(settings)
         self._streams = {task: self._database.Stream(stream.value) for task, stream in mapping.items()}
 
-    def add(self, task: BaseRedisTask) -> None:
+    def add_task(self, task: BaseRedisTask) -> bool:
         stream = self._streams[type(task)]
-        logger.info("Added redis task %s", task)
+        logger.info("Added Redis task %s", task)
         try:
             stream.add(task.message)
-        except redis.exceptions.ConnectionError as e:
-            raise RedisConnectionError("Could not connect to Redis service!") from e
+            return True
+        except redis.exceptions.ConnectionError:
+            logger.exception("Could not add %s to Redis!", type(task).__name__)
+            return False

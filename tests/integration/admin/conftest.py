@@ -8,7 +8,7 @@ import pytest
 from faker import Faker
 from flask.testing import FlaskClient
 
-from overhave import OverhaveAppType, OverhaveContext, overhave_app
+from overhave import OverhaveAdmin, OverhaveContext, overhave_app
 from overhave.base_settings import DataBaseSettings
 from overhave.factory import ProxyFactory
 
@@ -52,12 +52,12 @@ def patched_app_proxy_factory(
 
 
 @pytest.fixture()
-def test_app(patched_app_proxy_factory) -> OverhaveAppType:
+def test_app(patched_app_proxy_factory) -> OverhaveAdmin:
     return overhave_app(factory=patched_app_proxy_factory)
 
 
 @pytest.fixture()
-def test_client(test_app: OverhaveAppType) -> FlaskClient:
+def test_client(test_app: OverhaveAdmin) -> FlaskClient:
     db_fd, test_app.config["DATABASE"] = tempfile.mkstemp()
     test_app.config["TESTING"] = True
 

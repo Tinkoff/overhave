@@ -41,9 +41,9 @@ class ExternalCommandCheckMixin:
 class Emulator(ExternalCommandCheckMixin):
     """ Class for creation of emulation runs. """
 
-    def __init__(self, storage: IEmulationStorage, settings: OverhaveEmulationSettings):
-        self._storage = storage
+    def __init__(self, settings: OverhaveEmulationSettings, storage: IEmulationStorage):
         self._settings = settings
+        self._storage = storage
 
     def _initiate(self, emulation_run: EmulationRunModel) -> None:
         if not isinstance(self._settings.emulation_base_cmd, str):

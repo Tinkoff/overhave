@@ -1,6 +1,4 @@
-ARG DOCKER_HUB_PROXY
-
-FROM ${DOCKER_HUB_PROXY}python:3.8-slim
+FROM python:3.8-slim
 
 RUN groupadd -r app && useradd -r -g app app
 

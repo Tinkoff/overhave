@@ -1,11 +1,19 @@
 import click
 
-from demo.settings import OverhaveDemoSettings
-from overhave import OverhaveContext, OverhaveLanguageSettings, overhave_factory
+from demo.settings import OverhaveDemoSettingsGenerator
+from overhave import (
+    OverhaveAdminContext,
+    OverhavePublicationContext,
+    OverhaveRedisStream,
+    OverhaveTestExecutionContext,
+    overhave_admin_factory,
+    overhave_publication_factory,
+    overhave_test_execution_factory,
+)
 from overhave.cli.admin import _run_admin
 from overhave.cli.consumers import _run_consumer
-from overhave.extra import RUSSIAN_PREFIXES
-from overhave.transport import RedisStream
+
+_SETTINGS_GENERATOR = OverhaveDemoSettingsGenerator()
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -13,18 +21,9 @@ def overhave_demo() -> None:
     pass
 
 
-def _set_custom_context() -> None:
-    # prepare settings and environment for demo run
-    demo_settings = OverhaveDemoSettings()
-    demo_settings.enrich_env()
-
-    # context enriched with russian `pytest_bdd` prefixes
-    context = OverhaveContext(language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES))
-    overhave_factory().set_context(context)
-
-
 def _run_demo_admin() -> None:
-    _set_custom_context()
+    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.default_context_settings)
+    overhave_admin_factory().set_context(context)
     _run_admin(port=8076, debug=True)
 
 
@@ -33,8 +32,13 @@ def admin() -> None:
     _run_demo_admin()
 
 
-def _run_demo_consumer(stream: RedisStream) -> None:
-    _set_custom_context()
+def _run_demo_consumer(stream: OverhaveRedisStream) -> None:
+    if stream is OverhaveRedisStream.TEST:
+        context = OverhaveTestExecutionContext(**_SETTINGS_GENERATOR.default_context_settings)
+        overhave_test_execution_factory().set_context(context)
+    if stream is OverhaveRedisStream.PUBLICATION:
+        context = OverhavePublicationContext(**_SETTINGS_GENERATOR.publication_settings)
+        overhave_publication_factory().set_context(context)
     _run_consumer(stream=stream)
 
 
@@ -42,9 +46,9 @@ def _run_demo_consumer(stream: RedisStream) -> None:
 @click.option(
     "-s",
     "--stream",
-    type=click.Choice(RedisStream.__members__),
-    callback=lambda c, p, v: getattr(RedisStream, v),
+    type=click.Choice(OverhaveRedisStream.__members__),
+    callback=lambda c, p, v: getattr(OverhaveRedisStream, v),
     help="Redis stream, which defines application",
 )
-def consumer(stream: RedisStream) -> None:
+def consumer(stream: OverhaveRedisStream) -> None:
     _run_demo_consumer(stream)

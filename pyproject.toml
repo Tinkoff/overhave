@@ -26,7 +26,7 @@ overhave = 'overhave.cli:overhave'
 overhave-demo = 'demo:overhave_demo'
 
 [tool.poetry.plugins.pytest11]
-overhave = "overhave.testing.plugin"
+overhave = "overhave.pytest_plugin.plugin"
 
 [tool.poetry.dependencies]
 python = "^3.8"

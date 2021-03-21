@@ -6,8 +6,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
-from overhave.entities import IFeatureExtractor
-from overhave.entities.settings import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
 from overhave.scenario.errors import FeatureNameParsingError, FeatureTypeParsingError, LastEditorParsingError
 from overhave.scenario.mixin import PrefixMixin
 

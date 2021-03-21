@@ -12,10 +12,10 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
-from overhave.testing import get_scenario, has_issue_links
-from overhave.testing.plugin import (
+from overhave.pytest_plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
+    StepContextNotDefinedError,
     StepNotFoundError,
     _OptionName,
     _Options,
@@ -31,7 +31,7 @@ from overhave.testing.plugin import (
     pytest_runtest_makereport,
     pytest_runtest_setup,
 )
-from overhave.testing.plugin_utils import StepContextNotDefinedError
+from overhave.test_execution import get_scenario, has_issue_links
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -224,7 +224,7 @@ class TestPytestCommonHooks:
 
     def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
         with mock.patch(
-            "overhave.testing.plugin_utils.allure_utils.common.add_scenario_title_to_report",
+            "overhave.test_execution.helpers.allure_utils.common.add_scenario_title_to_report",
             return_value=mock.MagicMock(),
         ) as mocked_title_func:
             pytest_collection_modifyitems(test_pytest_clean_session)

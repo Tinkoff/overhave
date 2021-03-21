@@ -12,10 +12,9 @@ from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave import OverhaveContext, OverhaveDescriptionManagerSettings, OverhaveProjectSettings
-from overhave.base_settings import OverhaveLoggingSettings
+from overhave.base_settings import LoggingSettings
 from overhave.factory import ProxyFactory
-from overhave.testing.plugin import pytest_addoption
-from overhave.testing.plugin_utils import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin import DescriptionManager, StepContextRunner, pytest_addoption
 from tests.objects import get_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
@@ -72,18 +71,18 @@ def test_step_context_logs(request: FixtureRequest) -> bool:
 
 
 @pytest.fixture()
-def test_logging_settings(test_step_context_logs: bool) -> OverhaveLoggingSettings:
-    return OverhaveLoggingSettings(step_context_logs=test_step_context_logs)
+def test_logging_settings(test_step_context_logs: bool) -> LoggingSettings:
+    return LoggingSettings(step_context_logs=test_step_context_logs)
 
 
 @pytest.fixture()
-def test_step_context_runner(test_logging_settings: OverhaveLoggingSettings) -> StepContextRunner:
+def test_step_context_runner(test_logging_settings: LoggingSettings) -> StepContextRunner:
     return StepContextRunner(logging_settings=test_logging_settings)
 
 
 @pytest.fixture()
 def clear_get_step_context_runner() -> None:
-    from overhave.testing.plugin_utils import get_step_context_runner
+    from overhave.pytest_plugin import get_step_context_runner
 
     get_step_context_runner.cache_clear()
 
@@ -124,7 +123,7 @@ def link_handler_mock() -> mock.MagicMock:
 
 @pytest.fixture()
 def clear_get_description_manager() -> None:
-    from overhave.testing.plugin_utils import get_description_manager
+    from overhave.pytest_plugin import get_description_manager
 
     get_description_manager.cache_clear()
 

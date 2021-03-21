@@ -12,14 +12,14 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
 from overhave import AuthorizationStrategy, OverhaveContext
-from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
+from overhave.base_settings import DataBaseSettings, LoggingSettings
 from overhave.factory import ProxyFactory, get_proxy_factory
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_logging() -> None:
-    OverhaveLoggingSettings(log_level=logging.DEBUG).setup_logging()
+    LoggingSettings(log_level=logging.DEBUG).setup_logging()
 
 
 @pytest.fixture(scope="session")

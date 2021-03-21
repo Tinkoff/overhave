@@ -15,9 +15,8 @@ from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import get_proxy_factory
+from overhave.factory import get_admin_factory
 from overhave.transport import TestRunData, TestRunTask
-from overhave.transport.redis.errors import BaseRedisException
 
 logger = logging.getLogger(__name__)
 
@@ -115,15 +114,15 @@ class FeatureView(ModelViewConfigured):
 
     @cached_property
     def get_bdd_steps(self) -> Dict[str, Dict[str, List[str]]]:
-        factory = get_proxy_factory()
+        factory = get_admin_factory()
         return {
-            feature_type: factory.injector.get_steps(feature_type)
+            feature_type: factory.step_collector.get_steps(feature_type)
             for feature_type in factory.feature_extractor.feature_types
         }
 
     @property
     def browse_url(self) -> Optional[str]:
-        browse_url_value = get_proxy_factory().context.project_settings.browse_url
+        browse_url_value = get_admin_factory().context.project_settings.browse_url
         if browse_url_value is not None:
             return cast(str, browse_url_value.human_repr())
         return None
@@ -136,18 +135,13 @@ class FeatureView(ModelViewConfigured):
         if not scenario_id or not scenario_text:
             flask.flash("Scenario does not exist, so could not run test.", category="warning")
             return rendered
-
-        factory = get_proxy_factory()
+        factory = get_admin_factory()
         test_run_id = factory.test_run_storage.create_test_run(
             scenario_id=int(scenario_id), executed_by=current_user.login
         )
-        try:
-            factory.redis_producer.add(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
-        except BaseRedisException:
-            logger.exception("Could not add TestRunTask to Redis!")
+        if not factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id))):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return rendered
-
         logger.debug("Redirect to TestRun details view with test_run_id='%s'...", test_run_id)
         return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 

@@ -41,5 +41,5 @@ class RedisConsumerRunner:
 
     def _process(self, data: RedisUnreadData) -> None:
         container = RedisContainer(task=data.decoded_message)
-        logger.info("Gotten ready for processing BaseRedisTask: %s", container.task)
+        logger.info("Gotten ready for test_execution BaseRedisTask: %s", container.task)
         self._mapping[type(container.task)](container.task)

@@ -5,7 +5,7 @@ from faker import Faker
 from pytest_mock import MockFixture
 
 from overhave.entities import FeatureTypeName
-from overhave.entities.stash import OverhaveStashManagerSettings
+from overhave.publication.stash import OverhaveStashPublisherSettings
 from overhave.transport import StashHttpClient
 from tests.objects import get_feature_extractor
 
@@ -33,8 +33,8 @@ def test_default_reviewers(faker: Faker) -> Sequence[str]:
 @pytest.fixture()
 def test_stash_project_settings_with_default_reviewers(
     test_repository_name: str, test_project_key: str, test_target_branch: str, test_default_reviewers: Sequence[str],
-) -> OverhaveStashManagerSettings:
-    return OverhaveStashManagerSettings(
+) -> OverhaveStashPublisherSettings:
+    return OverhaveStashPublisherSettings(
         repository_name=test_repository_name,
         project_key=test_project_key,
         default_target_branch_name=test_target_branch,
@@ -56,8 +56,8 @@ def test_stash_project_settings_with_reviewers_mapping(
     test_project_key: str,
     test_target_branch: str,
     test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
-) -> OverhaveStashManagerSettings:
-    return OverhaveStashManagerSettings(
+) -> OverhaveStashPublisherSettings:
+    return OverhaveStashPublisherSettings(
         repository_name=test_repository_name,
         project_key=test_project_key,
         default_target_branch_name=test_target_branch,

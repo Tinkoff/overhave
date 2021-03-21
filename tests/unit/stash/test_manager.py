@@ -4,7 +4,7 @@ import pytest
 from faker import Faker
 
 from overhave.entities import FeatureTypeName, OverhaveFileSettings, OverhaveStashManagerSettings
-from overhave.entities.stash.manager.stash_manager import StashProjectManager
+from overhave.publication.stash.manager import StashProjectManager
 from overhave.scenario import FileManager
 from overhave.transport import (
     StashBranch,
@@ -19,7 +19,7 @@ from tests.objects import get_file_settings
 
 @pytest.mark.parametrize("test_file_settings", [get_file_settings()], indirect=True)
 class TestStashProjectManager:
-    """ Unit tests for :class:`StashProjectManager`. """
+    """ Unit tests for :class:`StashVersionPublisher`. """
 
     def test_stash_project_settings_basic(
         self,
@@ -39,8 +39,8 @@ class TestStashProjectManager:
             task_links_keyword=None,
         )
         correct_repository = StashRepository(slug=test_repository_name, project=StashProject(key=test_project_key))
-        assert manager._stash_project_settings.repository == correct_repository
-        assert manager._stash_project_settings.target_branch == StashBranch(
+        assert manager._stash_publisher_settings.repository == correct_repository
+        assert manager._stash_publisher_settings.target_branch == StashBranch(
             id=test_target_branch, repository=correct_repository
         )
 
@@ -60,7 +60,7 @@ class TestStashProjectManager:
             file_manager=mocked_file_manager,
             task_links_keyword=None,
         )
-        assert manager._stash_project_settings.get_reviewers(faker.word()) == [
+        assert manager._stash_publisher_settings.get_reviewers(faker.word()) == [
             StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_default_reviewers
         ]
 
@@ -81,6 +81,6 @@ class TestStashProjectManager:
             task_links_keyword=None,
         )
         for key in test_reviewers_mapping.keys():
-            assert manager._stash_project_settings.get_reviewers(key) == [
+            assert manager._stash_publisher_settings.get_reviewers(key) == [
                 StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_reviewers_mapping[key]
             ]

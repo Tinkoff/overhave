@@ -6,7 +6,7 @@ import pytest
 from allure_commons._allure import StepContext
 from faker import Faker
 
-from overhave.testing.plugin_utils import StepContextNotDefinedError, StepContextRunner
+from overhave.pytest_plugin import StepContextNotDefinedError, StepContextRunner
 
 
 @pytest.mark.parametrize("test_step_context_logs", [False, True], indirect=True)

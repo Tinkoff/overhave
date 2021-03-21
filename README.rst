@@ -144,7 +144,7 @@ provides a CLI entrypoints for easy server run in debug mode:
 
 .. code-block:: shell
 
-    docker-compose up -d db  # start PostgreSQL database
+    make up  # start PostgreSQL database and Redis
     overhave db create-all  # create Overhave database schema
     overhave-demo admin  # start Overhave admin on port 8076 in debug mode
 

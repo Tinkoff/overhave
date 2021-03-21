@@ -16,6 +16,8 @@ from .redis import (
     BaseRedisTask,
     EmulationData,
     EmulationTask,
+    PublicationData,
+    PublicationTask,
     RedisConsumer,
     RedisConsumerRunner,
     RedisProducer,
