@@ -25,6 +25,10 @@ class BaseStashVersionPublisherException(BaseGitVersionPublisherError):
     """ Base exception for :class:`StashVersionPublisher`. """
 
 
+class NullablePullRequestUrlError(BaseStashVersionPublisherException):
+    """ Exception for nullable pull-request in selected Draft. """
+
+
 class StashVersionPublisher(GitVersionPublisher):
     """ Class for feature version's pull requests management relative to Atlassian Stash API. """
 
@@ -54,6 +58,12 @@ class StashVersionPublisher(GitVersionPublisher):
 
     def _save_as_duplicate(self, context: PublisherContext) -> None:
         previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
+        if previous_draft.pr_url is None:
+            raise NullablePullRequestUrlError(
+                "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
+            )
+        if previous_draft.published_at is None:
+            raise RuntimeError
         self._draft_storage.save_response(
             draft_id=context.draft.id,
             pr_url=previous_draft.pr_url,

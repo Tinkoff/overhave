@@ -10,7 +10,7 @@ class IDraftStorage(abc.ABC):
     """ Abstract class for scenario versions storage. """
 
     @abc.abstractmethod
-    def get_draft(self, draft_id: int) -> DraftModel:
+    def get_draft(self, draft_id: int) -> Optional[DraftModel]:
         pass
 
     @abc.abstractmethod

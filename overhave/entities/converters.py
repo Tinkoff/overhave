@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
-from pydantic import validator
 from pydantic.main import BaseModel
 from pydantic.types import SecretStr
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
@@ -97,13 +96,6 @@ class PublisherContext(TestExecutorContext):
 
     draft: DraftModel
     target_branch: str
-
-    @validator("target_branch", pre=True)
-    def make_branch_name(cls, v: Optional[str], values: Dict[str, Any]) -> str:
-        if v is None:
-            feature = values.get("feature")
-            return f"bdd-feature-{feature.id}"
-        return v
 
 
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore

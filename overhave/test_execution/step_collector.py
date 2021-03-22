@@ -61,12 +61,12 @@ class StepCollector:
             for step_type in default_types.STEP_TYPES
         }
 
-    def collect_steps(self, session: Session, feature_type: FeatureTypeName):
+    def collect_steps(self, session: Session, feature_type: FeatureTypeName) -> None:
         step_fixtures = self._get_pytestbdd_steps(session)
         steps_dict = self._compile_steps_dict(step_fixtures)
         if steps_dict:
             logger.debug("Loaded steps dict:\n%s", steps_dict)
-        self._steps[feature_type] = steps_dict  # type: ignore
+        self._steps[feature_type] = steps_dict
 
     def get_steps(self, feature_type: FeatureTypeName) -> Dict[str, List[str]]:
         return self._steps.get(feature_type, {})

@@ -76,7 +76,7 @@ class ConfigInjector:
         if self._step_collector is None:
             raise NullableEntitiesError
         if self._inside_collecting:
-            self._step_collector.collect_steps(session=session, feature_type=self._current_type)
+            self._step_collector.collect_steps(session=session, feature_type=self._current_type)  # type: ignore
 
     def adapt(self, session: Session) -> None:
         """ Main def for data loading from pytest Session and enrichment of pytest configs. """

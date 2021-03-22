@@ -49,7 +49,13 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             raise TestRunNotExistsError(f"TestRun with id={draft.test_run_id} does not exist!")
         feature = self._feature_storage.get_feature(draft.feature_id)
         scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
-        return PublisherContext(feature=feature, scenario=scenario, test_run=test_run, draft=draft)
+        return PublisherContext(
+            feature=feature,
+            scenario=scenario,
+            test_run=test_run,
+            draft=draft,
+            target_branch=f"bdd-feature-{feature.id}",
+        )
 
     def _compile_publication_description(self, context: PublisherContext) -> str:
         return "\n".join(
