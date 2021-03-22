@@ -52,11 +52,7 @@ class TestTestRunStorage:
     ):
         test_run = test_test_run_storage.get_test_run(test_test_run_id)
         assert test_run.report is None
-        test_test_run_storage.set_report(
-            run_id=test_test_run_id,
-            status=report_status,
-            report=test_report,
-        )
+        test_test_run_storage.set_report(run_id=test_test_run_id, status=report_status, report=test_report)
         test_run = test_test_run_storage.get_test_run(test_test_run_id)
         assert test_run.report_status == report_status
         assert test_run.report == test_report
