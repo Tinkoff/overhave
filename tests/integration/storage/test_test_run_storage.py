@@ -48,12 +48,14 @@ class TestTestRunStorage:
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         ("report_status", "report"),
-        [
-            (TestReportStatus.GENERATED, uuid1().hex),
-            (TestReportStatus.GENERATION_FAILED, uuid1().hex),
-            (TestReportStatus.EMPTY, uuid1().hex),
-            (TestReportStatus.SAVED, uuid1().hex),
-        ],
+        sorted(
+            [
+                (TestReportStatus.GENERATED, uuid1().hex),
+                (TestReportStatus.GENERATION_FAILED, uuid1().hex),
+                (TestReportStatus.EMPTY, uuid1().hex),
+                (TestReportStatus.SAVED, uuid1().hex),
+            ]
+        ),
     )
     def test_set_report(
         self,
