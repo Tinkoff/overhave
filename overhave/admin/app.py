@@ -85,10 +85,15 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdmin:  # noqa: C901
     @flask_app.route("/reports/<path:request>", methods=["GET", "POST"])
     def get_report(request: str) -> flask.Response:
         if flask.request.method == "POST":
-            test_run_id = flask.request.form.get("run_id")
-            if test_run_id is None or not factory.report_manager.ensure_allure_report_exists(
+            test_run_id = flask.request.form.get("run_id")  # ReportPresenceResolution
+            if test_run_id is None:
+                return flask.abort(status=HTTPStatus.BAD_REQUEST)
+            report_precense_resolution = factory.report_manager.get_report_precense_resolution(
                 report=request, run_id=int(test_run_id)
-            ):
+            )
+            if not report_precense_resolution.exists:
+                if report_precense_resolution.not_ready:
+                    return flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
                 return flask.abort(status=HTTPStatus.NOT_FOUND)
         return typing.cast(
             flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)

@@ -21,7 +21,7 @@ from .feature import (
     ScenariosTestFileNotFound,
 )
 from .language import StepPrefixesModel, TranslitPack
-from .report_manager import ReportManager
+from .report_manager import ReportManager, ReportPresenceResolution
 from .settings import (
     OverhaveDescriptionManagerSettings,
     OverhaveEmulationSettings,

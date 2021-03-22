@@ -7,6 +7,7 @@ from uuid import uuid1
 
 from overhave.db import TestReportStatus
 from overhave.entities.archiver import ArchiveManager
+from overhave.entities.report_manager.models import ReportPresenceResolution
 from overhave.entities.settings import OverhaveFileSettings, OverhaveReportManagerSettings
 from overhave.storage import ITestRunStorage
 from overhave.transport import OverhaveS3Bucket, S3Manager
@@ -77,11 +78,11 @@ class ReportManager:
         logger.debug("Allure report successfully generated to directory: %s", report_dir.as_posix())
         self._process_generated_report(test_run_id=test_run_id, report_dir=report_dir)
 
-    def ensure_allure_report_exists(self, report: str, run_id: int) -> bool:
+    def get_report_precense_resolution(self, report: str, run_id: int) -> ReportPresenceResolution:  # noqa: C901
         report_index = Path(self._file_settings.tmp_reports_dir / report)
         report_dir = report_index.parent
         if report_dir.exists() and report_index.exists():
-            return True
+            return ReportPresenceResolution(exists=True)
 
         if not report_dir.exists():
             logger.warning("Report '%s' does not exist!", report_index.parent.name)
@@ -90,8 +91,22 @@ class ReportManager:
         test_run = self._test_run_storage.get_test_run(run_id)
         if test_run is None:
             logger.warning("No one test run with id=%s exists!", run_id)
-            return False
+            return ReportPresenceResolution(exists=False)
 
+        resolution = ReportPresenceResolution(
+            exists=False, s3_enabled=self._s3_manager.enabled, report_status=test_run.report_status
+        )
+        if not test_run.report_status.has_report:
+            logger.warning("TestRun with id=%s has not got report!", run_id)
+            return resolution
+        if not self._s3_manager.enabled:
+            logger.info("S3Manager disabled, so could not download file from s3 cloud.")
+            return resolution
+        if test_run.report_status is TestReportStatus.GENERATED:
+            logger.warning(
+                "File %s after TestRun with id=%s has been generated, but still not uploaded!", test_run.report, run_id
+            )
+            return resolution
         zip_report_path = self._file_settings.tmp_reports_dir / (
             report_dir.name + f".{self._settings.archive_extension}"
         )
@@ -101,11 +116,12 @@ class ReportManager:
         )
         if not download_success:
             logger.error("Report archive '%s' is not available on s3 cloud!", zip_report_path.name)
-            return False
+            return resolution
 
         unpacked_report = self._archive_manager.unpack_path(
             path=zip_report_path, extension=self._settings.archive_extension
         )
         zip_report_path.unlink()
         logger.info("Unpacked Allure report: %s", unpacked_report)
-        return True
+        resolution.exists = True
+        return resolution

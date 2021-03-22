@@ -76,6 +76,8 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
 
     def set_context(self, context: TApplicationContext) -> None:
         self._context = context
+        if hasattr(self._context, "s3_manager_settings") and self._context.s3_manager_settings.enabled:
+            self._s3_manager.initialize()
 
     @property
     def context(self) -> TApplicationContext:
