@@ -117,3 +117,8 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
 @pytest.fixture(scope="class")
 def test_report() -> str:
     return uuid1().hex
+
+
+@pytest.fixture()
+def test_test_run_id(test_test_run_storage, test_scenario, test_feature):
+    return test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
