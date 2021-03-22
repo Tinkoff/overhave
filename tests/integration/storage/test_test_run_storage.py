@@ -4,7 +4,7 @@ import pytest
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
-from overhave.entities import FeatureModel, ScenarioModel
+from overhave.entities import FeatureModel
 from overhave.storage.test_run import TestRunStorage
 
 
