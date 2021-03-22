@@ -16,6 +16,7 @@ from overhave.storage import (
     IFeatureTypeStorage,
     IScenarioStorage,
     ITestRunStorage,
+    ScenarioStorage,
     TestRunStorage,
 )
 from overhave.test_execution import PytestRunner, StepCollector
@@ -68,7 +69,7 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
 class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     """ Base factory for application entities resolution and usage. """
 
-    context_cls = Type[TApplicationContext]
+    context_cls: Type[TApplicationContext]
 
     def __init__(self) -> None:
         self._context: Optional[TApplicationContext] = None
@@ -170,7 +171,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
 
     @cached_property
     def _scenario_storage(self) -> IScenarioStorage:
-        return self._scenario_storage
+        return ScenarioStorage()
 
     @cached_property
     def _test_run_storage(self) -> TestRunStorage:

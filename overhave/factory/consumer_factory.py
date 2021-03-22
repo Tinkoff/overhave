@@ -34,22 +34,14 @@ class ConsumerFactory:
     @cached_property
     def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]:
         return {
-            TestRunTask: self._process_test_execution,
-            PublicationTask: self._process_publication,
-            EmulationTask: self._process_emulation,
+            TestRunTask: self._process_test_execution_task,
+            PublicationTask: get_publication_factory().process_task,
+            EmulationTask: get_emulation_factory().process_task,
         }
 
     @cached_property
-    def _process_test_execution(self) -> Callable[[TestRunTask], None]:
+    def _process_test_execution_task(self) -> Callable[[TestRunTask], None]:
         factory = get_test_execution_factory()
         proxy_manager = get_proxy_manager()
         proxy_manager.set_factory(factory)
-        return partial(factory.test_execution_manager.execute_test)
-
-    @cached_property
-    def _process_publication(self) -> Callable[[PublicationTask], None]:
-        return partial(get_publication_factory().publisher.publish_version)
-
-    @cached_property
-    def _process_emulation(self) -> Callable[[PublicationTask], None]:
-        return partial(get_emulation_factory().emulator.start_emulation)
+        return partial(factory.process_task,)

@@ -14,6 +14,8 @@ from overhave.transport import EmulationTask, PublicationTask, RedisProducer, Re
 class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
     """ Factory interface for Overhave admin application. """
 
+    context_cls = OverhaveAdminContext
+
     @property
     @abc.abstractmethod
     def auth_manager(self) -> IAdminAuthorizationManager:

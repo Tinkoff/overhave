@@ -1,6 +1,6 @@
 # flake8: noqa
 from .base_factory import IOverhaveFactory
-from .components import IAdminFactory, IEmulationFactory, IPublicationFactory, ITestExecutionFactory
+from .components import IAdminFactory, ITaskConsumerFactory
 from .consumer_factory import ConsumerFactory
 from .context import (
     OverhaveAdminContext,

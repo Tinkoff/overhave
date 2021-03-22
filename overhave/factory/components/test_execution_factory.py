@@ -1,26 +1,19 @@
-import abc
 from functools import cached_property
 
-from overhave.factory import IOverhaveFactory
 from overhave.factory.base_factory import BaseOverhaveFactory
+from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhaveTestExecutionContext
 from overhave.test_execution import ITestExecutionManager, TestExecutionManager
+from overhave.transport import TestRunTask
 
 
-class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext]):
-    """ Factory interface for Overhave test execution application. """
-
-    @property
-    @abc.abstractmethod
-    def test_execution_manager(self) -> ITestExecutionManager:
-        pass
-
-
-class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], ITestExecutionFactory):
+class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], ITaskConsumerFactory[TestRunTask]):
     """ Factory for Overhave test execution application. """
 
+    context_cls = OverhaveTestExecutionContext
+
     @cached_property
-    def _test_execution_manager(self) -> TestExecutionManager:
+    def _test_execution_manager(self) -> ITestExecutionManager:
         return TestExecutionManager(
             file_settings=self.context.file_settings,
             feature_storage=self._feature_storage,
@@ -31,6 +24,5 @@ class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], IT
             report_manager=self._report_manager,
         )
 
-    @property
-    def test_execution_manager(self) -> ITestExecutionManager:
-        return self._test_execution_manager
+    def process_task(self, task: TestRunTask) -> None:
+        return self._test_execution_manager.execute_test(task)

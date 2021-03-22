@@ -4,9 +4,6 @@ from overhave.factory.components import (
     AdminFactory,
     EmulationFactory,
     IAdminFactory,
-    IEmulationFactory,
-    IPublicationFactory,
-    ITestExecutionFactory,
     PublicationFactory,
     TestExecutionFactory,
 )
@@ -18,15 +15,15 @@ def get_admin_factory() -> IAdminFactory:
 
 
 @lru_cache(maxsize=None)
-def get_test_execution_factory() -> ITestExecutionFactory:
+def get_test_execution_factory() -> TestExecutionFactory:
     return TestExecutionFactory()
 
 
 @lru_cache(maxsize=None)
-def get_publication_factory() -> IPublicationFactory:
+def get_publication_factory() -> PublicationFactory:
     return PublicationFactory()
 
 
 @lru_cache(maxsize=None)
-def get_emulation_factory() -> IEmulationFactory:
+def get_emulation_factory() -> EmulationFactory:
     return EmulationFactory()

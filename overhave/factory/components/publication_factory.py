@@ -1,30 +1,23 @@
-import abc
 from functools import cached_property
 
-from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
+from overhave.factory.base_factory import BaseOverhaveFactory
+from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
-from overhave.transport import StashHttpClient
+from overhave.transport import PublicationTask, StashHttpClient
 
 
-class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext]):
-    """ Factory interface for Overhave publication application. """
-
-    @property
-    @abc.abstractmethod
-    def publisher(self) -> IVersionPublisher:
-        pass
-
-
-class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPublicationFactory):
+class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask]):
     """ Factory for Overhave publication application. """
+
+    context_cls = OverhavePublicationContext
 
     @cached_property
     def _stash_client(self) -> StashHttpClient:
         return StashHttpClient(settings=self.context.stash_client_settings)
 
     @cached_property
-    def _stash_publisher(self) -> StashVersionPublisher:
+    def _stash_publisher(self) -> IVersionPublisher:
         return StashVersionPublisher(
             file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,
@@ -37,6 +30,5 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             client=self._stash_client,
         )
 
-    @property
-    def publisher(self) -> IVersionPublisher:
-        return self._stash_publisher
+    def process_task(self, task: PublicationTask) -> None:
+        return self._stash_publisher.publish_version(task)
