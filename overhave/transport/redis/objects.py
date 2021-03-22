@@ -72,6 +72,7 @@ class EmulationTask(BaseRedisTask):
 
 
 TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, PublicationTask, covariant=True)
+AnyRedisTask = Union[TestRunTask, PublicationTask, EmulationTask]
 
 
 class RedisPendingData(BaseModel):
@@ -101,4 +102,4 @@ class RedisContainer(BaseModel):
     ```task``` will be parsed to one of declared models.
     """
 
-    task: Union[TestRunTask, EmulationTask]
+    task: AnyRedisTask

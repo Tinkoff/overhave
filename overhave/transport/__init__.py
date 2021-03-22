@@ -13,6 +13,7 @@ from .http import (
     StashReviewerInfo,
 )
 from .redis import (
+    AnyRedisTask,
     BaseRedisTask,
     EmulationData,
     EmulationTask,

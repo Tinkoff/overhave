@@ -1,6 +1,7 @@
 # flake8: noqa
 from .consumer import RedisConsumer
 from .objects import (
+    AnyRedisTask,
     BaseRedisTask,
     EmulationData,
     EmulationTask,

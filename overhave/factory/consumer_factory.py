@@ -3,16 +3,16 @@ from typing import Callable, Dict, Type
 
 from overhave.factory.getters import get_emulation_factory, get_publication_factory, get_test_execution_factory
 from overhave.pytest_plugin import get_proxy_manager
-from overhave.transport.redis.consumer import RedisConsumer
-from overhave.transport.redis.objects import (
+from overhave.transport import (
+    AnyRedisTask,
     BaseRedisTask,
     EmulationTask,
     PublicationTask,
+    RedisConsumer,
+    RedisConsumerRunner,
     RedisStream,
     TestRunTask,
-    TRedisTask,
 )
-from overhave.transport.redis.runner import RedisConsumerRunner
 
 
 class ConsumerFactory:
@@ -32,7 +32,7 @@ class ConsumerFactory:
         return RedisConsumerRunner(consumer=self._consumer, mapping=self._mapping)
 
     @cached_property
-    def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]:
+    def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[AnyRedisTask], None]]:
         return {
             TestRunTask: self._process_test_execution_task,
             PublicationTask: get_publication_factory().process_task,
