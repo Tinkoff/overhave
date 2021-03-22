@@ -1,6 +1,3 @@
-from typing import Optional
-from uuid import uuid1
-
 import pytest
 
 from overhave import db
@@ -47,15 +44,13 @@ class TestTestRunStorage:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
-        ("report_status", "report"),
-        sorted(
-            [
-                (TestReportStatus.GENERATED, uuid1().hex),
-                (TestReportStatus.GENERATION_FAILED, uuid1().hex),
-                (TestReportStatus.EMPTY, uuid1().hex),
-                (TestReportStatus.SAVED, uuid1().hex),
-            ]
-        ),
+        "report_status",
+        [
+            TestReportStatus.GENERATED,
+            TestReportStatus.GENERATION_FAILED,
+            TestReportStatus.EMPTY,
+            TestReportStatus.SAVED,
+        ],
     )
     def test_set_report(
         self,
@@ -63,15 +58,15 @@ class TestTestRunStorage:
         test_scenario: ScenarioModel,
         report_status: TestReportStatus,
         test_feature: FeatureModel,
-        report: Optional[str],
+        test_report: str,
     ):
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report is None
-        test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=report)
+        test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=test_report)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
-        assert test_run.report is report
+        assert test_run.report is test_report
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(

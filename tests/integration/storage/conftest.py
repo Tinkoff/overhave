@@ -1,4 +1,5 @@
 from typing import cast
+from uuid import uuid1
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -111,3 +112,8 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         session.add(db_scenario)
         session.flush()
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture(scope="class")
+def test_report() -> str:
+    return uuid1().hex
