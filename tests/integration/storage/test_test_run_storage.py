@@ -66,7 +66,7 @@ class TestTestRunStorage:
         test_test_run_storage.set_report(run_id=test_run_id, status=report_status, report=test_report)
         test_run = test_test_run_storage.get_test_run(test_run_id)
         assert test_run.report_status == report_status
-        assert test_run.report is test_report
+        assert test_run.report == test_report
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(
