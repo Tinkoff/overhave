@@ -46,6 +46,7 @@ class TestTestRunStorage:
         assert test_run.status == run_status
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+    @pytest.mark.parametrize("report", [uuid1().hex])
     @pytest.mark.parametrize(
         "report_status",
         [
@@ -55,7 +56,6 @@ class TestTestRunStorage:
             TestReportStatus.SAVED,
         ],
     )
-    @pytest.mark.parametrize("report", [uuid1().hex])
     def test_set_report(
         self,
         test_test_run_storage: TestRunStorage,
