@@ -19,7 +19,6 @@ class TestTestRunStorage:
         test_run_id = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         assert isinstance(test_run_id, int)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         "run_status",
         [
@@ -30,6 +29,7 @@ class TestTestRunStorage:
             TestRunStatus.INTERNAL_ERROR,
         ],
     )
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_set_run_status(
         self,
         test_test_run_storage: TestRunStorage,
