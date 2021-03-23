@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Optional, cast
+from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
 import pytest
@@ -11,7 +11,7 @@ from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings, OverhaveStepContextSettings
+from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSettings
 from overhave.base_settings import LoggingSettings
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
@@ -59,11 +59,6 @@ def test_pytest_bdd_step(faker: Faker) -> Step:
     item.keyword = faker.word()
     item._name = faker.word()
     return cast(Step, item)
-
-
-@pytest.fixture()
-def test_project_settings(test_browse_url: Optional[str]) -> OverhaveProjectSettings:
-    return OverhaveProjectSettings(browse_url=test_browse_url)
 
 
 @pytest.fixture()
