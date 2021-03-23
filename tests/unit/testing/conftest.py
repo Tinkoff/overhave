@@ -11,18 +11,13 @@ from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave import (
-    OverhaveAdminContext,
-    OverhaveDescriptionManagerSettings,
-    OverhaveProjectSettings,
-    OverhaveStepContextSettings,
-)
+from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings, OverhaveStepContextSettings
 from overhave.base_settings import LoggingSettings
-from overhave.factory import IAdminFactory
+from overhave.factory import ITestExecutionFactory
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import AnyProxyFactory, IProxyManager
-from tests.conftest import clean_proxy_manager
 from tests.objects import get_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
@@ -153,13 +148,7 @@ def terminal_writer_mock() -> mock.MagicMock:
 
 
 @pytest.fixture()
-def import_module_mock() -> mock.MagicMock:
-    with mock.patch("importlib.import_module", return_value=mock.MagicMock()) as import_module:
-        yield import_module
-
-
-@pytest.fixture()
-def test_prepared_config(terminal_writer_mock: mock.MagicMock, import_module_mock: mock.MagicMock) -> Config:
+def test_prepared_config(terminal_writer_mock: mock.MagicMock) -> Config:
     config = Config(PytestPluginManager())
     test_pytest_parser = Parser(
         usage="%(prog)s [options] [file_or_dir] [file_or_dir] [...]", processopt=config._processopt
@@ -200,9 +189,9 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 @pytest.fixture()
 def patched_hook_proxy_factory(
-    mocked_context: OverhaveAdminContext, clean_admin_factory: Callable[[], IAdminFactory]
-) -> IAdminFactory:
-    factory = clean_admin_factory()
+    mocked_context: BaseFactoryContext, clean_test_execution_factory: Callable[[], ITestExecutionFactory]
+) -> ITestExecutionFactory:
+    factory = clean_test_execution_factory()
     factory.set_context(mocked_context)
     return factory
 

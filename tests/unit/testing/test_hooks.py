@@ -39,7 +39,7 @@ class TestPytestBddHooks:
     """ Unit tests for pytest-bdd wrapped hooks. """
 
     def test_pytest_bdd_before_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_factory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_manager: IProxyManager
     ):
         pytest_bdd_before_step(
             request=request,
@@ -48,10 +48,10 @@ class TestPytestBddHooks:
             step=test_pytest_bdd_step,
             step_func=mock.MagicMock(),
         )
-        assert cast(mock.MagicMock, patched_hook_proxy_factory.context).called_once()
+        assert cast(mock.MagicMock, patched_hook_proxy_manager.factory.context).called_once()
 
     def test_pytest_bdd_after_step_failed(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_factory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_manager: IProxyManager
     ):
         with pytest.raises(StepContextNotDefinedError):
             pytest_bdd_after_step(
@@ -64,7 +64,7 @@ class TestPytestBddHooks:
             )
 
     def test_pytest_bdd_after_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_factory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_manager: IProxyManager
     ):
         pytest_bdd_before_step(
             request=request,
@@ -83,7 +83,7 @@ class TestPytestBddHooks:
         )
 
     def test_pytest_bdd_step_error(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_factory
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_proxy_manager: IProxyManager
     ):
         pytest_bdd_before_step(
             request=request,
@@ -131,7 +131,7 @@ class TestPytestCommonHooks:
         pytest_addoption(test_pytest_parser)
         group = test_pytest_parser.getgroup(_PLUGIN_NAME, _GROUP_HELP)
         assert isinstance(group, OptionGroup)
-        assert len(group.options) == 2
+        assert len(group.options) == 1
 
         assert group.options[0].names() == _Options.enable_injection.names()
         assert group.options[0].attrs() == _Options.enable_injection.attrs()
@@ -143,20 +143,17 @@ class TestPytestCommonHooks:
     def test_pytest_configure_disabled_options(
         self,
         terminal_writer_mock: mock.MagicMock,
-        import_module_mock: mock.MagicMock,
         test_prepared_config: Config,
         patched_hook_proxy_manager: IProxyManager,
     ):
         pytest_configure(test_prepared_config)
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
         terminal_writer_mock.assert_called_once()
-        import_module_mock.assert_not_called()
         assert not patched_hook_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
-    def test_pytest_configure_enabled_injection_without_context_module(
+    def test_pytest_configure_enabled_injection(
         self,
-        import_module_mock: mock.MagicMock,
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
@@ -166,15 +163,13 @@ class TestPytestCommonHooks:
             _OptionName.ENABLE_INJECTION.as_variable
         )
         pytest_configure(test_prepared_config)
-        import_module_mock.assert_not_called()
         assert patched_hook_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize(
         "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True,
     )
-    def test_pytest_configure_disabled_injection_with_context_module(
+    def test_pytest_configure_disabled_injection(
         self,
-        import_module_mock: mock.MagicMock,
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
@@ -184,26 +179,7 @@ class TestPytestCommonHooks:
             _OptionName.ENABLE_INJECTION.as_variable
         )
         pytest_configure(test_prepared_config)
-        import_module_mock.assert_not_called()
         assert not patched_hook_proxy_manager.pytest_patched
-
-    @pytest.mark.parametrize(
-        "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True,
-    )
-    def test_pytest_configure_enabled_injection_with_context_module(
-        self,
-        import_module_mock: mock.MagicMock,
-        test_prepared_config: Config,
-        getoption_mapping: Mapping[str, Any],
-        getoption_mock: ConfigGetOptionMock,
-        patched_hook_proxy_manager: IProxyManager,
-    ):
-        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
-            _OptionName.ENABLE_INJECTION.as_variable
-        )
-        pytest_configure(test_prepared_config)
-        import_module_mock.assert_called_once()
-        assert patched_hook_proxy_manager.pytest_patched
 
     def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
         with mock.patch(
@@ -218,10 +194,10 @@ class TestPytestCommonHooks:
         self,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
         links_keyword: Optional[str],
     ):
-        patched_hook_proxy_factory.context.project_settings.links_keyword = links_keyword
+        patched_hook_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
         assert test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name
 
@@ -279,7 +255,7 @@ class TestPytestCommonHooks:
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
@@ -298,15 +274,15 @@ class TestPytestCommonHooks:
         faker: Faker,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
         browse_url: Optional[str],
         links_keyword: Optional[str],
     ):
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
 
-        patched_hook_proxy_factory.context.project_settings.browse_url = browse_url
-        patched_hook_proxy_factory.context.project_settings.links_keyword = links_keyword
+        patched_hook_proxy_manager.factory.context.project_settings.browse_url = browse_url
+        patched_hook_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
 
         pytest_collection_modifyitems(test_pytest_bdd_session)
         pytest_runtest_makereport(item=test_pytest_bdd_item, call=mock.MagicMock())

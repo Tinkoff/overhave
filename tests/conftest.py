@@ -14,7 +14,6 @@ from sqlalchemy.orm import close_all_sessions
 from overhave import (
     AuthorizationStrategy,
     LoggingSettings,
-    OverhaveAdminContext,
     OverhaveDBSettings,
     overhave_admin_factory,
     overhave_emulation_factory,
@@ -24,6 +23,7 @@ from overhave import (
 )
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.components import IEmulationFactory, IPublicationFactory
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
@@ -105,22 +105,22 @@ def clean_proxy_manager() -> Callable[[], IProxyManager]:
 
 
 @pytest.fixture()
-def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> OverhaveAdminContext:
+def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> BaseFactoryContext:
     context_mock = session_mocker.MagicMock()
     context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False
 
-    root_tmp_dir = Path(tmpdir)
-    features_dir = root_tmp_dir / "features"
-    fixtures_dir = root_tmp_dir / "fixtures"
-    reports_dir = root_tmp_dir / "reports"
+    root_dir = Path(tmpdir)
+    features_dir = root_dir / "features"
+    fixtures_dir = root_dir / "fixtures"
+    reports_dir = root_dir / "reports"
     for path in (features_dir, fixtures_dir, reports_dir):
         path.mkdir()
     context_mock.file_settings.tmp_features_dir = features_dir
     context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
     context_mock.file_settings.tmp_reports_dir = reports_dir
 
-    return cast(OverhaveAdminContext, context_mock)
+    return cast(BaseFactoryContext, context_mock)
 
 
 @pytest.fixture(scope="session")
