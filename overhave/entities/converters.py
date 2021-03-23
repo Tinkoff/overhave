@@ -86,6 +86,8 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
 class TestExecutorContext(BaseModel):
     """ Context model for test execution. """
 
+    __test__ = False
+
     feature: FeatureModel
     scenario: ScenarioModel
     test_run: TestRunModel

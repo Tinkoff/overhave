@@ -3,7 +3,6 @@ from unittest import mock
 
 from overhave import db
 from overhave.entities import ScenarioModel, SystemUserModel, TestRunModel
-from overhave.factory import ProxyFactory
 from tests.objects import FeatureTestContainer
 
 
@@ -11,16 +10,13 @@ class TestOverhaveRunTest:
     """ Sanity tests for application test run. """
 
     def test_redirect_to_run(
-        self,
-        test_factory_after_run: ProxyFactory,
-        flask_urlfor_handler_mock: mock.MagicMock,
-        test_db_scenario: ScenarioModel,
+        self, test_proxy_manager_after_run, flask_urlfor_handler_mock: mock.MagicMock, test_db_scenario: ScenarioModel,
     ):
         flask_urlfor_handler_mock.assert_called_with("testrun.details_view", id=test_db_scenario.id)
 
     def test_run_exists(
         self,
-        test_factory_after_run: ProxyFactory,
+        test_proxy_manager_after_run,
         test_db_user: SystemUserModel,
         test_feature_container: FeatureTestContainer,
         test_db_scenario: ScenarioModel,

@@ -1,5 +1,4 @@
-from multiprocessing.pool import CLOSE
-from typing import Callable, Dict, List, Optional, cast
+from typing import Callable, Dict, List, Optional
 from unittest import mock
 
 import click
@@ -10,16 +9,15 @@ from demo.demo import _run_demo_admin
 from overhave import db, set_config_to_context
 from overhave.base_settings import DataBaseSettings
 from overhave.entities import ScenarioModel, SystemUserModel
-from overhave.factory import ProxyFactory
-from overhave.processing import Processor
-from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
+from overhave.factory import IAdminFactory, ITestExecutionFactory
+from overhave.pytest_plugin import IProxyManager
+from tests.objects import FeatureTestContainer
 
 
 @pytest.fixture(scope="module")
 def envs_for_mock(db_settings: DataBaseSettings) -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_DB_URL": str(db_settings.db_url),
-        "OVERHAVE_WORKDIR": PROJECT_WORKDIR.as_posix(),
     }
 
 
@@ -50,16 +48,32 @@ def test_feature_types() -> List[str]:
 
 
 @pytest.fixture()
-def test_proxy_factory(clean_proxy_factory: Callable[[], ProxyFactory]) -> ProxyFactory:
-    return clean_proxy_factory()
+def test_admin_factory(clean_admin_factory: Callable[[], IAdminFactory]) -> IAdminFactory:
+    return clean_admin_factory()
 
 
 @pytest.fixture()
-def test_resolved_factory(
-    flask_run_mock: mock.MagicMock, test_proxy_factory: ProxyFactory, mock_envs: None, database: None
-) -> ProxyFactory:
+def test_testexecution_factory(
+    clean_test_execution_factory: Callable[[], ITestExecutionFactory]
+) -> ITestExecutionFactory:
+    return clean_test_execution_factory()
+
+
+@pytest.fixture()
+def test_proxy_manager(clean_proxy_manager: Callable[[], IProxyManager]) -> IProxyManager:
+    return clean_proxy_manager()
+
+
+@pytest.fixture()
+def test_resolved_admin_proxy_manager(
+    flask_run_mock: mock.MagicMock,
+    test_admin_factory: IAdminFactory,
+    test_proxy_manager: IProxyManager,
+    mock_envs: None,
+    database: None,
+) -> IProxyManager:
     _run_demo_admin()
-    return test_proxy_factory
+    return test_proxy_manager
 
 
 @pytest.fixture()
@@ -96,22 +110,6 @@ def flask_urlfor_handler_mock(test_db_scenario: ScenarioModel) -> mock.MagicMock
         yield flask_run_handler
 
 
-def synchronous_apply(*args, **kwargs) -> None:
-    func = args[0]
-    func_args = kwargs.get("args")
-    func(*func_args)
-
-
-@pytest.fixture()
-def patched_threadpool_apply_async(test_resolved_factory: ProxyFactory) -> mock.MagicMock:
-    processor = cast(Processor, test_resolved_factory.processor)
-    with mock.patch.object(
-        processor._thread_pool, "apply_async", new_callable=lambda: synchronous_apply
-    ) as patched_threadpool:
-        yield patched_threadpool
-    processor._thread_pool._state = CLOSE
-
-
 @pytest.fixture(scope="module")
 def subprocess_run_mock() -> mock.MagicMock:
     returncode_mock = mock.MagicMock()
@@ -121,13 +119,12 @@ def subprocess_run_mock() -> mock.MagicMock:
 
 
 @pytest.fixture()
-def test_factory_after_run(
+def test_proxy_manager_after_run(
     subprocess_run_mock: mock.MagicMock,
-    test_resolved_factory: ProxyFactory,
+    test_resolved_proxy_manager: IProxyManager,
     test_db_user: SystemUserModel,
     test_db_scenario: ScenarioModel,
     flask_urlfor_handler_mock: mock.MagicMock,
-    patched_threadpool_apply_async: mock.MagicMock,
-) -> ProxyFactory:
-    test_resolved_factory.processor.execute_test(scenario_id=test_db_scenario.id, executed_by=test_db_user.login)
-    return test_resolved_factory
+) -> IProxyManager:
+    test_resolved_proxy_manager.factory.execute_test(scenario_id=test_db_scenario.id, executed_by=test_db_user.login)
+    return test_resolved_proxy_manager
