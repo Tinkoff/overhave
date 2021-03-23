@@ -25,9 +25,9 @@ class TestOverhaveRunAdmin:
         assert test_resolved_admin_proxy_manager.pytest_patched
 
     def test_extractor_collect_feature_types(
-        self, test_feature_types: List[str], test_resolved_proxy_manager,
+        self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
     ):
-        assert set(test_resolved_proxy_manager.feature_extractor.feature_types) == set(test_feature_types)
+        assert set(test_resolved_admin_proxy_manager.factory.feature_extractor.feature_types) == set(test_feature_types)
 
     def test_db_feature_types_exists(
         self, test_feature_types: List[str], test_resolved_proxy_manager,

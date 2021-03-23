@@ -1,3 +1,4 @@
+from os import chdir
 from typing import Callable, Dict, List, Optional
 from unittest import mock
 
@@ -11,15 +12,12 @@ from overhave.base_settings import DataBaseSettings
 from overhave.entities import ScenarioModel, SystemUserModel
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager
-from tests.objects import FeatureTestContainer, PROJECT_WORKDIR
+from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
 
 
 @pytest.fixture(scope="module")
 def envs_for_mock(db_settings: DataBaseSettings) -> Dict[str, Optional[str]]:
-    return {
-        "OVERHAVE_DB_URL": str(db_settings.db_url),
-        "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix()
-    }
+    return {"OVERHAVE_DB_URL": str(db_settings.db_url), "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix()}
 
 
 @pytest.fixture(scope="module")
@@ -73,6 +71,7 @@ def test_resolved_admin_proxy_manager(
     mock_envs: None,
     database: None,
 ) -> IProxyManager:
+    chdir(PROJECT_WORKDIR)
     _run_demo_admin()
     return test_proxy_manager
 
