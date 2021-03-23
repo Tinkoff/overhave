@@ -5,16 +5,15 @@ from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario, Step
 
 from overhave import OverhaveProjectSettings
-from overhave.pytest_plugin import get_full_step_name
-from overhave.test_execution import (
-    EmptyBrowseURLError,
+from overhave.pytest_plugin import get_scenario, has_issue_links
+from overhave.pytest_plugin.helpers import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
-    get_scenario,
-    has_issue_links,
+    get_full_step_name,
     is_pytest_bdd_item,
     set_issue_links,
 )
+from overhave.test_execution.settings import EmptyBrowseURLError
 
 
 class TestPluginUtils:
