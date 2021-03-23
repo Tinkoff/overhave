@@ -8,9 +8,33 @@ import pytest
 from faker import Faker
 from flask.testing import FlaskClient
 
-from overhave import OverhaveAdmin, OverhaveContext, overhave_app
+from overhave import OverhaveAdmin, overhave_app
 from overhave.base_settings import DataBaseSettings
-from overhave.factory import ProxyFactory
+from overhave.factory import IAdminFactory
+from overhave.factory.context.base_context import BaseFactoryContext
+from overhave.pytest_plugin import IProxyManager
+
+
+@pytest.fixture()
+def patched_app_admin_factory(
+    db_settings: DataBaseSettings,
+    database: None,
+    mocked_context: BaseFactoryContext,
+    clean_admin_factory: Callable[[], IAdminFactory],
+) -> IAdminFactory:
+    db_settings.setup_db()
+    factory = clean_admin_factory()
+    factory.set_context(mocked_context)
+    return factory
+
+
+@pytest.fixture()
+def patched_app_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_app_admin_factory: IAdminFactory
+) -> IProxyManager:
+    proxy_manager = clean_proxy_manager()
+    proxy_manager.set_factory(patched_app_admin_factory)
+    return proxy_manager
 
 
 @pytest.fixture()
@@ -24,8 +48,8 @@ def test_pullrequest_published_by() -> str:
 
 
 @pytest.fixture()
-def test_report_without_index(patched_app_proxy_factory: ProxyFactory) -> Path:
-    report_dir = patched_app_proxy_factory.context.file_settings.tmp_reports_dir / uuid1().hex
+def test_report_without_index(patched_app_proxy_manager: IProxyManager) -> Path:
+    report_dir = patched_app_proxy_manager.factory.context.file_settings.tmp_reports_dir / uuid1().hex
     report_dir.mkdir()
     return report_dir
 
@@ -36,19 +60,6 @@ def test_report_with_index(test_report_without_index: Path, faker: Faker) -> Pat
     report_index.write_text(faker.word())
     yield test_report_without_index
     report_index.unlink()
-
-
-@pytest.fixture()
-def patched_app_proxy_factory(
-    db_settings: DataBaseSettings,
-    database: None,
-    mocked_context: OverhaveContext,
-    clean_proxy_factory: Callable[[], ProxyFactory],
-) -> ProxyFactory:
-    db_settings.setup_db()
-    factory = clean_proxy_factory()
-    factory.set_context(mocked_context)
-    return factory
 
 
 @pytest.fixture()
