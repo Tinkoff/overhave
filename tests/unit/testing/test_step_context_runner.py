@@ -9,7 +9,7 @@ from faker import Faker
 from overhave.pytest_plugin import StepContextNotDefinedError, StepContextRunner
 
 
-@pytest.mark.parametrize("test_step_context_logs", [False, True], indirect=True)
+@pytest.mark.parametrize("step_context_logs", [False, True], indirect=True)
 class TestStepContextRunner:
     """ Unit tests for StepContextRunner. """
 
@@ -21,10 +21,10 @@ class TestStepContextRunner:
         with pytest.raises(StepContextNotDefinedError):
             test_step_context_runner.start()
 
-    def test_start(self, test_step_context_logs: bool, test_step_context_runner: StepContextRunner, faker: Faker):
+    def test_start(self, step_context_logs: bool, test_step_context_runner: StepContextRunner, faker: Faker):
         test_step_context_runner.set_title(faker.word())
         test_step_context_runner.start()
-        if test_step_context_logs:
+        if step_context_logs:
             assert isinstance(test_step_context_runner._logger, Logger)
         else:
             assert isinstance(test_step_context_runner._logger, mock.MagicMock)

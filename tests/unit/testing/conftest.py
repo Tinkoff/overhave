@@ -12,7 +12,6 @@ from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSettings
-from overhave.base_settings import LoggingSettings
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
@@ -62,20 +61,20 @@ def test_pytest_bdd_step(faker: Faker) -> Step:
 
 
 @pytest.fixture()
-def test_step_context_logs(request: FixtureRequest) -> bool:
+def step_context_logs(request: FixtureRequest) -> bool:
     if hasattr(request, "param"):
         return cast(bool, request.param)
     raise NotImplementedError
 
 
 @pytest.fixture()
-def test_logging_settings(test_step_context_logs: bool) -> LoggingSettings:
-    return LoggingSettings(step_context_logs=test_step_context_logs)
+def test_step_context_settings(step_context_logs: bool) -> OverhaveStepContextSettings:
+    return OverhaveStepContextSettings(step_context_logs=step_context_logs)
 
 
 @pytest.fixture()
-def test_step_context_runner(test_logging_settings: LoggingSettings) -> StepContextRunner:
-    return StepContextRunner(OverhaveStepContextSettings())
+def test_step_context_runner(test_step_context_settings: OverhaveStepContextSettings) -> StepContextRunner:
+    return StepContextRunner(test_step_context_settings)
 
 
 @pytest.fixture()
