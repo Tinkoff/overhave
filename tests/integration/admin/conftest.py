@@ -29,15 +29,6 @@ def patched_app_admin_factory(
 
 
 @pytest.fixture()
-def patched_app_proxy_manager(
-    clean_proxy_manager: Callable[[], IProxyManager], patched_app_admin_factory: IAdminFactory
-) -> IProxyManager:
-    proxy_manager = clean_proxy_manager()
-    proxy_manager.set_factory(patched_app_admin_factory)
-    return proxy_manager
-
-
-@pytest.fixture()
 def test_pullrequest_id(faker: Faker) -> int:
     return faker.random_int()
 
@@ -48,8 +39,8 @@ def test_pullrequest_published_by() -> str:
 
 
 @pytest.fixture()
-def test_report_without_index(patched_app_proxy_manager: IProxyManager) -> Path:
-    report_dir = patched_app_proxy_manager.factory.context.file_settings.tmp_reports_dir / uuid1().hex
+def test_report_without_index(patched_app_admin_factory: IAdminFactory) -> Path:
+    report_dir = patched_app_admin_factory.context.file_settings.tmp_reports_dir / uuid1().hex
     report_dir.mkdir()
     return report_dir
 
@@ -63,8 +54,10 @@ def test_report_with_index(test_report_without_index: Path, faker: Faker) -> Pat
 
 
 @pytest.fixture()
-def test_app(patched_app_proxy_factory) -> OverhaveAdmin:
-    return overhave_app(factory=patched_app_proxy_factory)
+def test_app(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_app_admin_factory: IAdminFactory
+) -> OverhaveAdmin:
+    return overhave_app(factory=patched_app_admin_factory)
 
 
 @pytest.fixture()
