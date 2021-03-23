@@ -11,10 +11,18 @@ from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave import OverhaveContext, OverhaveDescriptionManagerSettings, OverhaveProjectSettings
+from overhave import (
+    OverhaveAdminContext,
+    OverhaveDescriptionManagerSettings,
+    OverhaveProjectSettings,
+    OverhaveStepContextSettings,
+)
 from overhave.base_settings import LoggingSettings
-from overhave.factory import ProxyFactory
-from overhave.pytest_plugin import DescriptionManager, StepContextRunner, pytest_addoption
+from overhave.factory import IAdminFactory
+from overhave.pytest_plugin import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin.plugin import pytest_addoption
+from overhave.pytest_plugin.proxy_manager import AnyProxyFactory, IProxyManager
+from tests.conftest import clean_proxy_manager
 from tests.objects import get_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
@@ -77,7 +85,7 @@ def test_logging_settings(test_step_context_logs: bool) -> LoggingSettings:
 
 @pytest.fixture()
 def test_step_context_runner(test_logging_settings: LoggingSettings) -> StepContextRunner:
-    return StepContextRunner(logging_settings=test_logging_settings)
+    return StepContextRunner(OverhaveStepContextSettings())
 
 
 @pytest.fixture()
@@ -192,8 +200,17 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 @pytest.fixture()
 def patched_hook_proxy_factory(
-    mocked_context: OverhaveContext, clean_proxy_factory: Callable[[], ProxyFactory]
-) -> ProxyFactory:
-    factory = clean_proxy_factory()
+    mocked_context: OverhaveAdminContext, clean_admin_factory: Callable[[], IAdminFactory]
+) -> IAdminFactory:
+    factory = clean_admin_factory()
     factory.set_context(mocked_context)
     return factory
+
+
+@pytest.fixture()
+def patched_hook_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_proxy_factory: AnyProxyFactory
+) -> IProxyManager:
+    proxy_manager = clean_proxy_manager()
+    proxy_manager.set_factory(patched_hook_proxy_factory)
+    return proxy_manager

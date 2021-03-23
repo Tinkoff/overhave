@@ -18,11 +18,13 @@ from overhave import (
     OverhaveDBSettings,
     overhave_admin_factory,
     overhave_emulation_factory,
+    overhave_proxy_manager,
     overhave_publication_factory,
     overhave_test_execution_factory,
 )
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.components import IEmulationFactory, IPublicationFactory
+from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
@@ -94,6 +96,12 @@ def clean_publication_factory() -> Callable[[], IPublicationFactory]:
 def clean_emulation_factory() -> Callable[[], IEmulationFactory]:
     overhave_emulation_factory.cache_clear()
     return overhave_emulation_factory
+
+
+@pytest.fixture()
+def clean_proxy_manager() -> Callable[[], IProxyManager]:
+    overhave_proxy_manager.cache_clear()
+    return overhave_proxy_manager
 
 
 @pytest.fixture()

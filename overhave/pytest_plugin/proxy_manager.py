@@ -45,6 +45,11 @@ class IProxyManager(abc.ABC):
     def pytest_patched(self) -> bool:
         pass
 
+    @property
+    @abc.abstractmethod
+    def collection_prepared(self) -> bool:
+        pass
+
     @abc.abstractmethod
     def supply_injector_for_collection(self) -> None:
         pass
@@ -111,6 +116,10 @@ class ProxyManager(IProxyManager):
     @property
     def pytest_patched(self) -> bool:
         return self._pytest_patched
+
+    @property
+    def collection_prepared(self) -> bool:
+        return self._collection_prepared
 
     def supply_injector_for_collection(self) -> None:
         if not self._collection_prepared:

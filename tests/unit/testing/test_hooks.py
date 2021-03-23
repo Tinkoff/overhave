@@ -12,10 +12,10 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
-from overhave.pytest_plugin import (
+from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
+from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
-    StepContextNotDefinedError,
     StepNotFoundError,
     _OptionName,
     _Options,
@@ -31,7 +31,6 @@ from overhave.pytest_plugin import (
     pytest_runtest_makereport,
     pytest_runtest_setup,
 )
-from overhave.test_execution import get_scenario, has_issue_links
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -136,8 +135,6 @@ class TestPytestCommonHooks:
 
         assert group.options[0].names() == _Options.enable_injection.names()
         assert group.options[0].attrs() == _Options.enable_injection.attrs()
-        assert group.options[1].names() == _Options.context_module.names()
-        assert group.options[1].attrs() == _Options.context_module.attrs()
 
     def test_pytest_configure_failed_no_option(self, test_empty_config: Config):
         with pytest.raises(ValueError, match="no option named"):
@@ -148,14 +145,13 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         import_module_mock: mock.MagicMock,
         test_prepared_config: Config,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         pytest_configure(test_prepared_config)
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
-        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is None
         terminal_writer_mock.assert_called_once()
         import_module_mock.assert_not_called()
-        assert not patched_hook_proxy_factory._pytest_patched
+        assert not patched_hook_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     def test_pytest_configure_enabled_injection_without_context_module(
@@ -164,22 +160,17 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
-        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
-            _OptionName.FACTORY_CONTEXT.as_variable
-        )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_not_called()
-        assert patched_hook_proxy_factory._pytest_patched
+        assert patched_hook_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize(
-        "getoption_mapping",
-        [{_OptionName.ENABLE_INJECTION.as_variable: False, _OptionName.FACTORY_CONTEXT.as_variable: "random_module"}],
-        indirect=True,
+        "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True,
     )
     def test_pytest_configure_disabled_injection_with_context_module(
         self,
@@ -187,22 +178,17 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
-        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
-            _OptionName.FACTORY_CONTEXT.as_variable
-        )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_not_called()
-        assert not patched_hook_proxy_factory._pytest_patched
+        assert not patched_hook_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize(
-        "getoption_mapping",
-        [{_OptionName.ENABLE_INJECTION.as_variable: True, _OptionName.FACTORY_CONTEXT.as_variable: "random_module"}],
-        indirect=True,
+        "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True,
     )
     def test_pytest_configure_enabled_injection_with_context_module(
         self,
@@ -210,17 +196,14 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
-        assert test_prepared_config.getoption(_OptionName.FACTORY_CONTEXT.as_variable) is getoption_mapping.get(
-            _OptionName.FACTORY_CONTEXT.as_variable
-        )
         pytest_configure(test_prepared_config)
         import_module_mock.assert_called_once()
-        assert patched_hook_proxy_factory._pytest_patched
+        assert patched_hook_proxy_manager.pytest_patched
 
     def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
         with mock.patch(
@@ -263,11 +246,11 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_called_once()
-        assert patched_hook_proxy_factory._collection_prepared is False
+        assert not patched_hook_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     def test_pytest_collection_finish_injection_enabled_with_patched_pytest(
@@ -275,12 +258,12 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_hook_proxy_factory,
+        patched_hook_proxy_manager: IProxyManager,
     ):
         pytest_configure(test_pytest_bdd_session.config)
         pytest_collection_finish(test_pytest_bdd_session)
         assert terminal_writer_mock.call_count == 2
-        assert patched_hook_proxy_factory._collection_prepared
+        assert patched_hook_proxy_manager.collection_prepared
 
     def test_pytest_runtest_setup(self, test_clean_item: Item):
         with mock.patch(

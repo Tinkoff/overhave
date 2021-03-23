@@ -10,6 +10,7 @@ from overhave.entities import (
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
     OverhaveScenarioCompilerSettings,
+    OverhaveStepContextSettings,
     StepPrefixesModel,
     TranslitPack,
 )
