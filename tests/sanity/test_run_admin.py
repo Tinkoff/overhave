@@ -1,26 +1,28 @@
-from typing import List
+from typing import List, cast
 from unittest import mock
 
 from overhave import db
 from overhave.entities import FeatureTypeModel
+from overhave.factory import AdminFactory
+from overhave.pytest_plugin import IProxyManager
 
 
 class TestOverhaveRunAdmin:
     """ Sanity tests for application admin mode. """
 
     def test_clean_factory(
-        self, flask_run_mock: mock.MagicMock, test_proxy_manager,
+        self, flask_run_mock: mock.MagicMock, test_admin_factory: AdminFactory, test_proxy_manager: IProxyManager,
     ):
         flask_run_mock.assert_not_called()
-        assert not test_proxy_manager._factory.has_context
+        assert not test_admin_factory._context
         assert not test_proxy_manager.pytest_patched
 
     def test_factory_resolved(
-        self, flask_run_mock: mock.MagicMock, test_resolved_proxy_manager,
+        self, flask_run_mock: mock.MagicMock, test_resolved_admin_proxy_manager: IProxyManager,
     ):
         flask_run_mock.assert_called_once_with(host="0.0.0.0", port=8076, debug=True)
-        assert test_resolved_proxy_manager._factory.has_context
-        assert test_resolved_proxy_manager.pytest_patched
+        assert cast(AdminFactory, test_resolved_admin_proxy_manager.factory)._context
+        assert test_resolved_admin_proxy_manager.pytest_patched
 
     def test_extractor_collect_feature_types(
         self, test_feature_types: List[str], test_resolved_proxy_manager,

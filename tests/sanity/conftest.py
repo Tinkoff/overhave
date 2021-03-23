@@ -11,13 +11,14 @@ from overhave.base_settings import DataBaseSettings
 from overhave.entities import ScenarioModel, SystemUserModel
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager
-from tests.objects import FeatureTestContainer
+from tests.objects import FeatureTestContainer, PROJECT_WORKDIR
 
 
 @pytest.fixture(scope="module")
 def envs_for_mock(db_settings: DataBaseSettings) -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_DB_URL": str(db_settings.db_url),
+        "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix()
     }
 
 
