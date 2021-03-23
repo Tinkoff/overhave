@@ -5,7 +5,6 @@ from overhave.factory.getters import get_emulation_factory, get_publication_fact
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.transport import (
     AnyRedisTask,
-    BaseRedisTask,
     EmulationTask,
     PublicationTask,
     RedisConsumer,
@@ -32,11 +31,11 @@ class ConsumerFactory:
         return RedisConsumerRunner(consumer=self._consumer, mapping=self._mapping)
 
     @cached_property
-    def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[AnyRedisTask], None]]:
+    def _mapping(self) -> Dict[Type[AnyRedisTask], Callable[[AnyRedisTask], None]]:
         return {
-            TestRunTask: self._process_test_execution_task,
-            PublicationTask: get_publication_factory().process_task,
-            EmulationTask: get_emulation_factory().process_task,
+            TestRunTask: self._process_test_execution_task,  # type: ignore
+            PublicationTask: get_publication_factory().process_task,  # type: ignore
+            EmulationTask: get_emulation_factory().process_task,  # type: ignore
         }
 
     @cached_property

@@ -1,13 +1,18 @@
+import abc
 from functools import cached_property
 
 from overhave.entities import Emulator
-from overhave.factory.base_factory import BaseOverhaveFactory
+from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhaveEmulationContext
 from overhave.transport import EmulationTask
 
 
-class EmulationFactory(BaseOverhaveFactory[OverhaveEmulationContext], ITaskConsumerFactory[EmulationTask]):
+class IEmulationFactory(IOverhaveFactory[OverhaveEmulationContext], ITaskConsumerFactory[EmulationTask], abc.ABC):
+    """ Abstract factory for Overhave emulation application. """
+
+
+class EmulationFactory(BaseOverhaveFactory[OverhaveEmulationContext], IEmulationFactory):
     """ Factory for Overhave emulation application. """
 
     context_cls = OverhaveEmulationContext

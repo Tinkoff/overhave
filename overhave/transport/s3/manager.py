@@ -10,7 +10,7 @@ from pydantic.tools import parse_obj_as
 
 from overhave.transport.s3.models import BucketModel, DeletionResultModel, ObjectModel
 from overhave.transport.s3.objects import OverhaveS3Bucket
-from overhave.transport.s3.settings import S3ManagerSettings
+from overhave.transport.s3.settings import OverhaveS3ManagerSettings
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ def _s3_error(msg: str):  # type: ignore
 class S3Manager:
     """ Class for s3 management with boto3 client. """
 
-    def __init__(self, settings: S3ManagerSettings):
+    def __init__(self, settings: OverhaveS3ManagerSettings):
         self._settings = settings
         self._client: Optional[Client] = None
 
@@ -76,7 +76,7 @@ class S3Manager:
         return self._client is not None
 
     @staticmethod
-    def _get_client(settings: S3ManagerSettings) -> Client:
+    def _get_client(settings: OverhaveS3ManagerSettings) -> Client:
         if not settings.verify:
             logger.warning("Verification disabled in '%s', so ignore 'urllib3' warnings.", type(settings).__name__)
             urllib3.disable_warnings()

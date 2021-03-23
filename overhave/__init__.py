@@ -34,5 +34,5 @@ from overhave.publication import OverhaveStashPublisherSettings
 from overhave.pytest_plugin import get_description_manager
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveStashClientSettings
+from overhave.transport import OverhaveS3ManagerSettings, OverhaveStashClientSettings
 from overhave.transport import RedisStream as OverhaveRedisStream

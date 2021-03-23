@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseSettings, root_validator
 
 
-class S3ManagerSettings(BaseSettings):
+class OverhaveS3ManagerSettings(BaseSettings):
     """ Settings for S3Client. """
 
     enabled: bool = False

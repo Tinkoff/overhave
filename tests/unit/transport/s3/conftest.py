@@ -6,7 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
-from overhave.transport import S3Manager, S3ManagerSettings
+from overhave.transport import OverhaveS3ManagerSettings, S3Manager
 from overhave.utils import get_current_time
 
 
@@ -27,8 +27,8 @@ def test_s3_autocreate_buckets(request: FixtureRequest) -> bool:
 @pytest.fixture()
 def test_s3_manager_settings(
     test_s3_enabled: bool, test_s3_autocreate_buckets: bool, faker: Faker
-) -> S3ManagerSettings:
-    return S3ManagerSettings(
+) -> OverhaveS3ManagerSettings:
+    return OverhaveS3ManagerSettings(
         enabled=test_s3_enabled,
         url="https://overhave.readthedocs.io",
         access_key=faker.word(),
@@ -110,7 +110,7 @@ def mocked_boto3_client_getter(
 
 
 @pytest.fixture()
-def test_s3_manager(test_s3_manager_settings: S3ManagerSettings, mocked_boto3_client_getter) -> S3Manager:
+def test_s3_manager(test_s3_manager_settings: OverhaveS3ManagerSettings, mocked_boto3_client_getter) -> S3Manager:
     return S3Manager(test_s3_manager_settings)
 
 

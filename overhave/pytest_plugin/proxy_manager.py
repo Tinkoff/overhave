@@ -1,13 +1,15 @@
 import abc
 from functools import cached_property, lru_cache
-from typing import Optional
+from typing import Optional, Union
 
-from overhave.factory import IOverhaveFactory
+from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.pytest_plugin.config_injector import ConfigInjector
 from overhave.pytest_plugin.plugin_resolver import PluginResolver
 
+AnyProxyFactory = Union[IAdminFactory, ITestExecutionFactory]
 
-class IProxyManager:
+
+class IProxyManager(abc.ABC):
     """ Abstract class for proxy manager. """
 
     @property
@@ -16,12 +18,12 @@ class IProxyManager:
         pass
 
     @abc.abstractmethod
-    def set_factory(self, factory: IOverhaveFactory):
+    def set_factory(self, factory: AnyProxyFactory) -> None:
         pass
 
     @property
     @abc.abstractmethod
-    def factory(self):
+    def factory(self) -> AnyProxyFactory:
         pass
 
     @property
@@ -64,7 +66,7 @@ class ProxyManager(IProxyManager):
     """ Manager for application factory resolution and usage, based on proxy-object pattern. """
 
     def __init__(self) -> None:
-        self._factory: Optional[IOverhaveFactory] = None
+        self._factory: Optional[AnyProxyFactory] = None
         self._pytest_patched = False
         self._collection_prepared = False
 
@@ -76,13 +78,13 @@ class ProxyManager(IProxyManager):
     def injector(self) -> ConfigInjector:
         return self._injector
 
-    def set_factory(self, factory: IOverhaveFactory):
+    def set_factory(self, factory: AnyProxyFactory) -> None:
         if self._factory is not None:
             raise FactoryAlreadyDefinedError("Factory is not nullable!")
         self._factory = factory
 
     @property
-    def factory(self):
+    def factory(self) -> AnyProxyFactory:
         if self._factory is None:
             raise FactoryNotDefinedError("Factory is nullable!")
         return self._factory
@@ -94,13 +96,13 @@ class ProxyManager(IProxyManager):
     def patch_pytest(self) -> None:
         if not self._pytest_patched:
             self._injector.patch_pytestbdd_prefixes(
-                custom_step_prefixes=self._factory.context.language_settings.step_prefixes
+                custom_step_prefixes=self.factory.context.language_settings.step_prefixes
             )
             self._pytest_patched = True
 
     @cached_property
     def _plugin_resolver(self) -> PluginResolver:
-        return PluginResolver(self._factory.context.file_settings)
+        return PluginResolver(self.factory.context.file_settings)
 
     @property
     def plugin_resolver(self) -> PluginResolver:
@@ -113,10 +115,10 @@ class ProxyManager(IProxyManager):
     def supply_injector_for_collection(self) -> None:
         if not self._collection_prepared:
             self._injector.supplement_components(
-                file_settings=self._factory.context.file_settings,
-                step_collector=self._factory.step_collector,
-                test_runner=self._factory.test_runner,
-                feature_extractor=self._factory.feature_extractor,
+                file_settings=self.factory.context.file_settings,
+                step_collector=self.factory.step_collector,
+                test_runner=self.factory.test_runner,
+                feature_extractor=self.factory.feature_extractor,
             )
             self._collection_prepared = True
 

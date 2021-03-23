@@ -22,7 +22,7 @@ def overhave_demo() -> None:
 
 
 def _run_demo_admin() -> None:
-    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.default_context_settings)
+    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.default_context_settings)  # type: ignore
     overhave_admin_factory().set_context(context)
     _run_admin(port=8076, debug=True)
 
@@ -34,13 +34,15 @@ def admin() -> None:
 
 def _run_demo_consumer(stream: OverhaveRedisStream) -> None:
     if stream is OverhaveRedisStream.TEST:
-        context: OverhaveTestExecutionContext = OverhaveTestExecutionContext(
-            **_SETTINGS_GENERATOR.default_context_settings
+        test_execution_context: OverhaveTestExecutionContext = OverhaveTestExecutionContext(
+            **_SETTINGS_GENERATOR.default_context_settings  # type: ignore
         )
-        overhave_test_execution_factory().set_context(context)
+        overhave_test_execution_factory().set_context(test_execution_context)
     if stream is OverhaveRedisStream.PUBLICATION:
-        context: OverhavePublicationContext = OverhavePublicationContext(**_SETTINGS_GENERATOR.publication_settings)
-        overhave_publication_factory().set_context(context)
+        publication_context: OverhavePublicationContext = OverhavePublicationContext(
+            **_SETTINGS_GENERATOR.publication_settings  # type: ignore
+        )
+        overhave_publication_factory().set_context(publication_context)
     _run_consumer(stream=stream)
 
 

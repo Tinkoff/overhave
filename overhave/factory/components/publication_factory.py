@@ -1,13 +1,18 @@
+import abc
 from functools import cached_property
 
-from overhave.factory.base_factory import BaseOverhaveFactory
+from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
 from overhave.transport import PublicationTask, StashHttpClient
 
 
-class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask]):
+class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask], abc.ABC):
+    """ Abstract factory for Overhave publication application. """
+
+
+class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPublicationFactory):
     """ Factory for Overhave publication application. """
 
     context_cls = OverhavePublicationContext

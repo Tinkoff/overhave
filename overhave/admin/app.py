@@ -93,7 +93,9 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdmin:  # noqa: C901
             )
             if not report_precense_resolution.exists:
                 if report_precense_resolution.not_ready:
-                    return flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
+                    return typing.cast(
+                        flask.Response, flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
+                    )
                 return flask.abort(status=HTTPStatus.NOT_FOUND)
         return typing.cast(
             flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)

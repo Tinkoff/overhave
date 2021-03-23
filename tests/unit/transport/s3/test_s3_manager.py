@@ -5,7 +5,7 @@ from unittest import mock
 import botocore.exceptions
 import pytest
 
-from overhave.transport import OverhaveS3Bucket, S3Manager, S3ManagerSettings
+from overhave.transport import OverhaveS3Bucket, OverhaveS3ManagerSettings, S3Manager
 from overhave.transport.s3.manager import (
     EmptyObjectsListError,
     EndpointConnectionError,
@@ -29,7 +29,7 @@ class TestS3Manager:
     def test_initialize_enabled(
         self,
         mocked_boto3_client_getter: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_s3_manager: S3Manager,
     ):
         test_s3_manager.initialize()
@@ -68,7 +68,7 @@ class TestInitializedS3Manager:
     def test_create_bucket(
         self,
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
     ):
@@ -79,7 +79,7 @@ class TestInitializedS3Manager:
         self,
         test_object_dict: Dict[str, Any],
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
     ):
@@ -115,7 +115,7 @@ class TestInitializedS3Manager:
         self,
         test_object_dict: Dict[str, Any],
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
     ):
@@ -128,7 +128,7 @@ class TestInitializedS3Manager:
     def test_delete_files_empty_error(
         self,
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
     ):
@@ -140,7 +140,7 @@ class TestInitializedS3Manager:
     def test_delete_bucket(
         self,
         mocked_boto3_client: mock.MagicMock,
-        test_s3_manager_settings: S3ManagerSettings,
+        test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         force: bool,

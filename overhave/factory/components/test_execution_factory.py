@@ -1,13 +1,18 @@
+import abc
 from functools import cached_property
 
-from overhave.factory.base_factory import BaseOverhaveFactory
+from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhaveTestExecutionContext
 from overhave.test_execution import ITestExecutionManager, TestExecutionManager
 from overhave.transport import TestRunTask
 
 
-class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], ITaskConsumerFactory[TestRunTask]):
+class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext], ITaskConsumerFactory[TestRunTask], abc.ABC):
+    """ Abstract factory for Overhave test execution application. """
+
+
+class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], ITestExecutionFactory):
     """ Factory for Overhave test execution application. """
 
     context_cls = OverhaveTestExecutionContext
