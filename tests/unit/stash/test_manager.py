@@ -14,10 +14,10 @@ from overhave.transport import (
     StashReviewer,
     StashReviewerInfo,
 )
-from tests.objects import get_file_settings
+from tests.objects import get_test_file_settings
 
 
-@pytest.mark.parametrize("test_file_settings", [get_file_settings()], indirect=True)
+@pytest.mark.parametrize("test_file_settings", [get_test_file_settings()], indirect=True)
 class TestStashProjectManager:
     """ Unit tests for :class:`StashVersionPublisher`. """
 

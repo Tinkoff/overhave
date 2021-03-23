@@ -13,12 +13,12 @@ from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave import OverhaveDescriptionManagerSettings, OverhaveProjectSettings, OverhaveStepContextSettings
 from overhave.base_settings import LoggingSettings
-from overhave.factory import ITestExecutionFactory
+from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.plugin import pytest_addoption
-from overhave.pytest_plugin.proxy_manager import AnyProxyFactory, IProxyManager
-from tests.objects import get_file_settings
+from overhave.pytest_plugin.proxy_manager import IProxyManager
+from tests.objects import get_test_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -39,7 +39,7 @@ def test_pytest_bdd_scenario(test_scenario_name: str) -> Scenario:
     setattr(
         scenario.feature,
         "filename",
-        get_file_settings().features_dir / "feature_type_1" / "full_feature_example_en.feature",
+        get_test_file_settings().features_dir / "feature_type_1" / "full_feature_example_en.feature",
     )
     setattr(scenario, "name", test_scenario_name)
     return scenario
@@ -188,7 +188,16 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 
 @pytest.fixture()
-def patched_hook_proxy_factory(
+def patched_hook_admin_factory(
+    mocked_context: BaseFactoryContext, clean_admin_factory: Callable[[], IAdminFactory]
+) -> IAdminFactory:
+    factory = clean_admin_factory()
+    factory.set_context(mocked_context)
+    return factory
+
+
+@pytest.fixture()
+def patched_hook_test_execution_factory(
     mocked_context: BaseFactoryContext, clean_test_execution_factory: Callable[[], ITestExecutionFactory]
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()
@@ -197,9 +206,18 @@ def patched_hook_proxy_factory(
 
 
 @pytest.fixture()
-def patched_hook_proxy_manager(
-    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_proxy_factory: AnyProxyFactory
+def patched_hook_admin_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_admin_factory
 ) -> IProxyManager:
     proxy_manager = clean_proxy_manager()
-    proxy_manager.set_factory(patched_hook_proxy_factory)
+    proxy_manager.set_factory(patched_hook_admin_factory)
+    return proxy_manager
+
+
+@pytest.fixture()
+def patched_hook_test_execution_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_test_execution_factory
+) -> IProxyManager:
+    proxy_manager = clean_proxy_manager()
+    proxy_manager.set_factory(patched_hook_test_execution_factory)
     return proxy_manager
