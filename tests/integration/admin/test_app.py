@@ -29,7 +29,7 @@ class TestAppCommon:
         self, test_app: OverhaveAdmin, test_client: FlaskClient, test_pullrequest_id: int
     ):
         response: Response = test_client.get(f"/pull_request/{test_pullrequest_id}")
-        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        assert response.status_code == HTTPStatus.FOUND
 
     def test_app_create_pr_incorrect_data(
         self,
@@ -41,7 +41,7 @@ class TestAppCommon:
         response: Response = test_client.get(
             f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}"
         )
-        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        assert response.status_code == HTTPStatus.FOUND
 
 
 class TestAppReport:
@@ -60,7 +60,14 @@ class TestAppReport:
         assert response.status_code == HTTPStatus.OK
         assert response.data == (test_report_with_index / "index.html").read_bytes()
 
-    @pytest.mark.parametrize("data", [None, {"run_id": "123"}])
+    @pytest.mark.parametrize("data", [None])
+    def test_app_post_report_without_run_id(
+        self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
+    ):
+        response: Response = test_client.post(get_report_index_link(test_report_without_index.name), data=data)
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+    @pytest.mark.parametrize("data", [{"run_id": "123"}])
     def test_app_post_report_notexists(
         self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
     ):
