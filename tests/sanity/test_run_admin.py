@@ -2,7 +2,7 @@ from typing import List, cast
 from unittest import mock
 
 from overhave import db
-from overhave.entities import FeatureTypeModel
+from overhave.entities import FeatureTypeModel, FeatureTypeName
 from overhave.factory import AdminFactory
 from overhave.pytest_plugin import IProxyManager
 
@@ -30,7 +30,7 @@ class TestOverhaveRunAdmin:
         assert set(test_resolved_admin_proxy_manager.factory.feature_extractor.feature_types) == set(test_feature_types)
 
     def test_db_feature_types_exists(
-        self, test_feature_types: List[str], test_resolved_proxy_manager,
+        self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
     ):
         feature_type_models: List[FeatureTypeModel] = []
         with db.create_session() as session:
@@ -40,17 +40,17 @@ class TestOverhaveRunAdmin:
         assert {model.name for model in feature_type_models} == set(test_feature_types)
 
     def test_injector_collect_steps(
-        self, test_feature_types: List[str], test_resolved_proxy_manager,
+        self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
     ):
         # TODO: check steps content
         for feature_type in test_feature_types:
-            assert test_resolved_proxy_manager.injector.get_steps(feature_type)
+            assert test_resolved_admin_proxy_manager.factory.step_collector.get_steps(FeatureTypeName(feature_type))
 
     def test_plugin_resolver_collect_plugins(
-        self, test_feature_types: List[str], test_resolved_proxy_manager,
+        self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
     ):
         for feature_type in test_feature_types:
-            assert set(test_resolved_proxy_manager.plugin_resolver.get_plugins(feature_type)) == {
+            assert set(test_resolved_admin_proxy_manager.plugin_resolver.get_plugins(feature_type)) == {
                 f"demo.steps.{feature_type}.given_steps",
                 f"demo.steps.{feature_type}.when_steps",
                 f"demo.steps.{feature_type}.then_steps",
