@@ -120,5 +120,7 @@ def test_report() -> str:
 
 
 @pytest.fixture()
-def test_test_run_id(test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel):
+def test_created_test_run_id(
+    test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
+) -> int:
     return test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
