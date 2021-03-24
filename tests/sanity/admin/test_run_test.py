@@ -80,7 +80,8 @@ class TestOverhaveAdminRunTest:
         test_db_scenario: ScenarioModel,
     ):
         with db.create_session() as session:
-            db_test_run = session.query(db.TestRun).filter(db.TestRun.scenario_id == test_db_scenario.id).one()
+            db_test_run = session.query(db.TestRun).get(test_db_scenario.id)
+            assert db_test_run is not None
             test_run: TestRunModel = TestRunModel.from_orm(db_test_run)
         assert test_run.id == test_db_scenario.id
         assert isinstance(test_run.created_at, datetime)

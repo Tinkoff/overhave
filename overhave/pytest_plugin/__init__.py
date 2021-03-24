@@ -9,4 +9,4 @@ from .helpers import (
     has_issue_links,
 )
 from .plugin_resolver import PluginResolver
-from .proxy_manager import IProxyManager, get_proxy_manager
+from .proxy_manager import IProxyManager, ProxyManager, get_proxy_manager
