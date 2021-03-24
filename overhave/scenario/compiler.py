@@ -13,6 +13,12 @@ def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
     return ""
 
 
+def generate_tags_list(context: TestExecutorContext) -> Optional[List[str]]:
+    if feature_tags := [i.value for i in context.feature.feature_tags]:
+        return feature_tags
+    return None
+
+
 class ScenarioCompiler(PrefixMixin):
     """ Class for scenario compilation from text view into pytest_bdd feature format. """
 
@@ -26,10 +32,17 @@ class ScenarioCompiler(PrefixMixin):
         self._language_settings = language_settings
         self._task_links_keyword = task_links_keyword
 
-    def _get_tag_if_not_specified(self, scenario_text: str, tag: str) -> str:
+    def _get_feature_type_tag(self, scenario_text: str, tag: str) -> str:
         if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
+
+    def _get_additional_tags(self, scenario_text: str, tag: Optional[List[str]]) -> str:
+        if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
+            return ""
+        if tag is not None:
+            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{tag}' for tag in tag)}"
+        return ""
 
     def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:
         keywords: List[str] = [default_types.FEATURE]
@@ -68,7 +81,8 @@ class ScenarioCompiler(PrefixMixin):
             raise RuntimeError
         return "\n".join(
             (
-                self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name),
+                f"{self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name)} "
+                f"{self._get_additional_tags(scenario_text=text, tag=generate_tags_list(context))}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 (
                     f"{self._compilation_settings.created_by_prefix} {context.feature.author}"

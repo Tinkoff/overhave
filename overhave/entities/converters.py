@@ -13,6 +13,7 @@ from overhave.db import (
     FeatureType,
     Role,
     Scenario,
+    Tags,
     TestReportStatus,
     TestRun,
     TestRunStatus,
@@ -36,6 +37,12 @@ class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
     name: FeatureTypeName
 
 
+class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
+    """ Model for :class:`Tags` row. """
+
+    value: str
+
+
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     """ Model for :class:`Feature` row. """
 
@@ -45,6 +52,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     feature_type: FeatureTypeModel
     last_edited_by: str
     task: List[str]
+    feature_tags: List[TagsTypeModel]
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore

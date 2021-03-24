@@ -12,6 +12,7 @@ from overhave.entities import (
     TestExecutorContext,
     TestRunModel,
 )
+from overhave.entities.converters import TagsTypeModel
 from overhave.scenario import ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
 from tests.objects import TestLanguageName, get_feature_extractor, get_test_feature_containers
@@ -44,6 +45,7 @@ def test_feature() -> FeatureModel:
         last_edited_by="overlord",
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
+        feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],
     )
 
 
