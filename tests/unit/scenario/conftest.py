@@ -2,6 +2,7 @@ from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from faker import Faker
 
 from overhave.entities import (
     FeatureModel,
@@ -67,8 +68,8 @@ def test_testrun() -> TestRunModel:
 
 
 @pytest.fixture()
-def test_scenario(test_scenario_text: str) -> ScenarioModel:
-    return ScenarioModel(id=1, feature_id=1, text=test_scenario_text)
+def test_scenario(test_scenario_text: str, faker: Faker) -> ScenarioModel:
+    return ScenarioModel(id=faker.random_int(), feature_id=faker.random_int(), text=test_scenario_text)
 
 
 @pytest.fixture()
