@@ -17,11 +17,9 @@ from overhave import (
     OverhaveDBSettings,
     overhave_admin_factory,
     overhave_proxy_manager,
-    overhave_publication_factory,
     overhave_test_execution_factory,
 )
 from overhave.factory import IAdminFactory, ITestExecutionFactory
-from overhave.factory.components import IPublicationFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
@@ -83,12 +81,6 @@ def clean_admin_factory() -> Callable[[], IAdminFactory]:
 def clean_test_execution_factory() -> Callable[[], ITestExecutionFactory]:
     overhave_test_execution_factory.cache_clear()
     return overhave_test_execution_factory
-
-
-@pytest.fixture()
-def clean_publication_factory() -> Callable[[], IPublicationFactory]:
-    overhave_publication_factory.cache_clear()
-    return overhave_publication_factory
 
 
 @pytest.fixture()
