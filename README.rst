@@ -221,6 +221,25 @@ The `PyTest` usage should be similar to:
     pytest --enable-injection
 
 
+Consumers
+---------
+
+**Overhave** has `producer-consumer` architecture, based on Redis streams,
+and supported 3 consumer's types:
+
+* **TEST** - consumer for test execution with it's own factory
+    ```overhave_test_execution_factory```;
+
+* **PUBLICATION** - consumer for features publication with it's own factory
+    ```overhave_publication_factory```;
+
+* **EMULATION** - consumer for specific emulation with it's own factory
+    ```overhave_emulation_factory```.
+
+**Note**: the ```overhave_test_execution_factory``` has ability for context injection
+and could be enriched with the custom context as the ```overhave_admin_factory```.
+
+
 Project structure
 -----------------
 
