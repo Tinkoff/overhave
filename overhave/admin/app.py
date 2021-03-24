@@ -15,7 +15,7 @@ from overhave.transport import PublicationData, PublicationTask
 
 logger = logging.getLogger(__name__)
 
-OverhaveAdmin = typing.NewType("OverhaveAdmin", flask.Flask)
+OverhaveAdminApp = typing.NewType("OverhaveAdminApp", flask.Flask)
 
 
 def _prepare_factory(factory: IAdminFactory) -> None:
@@ -68,7 +68,7 @@ def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
     return flask_app
 
 
-def overhave_app(factory: IAdminFactory) -> OverhaveAdmin:  # noqa: C901
+def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / "templates"
@@ -85,7 +85,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdmin:  # noqa: C901
     @flask_app.route("/reports/<path:request>", methods=["GET", "POST"])
     def get_report(request: str) -> flask.Response:
         if flask.request.method == "POST":
-            test_run_id = flask.request.form.get("run_id")  # ReportPresenceResolution
+            test_run_id = flask.request.form.get("run_id")
             if test_run_id is None:
                 return flask.abort(status=HTTPStatus.BAD_REQUEST)
             report_precense_resolution = factory.report_manager.get_report_precense_resolution(
@@ -134,4 +134,4 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdmin:  # noqa: C901
             flask.Response, flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
         )
 
-    return OverhaveAdmin(flask_app)
+    return OverhaveAdminApp(flask_app)

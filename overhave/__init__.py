@@ -1,5 +1,5 @@
 # flake8: noqa
-from overhave.admin import OverhaveAdmin, overhave_app
+from overhave.admin import OverhaveAdminApp, overhave_app
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import LoggingSettings
 from overhave.cli import group, set_config_to_context

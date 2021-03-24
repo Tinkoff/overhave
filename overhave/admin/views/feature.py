@@ -147,18 +147,18 @@ class FeatureView(ModelViewConfigured):
 
     @expose("/edit/", methods=("GET", "POST"))
     def edit_view(self) -> werkzeug.Response:
+        rendered: werkzeug.Response = super().edit_view()
+        if flask.request.method != "POST":
+            return rendered
+
         data = flask.request.form
         logger.debug("Request data:\n%s", json.dumps(data))
-
-        rendered: werkzeug.Response = super().edit_view()
-        logger.debug("EditView rendered")
-
         run_scenario_action = data.get("run")
         if not run_scenario_action:
             logger.debug("Show rendered EditView")
             return rendered
 
-        logger.debug("Seen feature 'RUN' request")
+        logger.debug("Process feature 'RUN' request")
         tasks = data.get("task").split(",")  # type: ignore
         self._validate_tasks(tasks=tasks)
         return self._run_test(data, rendered)

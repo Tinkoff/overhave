@@ -8,7 +8,7 @@ import pytest
 from faker import Faker
 from flask.testing import FlaskClient
 
-from overhave import OverhaveAdmin, overhave_app
+from overhave import OverhaveAdminApp, overhave_app
 from overhave.base_settings import DataBaseSettings
 from overhave.factory import IAdminFactory
 from overhave.factory.context.base_context import BaseFactoryContext
@@ -56,12 +56,12 @@ def test_report_with_index(test_report_without_index: Path, faker: Faker) -> Pat
 @pytest.fixture()
 def test_app(
     clean_proxy_manager: Callable[[], IProxyManager], patched_app_admin_factory: IAdminFactory
-) -> OverhaveAdmin:
+) -> OverhaveAdminApp:
     return overhave_app(factory=patched_app_admin_factory)
 
 
 @pytest.fixture()
-def test_client(test_app: OverhaveAdmin) -> FlaskClient:
+def test_client(test_app: OverhaveAdminApp) -> FlaskClient:
     db_fd, test_app.config["DATABASE"] = tempfile.mkstemp()
     test_app.config["TESTING"] = True
 
