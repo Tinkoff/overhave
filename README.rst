@@ -43,7 +43,7 @@ Features
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
 * Still configurable as `Flask Admin`_, supports plug-ins and extensions
 * Distributed `producer-consumer` architecture based on Redis streams
-  through `Walrus`_ (partially integrated)
+  through `Walrus`_
 * Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
 * Simple command-line interface, provided with `Click`_
 * Integrated interaction for files storage with s3-cloud based on `boto3`_
@@ -98,6 +98,14 @@ The web-interface is a basic tool for BDD features management. It consists of:
           :align: center
           :alt: Feature published versions list
 
+    * Tags
+        contains tags values, which are used for feature's tagging.
+
+        .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/tags_img.png
+          :width: 500
+          :align: center
+          :alt: Feature published versions list
+
 * `Access` - section for access management, contains `Users` and
     `Groups` subsections;
 * `Emulation` - experimental section for alternative tools implementation
@@ -147,6 +155,7 @@ provides a CLI entrypoints for easy server run in debug mode:
     make up  # start PostgreSQL database and Redis
     overhave db create-all  # create Overhave database schema
     overhave-demo admin  # start Overhave admin on port 8076 in debug mode
+    overhave-demo consumer -s TEST  # start Overhave test execution consumer
 
 Command-line interface
 ----------------------
@@ -158,7 +167,7 @@ run consumer and execute basic database operations. Examples are below:
 
     overhave db create-all
     overhave admin --port 8080
-    overhave consumer -s EMULATION
+    overhave consumer -s PUBLICATION
 
 **Note**: service start-up takes a set of settings, so you can set them through
 virtual environment with prefix ```OVERHAVE_```, for example ```OVERHAVE_DB_URL```.
@@ -180,9 +189,9 @@ be realised with follow code:
 
 .. code-block:: python
 
-    from overhave import overhave_app, overhave_factory
+    from overhave import overhave_app, overhave_admin_factory
 
-    factory = overhave_factory()
+    factory = overhave_admin_factory()
     factory.set_context(my_custom_context)
     overhave_app(factory).run(host='localhost', port=8080, debug=True)
 
@@ -196,37 +205,20 @@ be realised with follow code:
 * ```my_custom_context``` is an example of context configuration, see an
     example code in `context_example.rst`_.
 
-Import context in PyTest
-^^^^^^^^^^^^^^^^^^^^^^^^
+Enabling of injection
+^^^^^^^^^^^^^^^^^^^^^
 
 **Overhave** has it's own built-in `PyTest`_ plugin, which is used to enable
 and configure injection of prepared context into application core instance.
-The plugin provides two options:
+The plugin provides one option:
 
-* `--enable-injection` - flag to enable context injection;
+* `--enable-injection` - flag to enable context injection.
 
-* `--ctx-module` - option specifying path to Python module with context injection.
-
-The module with context injection should contain usage of
-```set_context``` function, but this module should be
-unique and created only for `PyTest`_ usage instead of web-interface start-up.
-
-For example, ```module_with_injection.py``` module contains:
-
-.. code-block:: python
-
-    from overhave import overhave_factory
-
-    overhave_factory().set_context(my_custom_context)
-
-And `PyTest` usage should be similar to:
+The `PyTest` usage should be similar to:
 
 .. code-block:: bash
 
-    pytest --enable-injection --ctx-module=module_with_injection
-
-Specified module will be imported before tests start-up (with
-```pytest_configure``` `PyTest`_ hook).
+    pytest --enable-injection
 
 
 Project structure
@@ -363,7 +355,7 @@ S3 cloud
 **Overhave** implements functionality for *s3* cloud interactions, such as
 bucket creation and deletion, files uploading, downloading and deletion.
 The framework provides an ability to store reports and other files in
-the remote s3 cloud storage. You should enrich your environment with following
+the remote s3 cloud storage. You could enrich your environment with following
 settings:
 
 .. code-block:: shell
@@ -411,7 +403,7 @@ preparation and serving, such as database. Simple tests and linters execution:
 
 .. code-block:: shell
 
-    docker-compose up -d db
+    make up
     make test
     make lint
 

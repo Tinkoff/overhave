@@ -17,13 +17,6 @@ pre-init:
 	sudo apt install python3.8 python3.8-venv python3.8-dev python3.8-distutils gcc\
         libsasl2-dev libldap2-dev libssl-dev libpq-dev g++ libgnutls28-dev
 
-pre-init-mac:
-	brew install python@3.8
-	brew install openldap
-	brew install openssl
-	brew install libpq
-	brew install gnutls
-
 init:
 	python3.8 -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
