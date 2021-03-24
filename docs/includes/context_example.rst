@@ -9,7 +9,7 @@
         OverhaveLdapClientSettings,
         OverhaveAdminSettings,
         OverhaveAuthorizationSettings,
-        OverhaveContext,
+        OverhaveAdminContext,
         OverhaveFileSettings,
         OverhaveLanguageSettings,
         OverhaveProjectSettings,
@@ -18,7 +18,7 @@
     )
     from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 
-    my_custom_context = OverhaveContext(
+    my_custom_context = OverhaveAdminContext(
         file_settings=OverhaveFileSettings(
             features_base_dir=path_settings.features_base_dir, tmp_dir=path_settings.tmp_dir
         ),
