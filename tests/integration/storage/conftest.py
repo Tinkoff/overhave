@@ -1,4 +1,6 @@
+import socket
 from typing import cast
+from unittest import mock
 from uuid import uuid1
 
 import pytest
@@ -15,9 +17,14 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import TestRunStorage
-from overhave.storage.emulation import EmulationStorage
-from overhave.storage.feature_type import FeatureTypeStorage
+from overhave.storage import FeatureTypeStorage, TestRunStorage
+from overhave.storage.emulation_storage import EmulationStorage
+
+
+@pytest.fixture(scope="module")
+def socket_mock() -> mock.MagicMock:
+    with mock.patch("socket.socket", return_value=mock.create_autospec(socket.socket)) as mocked_socket:
+        yield mocked_socket
 
 
 @pytest.fixture(scope="class")
@@ -26,7 +33,9 @@ def test_emulation_settings() -> OverhaveEmulationSettings:
 
 
 @pytest.fixture(scope="class")
-def test_emulation_storage(test_emulation_settings: OverhaveEmulationSettings) -> EmulationStorage:
+def test_emulation_storage(
+    socket_mock: mock.MagicMock, test_emulation_settings: OverhaveEmulationSettings
+) -> EmulationStorage:
     return EmulationStorage(test_emulation_settings)
 
 
@@ -97,7 +106,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             name=faker.word(),
             author=test_system_user.login,
             type_id=test_feature_type.id,
-            task=[faker.word()],
+            task=[faker.word()[:11]],
             last_edited_by=test_system_user.login,
         )
         session.add(feature)

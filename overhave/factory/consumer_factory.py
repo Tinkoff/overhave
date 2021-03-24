@@ -1,20 +1,24 @@
-from functools import cached_property
+from functools import cached_property, partial
 from typing import Callable, Dict, Type
 
-from overhave.base_settings import DataBaseSettings
-from overhave.factory import IOverhaveFactory
-from overhave.transport.redis.consumer import RedisConsumer
-from overhave.transport.redis.objects import BaseRedisTask, EmulationTask, RedisStream, TestRunTask, TRedisTask
-from overhave.transport.redis.runner import RedisConsumerRunner
+from overhave.factory.getters import get_emulation_factory, get_publication_factory, get_test_execution_factory
+from overhave.pytest_plugin import get_proxy_manager
+from overhave.transport import (
+    AnyRedisTask,
+    EmulationTask,
+    PublicationTask,
+    RedisConsumer,
+    RedisConsumerRunner,
+    RedisStream,
+    TestRunTask,
+)
 
 
 class ConsumerFactory:
     """ Factory for :class:`RedisConsumer`, :class:`RedisConsumerRunner` and tasks mapping. """
 
-    def __init__(self, factory: IOverhaveFactory, stream: RedisStream):
-        self._factory = factory
+    def __init__(self, stream: RedisStream):
         self._stream = stream
-        DataBaseSettings().setup_db()
 
     @cached_property
     def _consumer(self) -> RedisConsumer:
@@ -23,12 +27,20 @@ class ConsumerFactory:
         return RedisConsumer(settings=OverhaveRedisSettings(), stream_name=self._stream)
 
     @cached_property
-    def _mapping(self) -> Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]:
+    def runner(self) -> RedisConsumerRunner:
+        return RedisConsumerRunner(consumer=self._consumer, mapping=self._mapping)
+
+    @cached_property
+    def _mapping(self) -> Dict[Type[AnyRedisTask], Callable[[AnyRedisTask], None]]:
         return {
-            EmulationTask: self._factory.emulator.start_emulation,  # type: ignore
-            TestRunTask: lambda _: None,
+            TestRunTask: self._process_test_execution_task,  # type: ignore
+            PublicationTask: get_publication_factory().process_task,  # type: ignore
+            EmulationTask: get_emulation_factory().process_task,  # type: ignore
         }
 
     @cached_property
-    def runner(self) -> RedisConsumerRunner:
-        return RedisConsumerRunner(consumer=self._consumer, mapping=self._mapping)
+    def _process_test_execution_task(self) -> Callable[[TestRunTask], None]:
+        factory = get_test_execution_factory()
+        proxy_manager = get_proxy_manager()
+        proxy_manager.set_factory(factory)
+        return partial(factory.process_task,)

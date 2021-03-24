@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 83.2
+MIN_COVERAGE ?= 83.8
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -16,13 +16,6 @@ ALL = $(CODE) $(DOCS_DIR) tests demo
 pre-init:
 	sudo apt install python3.8 python3.8-venv python3.8-dev python3.8-distutils gcc\
         libsasl2-dev libldap2-dev libssl-dev libpq-dev g++ libgnutls28-dev
-
-pre-init-mac:
-	brew install python@3.8
-	brew install openldap
-	brew install openssl
-	brew install libpq
-	brew install gnutls
 
 init:
 	python3.8 -m venv $(VENV)
@@ -80,3 +73,10 @@ build-docker:
 
 test-docker: build-docker
 	docker-compose run code
+
+up:
+	docker-compose up -d db
+	docker-compose up -d redis
+
+down:
+	docker-compose down -v

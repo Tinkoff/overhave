@@ -26,7 +26,11 @@ from overhave.admin.views.formatters.formatters import (
     feature_link_formatter,
     json_formatter,
 )
-from overhave.admin.views.formatters.helpers import get_feature_link_markup, get_testrun_details_link
+from overhave.admin.views.formatters.helpers import (
+    get_feature_link_markup,
+    get_report_index_link,
+    get_testrun_details_link,
+)
 from overhave.db import TestReportStatus, TestRun, TestRunStatus, TestUser
 from overhave.utils import get_current_time
 
@@ -164,13 +168,11 @@ class TestResultReportFormatter:
             name=column_name,
         )
         assert result == Markup(
-            f"<a href='/testrun/details/?id={test_testrun_id}'"
-            f"<form action='#'>"
+            f"<form action='/testrun/details/?id={test_testrun_id}'>"
             f"<fieldset title='Show details'>"
             f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
             "</fieldset>"
             "</form>"
-            "</a>"
         )
 
     @pytest.mark.parametrize("status", list(TestRunStatus))
@@ -183,26 +185,22 @@ class TestResultReportFormatter:
         column_name: str,
         status: TestRunStatus,
         report_status: TestReportStatus,
-        test_testrun_report_link: Optional[str],
+        test_testrun_report: Optional[str],
         test_testrun_button_css_class: str,
     ):
         result = result_report_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(
-                id=test_testrun_id, status=status, report_status=report_status, report=test_testrun_report_link
-            ),
+            model=TestRun(id=test_testrun_id, status=status, report_status=report_status, report=test_testrun_report),
             name=column_name,
         )
         assert result == Markup(
-            f"<a href='/reports/{test_testrun_report_link}/index.html' method='POST' target='_blank'"
-            f"<form action='#'>"
+            f"<form action='{get_report_index_link(test_testrun_report)}' method='POST' target='_blank'>"
             f"<input type='hidden' name='run_id' value='{test_testrun_id}' />"
             f"<fieldset title='Go to report'>"
             f"<button class='link-button {test_testrun_button_css_class}' type='submit'>{status}</button>"
             "</fieldset>"
             "</form>"
-            "</a>"
         )
 
 

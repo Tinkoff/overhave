@@ -2,14 +2,15 @@ from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from faker import Faker
 
 from overhave.entities import (
     FeatureModel,
     FeatureTypeModel,
     OverhaveLanguageSettings,
     OverhaveScenarioCompilerSettings,
-    ProcessingContext,
     ScenarioModel,
+    TestExecutorContext,
     TestRunModel,
 )
 from overhave.entities.converters import TagsTypeModel
@@ -53,6 +54,7 @@ def test_feature() -> FeatureModel:
 def test_testrun() -> TestRunModel:
     return TestRunModel(
         id=1,
+        created_at=get_current_time(),
         scenario_id=1,
         name="test",
         start=get_current_time(),
@@ -66,15 +68,15 @@ def test_testrun() -> TestRunModel:
 
 
 @pytest.fixture()
-def test_scenario(test_scenario_text: str) -> ScenarioModel:
-    return ScenarioModel(id=1, feature_id=1, text=test_scenario_text)
+def test_scenario(test_scenario_text: str, faker: Faker) -> ScenarioModel:
+    return ScenarioModel(id=faker.random_int(), feature_id=faker.random_int(), text=test_scenario_text)
 
 
 @pytest.fixture()
 def test_processing_ctx(
     test_feature: FeatureModel, test_scenario: ScenarioModel, test_testrun: TestRunModel
-) -> ProcessingContext:
-    return ProcessingContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
+) -> TestExecutorContext:
+    return TestExecutorContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
 
 
 @pytest.fixture()

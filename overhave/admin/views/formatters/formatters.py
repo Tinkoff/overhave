@@ -9,6 +9,7 @@ from overhave import db
 from overhave.admin.views.formatters.helpers import (
     get_button_class_by_status,
     get_feature_link_markup,
+    get_report_index_link,
     get_testrun_details_link,
 )
 from overhave.admin.views.formatters.safe_formatter import safe_formatter
@@ -50,25 +51,22 @@ def result_report_formatter(view: ModelView, context: Any, model: db.TestRun, va
     test_run_id = getattr(model, "id")
     if test_run_id is None:
         raise ValueError("test_run_id could not be None!")
-    if report_status.has_report:
+    report = getattr(model, "report")
+    if report_status.has_report and isinstance(report, str):
         return Markup(
-            f"<a href='/reports/{getattr(model, 'report')}/index.html' method='POST' target='_blank'"
-            f"<form action='#'>"
+            f"<form action='{get_report_index_link(report)}' method='POST' target='_blank'>"
             f"<input type='hidden' name='run_id' value='{test_run_id}' />"
             f"<fieldset title='Go to report'>"
             f"<button class='link-button {get_button_class_by_status(value)}' type='submit'>{value}</button>"
             "</fieldset>"
             "</form>"
-            "</a>"
         )
     return Markup(
-        f"<a {get_testrun_details_link(test_run_id)}"
-        f"<form action='#'>"
+        f"<form action='{get_testrun_details_link(test_run_id)}'>"
         f"<fieldset title='Show details'>"
         f"<button class='link-button {get_button_class_by_status(value)}'>{value}</button>"
         "</fieldset>"
         "</form>"
-        "</a>"
     )
 
 

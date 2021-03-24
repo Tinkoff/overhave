@@ -74,7 +74,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
 
     scenario_id = sa.Column(INT_TYPE, sa.ForeignKey(Scenario.id), nullable=False, index=True)
     name = sa.Column(LONG_STR_TYPE, nullable=False)
-    start = sa.Column(DATETIME_TYPE, doc="Test start time", nullable=False)
+    start = sa.Column(DATETIME_TYPE, doc="Test start time")
     end = sa.Column(DATETIME_TYPE, doc="Test finish time")
     status = sa.Column(sa.Enum(TestRunStatus), doc="Current test status", nullable=False)
     report_status = sa.Column(sa.Enum(TestReportStatus), doc="Report generation result", nullable=False)
@@ -118,6 +118,7 @@ class Draft(BaseTable, PrimaryKeyMixin):
     text = sa.Column(TEXT_TYPE, doc="Released scenario text")
     pr_url = sa.Column(sa.Text, doc="Absolute pull-request URL", nullable=True)
     published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
+    published_at = sa.Column(DATETIME_TYPE, doc="Publication time")
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 

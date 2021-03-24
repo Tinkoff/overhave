@@ -15,14 +15,14 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
 
 
 class OverhaveAuthorizationSettings(BaseOverhavePrefix):
-    """ Settings for Overhave authorization in admin interface.
+    """ Settings for Overhave authorization in components interface.
 
     Supports 3 strategies: SIMPLE, DEFAULT and LDAP.
     LDAP authorization uses group politics with administration group `admin_group`.
     SIMPLE and DEFAULT strategies use admin user that would be dynamically created at startup.
     """
 
-    auth_strategy: AuthorizationStrategy = AuthorizationStrategy.DEFAULT
+    auth_strategy: AuthorizationStrategy = AuthorizationStrategy.SIMPLE
     admin_group: Optional[str] = None
 
 

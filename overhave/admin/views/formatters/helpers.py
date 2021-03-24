@@ -13,7 +13,11 @@ def get_button_class_by_status(status: str) -> str:
 
 
 def get_testrun_details_link(test_run_id: Union[int, str]) -> str:
-    return f"href='/testrun/details/?id={test_run_id}'"
+    return f"/testrun/details/?id={test_run_id}"
+
+
+def get_report_index_link(report: str) -> str:
+    return f"/reports/{report}/index.html"
 
 
 def get_feature_link_markup(feature_id: Union[int, str], feature_name: str) -> Markup:

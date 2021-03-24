@@ -1,7 +1,7 @@
 import pytest
 
 from overhave.entities import FeatureTypeModel
-from overhave.storage.feature_type import FeatureTypeStorage
+from overhave.storage import FeatureTypeStorage
 
 
 @pytest.mark.usefixtures("database")

@@ -5,12 +5,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from overhave.entities.converters import ProcessingContext
-from overhave.entities.feature import IFeatureExtractor
-from overhave.entities.settings import OverhaveFileSettings, OverhaveLanguageSettings
+from overhave.entities import IFeatureExtractor, OverhaveFileSettings, OverhaveLanguageSettings, TestExecutorContext
 from overhave.scenario.compiler import ScenarioCompiler
-from overhave.scenario.parser import ScenarioParser
-from overhave.testing.settings import OverhaveProjectSettings
+from overhave.test_execution.settings import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)
 
@@ -40,23 +37,21 @@ class FileManager(FileSavingMixin):
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
         scenario_compiler: ScenarioCompiler,
-        scenario_parser: ScenarioParser,
     ):
         self._language_settings = language_settings
         self._project_settings = project_settings
         self._file_settings = file_settings
         self._feature_extractor = feature_extractor
         self._scenario_compiler = scenario_compiler
-        self._scenario_parser = scenario_parser
 
-    def _compile_feature_file_name_prefix(self, context: ProcessingContext) -> str:
+    def _compile_feature_file_name_prefix(self, context: TestExecutorContext) -> str:
         feature_name = context.feature.name
         if self._language_settings.translit_pack is not None:
             feature_name = self._language_settings.translit_pack.translate(feature_name)
         return self._get_feature_name(feature_name=feature_name, feature_id=context.feature.id)
 
     @contextmanager
-    def tmp_feature_file(self, context: ProcessingContext) -> Iterator:  # type: ignore
+    def tmp_feature_file(self, context: TestExecutorContext) -> Iterator:  # type: ignore
         run_prefix = self._compile_feature_file_name_prefix(context)
         logger.debug("Feature prefix: '%s'", run_prefix)
         with tempfile.NamedTemporaryFile(
@@ -71,7 +66,7 @@ class FileManager(FileSavingMixin):
             yield file
 
     @contextmanager
-    def tmp_fixture_file(self, context: ProcessingContext, feature_file: Any) -> Iterator:  # type: ignore
+    def tmp_fixture_file(self, context: TestExecutorContext, feature_file: Any) -> Iterator:  # type: ignore
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_fixtures_dir,
             prefix=f"{context.test_run.id}_",
@@ -85,7 +80,7 @@ class FileManager(FileSavingMixin):
             self._write_data(file=file, data=data, entity_name="fixture")
             yield file
 
-    def produce_feature_file(self, context: ProcessingContext) -> Path:
+    def produce_feature_file(self, context: TestExecutorContext) -> Path:
         feature_file_path: Path = (
             self._feature_extractor.feature_type_to_dir_mapping[context.feature.feature_type.name]
             / f"{self._compile_feature_file_name_prefix(context)}{self._file_settings.feature_suffix}"

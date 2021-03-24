@@ -7,24 +7,27 @@ import flask
 import werkzeug
 
 from overhave import db
-from overhave.admin.flask import get_flask_admin, get_flask_app
-from overhave.admin.flask.login_manager import get_flask_login_manager
-from overhave.factory import IOverhaveFactory, ProxyFactory
+from overhave.admin.flask import get_flask_admin, get_flask_app, get_flask_login_manager
+from overhave.factory import IAdminFactory
+from overhave.pytest_plugin import get_proxy_manager
+from overhave.storage import UniqueDraftCreationError
+from overhave.transport import PublicationData, PublicationTask
 
 logger = logging.getLogger(__name__)
 
-OverhaveAppType = typing.NewType("OverhaveAppType", flask.Flask)
+OverhaveAdminApp = typing.NewType("OverhaveAdminApp", flask.Flask)
 
 
-def _prepare_factory(factory: ProxyFactory) -> None:
-    """ Resolve necessary settings and prepare instance of :class:`ProxyFactory` for usage. """
-    factory.context.logging_settings.setup_logging()
-    factory.patch_pytest()
-    factory.supply_injector_for_collection()
-    factory.injector.collect_configs()
+def _prepare_factory(factory: IAdminFactory) -> None:
+    """ Resolve necessary settings with :class:`IProxyManager` and prepare :class:`IOverhaveFactory` for usage. """
+    proxy_manager = get_proxy_manager()
+    proxy_manager.set_factory(factory)
+    proxy_manager.patch_pytest()
+    proxy_manager.supply_injector_for_collection()
+    proxy_manager.injector.collect_configs()
 
 
-def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
+def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
     """ Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`. """
     from overhave.admin.views import (
         DraftView,
@@ -39,7 +42,12 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
         UserView,
     )
 
-    index_view = OverhaveIndexView(name="Info", url="/", context=factory.context, auth_manager=factory.auth_manager)
+    index_view = OverhaveIndexView(
+        name="Info",
+        url="/",
+        auth_manager=factory.auth_manager,
+        index_template_path=factory.context.admin_settings.index_template_path,
+    )
     flask_admin = get_flask_admin(index_view=index_view)
     flask_admin.add_views(
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
@@ -60,7 +68,7 @@ def _resolved_app(factory: IOverhaveFactory, template_dir: Path) -> flask.Flask:
     return flask_app
 
 
-def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
+def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     """ Overhave application, based on Flask. """
     current_dir = Path(__file__).parent
     template_dir = current_dir / "templates"
@@ -78,9 +86,16 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
     def get_report(request: str) -> flask.Response:
         if flask.request.method == "POST":
             test_run_id = flask.request.form.get("run_id")
-            if test_run_id is None or not factory.report_manager.ensure_allure_report_exists(
+            if test_run_id is None:
+                return flask.abort(status=HTTPStatus.BAD_REQUEST)
+            report_precense_resolution = factory.report_manager.get_report_precense_resolution(
                 report=request, run_id=int(test_run_id)
-            ):
+            )
+            if not report_precense_resolution.exists:
+                if report_precense_resolution.not_ready:
+                    return typing.cast(
+                        flask.Response, flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
+                    )
                 return flask.abort(status=HTTPStatus.NOT_FOUND)
         return typing.cast(
             flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)
@@ -91,14 +106,23 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
         return flask.redirect(factory.context.emulation_settings.get_emulation_url(url))
 
     @flask_app.route("/pull_request/<int:run_id>")
-    def create_pr(run_id: int) -> werkzeug.Response:
+    def publish_feature(run_id: int) -> werkzeug.Response:
         published_by = flask.request.args.get("published_by")
         if not isinstance(published_by, str):
             flask.flash("Parameter 'published_by' should be specified for version's creation!", category="error")
-            return flask.redirect(
-                flask.url_for("testrun.details_view", id=run_id), code=HTTPStatus.UNPROCESSABLE_ENTITY
+            return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
+        try:
+            draft_id = factory.draft_storage.save_draft(test_run_id=run_id, published_by=published_by)
+        except UniqueDraftCreationError:
+            logger.exception("Error while creation draft!")
+            flask.flash(
+                "Requested publication contains scenario which identical to the previous version!", category="warning"
             )
-        return factory.processor.create_version(test_run_id=run_id, published_by=published_by)
+            return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
+        if not factory.redis_producer.add_task(PublicationTask(data=PublicationData(draft_id=draft_id))):
+            flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
+            return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
+        return flask.redirect(flask.url_for("draft.details_view", id=draft_id))
 
     @flask_app.route("/files/<path:file>")
     def get_files(file: str) -> flask.Response:
@@ -110,4 +134,4 @@ def overhave_app(factory: ProxyFactory) -> OverhaveAppType:  # noqa: C901
             flask.Response, flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
         )
 
-    return OverhaveAppType(flask_app)
+    return OverhaveAdminApp(flask_app)

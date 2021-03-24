@@ -1,2 +1,2 @@
 # flake8: noqa
-from .app import OverhaveAppType, overhave_app
+from .app import OverhaveAdminApp, overhave_app

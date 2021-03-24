@@ -2,8 +2,7 @@ from typing import List, Optional, cast
 
 from pytest_bdd import types as default_types
 
-from overhave.entities.converters import ProcessingContext
-from overhave.entities.settings import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings, TestExecutorContext
 from overhave.scenario.errors import IncorrectScenarioTextError
 from overhave.scenario.mixin import PrefixMixin
 
@@ -14,7 +13,7 @@ def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
     return ""
 
 
-def generate_tags_list(context: ProcessingContext) -> Optional[List[str]]:
+def generate_tags_list(context: TestExecutorContext) -> Optional[List[str]]:
     if feature_tags := [i.value for i in context.feature.feature_tags]:
         return feature_tags
     return None
@@ -72,12 +71,14 @@ class ScenarioCompiler(PrefixMixin):
             "Could not find any scenario prefix in scenario text, so could not compile feature header!"
         )
 
-    def _compile_header(self, context: ProcessingContext) -> str:
+    def _compile_header(self, context: TestExecutorContext) -> str:
         text = context.scenario.text
         feature_prefix = self._get_feature_prefix_if_specified(scenario_text=text)
         if not feature_prefix:
             feature_prefix = self._detect_feature_prefix_by_scenario_format(scenario_text=text)
         blocks_delimiter = f" {self._compilation_settings.blocks_delimiter} "
+        if context.test_run.start is None:
+            raise RuntimeError
         return "\n".join(
             (
                 f"{self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name)} "
@@ -97,5 +98,5 @@ class ScenarioCompiler(PrefixMixin):
             )
         )
 
-    def compile(self, context: ProcessingContext) -> str:
+    def compile(self, context: TestExecutorContext) -> str:
         return self._compile_header(context=context) + "\n" + context.scenario.text.strip("\n") + "\n"
