@@ -74,7 +74,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
 
     scenario_id = sa.Column(INT_TYPE, sa.ForeignKey(Scenario.id), nullable=False, index=True)
     name = sa.Column(LONG_STR_TYPE, nullable=False)
-    start = sa.Column(DATETIME_TYPE, doc="Test start time", nullable=False)
+    start = sa.Column(DATETIME_TYPE, doc="Test start time")
     end = sa.Column(DATETIME_TYPE, doc="Test finish time")
     status = sa.Column(sa.Enum(TestRunStatus), doc="Current test status", nullable=False)
     report_status = sa.Column(sa.Enum(TestReportStatus), doc="Report generation result", nullable=False)

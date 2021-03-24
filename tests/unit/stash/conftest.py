@@ -80,6 +80,7 @@ def test_stash_publisher_with_default_reviewers(
     test_project_settings: OverhaveProjectSettings,
     test_stash_publisher_settings_with_default_reviewers: OverhaveStashPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_stash_client: StashHttpClient,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
     return StashVersionPublisher(
@@ -101,6 +102,7 @@ def test_stash_publisher_with_reviewers_mapping(
     test_project_settings: OverhaveProjectSettings,
     test_stash_project_settings_with_reviewers_mapping: OverhaveStashPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_stash_client: StashHttpClient,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
     return StashVersionPublisher(

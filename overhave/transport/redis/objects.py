@@ -38,11 +38,15 @@ class BaseRedisTask(_IRedisTask):
 class TestRunData(BaseModel):
     """ Specific data for test run. """
 
+    __test__ = False
+
     test_run_id: int
 
 
 class TestRunTask(BaseRedisTask):
     """ Redis stream task for test run. """
+
+    __test__ = False
 
     data: TestRunData
 

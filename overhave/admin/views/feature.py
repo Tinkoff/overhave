@@ -20,6 +20,8 @@ from overhave.transport import TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
 
+_SCENARIO_PREFIX = "scenario-0"
+
 
 class ScenarioTextWidget(HiddenInput):
     """ Widget to override scenario view. """
@@ -129,16 +131,17 @@ class FeatureView(ModelViewConfigured):
 
     @staticmethod
     def _run_test(data: Dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
-        prefix = "scenario-0"
-        scenario_id = data.get(f"{prefix}-id")
-        scenario_text = data.get(f"{prefix}-text")
+        scenario_id = data.get(f"{_SCENARIO_PREFIX}-id")
+        scenario_text = data.get(f"{_SCENARIO_PREFIX}-text")
         if not scenario_id or not scenario_text:
-            flask.flash("Scenario does not exist, so could not run test.", category="warning")
+            flask.flash("Scenario information not requested.", category="error")
             return rendered
         factory = get_admin_factory()
-        test_run_id = factory.test_run_storage.create_test_run(
-            scenario_id=int(scenario_id), executed_by=current_user.login
-        )
+        scenario = factory.scenario_storage.get_scenario(int(scenario_id))
+        if scenario is None:
+            flask.flash("Scenario does not exist, so could not run test.", category="error")
+            return rendered
+        test_run_id = factory.test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=current_user.login)
         if not factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id))):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return rendered

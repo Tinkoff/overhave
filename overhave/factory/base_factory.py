@@ -52,6 +52,11 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
 
     @property
     @abc.abstractmethod
+    def scenario_storage(self) -> IScenarioStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
     def step_collector(self) -> StepCollector:
         pass
 
@@ -168,16 +173,20 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
         )
 
     @cached_property
+    def _scenario_storage(self) -> IScenarioStorage:
+        return ScenarioStorage()
+
+    @property
+    def scenario_storage(self) -> IScenarioStorage:
+        return self._scenario_storage
+
+    @cached_property
     def _step_collector(self) -> StepCollector:
         return StepCollector(step_prefixes=self.context.language_settings.step_prefixes)
 
     @property
     def step_collector(self) -> StepCollector:
         return self._step_collector
-
-    @cached_property
-    def _scenario_storage(self) -> IScenarioStorage:
-        return ScenarioStorage()
 
     @cached_property
     def _test_run_storage(self) -> TestRunStorage:

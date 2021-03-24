@@ -19,6 +19,10 @@ class TestRunNotExistsError(BaseVersionPublisherException):
     """ Exception for situation with not existing TestRun. """
 
 
+class ScenarioNotExistsError(BaseVersionPublisherException):
+    """ Exception for situation with not existing Scenario. """
+
+
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
     """ Class for feature version's pull requests management relative to Atlassian Stash API. """
 
@@ -49,6 +53,8 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             raise TestRunNotExistsError(f"TestRun with id={draft.test_run_id} does not exist!")
         feature = self._feature_storage.get_feature(draft.feature_id)
         scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
+        if not scenario:
+            raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
         return PublisherContext(
             feature=feature,
             scenario=scenario,

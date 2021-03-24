@@ -64,6 +64,8 @@ class ScenarioCompiler(PrefixMixin):
         if not feature_prefix:
             feature_prefix = self._detect_feature_prefix_by_scenario_format(scenario_text=text)
         blocks_delimiter = f" {self._compilation_settings.blocks_delimiter} "
+        if context.test_run.start is None:
+            raise RuntimeError
         return "\n".join(
             (
                 self._get_tag_if_not_specified(scenario_text=text, tag=context.feature.feature_type.name),

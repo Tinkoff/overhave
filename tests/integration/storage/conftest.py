@@ -1,4 +1,6 @@
+import socket
 from typing import cast
+from unittest import mock
 
 import pytest
 from faker import Faker
@@ -9,13 +11,21 @@ from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage.emulation_storage import EmulationStorage
 
 
+@pytest.fixture(scope="module")
+def socket_mock() -> mock.MagicMock:
+    with mock.patch("socket.socket", return_value=mock.create_autospec(socket.socket)) as mocked_socket:
+        yield mocked_socket
+
+
 @pytest.fixture(scope="class")
 def test_emulation_settings() -> OverhaveEmulationSettings:
     return OverhaveEmulationSettings()
 
 
 @pytest.fixture(scope="class")
-def test_emulation_storage(test_emulation_settings: OverhaveEmulationSettings) -> EmulationStorage:
+def test_emulation_storage(
+    socket_mock: mock.MagicMock, test_emulation_settings: OverhaveEmulationSettings
+) -> EmulationStorage:
     return EmulationStorage(test_emulation_settings)
 
 

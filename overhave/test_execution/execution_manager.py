@@ -29,6 +29,10 @@ class TestRunNotExistsError(BaseTestExecutionManagerException):
     """ Exception for situation with not existing TestRun. """
 
 
+class ScenarioNotExistsError(BaseTestExecutionManagerException):
+    """ Exception for situation with not existing Scenario. """
+
+
 class TestExecutionManager(ITestExecutionManager):
     """ Class for test execution management. """
 
@@ -57,9 +61,11 @@ class TestExecutionManager(ITestExecutionManager):
 
     def _compile_context(self, test_run_id: int) -> TestExecutorContext:
         test_run = self._test_run_storage.get_test_run(test_run_id)
-        if not test_run:
+        if test_run is None:
             raise TestRunNotExistsError(f"TestRun with id={test_run_id} does not exist!")
         scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
+        if scenario is None:
+            raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
         feature = self._feature_storage.get_feature(scenario.feature_id)
         return TestExecutorContext(feature=feature, scenario=scenario, test_run=test_run,)
 

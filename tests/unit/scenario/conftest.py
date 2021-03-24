@@ -51,6 +51,7 @@ def test_feature() -> FeatureModel:
 def test_testrun() -> TestRunModel:
     return TestRunModel(
         id=1,
+        created_at=get_current_time(),
         scenario_id=1,
         name="test",
         start=get_current_time(),

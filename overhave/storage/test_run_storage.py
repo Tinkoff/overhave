@@ -36,7 +36,6 @@ class TestRunStorage(ITestRunStorage):
             run = db.TestRun(  # type: ignore
                 scenario_id=scenario_id,
                 name=feature.name,
-                start=get_current_time(),
                 status=db.TestRunStatus.STARTED,
                 report_status=db.TestReportStatus.EMPTY,
                 executed_by=executed_by,
@@ -49,6 +48,8 @@ class TestRunStorage(ITestRunStorage):
         with db.create_session() as session:
             run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
             run.status = status
+            if status is db.TestRunStatus.RUNNING:
+                run.start = get_current_time()
             if status.finished:
                 run.end = get_current_time()
             if isinstance(traceback, str):

@@ -61,9 +61,10 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     __test__ = False
 
     id: int
+    created_at: datetime
     name: str
     executed_by: str
-    start: datetime
+    start: Optional[datetime]
     end: Optional[datetime]
     status: TestRunStatus
     report_status: TestReportStatus

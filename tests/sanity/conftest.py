@@ -1,13 +1,18 @@
 from os import chdir
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, cast
 from unittest import mock
 
 import click
 import pytest
+import werkzeug
+from _pytest.fixtures import FixtureRequest
 from flask import Flask
+from pytest_mock import MockFixture
 
 from demo.demo import _run_demo_admin
 from overhave import db, set_config_to_context
+from overhave.admin.views import FeatureView
+from overhave.admin.views.feature import _SCENARIO_PREFIX
 from overhave.base_settings import DataBaseSettings
 from overhave.entities import ScenarioModel, SystemUserModel
 from overhave.factory import IAdminFactory, ITestExecutionFactory
@@ -105,9 +110,17 @@ def test_db_scenario(test_feature_container: FeatureTestContainer, test_db_user:
 
 
 @pytest.fixture()
-def flask_urlfor_handler_mock(test_db_scenario: ScenarioModel) -> mock.MagicMock:
-    with mock.patch("flask.url_for", return_value=f"/testrun/details/?id={test_db_scenario.id}") as flask_run_handler:
+def flask_flash_handler_mock() -> mock.MagicMock:
+    with mock.patch("flask.flash", return_value=mock.MagicMock()) as flask_run_handler:
         yield flask_run_handler
+
+
+@pytest.fixture()
+def flask_urlfor_handler_mock(test_db_scenario: ScenarioModel) -> mock.MagicMock:
+    with mock.patch(
+        "flask.url_for", return_value=f"/testrun/details/?id={test_db_scenario.id}"
+    ) as flask_urlfor_handler:
+        yield flask_urlfor_handler
 
 
 @pytest.fixture(scope="module")
@@ -118,13 +131,46 @@ def subprocess_run_mock() -> mock.MagicMock:
         yield mocked_subprocess_run
 
 
+@pytest.fixture(scope="module")
+def test_rendered_featureview(module_mocker: MockFixture) -> mock.MagicMock:
+    return module_mocker.create_autospec(werkzeug.Response)
+
+
 @pytest.fixture()
-def test_proxy_manager_after_run(
-    subprocess_run_mock: mock.MagicMock,
-    test_resolved_proxy_manager: IProxyManager,
-    test_db_user: SystemUserModel,
+def redisproducer_addtask_mock(test_resolved_admin_proxy_manager: IProxyManager) -> mock.MagicMock:
+    with mock.patch.object(
+        test_resolved_admin_proxy_manager.factory.redis_producer, "add_task", return_value=mock.MagicMock()
+    ) as mocked_redisproducer_addtask:
+        yield mocked_redisproducer_addtask
+
+
+@pytest.fixture()
+def flask_currentuser_mock(test_db_user: SystemUserModel) -> mock.MagicMock:
+    with mock.patch("overhave.admin.views.feature.current_user", return_value=mock.MagicMock()) as mocked:
+        mocked.login = test_db_user.login
+        yield mocked
+
+
+@pytest.fixture()
+def runtest_data(test_db_scenario: ScenarioModel, request: FixtureRequest) -> Dict[str, Any]:
+    if hasattr(request, "param"):
+        return cast(Dict[str, Any], request.param)
+    # regular data
+    return {
+        f"{_SCENARIO_PREFIX}-id": test_db_scenario.id,
+        f"{_SCENARIO_PREFIX}-text": test_db_scenario.text,
+    }
+
+
+@pytest.fixture()
+def test_featureview_runtest_result(
+    test_rendered_featureview: mock.MagicMock,
+    test_resolved_admin_proxy_manager: IProxyManager,
     test_db_scenario: ScenarioModel,
+    flask_flash_handler_mock: mock.MagicMock,
     flask_urlfor_handler_mock: mock.MagicMock,
-) -> IProxyManager:
-    test_resolved_proxy_manager.factory.execute_test(scenario_id=test_db_scenario.id, executed_by=test_db_user.login)
-    return test_resolved_proxy_manager
+    redisproducer_addtask_mock: mock.MagicMock,
+    flask_currentuser_mock: mock.MagicMock,
+    runtest_data: Dict[str, Any],
+) -> werkzeug.Response:
+    return FeatureView._run_test(data=runtest_data, rendered=test_rendered_featureview)
