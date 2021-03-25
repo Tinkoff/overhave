@@ -21,6 +21,10 @@ from overhave.entities.authorization.settings import (
     OverhaveLdapClientSettings,
 )
 from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
+from overhave.factory import IAdminFactory as OverhaveAdminFactory
+from overhave.factory import IEmulationFactory as OverhaveEmulationFactory
+from overhave.factory import IPublicationFactory as OverhavePublicationFactory
+from overhave.factory import ITestExecutionFactory as OverhaveTestExecutionFactory
 from overhave.factory import (
     OverhaveAdminContext,
     OverhaveEmulationContext,
@@ -32,6 +36,7 @@ from overhave.factory import get_emulation_factory as overhave_emulation_factory
 from overhave.factory import get_publication_factory as overhave_publication_factory
 from overhave.factory import get_test_execution_factory as overhave_test_execution_factory
 from overhave.publication import OverhaveStashPublisherSettings
+from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
 from overhave.pytest_plugin import get_description_manager
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
