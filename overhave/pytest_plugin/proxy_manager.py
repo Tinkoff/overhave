@@ -32,6 +32,10 @@ class IProxyManager(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def clear_factory(self) -> None:
+        pass
+
+    @abc.abstractmethod
     def patch_pytest(self) -> None:
         pass
 
@@ -93,6 +97,9 @@ class ProxyManager(IProxyManager):
         if self._factory is None:
             raise FactoryNotDefinedError("Factory is nullable!")
         return self._factory
+
+    def clear_factory(self) -> None:
+        self._factory = None
 
     @property
     def has_factory(self) -> bool:
