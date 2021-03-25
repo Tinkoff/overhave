@@ -17,15 +17,6 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     You could specify your fixture content for specific pytest usage with your own plugins.
     It could give you pretty extended file with powerful possibilities.
     `fixture_context` will be formatted by `OverhaveProccessor` before test would be started.
-
-    For example::
-
-        fixture_content: = [
-            "from pytest_bdd import scenarios",
-            "from my_app.plugins import kwargs, plugins",
-            "pytest_plugins = plugins",
-            "scenarios('{feature_file_path}', **kwargs)",
-        ]
     """
 
     # Fixture content in list format, which would be compiled into formatted string.

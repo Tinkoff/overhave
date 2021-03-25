@@ -2,7 +2,10 @@ import abc
 import logging
 from typing import Optional
 
-import git
+try:
+    import git
+except ImportError:
+    git = None
 
 from overhave.entities import PublisherContext
 from overhave.publication.base_publisher import BaseVersionPublisher, BaseVersionPublisherException
