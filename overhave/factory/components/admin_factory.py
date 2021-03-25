@@ -5,7 +5,8 @@ from typing import Any, Dict
 from overhave.entities import ReportManager
 from overhave.entities.authorization import AuthorizationStrategy, IAdminAuthorizationManager, LDAPAuthenticator
 from overhave.entities.authorization.mapping import AUTH_STRATEGY_TO_MANAGER_MAPPING
-from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
+from overhave.factory.base_factory import IOverhaveFactory
+from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveAdminContext
 from overhave.storage import IFeatureTypeStorage
 from overhave.transport import EmulationTask, PublicationTask, RedisProducer, RedisStream, TestRunTask
@@ -35,7 +36,7 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
         pass
 
 
-class AdminFactory(BaseOverhaveFactory[OverhaveAdminContext], IAdminFactory):
+class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory):
     """ Factory for Overhave admin application. """
 
     context_cls = OverhaveAdminContext

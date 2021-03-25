@@ -1,8 +1,9 @@
 import abc
 from functools import cached_property
 
-from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
+from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
+from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveTestExecutionContext
 from overhave.test_execution import ITestExecutionManager, TestExecutionManager
 from overhave.transport import TestRunTask
@@ -12,7 +13,7 @@ class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext], ITas
     """ Abstract factory for Overhave test execution application. """
 
 
-class TestExecutionFactory(BaseOverhaveFactory[OverhaveTestExecutionContext], ITestExecutionFactory):
+class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext], ITestExecutionFactory):
     """ Factory for Overhave test execution application. """
 
     context_cls = OverhaveTestExecutionContext
