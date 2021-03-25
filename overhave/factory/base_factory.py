@@ -20,7 +20,7 @@ from overhave.storage import (
     TestRunStorage,
 )
 from overhave.test_execution import PytestRunner, StepCollector
-from overhave.transport import OverhaveS3ManagerSettings, S3Manager
+from overhave.transport import S3Manager
 
 
 class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
@@ -81,12 +81,6 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
 
     def set_context(self, context: TApplicationContext) -> None:
         self._context = context
-        self._resolve_setup_entities()
-
-    def _resolve_setup_entities(self) -> None:
-        s3_manager_settings = getattr(self._context, "s3_manager_settings")
-        if isinstance(s3_manager_settings, OverhaveS3ManagerSettings) and s3_manager_settings.enabled:
-            self._s3_manager.initialize()
 
     @property
     def context(self) -> TApplicationContext:
