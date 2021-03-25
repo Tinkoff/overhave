@@ -1,5 +1,4 @@
 import logging
-from functools import cached_property
 from types import TracebackType
 from typing import Iterator, List, Sequence, Type
 
@@ -19,7 +18,7 @@ class RedisConsumer(RedisTemplate):
         super().__init__(settings)
         self._stream_name = stream_name
 
-    @cached_property
+    @property
     def _consumer_group(self) -> walrus.ConsumerGroup:
         consumer_group = self._database.consumer_group(f"cg-{self._stream_name}", (self._stream_name,))
         consumer_group.create()
