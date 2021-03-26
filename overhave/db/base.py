@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import re
-from typing import List, Type, Union, Tuple
+from typing import List, Tuple, Type, Union
 
 import sqlalchemy as sa
 from sqlalchemy import MetaData
