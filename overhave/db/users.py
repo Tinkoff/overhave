@@ -1,5 +1,5 @@
 import enum
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Optional
 
 import sqlalchemy as sa
 import sqlalchemy_utils as su
@@ -42,10 +42,10 @@ class BaseUser:
 
     # Required for administrative interface
     def __unicode__(self) -> str:
-        return cast(str, self.login)
+        return self.login
 
     def __str__(self) -> str:
-        return cast(str, self.login)
+        return self.login
 
 
 @su.generic_repr("login")

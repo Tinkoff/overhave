@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import re
-from typing import List, Type
+from typing import List, Type, Union, Tuple
 
 import sqlalchemy as sa
 from sqlalchemy import MetaData
@@ -52,7 +52,7 @@ class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
         return sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
 
 
-def _get_query_cls(mapper: Type[BaseTable], session: SessionClass) -> Query:
+def _get_query_cls(mapper: Union[Tuple[Type[BaseTable], ...], Mapper], session: SessionClass) -> Query:
     if mapper:
         m = mapper
         if isinstance(m, tuple):
