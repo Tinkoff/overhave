@@ -16,7 +16,7 @@ class TestArchiverManager:
         test_archive_manager: ArchiveManager,
         test_file_settings: OverhaveFileSettings,
         test_filepath: Path,
-    ):
+    ) -> None:
         assert test_archive_manager.archive_path(path=test_filepath, extension=extension) == (
             test_file_settings.tmp_reports_dir / test_filepath.name
         ).with_suffix(f".{extension}")
@@ -27,7 +27,7 @@ class TestArchiverManager:
         test_archive_manager: ArchiveManager,
         test_file_settings: OverhaveFileSettings,
         test_filepath: Path,
-    ):
+    ) -> None:
         archived = test_archive_manager.archive_path(path=test_filepath, extension=extension)
         unpacked = test_archive_manager.unpack_path(path=archived, extension=extension)
         assert unpacked == test_filepath

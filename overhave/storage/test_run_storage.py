@@ -64,7 +64,7 @@ class TestRunStorage(ITestRunStorage):
 
     def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
         with db.create_session() as session:
-            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one_or_none()
+            run: Optional[db.TestRun] = session.query(db.TestRun).get(run_id)
             if run is not None:
                 return cast(TestRunModel, TestRunModel.from_orm(run))
             return None

@@ -72,7 +72,7 @@ class EmulationStorage(IEmulationStorage):
             .order_by(db.EmulationRun.id.desc())
             .limit(len(self._settings.emulation_ports))
             .all(),
-            key=lambda t: t.changed_at,
+            key=lambda t: t.changed_at,  # type: ignore
         )
 
         allocated_ports = {run.port for run in allocated_sorted_runs}

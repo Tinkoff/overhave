@@ -59,6 +59,7 @@ alembic = "^1.4.3"
 boto3 = "^1.17.16"
 boto3-type-annotations = "^0.3.1"
 alchemy-mock = "^0.4.3"
+SQLAlchemy-Utils = "^0.36.8"
 
 
 [tool.poetry.dev-dependencies]

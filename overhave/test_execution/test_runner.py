@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import Optional
 
 import pytest
 
@@ -16,7 +16,7 @@ class PytestRunner:
         self._settings = settings
 
     @staticmethod
-    def _extend_cmd_args(cmd: List[str], addoptions: Optional[str]) -> None:
+    def _extend_cmd_args(cmd: list[str], addoptions: Optional[str]) -> None:
         if not isinstance(addoptions, str):
             return
         cmd.extend(addoptions.split(" "))
@@ -29,7 +29,7 @@ class PytestRunner:
             pytest_cmd.extend(["-n", f"{self._settings.workers}"])
 
         logger.debug("Prepared pytest args: %s", pytest_cmd)
-        return cast(int, pytest.main(pytest_cmd))
+        return pytest.main(pytest_cmd)
 
     def collect_only(self, fixture_file: Path) -> None:
         logger.info("Started tests collection process with '%s'...", fixture_file.name)

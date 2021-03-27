@@ -18,7 +18,7 @@ class TestOverhaveTestExecution:
     )
     def test_correct_run_created(
         self, test_executed_testruntask_id: int, subprocess_run_mock: mock.MagicMock, report_status: db.TestReportStatus
-    ):
+    ) -> None:
         subprocess_run_mock.assert_called_once()
         with db.create_session() as session:
             db_test_run = session.query(db.TestRun).get(test_executed_testruntask_id)

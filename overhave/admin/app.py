@@ -97,9 +97,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
                         flask.Response, flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
                     )
                 return flask.abort(status=HTTPStatus.NOT_FOUND)
-        return typing.cast(
-            flask.Response, flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)
-        )
+        return flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)
 
     @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:
@@ -126,12 +124,10 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
 
     @flask_app.route("/files/<path:file>")
     def get_files(file: str) -> flask.Response:
-        return typing.cast(flask.Response, flask.send_from_directory(files_dir, file))
+        return flask.send_from_directory(files_dir, file)
 
     @flask_app.route("/favicon.ico")
     def favicon() -> flask.Response:
-        return typing.cast(
-            flask.Response, flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
-        )
+        return flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
     return OverhaveAdminApp(flask_app)

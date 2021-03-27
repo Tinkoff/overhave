@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from functools import cached_property
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Optional
 
 import flask
 import werkzeug
@@ -94,7 +94,7 @@ class FeatureView(ModelViewConfigured):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def _validate_tasks(cls, tasks: List[str]) -> None:
+    def _validate_tasks(cls, tasks: list[str]) -> None:
         for task in tasks:
             if cls._task_pattern.match(task):
                 continue
@@ -115,7 +115,7 @@ class FeatureView(ModelViewConfigured):
             raise ValidationError("Only feature author or administrator could delete feature!")
 
     @cached_property
-    def get_bdd_steps(self) -> Dict[str, Dict[str, List[str]]]:
+    def get_bdd_steps(self) -> dict[str, dict[str, list[str]]]:
         factory = get_admin_factory()
         return {
             feature_type: factory.step_collector.get_steps(feature_type)
@@ -126,11 +126,11 @@ class FeatureView(ModelViewConfigured):
     def browse_url(self) -> Optional[str]:
         browse_url_value = get_admin_factory().context.project_settings.browse_url
         if browse_url_value is not None:
-            return cast(str, browse_url_value.human_repr())
+            return browse_url_value.human_repr()
         return None
 
     @staticmethod
-    def _run_test(data: Dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
+    def _run_test(data: dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
         scenario_id = data.get(f"{_SCENARIO_PREFIX}-id")
         scenario_text = data.get(f"{_SCENARIO_PREFIX}-text")
         if not scenario_id or not scenario_text:

@@ -167,7 +167,7 @@ class EmulationRun(BaseTable, PrimaryKeyMixin):
 
     emulation = so.relationship(Emulation, backref=so.backref("emulation_runs", cascade="all, delete-orphan"))
 
-    def __init__(self, emulation_id: int, initiated_by: str):
+    def __init__(self, emulation_id: int, initiated_by: str) -> None:
         self.emulation_id = emulation_id
         self.status = EmulationStatus.CREATED
         self.initiated_by = initiated_by

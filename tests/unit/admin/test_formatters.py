@@ -58,7 +58,7 @@ class TestSafeFormatter:
         formatter: FunctionType,
         mocker: MockerFixture,
         faker: Faker,
-    ):
+    ) -> None:
         assert formatter(
             view=test_view, context=mocker.MagicMock(), model=test_table, name="mykeysodifferrent"
         ) == Markup("")
@@ -78,7 +78,7 @@ class TestDatetimeFormatter:
         test_testrun_id: int,
         column_name: str,
         value: datetime,
-    ):
+    ) -> None:
         setattr(test_table, column_name, value)
         result = datetime_formatter(view=test_view, context=mocker.MagicMock(), model=test_table, name=column_name,)
         assert result == Markup(value.strftime("%d-%m-%Y %H:%M:%S"))
@@ -94,11 +94,11 @@ class TestDatetimeFormatter:
         test_testrun_id: int,
         column_name: str,
         value: datetime,
-    ):
+    ) -> None:
         result = datetime_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(**{"id": test_testrun_id, column_name: value}),
+            model=TestRun(**{"id": test_testrun_id, column_name: value}),  # type: ignore
             name=column_name,
         )
         assert result == Markup(value.strftime("%d-%m-%Y %H:%M:%S"))
@@ -117,11 +117,11 @@ class TestTaskFormatter:
         column_name: str,
         value: Sequence[str],
         mocker: MockerFixture,
-    ):
+    ) -> None:
         assert task_formatter(
             view=test_feature_view,
             context=mocker.MagicMock(),
-            model=db.Feature(**{column_name: value}),
+            model=db.Feature(**{column_name: value}),  # type: ignore
             name=column_name,
         ) == Markup(", ".join(value))
 
@@ -133,14 +133,14 @@ class TestTaskFormatter:
         column_name: str,
         value: Sequence[str],
         mocker: MockerFixture,
-    ):
+    ) -> None:
         task_links = []
         for task in value:
             task_links.append(f"<a href='{test_browse_url}/{task}' target='blank'>{task}</a>")
         assert task_formatter(
             view=test_feature_view,
             context=mocker.MagicMock(),
-            model=db.Feature(**{column_name: value}),
+            model=db.Feature(**{column_name: value}),  # type: ignore
             name=column_name,
         ) == Markup(", ".join(task_links))
 
@@ -153,18 +153,18 @@ class TestResultReportFormatter:
     @pytest.mark.parametrize("report_status", [x for x in list(TestReportStatus) if not x.has_report])
     def test_no_report(
         self,
-        test_testrun_view,
+        test_testrun_view: TestRunView,
         mocker: MockerFixture,
         test_testrun_id: int,
         column_name: str,
         status: TestRunStatus,
         report_status: TestReportStatus,
         test_testrun_button_css_class: str,
-    ):
+    ) -> None:
         result = result_report_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(id=test_testrun_id, status=status, report_status=report_status),
+            model=TestRun(id=test_testrun_id, status=status, report_status=report_status),  # type: ignore
             name=column_name,
         )
         assert result == Markup(
@@ -179,7 +179,7 @@ class TestResultReportFormatter:
     @pytest.mark.parametrize("report_status", [x for x in list(TestReportStatus) if x.has_report])
     def test_with_report(
         self,
-        test_testrun_view,
+        test_testrun_view: TestRunView,
         mocker: MockerFixture,
         test_testrun_id: int,
         column_name: str,
@@ -187,13 +187,17 @@ class TestResultReportFormatter:
         report_status: TestReportStatus,
         test_testrun_report: Optional[str],
         test_testrun_button_css_class: str,
-    ):
+    ) -> None:
         result = result_report_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(id=test_testrun_id, status=status, report_status=report_status, report=test_testrun_report),
+            model=TestRun(  # type: ignore
+                id=test_testrun_id, status=status, report_status=report_status, report=test_testrun_report
+            ),
             name=column_name,
         )
+        if test_testrun_report is None:
+            raise RuntimeError
         assert result == Markup(
             f"<form action='{get_report_index_link(test_testrun_report)}' method='POST' target='_blank'>"
             f"<input type='hidden' name='run_id' value='{test_testrun_id}' />"
@@ -210,8 +214,8 @@ class TestJsonFormatter:
 
     @pytest.mark.parametrize("value", [{"kek": "lol"}, {"a": "lot", "of": "items"}])
     def test_dict_with_data(
-        self, test_testuser_view: TestUserView, mocker: MockerFixture, column_name: str, value: Optional[dict],
-    ):
+        self, test_testuser_view: TestUserView, mocker: MockerFixture, column_name: str, value: dict[str, str],
+    ) -> None:
         info = ""
         for k, v in list(filter(lambda x: x, value.items())):
             info += f"<b>{k}</b>:&nbsp;&nbsp;{v}<br>"
@@ -220,7 +224,7 @@ class TestJsonFormatter:
         result = json_formatter(
             view=test_testuser_view,
             context=mocker.MagicMock(),
-            model=TestUser(**{column_name: value}),
+            model=TestUser(**{column_name: value}),  # type: ignore
             name=column_name,
         )
         assert result == expected
@@ -238,11 +242,11 @@ class TestFeatureLinkFormatter:
         column_name: str,
         test_feature_id: int,
         test_feature_name: str,
-    ):
+    ) -> None:
         assert feature_link_formatter(
             view=test_feature_view,
             context=mocker.MagicMock(),
-            model=db.Feature(**{"id": test_feature_id, column_name: test_feature_name}),
+            model=db.Feature(**{"id": test_feature_id, column_name: test_feature_name}),  # type: ignore
             name=column_name,
         ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
 
@@ -253,11 +257,13 @@ class TestFeatureLinkFormatter:
         column_name: str,
         test_feature_id: int,
         test_feature_name: str,
-    ):
+    ) -> None:
         assert feature_link_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=db.TestRun(**{column_name: test_feature_name, "scenario": db.Scenario(feature_id=test_feature_id)}),
+            model=db.TestRun(
+                **{column_name: test_feature_name, "scenario": db.Scenario(feature_id=test_feature_id)}  # type: ignore
+            ),
             name=column_name,
         ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
 
@@ -273,11 +279,13 @@ class TestDraftFeatureFormatter:
         column_name: str,
         test_feature_id: int,
         test_feature_name: str,
-    ):
+    ) -> None:
         assert draft_feature_formatter(
             view=test_draft_view,
             context=mocker.MagicMock(),
-            model=db.Draft(**{column_name: test_feature_id, "feature": db.Feature(name=test_feature_name)}),
+            model=db.Draft(
+                **{column_name: test_feature_id, "feature": db.Feature(name=test_feature_name)}  # type: ignore
+            ),
             name=column_name,
         ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
 
@@ -286,11 +294,13 @@ class TestDraftFeatureFormatter:
 class TestDraftTestRunFormatter:
     """ Unit tests for draft_testrun_formatter. """
 
-    def test_with_id(self, test_draft_view: DraftView, mocker: MockerFixture, column_name: str, test_testrun_id: int):
+    def test_with_id(
+        self, test_draft_view: DraftView, mocker: MockerFixture, column_name: str, test_testrun_id: int
+    ) -> None:
         assert draft_testrun_formatter(
             view=test_draft_view,
             context=mocker.MagicMock(),
-            model=db.Draft(**{column_name: test_testrun_id}),
+            model=db.Draft(**{column_name: test_testrun_id}),  # type: ignore
             name=column_name,
         ) == Markup(f"<a {get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
 
@@ -302,10 +312,10 @@ class TestDraftPrUrlFormatter:
     @pytest.mark.parametrize("test_prurl", ["https://overhave.readthedocs.io"], indirect=True)
     def test_with_url(
         self, test_draft_view: DraftView, mocker: MockerFixture, column_name: str, test_testrun_id: int, test_prurl: str
-    ):
+    ) -> None:
         assert draft_prurl_formatter(
             view=test_draft_view,
             context=mocker.MagicMock(),
-            model=db.Draft(**{column_name: test_prurl}),
+            model=db.Draft(**{column_name: test_prurl}),  # type: ignore
             name=column_name,
         ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")

@@ -61,7 +61,7 @@ def _get_query_cls(mapper: Union[Tuple[Type[BaseTable], ...], Mapper], session: 
             m = m.entity
 
         try:
-            return m.__query_cls__(mapper, session)  # type: ignore
+            return m.__query_cls__(mapper, session)
         except AttributeError:
             pass
 

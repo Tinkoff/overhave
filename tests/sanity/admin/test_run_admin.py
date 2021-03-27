@@ -12,26 +12,26 @@ class TestOverhaveRunAdmin:
 
     def test_clean_factory(
         self, flask_run_mock: mock.MagicMock, test_admin_factory: AdminFactory, test_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         flask_run_mock.assert_not_called()
         assert not test_admin_factory._context
         assert not test_proxy_manager.pytest_patched
 
     def test_factory_resolved(
         self, flask_run_mock: mock.MagicMock, test_resolved_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         flask_run_mock.assert_called_once_with(host="0.0.0.0", port=8076, debug=True)
         assert cast(AdminFactory, test_resolved_admin_proxy_manager.factory)._context
         assert test_resolved_admin_proxy_manager.pytest_patched
 
     def test_extractor_collect_feature_types(
         self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         assert set(test_resolved_admin_proxy_manager.factory.feature_extractor.feature_types) == set(test_feature_types)
 
     def test_db_feature_types_exists(
         self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         feature_type_models: List[FeatureTypeModel] = []
         with db.create_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
@@ -41,14 +41,14 @@ class TestOverhaveRunAdmin:
 
     def test_injector_collect_steps(
         self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         # TODO: check steps content
         for feature_type in test_feature_types:
             assert test_resolved_admin_proxy_manager.factory.step_collector.get_steps(FeatureTypeName(feature_type))
 
     def test_plugin_resolver_collect_plugins(
         self, test_feature_types: List[str], test_resolved_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         for feature_type in test_feature_types:
             assert set(test_resolved_admin_proxy_manager.plugin_resolver.get_plugins(feature_type)) == {
                 f"demo.steps.{feature_type}.given_steps",

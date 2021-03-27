@@ -28,7 +28,7 @@ class TestLdapAuthManager:
         test_ldap_auth_manager: LDAPAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = []
         assert test_ldap_auth_manager.authorize_user(username_field=test_username, password_field=test_password) is None
 
@@ -38,7 +38,7 @@ class TestLdapAuthManager:
         test_ldap_auth_manager: LDAPAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = ["not_supplied_group"]
         assert test_ldap_auth_manager.authorize_user(username_field=test_username, password_field=test_password) is None
 
@@ -49,7 +49,7 @@ class TestLdapAuthManager:
         test_ldap_auth_manager: LDAPAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = test_db_groups
         _create_user_groups(test_db_groups)
 
@@ -67,7 +67,7 @@ class TestLdapAuthManager:
         test_db_groups: List[str],
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         db_groups = [test_admin_group] + test_db_groups
         mocked_ldap_authenticator.get_user_groups.return_value = db_groups
         _create_user_groups(db_groups)
@@ -87,7 +87,7 @@ class TestLdapAuthManager:
         test_username: StringField,
         test_password: PasswordField,
         user_role: db.Role,
-    ):
+    ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = test_db_groups
         with db.create_session() as session:
             session.add(db.UserRole(login=test_username.data, password=None, role=user_role))
@@ -108,7 +108,7 @@ class TestDefaultAuthManager:
         test_default_auth_manager: DefaultAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         assert (
             test_default_auth_manager.authorize_user(username_field=test_username, password_field=test_password) is None
         )
@@ -120,7 +120,7 @@ class TestDefaultAuthManager:
         test_username: StringField,
         test_password: PasswordField,
         user_role: db.Role,
-    ):
+    ) -> None:
         with db.create_session() as session:
             session.add(db.UserRole(login=test_username.data, password=test_password.data, role=user_role))
 
@@ -140,7 +140,7 @@ class TestSimpleAuthManager:
         test_simple_auth_manager: SimpleAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         user = test_simple_auth_manager.authorize_user(username_field=test_username, password_field=test_password)
         assert user is not None
         assert user.login == test_username.data
@@ -154,7 +154,7 @@ class TestSimpleAuthManager:
         test_username: StringField,
         test_password: PasswordField,
         user_role: db.Role,
-    ):
+    ) -> None:
         with db.create_session() as session:
             session.add(db.UserRole(login=test_username.data, password=test_password.data, role=user_role))
 
@@ -169,7 +169,7 @@ class TestSimpleAuthManager:
         test_simple_auth_manager: SimpleAdminAuthorizationManager,
         test_username: StringField,
         test_password: PasswordField,
-    ):
+    ) -> None:
         with db.create_session() as session:
             session.add(db.UserRole(login=test_username.data, password=test_password.data, role=db.Role.user))
 

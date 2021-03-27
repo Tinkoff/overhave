@@ -34,7 +34,7 @@ test:
 lint:
 	$(VENV)/bin/poetry run black --check $(ALL)
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
-	$(VENV)/bin/poetry run mypy $(ALL) --exclude '(conftest.py|_steps.py)'
+	$(VENV)/bin/poetry run mypy $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
 
 pretty:

@@ -8,7 +8,7 @@ class TestS3ManagerSettings:
     """ Unit tests for :class:`OverhaveS3ManagerSettings`. """
 
     @pytest.mark.parametrize("test_s3_enabled", [False])
-    def test_disabled(self, test_s3_enabled: bool):
+    def test_disabled(self, test_s3_enabled: bool) -> None:
         settings = OverhaveS3ManagerSettings(enabled=test_s3_enabled)
         assert not settings.enabled
         assert not settings.url
@@ -16,7 +16,7 @@ class TestS3ManagerSettings:
         assert not settings.secret_key
 
     @pytest.mark.parametrize("test_s3_enabled", [True])
-    def test_empty_enabled(self, test_s3_enabled: bool):
+    def test_empty_enabled(self, test_s3_enabled: bool) -> None:
         with pytest.raises(ValidationError):
             OverhaveS3ManagerSettings(enabled=test_s3_enabled)
 
@@ -27,7 +27,7 @@ class TestS3ManagerSettings:
         test_s3_enabled: bool,
         test_s3_autocreate_buckets: bool,
         test_s3_manager_settings: OverhaveS3ManagerSettings,
-    ):
+    ) -> None:
         assert test_s3_manager_settings.enabled == test_s3_enabled
         assert test_s3_manager_settings.url
         assert test_s3_manager_settings.access_key
