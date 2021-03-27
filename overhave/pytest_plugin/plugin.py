@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Callable, Dict, Optional, cast
+from typing import Any, Callable, Dict, Optional
 
 import _pytest
 import pytest
@@ -42,7 +42,7 @@ class _OptionName(str, enum.Enum):
 
     @property
     def as_variable(self) -> str:
-        return cast(str, self.value.lstrip("--").replace("-", "_"))
+        return self.value.lstrip("--").replace("-", "_")
 
 
 _ENABLE_INJECTION_HELP = "Injection enabling of Overhave specified objects into PyTest session"

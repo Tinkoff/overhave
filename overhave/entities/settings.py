@@ -48,6 +48,9 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     # Template mask for fixtures pytest files which contain `feature_type` key
     fixtures_file_template_mask: str = "test_{feature_type}.py"
 
+    # Flag for `steps_dir` validation in case of relating to `work_dir`
+    validate_steps_dir: bool = False
+
     # Base directory for pytest-bdd steps, , by default - root_dir / 'steps'
     steps_dir: Path
 
@@ -66,8 +69,10 @@ class OverhaveFileSettings(BaseOverhavePrefix):
 
     @validator("steps_dir")
     def validate_nesting(cls, v: Path, values: Dict[str, Any]) -> Path:
-        work_dir: Path = values["work_dir"]
-        v.relative_to(work_dir)
+        validate_steps_dir = values["validate_steps_dir"]
+        if validate_steps_dir:
+            work_dir: Path = values["work_dir"]
+            v.relative_to(work_dir)
         return v
 
     @property

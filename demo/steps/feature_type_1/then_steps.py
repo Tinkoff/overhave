@@ -4,7 +4,7 @@ from demo.steps.parser import step_with_args
 
 
 @then(step_with_args("bot says {phrase:Str}"))
-def then_bot_says(phrase: str):
+def then_bot_says(phrase: str) -> None:
     pass
 
 

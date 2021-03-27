@@ -32,7 +32,7 @@ class TestOverhaveAdminRunTest:
         flask_flash_handler_mock: mock.MagicMock,
         flask_urlfor_handler_mock: mock.MagicMock,
         redisproducer_addtask_mock: mock.MagicMock,
-    ):
+    ) -> None:
         flask_flash_handler_mock.assert_called_once_with("Scenario information not requested.", category="error")
         flask_urlfor_handler_mock.assert_not_called()
         redisproducer_addtask_mock.assert_not_called()
@@ -48,7 +48,7 @@ class TestOverhaveAdminRunTest:
         flask_flash_handler_mock: mock.MagicMock,
         flask_urlfor_handler_mock: mock.MagicMock,
         redisproducer_addtask_mock: mock.MagicMock,
-    ):
+    ) -> None:
         flask_flash_handler_mock.assert_called_once_with(
             "Scenario does not exist, so could not run test.", category="error"
         )
@@ -64,7 +64,7 @@ class TestOverhaveAdminRunTest:
         flask_urlfor_handler_mock: mock.MagicMock,
         redisproducer_addtask_mock: mock.MagicMock,
         test_db_scenario: ScenarioModel,
-    ):
+    ) -> None:
         flask_flash_handler_mock.assert_not_called()
         flask_urlfor_handler_mock.assert_called_with("testrun.details_view", id=test_db_scenario.id)
         redisproducer_addtask_mock.assert_called_once_with(
@@ -78,7 +78,7 @@ class TestOverhaveAdminRunTest:
         test_db_user: SystemUserModel,
         test_feature_container: FeatureTestContainer,
         test_db_scenario: ScenarioModel,
-    ):
+    ) -> None:
         with db.create_session() as session:
             db_test_run = session.query(db.TestRun).get(test_db_scenario.id)
             assert db_test_run is not None

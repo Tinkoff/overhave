@@ -1,7 +1,7 @@
 import abc
 import enum
 import json
-from typing import Any, Dict, TypeVar, Union, cast
+from typing import Any, Dict, TypeVar, Union
 
 from pydantic.main import BaseModel
 
@@ -15,7 +15,7 @@ class RedisStream(str, enum.Enum):
 
     @property
     def with_dunder(self) -> str:
-        return cast(str, self.value.replace("-", "_"))
+        return self.value.replace("-", "_")
 
 
 class _IRedisTask(BaseModel, abc.ABC):

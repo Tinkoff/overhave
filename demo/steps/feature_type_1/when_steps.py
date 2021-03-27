@@ -9,7 +9,7 @@ def when_got_through():
 
 
 @when(step_with_args("I say {phrase:Str}"))
-def when_user_say(phrase: str):
+def when_user_say(phrase: str) -> None:
     pass
 
 

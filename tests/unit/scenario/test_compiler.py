@@ -12,17 +12,17 @@ class TestGenerateTaskInfo:
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info(self, tasks: List[str], header: str):
+    def test_generate_task_info(self, tasks: List[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == f"{header}: {', '.join(tasks)}"
 
     @pytest.mark.parametrize("tasks", [[]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info_without_tasks(self, tasks: List[str], header: str):
+    def test_generate_task_info_without_tasks(self, tasks: List[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", [None])
-    def test_generate_task_info_without_header(self, tasks: List[str], header: None):
+    def test_generate_task_info_without_header(self, tasks: List[str], header: None) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
 
@@ -43,7 +43,7 @@ class TestScenarioCompiler:
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_text: str,
         test_processing_ctx: TestExecutorContext,
-    ):
+    ) -> None:
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_processing_ctx)
 
@@ -55,7 +55,7 @@ class TestScenarioCompiler:
         test_feature: FeatureModel,
         test_scenario: ScenarioModel,
         test_processing_ctx: TestExecutorContext,
-    ):
+    ) -> None:
         feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)
         assert parsed_info.name == test_feature.name

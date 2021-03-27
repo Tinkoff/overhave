@@ -31,6 +31,7 @@ from overhave.pytest_plugin.plugin import (
     pytest_runtest_makereport,
     pytest_runtest_setup,
 )
+from overhave.utils import make_url
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -39,8 +40,11 @@ class TestPytestBddHooks:
     """ Unit tests for pytest-bdd wrapped hooks. """
 
     def test_pytest_bdd_before_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_test_execution_proxy_manager
-    ):
+        self,
+        request: FixtureRequest,
+        test_pytest_bdd_step: Step,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_bdd_before_step(
             request=request,
             feature=mock.MagicMock(),
@@ -51,8 +55,11 @@ class TestPytestBddHooks:
         assert cast(mock.MagicMock, patched_hook_test_execution_proxy_manager.factory.context).called_once()
 
     def test_pytest_bdd_after_step_failed(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_test_execution_proxy_manager
-    ):
+        self,
+        request: FixtureRequest,
+        test_pytest_bdd_step: Step,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         with pytest.raises(StepContextNotDefinedError):
             pytest_bdd_after_step(
                 request=request,
@@ -64,8 +71,11 @@ class TestPytestBddHooks:
             )
 
     def test_pytest_bdd_after_step(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_test_execution_proxy_manager
-    ):
+        self,
+        request: FixtureRequest,
+        test_pytest_bdd_step: Step,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_bdd_before_step(
             request=request,
             feature=mock.MagicMock(),
@@ -83,8 +93,11 @@ class TestPytestBddHooks:
         )
 
     def test_pytest_bdd_step_error(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, patched_hook_test_execution_proxy_manager
-    ):
+        self,
+        request: FixtureRequest,
+        test_pytest_bdd_step: Step,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_bdd_before_step(
             request=request,
             feature=mock.MagicMock(),
@@ -103,17 +116,17 @@ class TestPytestBddHooks:
         )
 
     @pytest.mark.parametrize("tag", ["random"])
-    def test_pytest_bdd_apply_tag_not_skip(self, test_pytest_function: Function, tag: str):
+    def test_pytest_bdd_apply_tag_not_skip(self, test_pytest_function: Function, tag: str) -> None:
         assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is None
 
     @pytest.mark.parametrize("tag", ["skip"])
-    def test_pytest_bdd_apply_tag_skip(self, test_pytest_function: Function, tag: str):
+    def test_pytest_bdd_apply_tag_skip(self, test_pytest_function: Function, tag: str) -> None:
         assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is True
 
     @pytest.mark.parametrize("exception", [Exception])
     def test_pytest_bdd_step_func_lookup_error(
         self, request: FixtureRequest, test_pytest_bdd_step: Step, exception: Type[BaseException]
-    ):
+    ) -> None:
         with pytest.raises(StepNotFoundError):
             pytest_bdd_step_func_lookup_error(
                 request=request,
@@ -127,7 +140,7 @@ class TestPytestBddHooks:
 class TestPytestCommonHooks:
     """ Unit tests for pytest wrapped hooks. """
 
-    def test_pytest_addoption(self, test_pytest_parser: Parser):
+    def test_pytest_addoption(self, test_pytest_parser: Parser) -> None:
         pytest_addoption(test_pytest_parser)
         group = test_pytest_parser.getgroup(_PLUGIN_NAME, _GROUP_HELP)
         assert isinstance(group, OptionGroup)
@@ -136,7 +149,7 @@ class TestPytestCommonHooks:
         assert group.options[0].names() == _Options.enable_injection.names()
         assert group.options[0].attrs() == _Options.enable_injection.attrs()
 
-    def test_pytest_configure_failed_no_option(self, test_empty_config: Config):
+    def test_pytest_configure_failed_no_option(self, test_empty_config: Config) -> None:
         with pytest.raises(ValueError, match="no option named"):
             pytest_configure(test_empty_config)
 
@@ -144,8 +157,8 @@ class TestPytestCommonHooks:
         self,
         terminal_writer_mock: mock.MagicMock,
         test_prepared_config: Config,
-        patched_hook_test_execution_proxy_manager,
-    ):
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_configure(test_prepared_config)
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
         terminal_writer_mock.assert_called_once()
@@ -157,8 +170,8 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_hook_test_execution_proxy_manager,
-    ):
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
@@ -173,15 +186,17 @@ class TestPytestCommonHooks:
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
-        patched_hook_test_execution_proxy_manager,
-    ):
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
             _OptionName.ENABLE_INJECTION.as_variable
         )
         pytest_configure(test_prepared_config)
         assert not patched_hook_test_execution_proxy_manager.pytest_patched
 
-    def test_pytest_collection_modifyitems_clean(self, test_clean_item: Item, test_pytest_clean_session: Session):
+    def test_pytest_collection_modifyitems_clean(
+        self, test_clean_item: Item, test_pytest_clean_session: Session
+    ) -> None:
         with mock.patch(
             "overhave.pytest_plugin.helpers.allure_utils.common.add_scenario_title_to_report",
             return_value=mock.MagicMock(),
@@ -194,12 +209,15 @@ class TestPytestCommonHooks:
         self,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_hook_test_execution_proxy_manager,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
         links_keyword: Optional[str],
-    ):
+    ) -> None:
         patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
-        assert test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name
+        assert (
+            test_pytest_bdd_item._obj.__allure_display_name__  # type: ignore
+            == get_scenario(test_pytest_bdd_item).name
+        )
 
         if links_keyword is None:
             assert not has_issue_links(test_pytest_bdd_item)
@@ -212,7 +230,7 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-    ):
+    ) -> None:
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_not_called()
 
@@ -223,7 +241,7 @@ class TestPytestCommonHooks:
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
         patched_hook_admin_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_called_once()
         assert not patched_hook_admin_proxy_manager.collection_prepared
@@ -235,7 +253,7 @@ class TestPytestCommonHooks:
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-    ):
+    ) -> None:
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_not_called()
         assert not patched_hook_test_execution_proxy_manager.collection_prepared
@@ -246,8 +264,8 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_hook_admin_proxy_manager,
-    ):
+        patched_hook_admin_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_configure(test_pytest_bdd_session.config)
         pytest_collection_finish(test_pytest_bdd_session)
         assert terminal_writer_mock.call_count == 2
@@ -259,14 +277,14 @@ class TestPytestCommonHooks:
         terminal_writer_mock: mock.MagicMock,
         getoption_mock: ConfigGetOptionMock,
         test_pytest_bdd_session: Session,
-        patched_hook_test_execution_proxy_manager,
-    ):
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         pytest_configure(test_pytest_bdd_session.config)
         pytest_collection_finish(test_pytest_bdd_session)
         assert terminal_writer_mock.call_count == 1
         assert not patched_hook_test_execution_proxy_manager.collection_prepared
 
-    def test_pytest_runtest_setup(self, test_clean_item: Item):
+    def test_pytest_runtest_setup(self, test_clean_item: Item) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
@@ -275,13 +293,13 @@ class TestPytestCommonHooks:
 
     def test_pytest_runtest_makereport_clean(
         self,
-        clear_get_description_manager,
+        clear_get_description_manager: None,
         description_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
-        patched_hook_test_execution_proxy_manager,
-    ):
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+    ) -> None:
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
         pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
@@ -293,20 +311,20 @@ class TestPytestCommonHooks:
     )
     def test_pytest_runtest_makereport_bdd(
         self,
-        clear_get_description_manager,
+        clear_get_description_manager: None,
         description_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
-        patched_hook_test_execution_proxy_manager,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
         browse_url: Optional[str],
         links_keyword: Optional[str],
-    ):
+    ) -> None:
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
 
-        patched_hook_test_execution_proxy_manager.factory.context.project_settings.browse_url = browse_url
+        patched_hook_test_execution_proxy_manager.factory.context.project_settings.browse_url = make_url(browse_url)
         patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
 
         pytest_collection_modifyitems(test_pytest_bdd_session)

@@ -4,6 +4,8 @@ from typing import Optional, Tuple, TypeVar
 from pydantic import BaseSettings, validator
 from yarl import URL
 
+from overhave.utils import make_url
+
 
 class BaseHttpClientSettings(BaseSettings):
     """ Base settings for :class:`BaseHttpClient`. """
@@ -15,9 +17,7 @@ class BaseHttpClientSettings(BaseSettings):
 
     @validator("url", pre=True)
     def make_url(cls, v: Optional[str]) -> Optional[URL]:
-        if v is not None and isinstance(v, str):
-            return URL(v)
-        return v
+        return make_url(v)
 
     @property
     def timeout(self) -> Tuple[float, float]:

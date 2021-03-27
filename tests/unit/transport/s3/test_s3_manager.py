@@ -4,6 +4,7 @@ from unittest import mock
 
 import botocore.exceptions
 import pytest
+from _pytest.logging import LogCaptureFixture
 
 from overhave.transport import OverhaveS3Bucket, OverhaveS3ManagerSettings, S3Manager
 from overhave.transport.s3.manager import (
@@ -20,7 +21,7 @@ class TestS3Manager:
     """ Unit tests for :class:`S3Manager` with non-bucket defs. """
 
     @pytest.mark.parametrize("test_s3_enabled", [False], indirect=True)
-    def test_initialize_disabled(self, mocked_boto3_client_getter, test_s3_manager: S3Manager):
+    def test_initialize_disabled(self, mocked_boto3_client_getter: mock.MagicMock, test_s3_manager: S3Manager) -> None:
         test_s3_manager.initialize()
         mocked_boto3_client_getter.assert_not_called()
         assert test_s3_manager._client is None
@@ -31,7 +32,7 @@ class TestS3Manager:
         mocked_boto3_client_getter: mock.MagicMock,
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_s3_manager: S3Manager,
-    ):
+    ) -> None:
         test_s3_manager.initialize()
         mocked_boto3_client_getter.assert_called_once_with(
             "s3",
@@ -53,7 +54,9 @@ class TestS3Manager:
         ],
         indirect=True,
     )
-    def test_initialize_errors(self, test_exception: Exception, mocked_boto3_client_getter, test_s3_manager: S3Manager):
+    def test_initialize_errors(
+        self, test_exception: Exception, mocked_boto3_client_getter: mock.MagicMock, test_s3_manager: S3Manager
+    ) -> None:
         with pytest.raises(type(test_exception)):
             test_s3_manager.initialize()
         mocked_boto3_client_getter.assert_called_once()
@@ -71,7 +74,7 @@ class TestInitializedS3Manager:
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
-    ):
+    ) -> None:
         test_initialized_s3_manager.create_bucket(bucket.value)
         mocked_boto3_client.create_bucket.assert_called()
 
@@ -82,7 +85,7 @@ class TestInitializedS3Manager:
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
-    ):
+    ) -> None:
         objects = test_initialized_s3_manager.get_bucket_objects(bucket.value)
         mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
         assert objects == [ObjectModel.parse_obj(test_object_dict)]
@@ -93,7 +96,7 @@ class TestInitializedS3Manager:
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
-    ):
+    ) -> None:
         assert test_initialized_s3_manager.upload_file(tmp_path, bucket=bucket)
         mocked_boto3_client.upload_file.assert_called_once_with(tmp_path.as_posix(), bucket.value, tmp_path.name)
 
@@ -103,8 +106,8 @@ class TestInitializedS3Manager:
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
-        caplog,
-    ):
+        caplog: LogCaptureFixture,
+    ) -> None:
         mocked_boto3_client.upload_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )
@@ -118,7 +121,7 @@ class TestInitializedS3Manager:
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
-    ):
+    ) -> None:
         objects = [ObjectModel.parse_obj(test_object_dict)]
         test_initialized_s3_manager.delete_bucket_objects(bucket=bucket.value, objects=objects)
         mocked_boto3_client.delete_objects.assert_called_once_with(
@@ -131,7 +134,7 @@ class TestInitializedS3Manager:
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
-    ):
+    ) -> None:
         with pytest.raises(EmptyObjectsListError):
             test_initialized_s3_manager.delete_bucket_objects(bucket=bucket.value, objects=[])
         mocked_boto3_client.delete_objects.assert_not_called()
@@ -144,7 +147,7 @@ class TestInitializedS3Manager:
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
         force: bool,
-    ):
+    ) -> None:
         test_initialized_s3_manager.delete_bucket(bucket.value, force=force)
         if force:
             mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
@@ -161,7 +164,7 @@ class TestInitializedS3Manager:
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
         test_filename: str,
-    ):
+    ) -> None:
         assert test_initialized_s3_manager.download_file(filename=test_filename, dir_to_save=tmp_path, bucket=bucket)
         mocked_boto3_client.download_file.assert_called_once_with(
             Bucket=bucket, Key=test_filename, Filename=(tmp_path / test_filename).as_posix()
@@ -174,8 +177,8 @@ class TestInitializedS3Manager:
         bucket: OverhaveS3Bucket,
         tmp_path: Path,
         test_filename: str,
-        caplog,
-    ):
+        caplog: LogCaptureFixture,
+    ) -> None:
         mocked_boto3_client.download_file.side_effect = botocore.exceptions.ClientError(
             mock.MagicMock(), mock.MagicMock()
         )

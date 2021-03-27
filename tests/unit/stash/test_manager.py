@@ -20,7 +20,7 @@ class TestStashProjectManager:
         test_repository_name: str,
         test_project_key: str,
         test_stash_publisher_with_default_reviewers: StashVersionPublisher,
-    ):
+    ) -> None:
         correct_repository = StashRepository(slug=test_repository_name, project=StashProject(key=test_project_key))
         assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.repository == correct_repository
         assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.target_branch == StashBranch(
@@ -32,7 +32,7 @@ class TestStashProjectManager:
         test_default_reviewers: Sequence[str],
         test_stash_publisher_with_default_reviewers: StashVersionPublisher,
         faker: Faker,
-    ):
+    ) -> None:
         assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.get_reviewers(faker.word()) == [
             StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_default_reviewers
         ]
@@ -42,7 +42,7 @@ class TestStashProjectManager:
         test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
         test_stash_publisher_with_reviewers_mapping: StashVersionPublisher,
         faker: Faker,
-    ):
+    ) -> None:
         for key in test_reviewers_mapping.keys():
             assert test_stash_publisher_with_reviewers_mapping._stash_publisher_settings.get_reviewers(key) == [
                 StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_reviewers_mapping[key]

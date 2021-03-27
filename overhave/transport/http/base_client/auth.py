@@ -6,7 +6,7 @@ import requests
 class BearerAuth(requests.auth.AuthBase):
     """ Class for Bearer authorization pattern. """
 
-    def __init__(self, token: str):
+    def __init__(self, token: str) -> None:
         super().__init__()
         self.token = token
 
