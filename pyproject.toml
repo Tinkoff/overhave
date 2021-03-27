@@ -16,6 +16,7 @@ classifiers = [
     "Topic :: Software Development :: Testing :: BDD",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Operating System :: OS Independent",
     "Framework :: Flask",
     "Framework :: Pytest",
