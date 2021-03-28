@@ -142,14 +142,14 @@ webencodings = "*"
 
 [[package]]
 name = "boto3"
-version = "1.17.38"
+version = "1.17.39"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
-botocore = ">=1.20.38,<1.21.0"
+botocore = ">=1.20.39,<1.21.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -163,7 +163,7 @@ python-versions = "*"
 
 [[package]]
 name = "botocore"
-version = "1.20.38"
+version = "1.20.39"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -586,14 +586,14 @@ WTForms = "*"
 
 [[package]]
 name = "gitdb"
-version = "4.0.6"
+version = "4.0.7"
 description = "Git Object Database"
 category = "dev"
 optional = false
 python-versions = ">=3.4"
 
 [package.dependencies]
-smmap = ">=3.0.1,<4"
+smmap = ">=3.0.1,<5"
 
 [[package]]
 name = "gitpython"
@@ -616,15 +616,15 @@ python-versions = "*"
 
 [[package]]
 name = "gunicorn"
-version = "20.0.4"
+version = "20.1.0"
 description = "WSGI HTTP Server for UNIX"
 category = "main"
 optional = false
-python-versions = ">=3.4"
+python-versions = ">=3.5"
 
 [package.extras]
-eventlet = ["eventlet (>=0.9.7)"]
-gevent = ["gevent (>=0.13)"]
+eventlet = ["eventlet (>=0.24.1)"]
+gevent = ["gevent (>=1.4.0)"]
 setproctitle = ["setproctitle"]
 tornado = ["tornado (>=0.2)"]
 
@@ -1330,11 +1330,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "smmap"
-version = "3.0.5"
+version = "4.0.0"
 description = "A pure Python implementation of a sliding window memory map manager"
 category = "dev"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.5"
 
 [[package]]
 name = "snowballstemmer"
@@ -1776,8 +1776,8 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.7,<=3.9"
-content-hash = "f176aac0e84333f98e5c1c5c4022063c1a6a3a6ac07efa6a7be58e82eb2bed02"
+python-versions = ">=3.7,<4.0"
+content-hash = "37ceb8504fe7a1974cfa6b41333d82ee3f7dd7150e45a038571403d1167e1502"
 
 [metadata.files]
 alabaster = [
@@ -1829,16 +1829,16 @@ bleach = [
     {file = "bleach-3.3.0.tar.gz", hash = "sha256:98b3170739e5e83dd9dc19633f074727ad848cbedb6026708c8ac2d3b697a433"},
 ]
 boto3 = [
-    {file = "boto3-1.17.38-py2.py3-none-any.whl", hash = "sha256:f427d7f001f457bd2693411396897624a081d0d6a9f6c1fabf6ef565238f5282"},
-    {file = "boto3-1.17.38.tar.gz", hash = "sha256:d891964c43de16f0b43a8fa87ae786abfd4166222b5e53c1e1164514cde12073"},
+    {file = "boto3-1.17.39-py2.py3-none-any.whl", hash = "sha256:6ec718f5a75724f6117a47944a3b2dd79aef02ed75b356060cede74fb91e2616"},
+    {file = "boto3-1.17.39.tar.gz", hash = "sha256:b5814ff73b5b8fc8601c1b73b70675807f9ce64713562e183a08415a2516eed4"},
 ]
 boto3-type-annotations = [
     {file = "boto3_type_annotations-0.3.1-py3-none-any.whl", hash = "sha256:52e007ac2ab792abee42aaac3019c2acc9781a84e79e1283a5bc64164225435e"},
     {file = "boto3_type_annotations-0.3.1.tar.gz", hash = "sha256:e5682093d035e935c8189f24c601ef6eaccedfcd1e642ba7922429d093b1b885"},
 ]
 botocore = [
-    {file = "botocore-1.20.38-py2.py3-none-any.whl", hash = "sha256:6e6107109abad89d95c829b2c3c281d353113d4b54fcfeb65d71e58e8ebd77ed"},
-    {file = "botocore-1.20.38.tar.gz", hash = "sha256:da447f46d412749720ca08e19bf14487d35e23f2378f7245975e4f55af7570dd"},
+    {file = "botocore-1.20.39-py2.py3-none-any.whl", hash = "sha256:54587d3c9d0d98ac579681245ea36f547cd5048e2bb9212e5e7166a963bcb562"},
+    {file = "botocore-1.20.39.tar.gz", hash = "sha256:28506d23ffa9abf5666c2c909c7edc83a1112cd44fe74eb1a4960df561531e98"},
 ]
 certifi = [
     {file = "certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830"},
@@ -2068,8 +2068,8 @@ flask-wtf = [
     {file = "Flask_WTF-0.14.3-py2.py3-none-any.whl", hash = "sha256:57b3faf6fe5d6168bda0c36b0df1d05770f8e205e18332d0376ddb954d17aef2"},
 ]
 gitdb = [
-    {file = "gitdb-4.0.6-py3-none-any.whl", hash = "sha256:27dea6c52fbcf768530e1af47f2e34afd24a52e53fa310c8279a5589bd7c85bd"},
-    {file = "gitdb-4.0.6.tar.gz", hash = "sha256:42535bb16b5db8983e2c4f6a714d29a8feba7165a12addc63e08fc672dfeccb9"},
+    {file = "gitdb-4.0.7-py3-none-any.whl", hash = "sha256:6c4cc71933456991da20917998acbe6cf4fb41eeaab7d6d67fbc05ecd4c865b0"},
+    {file = "gitdb-4.0.7.tar.gz", hash = "sha256:96bf5c08b157a666fec41129e6d327235284cca4c81e92109260f353ba138005"},
 ]
 gitpython = [
     {file = "GitPython-3.1.14-py3-none-any.whl", hash = "sha256:3283ae2fba31c913d857e12e5ba5f9a7772bbc064ae2bb09efafa71b0dd4939b"},
@@ -2079,8 +2079,7 @@ glob2 = [
     {file = "glob2-0.7.tar.gz", hash = "sha256:85c3dbd07c8aa26d63d7aacee34fa86e9a91a3873bc30bf62ec46e531f92ab8c"},
 ]
 gunicorn = [
-    {file = "gunicorn-20.0.4-py2.py3-none-any.whl", hash = "sha256:cd4a810dd51bf497552cf3f863b575dabd73d6ad6a91075b65936b151cbf4f9c"},
-    {file = "gunicorn-20.0.4.tar.gz", hash = "sha256:1904bb2b8a43658807108d59c3f3d56c2b6121a701161de0ddf9ad140073c626"},
+    {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 httptools = [
     {file = "httptools-0.1.1-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:a2719e1d7a84bb131c4f1e0cb79705034b48de6ae486eb5297a139d6a3296dce"},
@@ -2573,8 +2572,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 smmap = [
-    {file = "smmap-3.0.5-py2.py3-none-any.whl", hash = "sha256:7bfcf367828031dc893530a29cb35eb8c8f2d7c8f2d0989354d75d24c8573714"},
-    {file = "smmap-3.0.5.tar.gz", hash = "sha256:84c2751ef3072d4f6b2785ec7ee40244c6f45eb934d9e543e2c51f1bd3d54c50"},
+    {file = "smmap-4.0.0-py2.py3-none-any.whl", hash = "sha256:a9a7479e4c572e2e775c404dcd3080c8dc49f39918c2cf74913d30c4c478e3c2"},
+    {file = "smmap-4.0.0.tar.gz", hash = "sha256:7e65386bd122d45405ddf795637b7f7d2b532e7e401d46bbe3fb49b9986d5182"},
 ]
 snowballstemmer = [
     {file = "snowballstemmer-2.1.0-py2.py3-none-any.whl", hash = "sha256:b51b447bea85f9968c13b650126a888aabd4cb4463fca868ec596826325dedc2"},
