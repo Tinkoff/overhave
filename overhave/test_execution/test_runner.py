@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 
@@ -16,7 +16,7 @@ class PytestRunner:
         self._settings = settings
 
     @staticmethod
-    def _extend_cmd_args(cmd: list[str], addoptions: Optional[str]) -> None:
+    def _extend_cmd_args(cmd: List[str], addoptions: Optional[str]) -> None:
         if not isinstance(addoptions, str):
             return
         cmd.extend(addoptions.split(" "))

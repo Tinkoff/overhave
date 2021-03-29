@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Optional, Type
+from typing import Any, Dict, List, Mapping, Optional, Type
 
 from pydantic import BaseModel, validator
 from yarl import URL
@@ -21,7 +21,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     """
 
     # Fixture content in list format, which would be compiled into formatted string.
-    fixture_content: list[str] = [
+    fixture_content: List[str] = [
         "from pytest_bdd import scenarios",
         "from overhave import overhave_proxy_manager",
         "pytest_plugins = overhave_proxy_manager().plugin_resolver.get_plugins()",
@@ -42,7 +42,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
         return make_url(v)
 
     @validator("links_keyword")
-    def validate_links_keyword(cls, v: Optional[str], values: dict[str, Any]) -> Optional[str]:
+    def validate_links_keyword(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
         if isinstance(v, str) and values.get("browse_url") is None:
             raise ValueError("Browse URL should be specified in case of links keyword usage!")
         return v
