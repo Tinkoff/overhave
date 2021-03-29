@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from types import FunctionType
-from typing import Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 import pytest
 from faker import Faker
@@ -214,7 +214,7 @@ class TestJsonFormatter:
 
     @pytest.mark.parametrize("value", [{"kek": "lol"}, {"a": "lot", "of": "items"}])
     def test_dict_with_data(
-        self, test_testuser_view: TestUserView, mocker: MockerFixture, column_name: str, value: dict[str, str],
+        self, test_testuser_view: TestUserView, mocker: MockerFixture, column_name: str, value: Dict[str, str],
     ) -> None:
         info = ""
         for k, v in list(filter(lambda x: x, value.items())):
