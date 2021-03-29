@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
@@ -7,10 +8,12 @@ import botocore.exceptions
 import urllib3
 from boto3_type_annotations.s3 import Client
 from pydantic.tools import parse_obj_as
+from yarl import URL
 
 from overhave.transport.s3.models import BucketModel, DeletionResultModel, ObjectModel
 from overhave.transport.s3.objects import OverhaveS3Bucket
 from overhave.transport.s3.settings import OverhaveS3ManagerSettings
+from overhave.utils import make_url
 
 logger = logging.getLogger(__name__)
 
@@ -183,3 +186,14 @@ class S3Manager:
         except botocore.exceptions.ClientError:
             logger.exception("Could not download file from s3 cloud!")
             return False
+
+    def create_presigned_url(self, bucket: str, object_name: str, expiration: timedelta) -> Optional[URL]:
+        try:
+            response = self._ensured_client.generate_presigned_url(
+                "get_object", Params={"Bucket": bucket, "Key": object_name}, ExpiresIn=int(expiration.total_seconds())
+            )
+            logger.info("Created presigned URL: '%s'", response)
+            return make_url(response)
+        except botocore.exceptions.ClientError:
+            logging.exception("Could not create presigned URL for s3 cloud object '%s'!", object_name)
+            return None
