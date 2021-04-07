@@ -33,7 +33,7 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
 class Tags(BaseTable, PrimaryKeyMixin):
     """ Tags table. """
 
-    value = sa.Column(SHORT_STR_TYPE, nullable=False, doc="Feature tags choice", unique=True)
+    value = sa.Column(LONG_STR_TYPE, nullable=False, doc="Feature tags choice", unique=True)
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
 
     def __str__(self) -> str:
