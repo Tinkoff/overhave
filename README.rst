@@ -25,6 +25,10 @@ Overhave
   .. image:: https://img.shields.io/pypi/v/overhave?color=%2334D058&label=pypi%20package
     :target: https://pypi.org/project/overhave
     :alt: Package version
+    
+  .. image:: https://img.shields.io/pypi/dm/overhave.svg
+    :target: https://pypi.org/project/overhave
+    :alt: Downloads per month
 
 --------
 Features
