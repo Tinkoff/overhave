@@ -4,7 +4,7 @@ from overhave.transport import StashPrCreationResponse
 class TestStashHttpClientModels:
     """ Unit tests for :class:`StashHttpClient` models. """
 
-    def test_pr_creation_response(self):
+    def test_pr_creation_response(self) -> None:
         StashPrCreationResponse.parse_obj(
             {
                 "id": 270,

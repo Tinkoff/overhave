@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Optional, cast
+from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
 import pytest
@@ -11,12 +11,13 @@ from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
-from overhave import OverhaveContext, OverhaveDescriptionManagerSettings, OverhaveProjectSettings
-from overhave.base_settings import OverhaveLoggingSettings
-from overhave.factory import ProxyFactory
-from overhave.testing.plugin import pytest_addoption
-from overhave.testing.plugin_utils import DescriptionManager, StepContextRunner
-from tests.objects import get_file_settings
+from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSettings
+from overhave.factory import IAdminFactory, ITestExecutionFactory
+from overhave.factory.context.base_context import BaseFactoryContext
+from overhave.pytest_plugin import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin.plugin import pytest_addoption
+from overhave.pytest_plugin.proxy_manager import IProxyManager
+from tests.objects import get_test_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -37,7 +38,7 @@ def test_pytest_bdd_scenario(test_scenario_name: str) -> Scenario:
     setattr(
         scenario.feature,
         "filename",
-        get_file_settings().features_dir / "feature_type_1" / "full_feature_example_en.feature",
+        get_test_file_settings().features_dir / "feature_type_1" / "full_feature_example_en.feature",
     )
     setattr(scenario, "name", test_scenario_name)
     return scenario
@@ -60,30 +61,25 @@ def test_pytest_bdd_step(faker: Faker) -> Step:
 
 
 @pytest.fixture()
-def test_project_settings(test_browse_url: Optional[str]) -> OverhaveProjectSettings:
-    return OverhaveProjectSettings(browse_url=test_browse_url)
-
-
-@pytest.fixture()
-def test_step_context_logs(request: FixtureRequest) -> bool:
+def step_context_logs(request: FixtureRequest) -> bool:
     if hasattr(request, "param"):
         return cast(bool, request.param)
     raise NotImplementedError
 
 
 @pytest.fixture()
-def test_logging_settings(test_step_context_logs: bool) -> OverhaveLoggingSettings:
-    return OverhaveLoggingSettings(step_context_logs=test_step_context_logs)
+def test_step_context_settings(step_context_logs: bool) -> OverhaveStepContextSettings:
+    return OverhaveStepContextSettings(step_context_logs=step_context_logs)
 
 
 @pytest.fixture()
-def test_step_context_runner(test_logging_settings: OverhaveLoggingSettings) -> StepContextRunner:
-    return StepContextRunner(logging_settings=test_logging_settings)
+def test_step_context_runner(test_step_context_settings: OverhaveStepContextSettings) -> StepContextRunner:
+    return StepContextRunner(test_step_context_settings)
 
 
 @pytest.fixture()
 def clear_get_step_context_runner() -> None:
-    from overhave.testing.plugin_utils import get_step_context_runner
+    from overhave.pytest_plugin import get_step_context_runner
 
     get_step_context_runner.cache_clear()
 
@@ -124,7 +120,7 @@ def link_handler_mock() -> mock.MagicMock:
 
 @pytest.fixture()
 def clear_get_description_manager() -> None:
-    from overhave.testing.plugin_utils import get_description_manager
+    from overhave.pytest_plugin import get_description_manager
 
     get_description_manager.cache_clear()
 
@@ -146,13 +142,7 @@ def terminal_writer_mock() -> mock.MagicMock:
 
 
 @pytest.fixture()
-def import_module_mock() -> mock.MagicMock:
-    with mock.patch("importlib.import_module", return_value=mock.MagicMock()) as import_module:
-        yield import_module
-
-
-@pytest.fixture()
-def test_prepared_config(terminal_writer_mock: mock.MagicMock, import_module_mock: mock.MagicMock) -> Config:
+def test_prepared_config(terminal_writer_mock: mock.MagicMock) -> Config:
     config = Config(PytestPluginManager())
     test_pytest_parser = Parser(
         usage="%(prog)s [options] [file_or_dir] [file_or_dir] [...]", processopt=config._processopt
@@ -192,9 +182,36 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 
 @pytest.fixture()
-def patched_hook_proxy_factory(
-    mocked_context: OverhaveContext, clean_proxy_factory: Callable[[], ProxyFactory]
-) -> ProxyFactory:
-    factory = clean_proxy_factory()
+def patched_hook_admin_factory(
+    mocked_context: BaseFactoryContext, clean_admin_factory: Callable[[], IAdminFactory]
+) -> IAdminFactory:
+    factory = clean_admin_factory()
     factory.set_context(mocked_context)
     return factory
+
+
+@pytest.fixture()
+def patched_hook_test_execution_factory(
+    mocked_context: BaseFactoryContext, clean_test_execution_factory: Callable[[], ITestExecutionFactory]
+) -> ITestExecutionFactory:
+    factory = clean_test_execution_factory()
+    factory.set_context(mocked_context)
+    return factory
+
+
+@pytest.fixture()
+def patched_hook_admin_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_admin_factory
+) -> IProxyManager:
+    proxy_manager = clean_proxy_manager()
+    proxy_manager.set_factory(patched_hook_admin_factory)
+    return proxy_manager
+
+
+@pytest.fixture()
+def patched_hook_test_execution_proxy_manager(
+    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_test_execution_factory
+) -> IProxyManager:
+    proxy_manager = clean_proxy_manager()
+    proxy_manager.set_factory(patched_hook_test_execution_factory)
+    return proxy_manager

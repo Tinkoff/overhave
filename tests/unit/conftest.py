@@ -4,7 +4,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from pytest_mock import MockFixture
 
-from overhave import OverhaveFileSettings
+from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import OverhaveScenarioCompilerSettings
 from overhave.scenario import FileManager
 
@@ -31,3 +31,8 @@ def test_browse_url(request: FixtureRequest) -> Optional[str]:
     if hasattr(request, "param"):
         return cast(Optional[str], request.param)
     raise NotImplementedError
+
+
+@pytest.fixture()
+def test_project_settings(test_browse_url: Optional[str]) -> OverhaveProjectSettings:
+    return OverhaveProjectSettings(browse_url=test_browse_url)

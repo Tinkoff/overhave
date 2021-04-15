@@ -1,14 +1,30 @@
+import socket
 from typing import cast
+from unittest import mock
+from uuid import uuid1
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave import db
-from overhave.entities.converters import EmulationModel, FeatureTypeModel, SystemUserModel, TestUserModel
+from overhave.entities.converters import (
+    EmulationModel,
+    FeatureModel,
+    FeatureTypeModel,
+    ScenarioModel,
+    SystemUserModel,
+    TestUserModel,
+)
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage.emulation import EmulationStorage
-from overhave.storage.feature_type import FeatureTypeStorage
+from overhave.storage import FeatureTypeStorage, TestRunStorage
+from overhave.storage.emulation_storage import EmulationStorage
+
+
+@pytest.fixture(scope="module")
+def socket_mock() -> mock.MagicMock:
+    with mock.patch("socket.socket", return_value=mock.create_autospec(socket.socket)) as mocked_socket:
+        yield mocked_socket
 
 
 @pytest.fixture(scope="class")
@@ -17,7 +33,9 @@ def test_emulation_settings() -> OverhaveEmulationSettings:
 
 
 @pytest.fixture(scope="class")
-def test_emulation_storage(test_emulation_settings: OverhaveEmulationSettings) -> EmulationStorage:
+def test_emulation_storage(
+    socket_mock: mock.MagicMock, test_emulation_settings: OverhaveEmulationSettings
+) -> EmulationStorage:
     return EmulationStorage(test_emulation_settings)
 
 
@@ -38,7 +56,7 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_system_user(faker: Faker, test_user_role: db.Role) -> SystemUserModel:
+def test_system_user(database: None, faker: Faker, test_user_role: db.Role) -> SystemUserModel:
     with db.create_session() as session:
         app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
         session.add(app_user)
@@ -72,5 +90,46 @@ def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, 
 
 
 @pytest.fixture(scope="class")
-def test_feature_type_storage():
+def test_test_run_storage() -> TestRunStorage:
+    return TestRunStorage()
+
+
+@pytest.fixture(scope="class")
+def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
+
+
+@pytest.fixture()
+def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
+    with db.create_session() as session:
+        feature = db.Feature(
+            name=faker.word(),
+            author=test_system_user.login,
+            type_id=test_feature_type.id,
+            task=[faker.word()[:11]],
+            last_edited_by=test_system_user.login,
+        )
+        session.add(feature)
+        session.flush()
+        return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
+    with db.create_session() as session:
+        db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
+        session.add(db_scenario)
+        session.flush()
+        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture(scope="class")
+def test_report() -> str:
+    return uuid1().hex
+
+
+@pytest.fixture()
+def test_created_test_run_id(
+    test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
+) -> int:
+    return test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)

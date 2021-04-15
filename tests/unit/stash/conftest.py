@@ -4,8 +4,12 @@ import pytest
 from faker import Faker
 from pytest_mock import MockFixture
 
+from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import FeatureTypeName
-from overhave.entities.stash import OverhaveStashManagerSettings
+from overhave.publication import StashVersionPublisher
+from overhave.publication.stash import OverhaveStashPublisherSettings
+from overhave.scenario import FileManager
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import StashHttpClient
 from tests.objects import get_feature_extractor
 
@@ -31,10 +35,10 @@ def test_default_reviewers(faker: Faker) -> Sequence[str]:
 
 
 @pytest.fixture()
-def test_stash_project_settings_with_default_reviewers(
+def test_stash_publisher_settings_with_default_reviewers(
     test_repository_name: str, test_project_key: str, test_target_branch: str, test_default_reviewers: Sequence[str],
-) -> OverhaveStashManagerSettings:
-    return OverhaveStashManagerSettings(
+) -> OverhaveStashPublisherSettings:
+    return OverhaveStashPublisherSettings(
         repository_name=test_repository_name,
         project_key=test_project_key,
         default_target_branch_name=test_target_branch,
@@ -56,8 +60,8 @@ def test_stash_project_settings_with_reviewers_mapping(
     test_project_key: str,
     test_target_branch: str,
     test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
-) -> OverhaveStashManagerSettings:
-    return OverhaveStashManagerSettings(
+) -> OverhaveStashPublisherSettings:
+    return OverhaveStashPublisherSettings(
         repository_name=test_repository_name,
         project_key=test_project_key,
         default_target_branch_name=test_target_branch,
@@ -68,3 +72,47 @@ def test_stash_project_settings_with_reviewers_mapping(
 @pytest.fixture()
 def mocked_stash_client(mocker: MockFixture) -> StashHttpClient:
     return cast(StashHttpClient, mocker.create_autospec(StashHttpClient))
+
+
+@pytest.fixture()
+def test_stash_publisher_with_default_reviewers(
+    test_file_settings: OverhaveFileSettings,
+    test_project_settings: OverhaveProjectSettings,
+    test_stash_publisher_settings_with_default_reviewers: OverhaveStashPublisherSettings,
+    mocked_file_manager: FileManager,
+    mocked_stash_client: StashHttpClient,
+    mocker: MockFixture,
+) -> StashVersionPublisher:
+    return StashVersionPublisher(
+        file_settings=test_file_settings,
+        project_settings=test_project_settings,
+        feature_storage=mocker.create_autospec(IFeatureStorage),
+        scenario_storage=mocker.create_autospec(IScenarioStorage),
+        test_run_storage=mocker.create_autospec(ITestRunStorage),
+        draft_storage=mocker.create_autospec(IDraftStorage),
+        file_manager=mocked_file_manager,
+        stash_publisher_settings=test_stash_publisher_settings_with_default_reviewers,
+        client=mocked_stash_client,
+    )
+
+
+@pytest.fixture()
+def test_stash_publisher_with_reviewers_mapping(
+    test_file_settings: OverhaveFileSettings,
+    test_project_settings: OverhaveProjectSettings,
+    test_stash_project_settings_with_reviewers_mapping: OverhaveStashPublisherSettings,
+    mocked_file_manager: FileManager,
+    mocked_stash_client: StashHttpClient,
+    mocker: MockFixture,
+) -> StashVersionPublisher:
+    return StashVersionPublisher(
+        file_settings=test_file_settings,
+        project_settings=test_project_settings,
+        feature_storage=mocker.create_autospec(IFeatureStorage),
+        scenario_storage=mocker.create_autospec(IScenarioStorage),
+        test_run_storage=mocker.create_autospec(ITestRunStorage),
+        draft_storage=mocker.create_autospec(IDraftStorage),
+        file_manager=mocked_file_manager,
+        stash_publisher_settings=test_stash_project_settings_with_reviewers_mapping,
+        client=mocked_stash_client,
+    )

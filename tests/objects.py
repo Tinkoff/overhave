@@ -27,10 +27,11 @@ class DataBaseContext(NamedTuple):
 
 
 @lru_cache(maxsize=None)
-def get_file_settings() -> OverhaveFileSettings:
+def get_test_file_settings() -> OverhaveFileSettings:
     """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
-    root_dir = Path(__file__).parent.parent / "demo"
-    return OverhaveFileSettings(root_dir=root_dir)
+    work_dir = Path(__file__).parent.parent
+    root_dir = work_dir / "demo"
+    return OverhaveFileSettings(work_dir=work_dir, root_dir=root_dir)
 
 
 @lru_cache(maxsize=None)
@@ -40,7 +41,7 @@ def get_feature_extractor() -> FeatureExtractor:
     One of class functions is mocked to prevent the creation of additional files in docs includes.
     """
     with mock.patch.object(FeatureExtractor, "_check_pytest_bdd_scenarios_test_files", return_value=None):
-        return FeatureExtractor(file_settings=get_file_settings())
+        return FeatureExtractor(file_settings=get_test_file_settings())
 
 
 class TestLanguageName(str, enum.Enum):

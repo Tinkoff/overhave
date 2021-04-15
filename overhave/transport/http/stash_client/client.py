@@ -26,7 +26,7 @@ class StashHttpClientConflictError(BaseStashHttpClientException):
 class StashHttpClient(BaseHttpClient[OverhaveStashClientSettings]):
     """ Client for communication with remote Bitbucket server. """
 
-    def send_pr(self, pull_request: StashPrRequest) -> AnyStashResponseModel:
+    def send_pull_request(self, pull_request: StashPrRequest) -> AnyStashResponseModel:
         url = self._settings.get_pr_url(
             project_key=pull_request.target_branch.repository.project.key,
             repository_name=pull_request.target_branch.repository.name,

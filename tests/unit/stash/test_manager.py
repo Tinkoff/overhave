@@ -3,84 +3,47 @@ from typing import List, Mapping, Sequence
 import pytest
 from faker import Faker
 
-from overhave.entities import FeatureTypeName, OverhaveFileSettings, OverhaveStashManagerSettings
-from overhave.entities.stash.manager.stash_manager import StashProjectManager
-from overhave.scenario import FileManager
-from overhave.transport import (
-    StashBranch,
-    StashHttpClient,
-    StashProject,
-    StashRepository,
-    StashReviewer,
-    StashReviewerInfo,
-)
-from tests.objects import get_file_settings
+from overhave.entities import FeatureTypeName
+from overhave.publication import StashVersionPublisher
+from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
+from tests.objects import get_test_file_settings
 
 
-@pytest.mark.parametrize("test_file_settings", [get_file_settings()], indirect=True)
+@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+@pytest.mark.parametrize("test_file_settings", [get_test_file_settings()], indirect=True)
 class TestStashProjectManager:
-    """ Unit tests for :class:`StashProjectManager`. """
+    """ Unit tests for :class:`StashVersionPublisher`. """
 
     def test_stash_project_settings_basic(
         self,
-        test_stash_project_settings_with_default_reviewers: OverhaveStashManagerSettings,
-        test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashHttpClient,
-        mocked_file_manager: FileManager,
+        test_target_branch: str,
         test_repository_name: str,
         test_project_key: str,
-        test_target_branch: str,
-    ):
-        manager = StashProjectManager(
-            stash_project_settings=test_stash_project_settings_with_default_reviewers,
-            file_settings=test_file_settings,
-            client=mocked_stash_client,
-            file_manager=mocked_file_manager,
-            task_links_keyword=None,
-        )
+        test_stash_publisher_with_default_reviewers: StashVersionPublisher,
+    ) -> None:
         correct_repository = StashRepository(slug=test_repository_name, project=StashProject(key=test_project_key))
-        assert manager._stash_project_settings.repository == correct_repository
-        assert manager._stash_project_settings.target_branch == StashBranch(
+        assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.repository == correct_repository
+        assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.target_branch == StashBranch(
             id=test_target_branch, repository=correct_repository
         )
 
     def test_stash_project_settings_with_default_reviewers(
         self,
-        test_stash_project_settings_with_default_reviewers: OverhaveStashManagerSettings,
-        test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashHttpClient,
-        mocked_file_manager: FileManager,
         test_default_reviewers: Sequence[str],
+        test_stash_publisher_with_default_reviewers: StashVersionPublisher,
         faker: Faker,
-    ):
-        manager = StashProjectManager(
-            stash_project_settings=test_stash_project_settings_with_default_reviewers,
-            file_settings=test_file_settings,
-            client=mocked_stash_client,
-            file_manager=mocked_file_manager,
-            task_links_keyword=None,
-        )
-        assert manager._stash_project_settings.get_reviewers(faker.word()) == [
+    ) -> None:
+        assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.get_reviewers(faker.word()) == [
             StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_default_reviewers
         ]
 
     def test_stash_project_settings_with_reviewers_mapping(
         self,
-        test_stash_project_settings_with_reviewers_mapping: OverhaveStashManagerSettings,
-        test_file_settings: OverhaveFileSettings,
-        mocked_stash_client: StashHttpClient,
-        mocked_file_manager: FileManager,
         test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
+        test_stash_publisher_with_reviewers_mapping: StashVersionPublisher,
         faker: Faker,
-    ):
-        manager = StashProjectManager(
-            stash_project_settings=test_stash_project_settings_with_reviewers_mapping,
-            file_settings=test_file_settings,
-            client=mocked_stash_client,
-            file_manager=mocked_file_manager,
-            task_links_keyword=None,
-        )
+    ) -> None:
         for key in test_reviewers_mapping.keys():
-            assert manager._stash_project_settings.get_reviewers(key) == [
+            assert test_stash_publisher_with_reviewers_mapping._stash_publisher_settings.get_reviewers(key) == [
                 StashReviewer(user=StashReviewerInfo(name=reviewer)) for reviewer in test_reviewers_mapping[key]
             ]

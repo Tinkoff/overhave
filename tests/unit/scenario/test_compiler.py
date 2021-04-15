@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pytest
 
-from overhave.entities import FeatureModel, OverhaveLanguageSettings, ProcessingContext, ScenarioModel
+from overhave.entities import FeatureModel, OverhaveLanguageSettings, ScenarioModel, TestExecutorContext
 from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 
@@ -12,17 +12,17 @@ class TestGenerateTaskInfo:
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info(self, tasks: List[str], header: str):
+    def test_generate_task_info(self, tasks: List[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == f"{header}: {', '.join(tasks)}"
 
     @pytest.mark.parametrize("tasks", [[]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info_without_tasks(self, tasks: List[str], header: str):
+    def test_generate_task_info_without_tasks(self, tasks: List[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", [None])
-    def test_generate_task_info_without_header(self, tasks: List[str], header: None):
+    def test_generate_task_info_without_header(self, tasks: List[str], header: None) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
 
@@ -39,8 +39,11 @@ class TestScenarioCompiler:
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_processing_ctx: ProcessingContext,
-    ):
+        self,
+        test_scenario_compiler: ScenarioCompiler,
+        test_scenario_text: str,
+        test_processing_ctx: TestExecutorContext,
+    ) -> None:
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_processing_ctx)
 
@@ -51,8 +54,8 @@ class TestScenarioCompiler:
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,
         test_scenario: ScenarioModel,
-        test_processing_ctx: ProcessingContext,
-    ):
+        test_processing_ctx: TestExecutorContext,
+    ) -> None:
         feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)
         assert parsed_info.name == test_feature.name

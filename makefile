@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 83.1
+MIN_COVERAGE ?= 83.8
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -14,18 +14,11 @@ SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
 ALL = $(CODE) $(DOCS_DIR) tests demo
 
 pre-init:
-	sudo apt install python3.8 python3.8-venv python3.8-dev python3.8-distutils gcc\
+	sudo apt install python3.9 python3.9-venv python3.9-dev python3.9-distutils gcc\
         libsasl2-dev libldap2-dev libssl-dev libpq-dev g++ libgnutls28-dev
 
-pre-init-mac:
-	brew install python@3.8
-	brew install openldap
-	brew install openssl
-	brew install libpq
-	brew install gnutls
-
 init:
-	python3.8 -m venv $(VENV)
+	python3.9 -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
 	$(VENV)/bin/python -m pip install poetry
 	$(VENV)/bin/poetry install
@@ -41,7 +34,7 @@ test:
 lint:
 	$(VENV)/bin/poetry run black --check $(ALL)
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
-	$(VENV)/bin/poetry run mypy $(ALL)
+	$(VENV)/bin/poetry run mypy $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
 
 pretty:
@@ -80,3 +73,10 @@ build-docker:
 
 test-docker: build-docker
 	docker-compose run code
+
+up:
+	docker-compose up -d db
+	docker-compose up -d redis
+
+down:
+	docker-compose down -v

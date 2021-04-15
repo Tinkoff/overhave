@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "1.8.2"
+version = "2.0.6"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -16,6 +16,7 @@ classifiers = [
     "Topic :: Software Development :: Testing :: BDD",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Operating System :: OS Independent",
     "Framework :: Flask",
     "Framework :: Pytest",
@@ -26,17 +27,17 @@ overhave = 'overhave.cli:overhave'
 overhave-demo = 'demo:overhave_demo'
 
 [tool.poetry.plugins.pytest11]
-overhave = "overhave.testing.plugin"
+overhave = "overhave.pytest_plugin.plugin"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-sqlalchemy = "^1.3.3"
+python = ">=3.7,<4.0"
+sqlalchemy = "<=1.3.23"
 psycopg2-binary = "^2.8"
 click = "^7.0"
 pydantic = ">=1.7"
 requests = ">=2.0.0"
 tenacity = "*"
-sqlalchemy_utils = "^0.34.0"
+sqlalchemy_utils = "^0.36.8"
 yarl = "^1.1.1"
 pytz = "^2019.1"
 gunicorn = "^20.0.4"
@@ -59,18 +60,18 @@ alembic = "^1.4.3"
 boto3 = "^1.17.16"
 boto3-type-annotations = "^0.3.1"
 alchemy-mock = "^0.4.3"
+SQLAlchemy-Utils = "^0.36.8"
 
 
 [tool.poetry.dev-dependencies]
 black = "^19.3b0"
 flake8-awesome = "<1.3"
 requests_mock = "*"
-teamcity-messages = "^1.25"
 flake8-docstrings = "^1.5"
 transliterate = "^1.10"
 pytest-faker = "^2.0"
 sqlalchemy-diff = "^0.1.3"
-mypy = "^0.761"
+mypy = "^0.812"
 gitpython = "^3.0.5"
 filelock = "*"
 pytest-bdd = "^4.0.2"
@@ -84,6 +85,7 @@ pytest-xdist = "^2.2.0"
 tox = "^3.20.1"
 twine = "^3.3.0"
 Sphinx = "^3.4.3"
+mypy-extensions = "^0.4.3"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -125,7 +127,7 @@ legacy_tox_ini = """
 [tox]
 isolated_build = true
 isolated_build_env = .package
-envlist = py38
+envlist = py39
 
 [testenv]
 whitelist_externals =

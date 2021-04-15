@@ -10,7 +10,7 @@ from overhave.admin.views.base import ModelViewConfigured
 
 
 class AccessModelView(ModelViewConfigured):
-    """ Additional base view for access views. """
+    """ Additional base_factory view for access views. """
 
     can_view_details = False
 

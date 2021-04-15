@@ -2,7 +2,7 @@ version: '3.6'
 
 services:
   db:
-    image: "${DOCKER_HUB_PROXY}postgres:11.6"
+    image: postgres:11.6
     command:
       -c fsync=${FSYNC:-off}
     environment:
@@ -10,6 +10,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
 
   base:
     image: "${IMAGE_BASE}overhave-base:${POETRY_CONTENT_HASH:-unset}"

@@ -19,7 +19,6 @@ from overhave.db import (
     TestRunStatus,
     TestUser,
     UserRole,
-    create_session,
 )
 from overhave.entities.feature import FeatureTypeName
 
@@ -47,6 +46,7 @@ class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     """ Model for :class:`Feature` row. """
 
+    id: int
     name: str
     author: str
     feature_type: FeatureTypeModel
@@ -60,6 +60,7 @@ class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
 
     id: int
     text: str
+    feature_id: int
 
 
 class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
@@ -68,31 +69,44 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     __test__ = False
 
     id: int
+    created_at: datetime
     name: str
     executed_by: str
-    start: datetime
+    start: Optional[datetime]
     end: Optional[datetime]
     status: TestRunStatus
     report_status: TestReportStatus
     report: Optional[str]
     traceback: Optional[str]
+    scenario_id: int
 
 
 class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
     """ Model for :class:`Draft` row. """
 
+    id: int
     feature_id: int
     test_run_id: int
     pr_url: Optional[str]
     published_by: str
+    published_at: Optional[datetime]
 
 
-class ProcessingContext(BaseModel):
-    """ Model for simple processing entities usage. """
+class TestExecutorContext(BaseModel):
+    """ Context model for test execution. """
+
+    __test__ = False
 
     feature: FeatureModel
     scenario: ScenarioModel
     test_run: TestRunModel
+
+
+class PublisherContext(TestExecutorContext):
+    """ Context model for version publishing. """
+
+    draft: DraftModel
+    target_branch: str
 
 
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
@@ -111,15 +125,3 @@ class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
     """ Model for :class:`EmulationRun` row. """
 
     emulation: EmulationModel
-
-
-def get_context_by_test_run_id(test_run_id: int) -> ProcessingContext:
-    with create_session() as session:
-        db_test_run = session.query(TestRun).filter_by(id=test_run_id).one()
-        db_scenario = session.query(Scenario).filter_by(id=db_test_run.scenario.id).one()
-        db_feature = session.query(Feature).filter_by(id=db_scenario.feature.id).one()
-        return ProcessingContext(
-            feature=FeatureModel.from_orm(db_feature),
-            scenario=ScenarioModel.from_orm(db_scenario),
-            test_run=TestRunModel.from_orm(db_test_run),
-        )

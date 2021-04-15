@@ -11,9 +11,17 @@ from pytest_mock import MockFixture
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
-from overhave import AuthorizationStrategy, OverhaveContext
-from overhave.base_settings import DataBaseSettings, OverhaveLoggingSettings
-from overhave.factory import ProxyFactory, get_proxy_factory
+from overhave import (
+    AuthorizationStrategy,
+    OverhaveDBSettings,
+    OverhaveLoggingSettings,
+    overhave_admin_factory,
+    overhave_proxy_manager,
+    overhave_test_execution_factory,
+)
+from overhave.factory import IAdminFactory, ITestExecutionFactory
+from overhave.factory.context.base_context import BaseFactoryContext
+from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
@@ -23,14 +31,14 @@ def setup_logging() -> None:
 
 
 @pytest.fixture(scope="session")
-def db_settings(worker_id: XDistWorkerValueType) -> DataBaseSettings:
-    settings = DataBaseSettings()
+def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
+    settings = OverhaveDBSettings()
     settings.db_url = f"{settings.db_url}/overhave_{worker_id}"
     return settings
 
 
 @pytest.fixture(scope="session")
-def db_context(db_settings: DataBaseSettings) -> Iterator[DataBaseContext]:
+def db_context(db_settings: OverhaveDBSettings) -> Iterator[DataBaseContext]:
     from overhave.db import metadata
 
     if sau.database_exists(db_settings.db_url):
@@ -64,28 +72,40 @@ def mock_envs(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) 
 
 
 @pytest.fixture()
-def clean_proxy_factory() -> Callable[[], ProxyFactory]:
-    get_proxy_factory.cache_clear()
-    return get_proxy_factory
+def clean_admin_factory() -> Callable[[], IAdminFactory]:
+    overhave_admin_factory.cache_clear()
+    return overhave_admin_factory
 
 
 @pytest.fixture()
-def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> OverhaveContext:
+def clean_test_execution_factory() -> Callable[[], ITestExecutionFactory]:
+    overhave_test_execution_factory.cache_clear()
+    return overhave_test_execution_factory
+
+
+@pytest.fixture()
+def clean_proxy_manager() -> Callable[[], IProxyManager]:
+    overhave_proxy_manager.cache_clear()
+    return overhave_proxy_manager
+
+
+@pytest.fixture()
+def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> BaseFactoryContext:
     context_mock = session_mocker.MagicMock()
     context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False
 
-    root_tmp_dir = Path(tmpdir)
-    features_dir = root_tmp_dir / "features"
-    fixtures_dir = root_tmp_dir / "fixtures"
-    reports_dir = root_tmp_dir / "reports"
+    root_dir = Path(tmpdir)
+    features_dir = root_dir / "features"
+    fixtures_dir = root_dir / "fixtures"
+    reports_dir = root_dir / "reports"
     for path in (features_dir, fixtures_dir, reports_dir):
         path.mkdir()
     context_mock.file_settings.tmp_features_dir = features_dir
     context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
     context_mock.file_settings.tmp_reports_dir = reports_dir
 
-    return cast(OverhaveContext, context_mock)
+    return cast(BaseFactoryContext, context_mock)
 
 
 @pytest.fixture(scope="session")

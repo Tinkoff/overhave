@@ -2,7 +2,7 @@ import logging
 from typing import Callable, Dict, Type
 
 from overhave.transport.redis.consumer import RedisConsumer
-from overhave.transport.redis.objects import BaseRedisTask, RedisContainer, RedisUnreadData, TRedisTask
+from overhave.transport.redis.objects import AnyRedisTask, RedisContainer, RedisUnreadData
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +20,10 @@ class RedisConsumerRunner:
     """
 
     def __init__(
-        self, consumer: RedisConsumer, mapping: Dict[Type[BaseRedisTask], Callable[[TRedisTask], None]]
+        self, consumer: RedisConsumer, mapping: Dict[Type[AnyRedisTask], Callable[[AnyRedisTask], None]]
     ) -> None:
         self._consumer = consumer
-        self._mapping = mapping  # type: ignore
+        self._mapping = mapping
 
     def run(self) -> None:
         try:
@@ -41,5 +41,5 @@ class RedisConsumerRunner:
 
     def _process(self, data: RedisUnreadData) -> None:
         container = RedisContainer(task=data.decoded_message)
-        logger.info("Gotten ready for processing BaseRedisTask: %s", container.task)
+        logger.info("Gotten ready for test_execution BaseRedisTask: %s", container.task)
         self._mapping[type(container.task)](container.task)

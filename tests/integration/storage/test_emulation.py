@@ -6,21 +6,21 @@ from faker import Faker
 from overhave import db
 from overhave.db.statuses import EmulationStatus
 from overhave.entities import SystemUserModel
-from overhave.storage.emulation import EmulationStorage, NotFoundEmulationError
+from overhave.storage.emulation_storage import EmulationStorage, NotFoundEmulationError
 
 
 @pytest.mark.usefixtures("database")
 class TestEmulationStorage:
     """ Integration tests for :class:`EmulationStorage`. """
 
-    def test_raise_exception_for_not_existing_id(self, test_emulation_storage: EmulationStorage, faker: Faker):
+    def test_raise_exception_for_not_existing_id(self, test_emulation_storage: EmulationStorage, faker: Faker) -> None:
         with pytest.raises(NotFoundEmulationError):
             test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_create_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
-    ):
+    ) -> None:
         emulation_run = test_emulation_storage.create_emulation_run(
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )
@@ -32,7 +32,7 @@ class TestEmulationStorage:
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_get_requested_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
-    ):
+    ) -> None:
         emulation_run = test_emulation_storage.create_emulation_run(
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )
@@ -48,7 +48,7 @@ class TestEmulationStorage:
         test_system_user: SystemUserModel,
         test_emulation: db.Emulation,
         faker: Faker,
-    ):
+    ) -> None:
         emulation_run = test_emulation_storage.create_emulation_run(
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )
@@ -71,7 +71,7 @@ class TestEmulationStorage:
         test_system_user: SystemUserModel,
         test_emulation: db.Emulation,
         emulation_status: EmulationStatus,
-    ):
+    ) -> None:
         emulation_run = test_emulation_storage.create_emulation_run(
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )

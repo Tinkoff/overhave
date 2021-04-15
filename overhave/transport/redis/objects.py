@@ -1,7 +1,7 @@
 import abc
 import enum
 import json
-from typing import Any, Dict, TypeVar, Union, cast
+from typing import Any, Dict, TypeVar, Union
 
 from pydantic.main import BaseModel
 
@@ -10,11 +10,12 @@ class RedisStream(str, enum.Enum):
     """ Enum that declares Redis streams. """
 
     TEST = "test-stream"
+    PUBLICATION = "publication-stream"
     EMULATION = "emulation-stream"
 
     @property
     def with_dunder(self) -> str:
-        return cast(str, self.value.replace("-", "_"))
+        return self.value.replace("-", "_")
 
 
 class _IRedisTask(BaseModel, abc.ABC):
@@ -37,13 +38,29 @@ class BaseRedisTask(_IRedisTask):
 class TestRunData(BaseModel):
     """ Specific data for test run. """
 
+    __test__ = False
+
     test_run_id: int
 
 
 class TestRunTask(BaseRedisTask):
     """ Redis stream task for test run. """
 
+    __test__ = False
+
     data: TestRunData
+
+
+class PublicationData(BaseModel):
+    """ Specific data for test run. """
+
+    draft_id: int
+
+
+class PublicationTask(BaseRedisTask):
+    """ Redis stream task for test run. """
+
+    data: PublicationData
 
 
 class EmulationData(BaseModel):
@@ -58,7 +75,8 @@ class EmulationTask(BaseRedisTask):
     data: EmulationData
 
 
-TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, covariant=True)
+TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, PublicationTask, covariant=True)
+AnyRedisTask = Union[TestRunTask, PublicationTask, EmulationTask]
 
 
 class RedisPendingData(BaseModel):
@@ -88,4 +106,4 @@ class RedisContainer(BaseModel):
     ```task``` will be parsed to one of declared models.
     """
 
-    task: Union[TestRunTask, EmulationTask]
+    task: AnyRedisTask
