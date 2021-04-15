@@ -9,6 +9,7 @@ from sqlalchemy import orm as so
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
+from overhave.db.string_without_special_symbols import StringWithoutSpecialSymbols
 from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
 from overhave.db.users import UserRole
 
@@ -33,7 +34,7 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
 class Tags(BaseTable, PrimaryKeyMixin):
     """ Tags table. """
 
-    value = sa.Column(LONG_STR_TYPE, nullable=False, doc="Feature tags choice", unique=True)
+    value = sa.Column(StringWithoutSpecialSymbols(256), nullable=False, doc="Feature tags choice", unique=True)
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
 
     def __str__(self) -> str:
@@ -93,9 +94,11 @@ class DraftQuery(so.Query):
             run = self.session.query(TestRun).get(test_run_id)
             if run is None:
                 raise RuntimeError(f"Unknown test_run_id={test_run_id}!")
-            draft: Optional[Draft] = self.session.query(Draft).filter(
-                Draft.test_run_id == run.id, Draft.text == run.scenario.text
-            ).one_or_none()
+            draft: Optional[Draft] = (
+                self.session.query(Draft)
+                .filter(Draft.test_run_id == run.id, Draft.text == run.scenario.text)
+                .one_or_none()
+            )
 
         if draft:
             return draft
