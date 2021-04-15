@@ -1,11 +1,10 @@
 import re
-from abc import ABC
 
 import sqlalchemy as sa
 from sqlalchemy.types import TypeDecorator
 
 
-class StringWithoutSpecialSymbols(TypeDecorator, ABC):
+class StringWithoutSpecialSymbols(TypeDecorator):
 
     impl = sa.String
 
