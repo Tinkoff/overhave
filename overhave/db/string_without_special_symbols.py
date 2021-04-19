@@ -5,10 +5,14 @@ import sqlalchemy as sa
 from sqlalchemy.types import TypeDecorator
 
 
-class String(TypeDecorator):
+class StringWithoutSpecialSymbols(TypeDecorator):
     """ String without any special characters. """
 
     impl = sa.String
+
+    def __init__(self, *args, **kwargs) -> None:
+        self.__class__.__name__ = "String"
+        super().__init__(*args, **kwargs)
 
     def process_bind_param(self, value: Any, dialect: Any) -> Any:
         if value:
@@ -21,4 +25,4 @@ class String(TypeDecorator):
         return value
 
     def copy(self, **kw) -> Any:
-        return String(self.impl.length)
+        return StringWithoutSpecialSymbols(self.impl.length)
