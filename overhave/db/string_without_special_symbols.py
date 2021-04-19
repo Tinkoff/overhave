@@ -10,7 +10,7 @@ class StringWithoutSpecialSymbols(TypeDecorator):
 
     impl = sa.String
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.__class__.__name__ = "String"
         super().__init__(*args, **kwargs)
 
@@ -24,5 +24,5 @@ class StringWithoutSpecialSymbols(TypeDecorator):
     def process_result_value(self, value: Any, dialect: Any) -> Any:
         return value
 
-    def copy(self, **kw) -> Any:
+    def copy(self, **kw: Any) -> Any:
         return StringWithoutSpecialSymbols(self.impl.length)
