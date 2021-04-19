@@ -1,18 +1,24 @@
 import re
+from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy.types import TypeDecorator
 
 
-class StringWithoutSpecialSymbols(TypeDecorator):
+class String(TypeDecorator):
+    """ String without any special characters. """
 
     impl = sa.String
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value: Any, dialect: Any) -> Any:
         if value:
             if re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ]+$", value):
                 return value
             raise ValueError("Object shouldn`t contain any special symbols or spaces")
+        return value
 
-    def copy(self, **kw):
-        return StringWithoutSpecialSymbols(self.impl.length)
+    def process_result_value(self, value: Any, dialect: Any) -> Any:
+        return value
+
+    def copy(self, **kw) -> Any:
+        return String(self.impl.length)
