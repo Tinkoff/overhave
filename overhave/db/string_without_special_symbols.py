@@ -16,7 +16,7 @@ class StringWithoutSpecialSymbols(TypeDecorator):
 
     def process_bind_param(self, value: Any, dialect: Any) -> Any:
         if value:
-            if re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ]+$", value):
+            if re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", value):
                 return value
             raise ValueError("Object shouldn`t contain any special symbols or spaces")
         return value
