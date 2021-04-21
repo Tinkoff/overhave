@@ -24,7 +24,7 @@ class TestStringWithoutSpecialSymbols:
         with pytest.raises(StatementError):
             test_tags_factory(f"{faker.word()}#$!")
         with pytest.raises(StatementError):
-            test_tags_factory("_")
+            test_tags_factory("*")
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_correct_value(self, test_tags_factory: Callable[[str], None], faker: Faker) -> None:

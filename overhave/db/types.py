@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 
 INT_TYPE = sa.Integer()
+LONGEST_STR_TYPE = sa.String(256)
 LONG_STR_TYPE = sa.String(90)
 SHORT_STR_TYPE = sa.String(30)
 TEXT_TYPE = sa.Text()

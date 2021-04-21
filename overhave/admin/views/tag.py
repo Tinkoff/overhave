@@ -1,6 +1,10 @@
 import logging
 
+import flask
+import werkzeug as werkzeug
+from flask_admin import expose
 from flask_login import current_user
+from sqlalchemy.exc import StatementError
 from wtforms import Form, ValidationError
 
 from overhave import db
@@ -33,3 +37,21 @@ class TagsView(ModelViewConfigured):
     def on_model_delete(self, model: db.Tags) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
             raise ValidationError("Only author or administrator could delete tags!")
+
+    @expose("/edit/", methods=("GET", "POST"))
+    def edit_view(self) -> werkzeug.Response:
+        try:
+            rendered: werkzeug.Response = super().edit_view()
+        except StatementError:
+            flask.flash("Unsupported symbols in tag name!")
+            return flask.redirect(flask.request.url)
+        return rendered
+
+    @expose("/new/", methods=("GET", "POST"))
+    def crate_view(self) -> werkzeug.Response:
+        try:
+            rendered: werkzeug.Response = super().create_view()
+        except StatementError:
+            flask.flash("Unsupported symbols in tag name!")
+            return flask.redirect(flask.request.url)
+        return rendered

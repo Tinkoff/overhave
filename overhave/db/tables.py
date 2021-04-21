@@ -10,7 +10,15 @@ from sqlalchemy import orm as so
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
 from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.string_without_special_symbols import StringWithoutSpecialSymbols
-from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
+from overhave.db.types import (
+    ARRAY_TYPE,
+    DATETIME_TYPE,
+    INT_TYPE,
+    LONG_STR_TYPE,
+    LONGEST_STR_TYPE,
+    SHORT_STR_TYPE,
+    TEXT_TYPE,
+)
 from overhave.db.users import UserRole
 
 tags_association_table = sa.Table(
@@ -45,7 +53,7 @@ class Tags(BaseTable, PrimaryKeyMixin):
 class Feature(BaseTable, PrimaryKeyMixin):
     """ Features table. """
 
-    name = sa.Column(LONG_STR_TYPE, doc="Feature name", nullable=False, unique=True)
+    name = sa.Column(LONGEST_STR_TYPE, doc="Feature name", nullable=False, unique=True)
     author = sa.Column(
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
     )
