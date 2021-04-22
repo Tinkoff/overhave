@@ -1,3 +1,4 @@
+import datetime
 import socket
 from typing import cast
 from unittest import mock
@@ -9,6 +10,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.entities.converters import (
+    DraftModel,
     EmulationModel,
     FeatureModel,
     FeatureTypeModel,
@@ -17,7 +19,7 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import FeatureTypeStorage, TestRunStorage
+from overhave.storage import DraftStorage, FeatureTypeStorage, TestRunStorage
 from overhave.storage.emulation_storage import EmulationStorage
 
 
@@ -133,3 +135,26 @@ def test_created_test_run_id(
     test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
     return test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+
+
+@pytest.fixture(scope="class")
+def test_draft_storage():
+    return DraftStorage()
+
+
+@pytest.fixture()
+def test_draft(
+    faker: Faker, test_feature: FeatureModel, test_created_test_run_id: int, test_system_user: SystemUserModel
+) -> DraftModel:
+    with db.create_session() as session:
+        draft = db.Draft(
+            feature_id=test_feature.id,
+            test_run_id=test_created_test_run_id,
+            text=faker.word(),
+            pr_url=faker.word(),
+            published_by=test_system_user.login,
+            published_at=datetime.datetime.now(),
+        )
+        session.add(draft)
+        session.flush()
+        return cast(DraftModel, DraftModel.from_orm(draft))
