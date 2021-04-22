@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Callable
 
 import flask
 import werkzeug as werkzeug
@@ -11,6 +12,17 @@ from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 
 logger = logging.getLogger(__name__)
+
+
+def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[[Any], werkzeug.Response]:
+    def wrapper(self: Any) -> werkzeug.Response:
+        try:
+            return function_view(self)
+        except StatementError:
+            flask.flash("Unsupported symbols in tag name!")
+            return flask.redirect(flask.request.url)
+
+    return wrapper
 
 
 class TagsView(ModelViewConfigured):
@@ -39,19 +51,13 @@ class TagsView(ModelViewConfigured):
             raise ValidationError("Only author or administrator could delete tags!")
 
     @expose("/edit/", methods=("GET", "POST"))
+    @view_wrapper
     def edit_view(self) -> werkzeug.Response:
-        try:
-            rendered: werkzeug.Response = super().edit_view()
-        except StatementError:
-            flask.flash("Unsupported symbols in tag name!")
-            return flask.redirect(flask.request.url)
+        rendered: werkzeug.Response = super().edit_view()
         return rendered
 
     @expose("/new/", methods=("GET", "POST"))
+    @view_wrapper
     def crate_view(self) -> werkzeug.Response:
-        try:
-            rendered: werkzeug.Response = super().create_view()
-        except StatementError:
-            flask.flash("Unsupported symbols in tag name!")
-            return flask.redirect(flask.request.url)
+        rendered: werkzeug.Response = super().create_view()
         return rendered

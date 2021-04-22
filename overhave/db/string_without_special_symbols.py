@@ -14,12 +14,10 @@ class StringWithoutSpecialSymbols(TypeDecorator):
         self.__class__.__name__ = "String"
         super().__init__(*args, **kwargs)
 
-    def process_bind_param(self, value: Any, dialect: Any) -> Any:
-        if value:
-            if re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", value):
-                return value
-            raise ValueError("Object shouldn`t contain any special symbols or spaces")
-        return value
+    def process_bind_param(self, value: Any, dialect: Any) -> str:
+        if isinstance(value, str) and re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", value):
+            return value
+        raise ValueError("Object shouldn`t contain any special symbols or spaces")
 
     def process_result_value(self, value: Any, dialect: Any) -> Any:
         return value
