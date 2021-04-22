@@ -1,12 +1,28 @@
 import logging
+from typing import Any, Callable
 
+import flask
+import werkzeug as werkzeug
+from flask_admin import expose
 from flask_login import current_user
+from sqlalchemy.exc import StatementError
 from wtforms import Form, ValidationError
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 
 logger = logging.getLogger(__name__)
+
+
+def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[[Any], werkzeug.Response]:
+    def wrapper(obj: Any) -> werkzeug.Response:
+        try:
+            return function_view(obj)
+        except StatementError:
+            flask.flash("Unsupported symbols in tag name!")
+            return flask.redirect(flask.request.url)
+
+    return wrapper
 
 
 class TagsView(ModelViewConfigured):
@@ -33,3 +49,13 @@ class TagsView(ModelViewConfigured):
     def on_model_delete(self, model: db.Tags) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
             raise ValidationError("Only author or administrator could delete tags!")
+
+    @expose("/edit/", methods=("GET", "POST"))
+    @view_wrapper
+    def edit_view(self) -> Any:
+        return super().edit_view()
+
+    @expose("/new/", methods=("GET", "POST"))
+    @view_wrapper
+    def crate_view(self) -> Any:
+        return super().create_view()
