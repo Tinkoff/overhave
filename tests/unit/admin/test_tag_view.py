@@ -37,3 +37,7 @@ class TestTagView:
     ) -> None:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_delete(model=test_tags_row)
+
+    def test_tag_view_edit_view(self, test_tags_view: views.TagsView) -> None:
+        with pytest.raises(RuntimeError):
+            test_tags_view.edit_view()
