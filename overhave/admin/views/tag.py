@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[[Any], werkzeug.Response]:
-    def wrapper(self: Any) -> werkzeug.Response:
+    def wrapper(obj: Any) -> werkzeug.Response:
         try:
-            return function_view(self)
+            return function_view(obj)
         except StatementError:
             flask.flash("Unsupported symbols in tag name!")
             return flask.redirect(flask.request.url)
@@ -53,11 +53,9 @@ class TagsView(ModelViewConfigured):
     @expose("/edit/", methods=("GET", "POST"))
     @view_wrapper
     def edit_view(self) -> werkzeug.Response:
-        rendered: werkzeug.Response = super().edit_view()
-        return rendered
+        return super().edit_view()
 
     @expose("/new/", methods=("GET", "POST"))
     @view_wrapper
     def crate_view(self) -> werkzeug.Response:
-        rendered: werkzeug.Response = super().create_view()
-        return rendered
+        return super().create_view()
