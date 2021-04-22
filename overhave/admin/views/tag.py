@@ -52,10 +52,10 @@ class TagsView(ModelViewConfigured):
 
     @expose("/edit/", methods=("GET", "POST"))
     @view_wrapper
-    def edit_view(self) -> werkzeug.Response:
+    def edit_view(self) -> Any:
         return super().edit_view()
 
     @expose("/new/", methods=("GET", "POST"))
     @view_wrapper
-    def crate_view(self) -> werkzeug.Response:
+    def crate_view(self) -> Any:
         return super().create_view()
