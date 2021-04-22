@@ -39,11 +39,6 @@ class TestDraftStorage:
         new_test_draft: Optional[DraftModel] = test_draft_storage.get_draft(test_draft.id)
         assert new_test_draft is not None
         assert new_test_draft.pr_url == pr_url
-        assert new_test_draft.published_at.year == published_at.year
-        assert new_test_draft.published_at.month == published_at.month
-        assert new_test_draft.published_at.day == published_at.day
-        assert new_test_draft.published_at.hour == published_at.hour
-        assert new_test_draft.published_at.minute == published_at.minute
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_get_previous_feature_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
