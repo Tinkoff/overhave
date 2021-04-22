@@ -35,6 +35,6 @@ class TestStringWithoutSpecialSymbols:
         test_tags_factory(f"{faker.word()}_")
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
-    def test_correct_value_with_russian_letters(self, test_tags_factory: Callable[[str], None], faker: Faker):
+    def test_correct_value_with_russian_letters(self, test_tags_factory: Callable[[str], None], faker: Faker) -> None:
         test_tags_factory(f"{faker.word()}А")
         test_tags_factory(f"{faker.word()}ё")

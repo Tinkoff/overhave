@@ -138,7 +138,7 @@ def test_created_test_run_id(
 
 
 @pytest.fixture(scope="class")
-def test_draft_storage():
+def test_draft_storage() -> DraftStorage:
     return DraftStorage()
 
 
@@ -147,7 +147,7 @@ def test_draft(
     faker: Faker, test_feature: FeatureModel, test_created_test_run_id: int, test_system_user: SystemUserModel
 ) -> DraftModel:
     with db.create_session() as session:
-        draft = db.Draft(
+        draft: db.Draft = db.Draft(
             feature_id=test_feature.id,
             test_run_id=test_created_test_run_id,
             text=faker.word(),
