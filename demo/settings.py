@@ -5,6 +5,7 @@ from typing import Dict
 from pydantic import BaseSettings
 
 from overhave import (
+    OverhaveAdminSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveStashClientSettings,
@@ -24,6 +25,11 @@ class OverhaveDemoSettingsGenerator:
             language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES),
             file_settings=OverhaveFileSettings(root_dir=self.root_dir.as_posix()),
         )
+
+    def get_admin_context_settings(self, threadpool: bool) -> Dict[str, BaseSettings]:
+        settings: Dict[str, BaseSettings] = dict(admin_settings=OverhaveAdminSettings(consumer_based=not threadpool))
+        settings.update(self.default_context_settings)
+        return settings
 
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:

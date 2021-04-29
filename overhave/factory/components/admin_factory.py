@@ -1,5 +1,6 @@
 import abc
 from functools import cached_property
+from multiprocessing.pool import ThreadPool
 from typing import Any, Dict
 
 from overhave.entities import ReportManager
@@ -33,6 +34,11 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
     @property
     @abc.abstractmethod
     def report_manager(self) -> ReportManager:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def threadpool(self) -> ThreadPool:
         pass
 
 
@@ -71,3 +77,13 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
     @property
     def redis_producer(self) -> RedisProducer:
         return self._redis_producer
+
+    @cached_property
+    def _threadpool(self) -> ThreadPool:
+        if self.context.admin_settings.consumer_based:
+            raise RuntimeError("No threadpool when it's a consumer-based application!")
+        return ThreadPool(processes=self.context.admin_settings.threadpool_process_num)
+
+    @property
+    def threadpool(self) -> ThreadPool:
+        return self._threadpool

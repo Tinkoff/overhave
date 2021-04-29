@@ -13,6 +13,14 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     # Path to custom index template. By default, contains Overhave project info.
     index_template_path: Optional[Path]
 
+    # Enable testing with test execution consumer, based on Redis tasks. Enabled by default.
+    # When disabled - all test runs will be executed with :class:`Threadpool`.
+    # TODO: realise all other consumer actions with Threadpool for better customization.
+    consumer_based: bool = True
+
+    # Threadpool size for admin service
+    threadpool_process_num: int = 5
+
 
 class OverhaveAuthorizationSettings(BaseOverhavePrefix):
     """ Settings for Overhave authorization in components interface.

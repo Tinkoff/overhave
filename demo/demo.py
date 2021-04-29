@@ -21,15 +21,21 @@ def overhave_demo() -> None:
     pass
 
 
-def _run_demo_admin() -> None:
-    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.default_context_settings)  # type: ignore
+def _run_demo_admin(threadpool: bool = False) -> None:
+    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.get_admin_context_settings(threadpool))  # type: ignore
     overhave_admin_factory().set_context(context)
     _run_admin(port=8076, debug=True)
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")
-def admin() -> None:
-    _run_demo_admin()
+@click.option(
+    "-t",
+    "--threadpool",
+    is_flag=True,
+    help="Run Overhave admin without consumers, which produces tasks into Threadpool",
+)
+def admin(threadpool: bool) -> None:
+    _run_demo_admin(threadpool)
 
 
 def _run_demo_consumer(stream: OverhaveRedisStream) -> None:
