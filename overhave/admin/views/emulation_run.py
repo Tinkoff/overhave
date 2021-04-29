@@ -19,6 +19,7 @@ class EmulationRunView(ModelViewConfigured):
 
     can_view_details = True
     can_edit = False
+    can_create = False
     column_list = (
         "id",
         "emulation.name",
