@@ -8,7 +8,7 @@ import werkzeug
 
 from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app, get_flask_login_manager
-from overhave.factory import IAdminFactory
+from overhave.factory import IAdminFactory, get_publication_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import UniqueDraftCreationError
 from overhave.transport import PublicationData, PublicationTask
@@ -117,7 +117,11 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
                 "Requested publication contains scenario which identical to the previous version!", category="warning"
             )
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
-        if not factory.redis_producer.add_task(PublicationTask(data=PublicationData(draft_id=draft_id))):
+        if not factory.context.admin_settings.consumer_based:
+            factory.threadpool.apply_async(get_publication_factory().publisher.publish_version, args=(draft_id,))
+        if factory.context.admin_settings.consumer_based and not factory.redis_producer.add_task(
+            PublicationTask(data=PublicationData(draft_id=draft_id))
+        ):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
         return flask.redirect(flask.url_for("draft.details_view", id=draft_id))

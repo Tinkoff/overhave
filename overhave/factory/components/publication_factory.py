@@ -11,6 +11,11 @@ from overhave.transport import PublicationTask, StashHttpClient
 class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask], abc.ABC):
     """ Abstract factory for Overhave publication application. """
 
+    @property
+    @abc.abstractmethod
+    def publisher(self) -> IVersionPublisher:
+        pass
+
 
 class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPublicationFactory):
     """ Factory for Overhave publication application. """
@@ -22,7 +27,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         return StashHttpClient(settings=self.context.stash_client_settings)
 
     @cached_property
-    def _stash_publisher(self) -> IVersionPublisher:
+    def _stash_publisher(self) -> StashVersionPublisher:
         return StashVersionPublisher(
             file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,
@@ -35,5 +40,9 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             client=self._stash_client,
         )
 
+    @property
+    def publisher(self) -> IVersionPublisher:
+        return self._stash_publisher
+
     def process_task(self, task: PublicationTask) -> None:
-        return self._stash_publisher.publish_version(task)
+        return self._stash_publisher.process_publish_task(task)

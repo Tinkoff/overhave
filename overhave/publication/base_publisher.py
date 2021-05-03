@@ -5,6 +5,7 @@ from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.scenario import FileManager, generate_task_info
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
+from overhave.transport import PublicationTask
 
 
 class BaseVersionPublisherException(Exception):
@@ -43,6 +44,9 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         self._test_run_storage = test_run_storage
         self._draft_storage = draft_storage
         self._file_manager = file_manager
+
+    def process_publish_task(self, task: PublicationTask) -> None:
+        self.publish_version(task.data.draft_id)
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
         draft = self._draft_storage.get_draft(draft_id)

@@ -28,11 +28,19 @@ def _prepare_test_execution_factory() -> None:
     overhave_test_execution_factory().set_context(test_execution_context)
 
 
+def _prepare_publication_factory() -> None:
+    publication_context: OverhavePublicationContext = OverhavePublicationContext(
+        **_SETTINGS_GENERATOR.publication_settings  # type: ignore
+    )
+    overhave_publication_factory().set_context(publication_context)
+
+
 def _run_demo_admin(threadpool: bool = False) -> None:
     context = OverhaveAdminContext(**_SETTINGS_GENERATOR.get_admin_context_settings(threadpool))  # type: ignore
     overhave_admin_factory().set_context(context)
     if threadpool:
         _prepare_test_execution_factory()
+        _prepare_publication_factory()
     _run_admin(port=8076, debug=True)
 
 
@@ -51,10 +59,7 @@ def _run_demo_consumer(stream: OverhaveRedisStream) -> None:
     if stream is OverhaveRedisStream.TEST:
         _prepare_test_execution_factory()
     if stream is OverhaveRedisStream.PUBLICATION:
-        publication_context: OverhavePublicationContext = OverhavePublicationContext(
-            **_SETTINGS_GENERATOR.publication_settings  # type: ignore
-        )
-        overhave_publication_factory().set_context(publication_context)
+        _prepare_publication_factory()
     _run_consumer(stream=stream)
 
 

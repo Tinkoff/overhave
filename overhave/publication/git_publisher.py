@@ -40,7 +40,9 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
 
         branch = repository.create_head(name)
         logger.info("Created head for branch: %s", branch)
-        assert repository.active_branch != branch
+        assert (
+            repository.active_branch != branch
+        ), f"Active branch '{repository.active_branch.name}' is not '{branch.name}'!"
         return branch
 
     def _create_commit_and_push(self, context: PublisherContext, repository: git.Repo, target_branch: git.Head) -> None:
@@ -90,6 +92,7 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
 
     def _push_version(self, draft_id: int) -> Optional[PublisherContext]:
         try:
+            logger.debug("Initialize git repository in '%s'...", self._file_settings.features_dir)
             repository = git.Repo(self._file_settings.features_dir)
             logger.info("Repository: %s", repository)
             logger.info("Working dir: %s", repository.working_dir)
@@ -99,6 +102,8 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
             git_branch = self._create_head(repository=repository, name=ctx.target_branch)
             self._create_commit_and_push(context=ctx, repository=repository, target_branch=git_branch)
             return ctx
+        except git.InvalidGitRepositoryError:
+            logger.exception("Error while trying to initialize git repository!")
         except (git.GitCommandError, BaseGitVersionPublisherError):
             logger.exception("Error while trying to push scenario version!")
-            return None
+        return None
