@@ -10,7 +10,7 @@ python-versions = "*"
 name = "alchemy-mock"
 version = "0.4.3"
 description = "SQLAlchemy mock helpers."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1765,7 +1765,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "b4110068985b56df29c31ca6ace259241f6526a1e1bf56ec824edd6bcd2dd94a"
+content-hash = "293b9e1139dd572ddd1c01b5cc45d32eb60b2cd2f1893b92de617a22fabd8994"
 
 [metadata.files]
 alabaster = [
