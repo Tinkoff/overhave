@@ -1006,7 +1006,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pygments"
-version = "2.8.1"
+version = "2.9.0"
 description = "Pygments is a syntax highlighting package written in Python."
 category = "dev"
 optional = false
@@ -1470,21 +1470,6 @@ postgresql_psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql (<1)", "pymysql"]
 
 [[package]]
-name = "sqlalchemy-diff"
-version = "0.1.5"
-description = "Compare two database schemas using sqlalchemy."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-sqlalchemy-utils = ">=0.32.4"
-
-[package.extras]
-dev = ["mysql-connector-python-rf (==2.2.2)", "pytest (==6.2.2)", "pylint (==2.7.2)", "flake8 (==3.8.4)", "coverage (==5.5)"]
-docs = ["sphinx (==1.4.1)"]
-
-[[package]]
 name = "sqlalchemy-utc"
 version = "0.10.0"
 description = "SQLAlchemy type to store aware datetime values"
@@ -1780,7 +1765,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "02f6faedafee0deb4fa723bf58f98955dd42d140d4e37f41bd70df006d8e5e6b"
+content-hash = "321d2114e31fdce4b2c880f8657c2ad92d98d084e42f701270f6a7f0f89420bd"
 
 [metadata.files]
 alabaster = [
@@ -2420,8 +2405,8 @@ pyflakes = [
     {file = "pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db"},
 ]
 pygments = [
-    {file = "Pygments-2.8.1-py3-none-any.whl", hash = "sha256:534ef71d539ae97d4c3a4cf7d6f110f214b0e687e92f9cb9d2a3b0d3101289c8"},
-    {file = "Pygments-2.8.1.tar.gz", hash = "sha256:2656e1a6edcdabf4275f9a3640db59fd5de107d88e8663c5d4e9a0fa62f77f94"},
+    {file = "Pygments-2.9.0-py3-none-any.whl", hash = "sha256:d66e804411278594d764fc69ec36ec13d9ae9147193a1740cd34d272ca383b8e"},
+    {file = "Pygments-2.9.0.tar.gz", hash = "sha256:a18f47b506a429f6f4b9df81bb02beab9ca21d0a5fee38ed15aef65f0545519f"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
@@ -2652,10 +2637,6 @@ sqlalchemy = [
     {file = "SQLAlchemy-1.3.23-cp39-cp39-win32.whl", hash = "sha256:94208867f34e60f54a33a37f1c117251be91a47e3bfdb9ab8a7847f20886ad06"},
     {file = "SQLAlchemy-1.3.23-cp39-cp39-win_amd64.whl", hash = "sha256:f4d972139d5000105fcda9539a76452039434013570d6059993120dc2a65e447"},
     {file = "SQLAlchemy-1.3.23.tar.gz", hash = "sha256:6fca33672578666f657c131552c4ef8979c1606e494f78cd5199742dfb26918b"},
-]
-sqlalchemy-diff = [
-    {file = "sqlalchemy-diff-0.1.5.tar.gz", hash = "sha256:2a3d4de3cb7580876789a7da25040ae5b827c7a70ee4e733daef1ab68aad0e72"},
-    {file = "sqlalchemy_diff-0.1.5-py3-none-any.whl", hash = "sha256:8b618238de87e0062b025b0ff2cb4f9928ddddb64a5bb50bd407cd06b9543314"},
 ]
 sqlalchemy-utc = [
     {file = "SQLAlchemy-Utc-0.10.0.tar.gz", hash = "sha256:fed53af37d250168b99eba8f9908a50e34e10dab3c32d38df3e65601ac951baf"},
