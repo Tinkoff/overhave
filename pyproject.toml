@@ -60,6 +60,7 @@ boto3 = "^1.17.16"
 boto3-type-annotations = "^0.3.1"
 SQLAlchemy-Utils = "^0.36.8"
 transliterate = "^1.10.2"
+GitPython = "^3.1.15"
 
 
 [tool.poetry.dev-dependencies]
@@ -69,7 +70,6 @@ requests_mock = "*"
 flake8-docstrings = "^1.5"
 pytest-faker = "^2.0"
 mypy = "^0.812"
-gitpython = "^3.0.5"
 filelock = "*"
 pytest-bdd = "^4.0.2"
 pytest = "^6.1.2"
