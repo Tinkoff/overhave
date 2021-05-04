@@ -10,7 +10,7 @@ python-versions = "*"
 name = "alchemy-mock"
 version = "0.4.3"
 description = "SQLAlchemy mock helpers."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1587,7 +1587,7 @@ telegram = ["requests"]
 name = "transliterate"
 version = "1.10.2"
 description = "Bi-directional transliterator for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1762,7 +1762,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "6f7362df33b343548a8423161f2f386397327e15aee05726fb19809375f7a287"
+content-hash = "09637321a6682a5824d336ecc894f72a0aba3e4c955521fda43e9c89070c7113"
 
 [metadata.files]
 alabaster = [
