@@ -1467,21 +1467,6 @@ postgresql_psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql (<1)", "pymysql"]
 
 [[package]]
-name = "sqlalchemy-diff"
-version = "0.1.5"
-description = "Compare two database schemas using sqlalchemy."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-sqlalchemy-utils = ">=0.32.4"
-
-[package.extras]
-dev = ["mysql-connector-python-rf (==2.2.2)", "pytest (==6.2.2)", "pylint (==2.7.2)", "flake8 (==3.8.4)", "coverage (==5.5)"]
-docs = ["sphinx (==1.4.1)"]
-
-[[package]]
 name = "sqlalchemy-utc"
 version = "0.10.0"
 description = "SQLAlchemy type to store aware datetime values"
@@ -1777,7 +1762,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "37ceb8504fe7a1974cfa6b41333d82ee3f7dd7150e45a038571403d1167e1502"
+content-hash = "6f7362df33b343548a8423161f2f386397327e15aee05726fb19809375f7a287"
 
 [metadata.files]
 alabaster = [
@@ -2646,10 +2631,6 @@ sqlalchemy = [
     {file = "SQLAlchemy-1.3.23-cp39-cp39-win32.whl", hash = "sha256:94208867f34e60f54a33a37f1c117251be91a47e3bfdb9ab8a7847f20886ad06"},
     {file = "SQLAlchemy-1.3.23-cp39-cp39-win_amd64.whl", hash = "sha256:f4d972139d5000105fcda9539a76452039434013570d6059993120dc2a65e447"},
     {file = "SQLAlchemy-1.3.23.tar.gz", hash = "sha256:6fca33672578666f657c131552c4ef8979c1606e494f78cd5199742dfb26918b"},
-]
-sqlalchemy-diff = [
-    {file = "sqlalchemy-diff-0.1.5.tar.gz", hash = "sha256:2a3d4de3cb7580876789a7da25040ae5b827c7a70ee4e733daef1ab68aad0e72"},
-    {file = "sqlalchemy_diff-0.1.5-py3-none-any.whl", hash = "sha256:8b618238de87e0062b025b0ff2cb4f9928ddddb64a5bb50bd407cd06b9543314"},
 ]
 sqlalchemy-utc = [
     {file = "SQLAlchemy-Utc-0.10.0.tar.gz", hash = "sha256:fed53af37d250168b99eba8f9908a50e34e10dab3c32d38df3e65601ac951baf"},
