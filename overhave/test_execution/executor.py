@@ -13,28 +13,32 @@ from overhave.transport import TestRunTask
 logger = logging.getLogger(__name__)
 
 
-class ITestExecutionManager(abc.ABC):
-    """ Abstract class for test execution management. """
+class ITestExecutor(abc.ABC):
+    """ Abstract class for test execution. """
 
     @abc.abstractmethod
-    def execute_test(self, task: TestRunTask) -> None:
+    def execute_test(self, test_run_id: int) -> None:
+        pass
+
+    @abc.abstractmethod
+    def process_test_task(self, task: TestRunTask) -> None:
         pass
 
 
-class BaseTestExecutionManagerException(Exception):
+class BaseTestExecutionException(Exception):
     """ Base exception for :class:`TestExecutionManager`. """
 
 
-class TestRunNotExistsError(BaseTestExecutionManagerException):
+class TestRunNotExistsError(BaseTestExecutionException):
     """ Exception for situation with not existing TestRun. """
 
 
-class ScenarioNotExistsError(BaseTestExecutionManagerException):
+class ScenarioNotExistsError(BaseTestExecutionException):
     """ Exception for situation with not existing Scenario. """
 
 
-class TestExecutionManager(ITestExecutionManager):
-    """ Class for test execution management. """
+class TestExecutor(ITestExecutor):
+    """ Class for test execution. """
 
     def __init__(
         self,
@@ -69,8 +73,7 @@ class TestExecutionManager(ITestExecutionManager):
         feature = self._feature_storage.get_feature(scenario.feature_id)
         return TestExecutorContext(feature=feature, scenario=scenario, test_run=test_run,)
 
-    def execute_test(self, task: TestRunTask) -> None:
-        test_run_id = task.data.test_run_id
+    def execute_test(self, test_run_id: int) -> None:
         self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.RUNNING)
         ctx = self._compile_context(test_run_id)
 
@@ -93,3 +96,6 @@ class TestExecutionManager(ITestExecutionManager):
                 run_id=test_run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
             )
         self._report_manager.create_allure_report(test_run_id=test_run_id, results_dir=results_dir)
+
+    def process_test_task(self, task: TestRunTask) -> None:
+        self.execute_test(test_run_id=task.data.test_run_id)

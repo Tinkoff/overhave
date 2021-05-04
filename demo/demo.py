@@ -21,28 +21,45 @@ def overhave_demo() -> None:
     pass
 
 
-def _run_demo_admin() -> None:
-    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.default_context_settings)  # type: ignore
+def _prepare_test_execution_factory() -> None:
+    test_execution_context: OverhaveTestExecutionContext = OverhaveTestExecutionContext(
+        **_SETTINGS_GENERATOR.default_context_settings  # type: ignore
+    )
+    overhave_test_execution_factory().set_context(test_execution_context)
+
+
+def _prepare_publication_factory() -> None:
+    publication_context: OverhavePublicationContext = OverhavePublicationContext(
+        **_SETTINGS_GENERATOR.publication_settings  # type: ignore
+    )
+    overhave_publication_factory().set_context(publication_context)
+
+
+def _run_demo_admin(threadpool: bool = False) -> None:
+    context = OverhaveAdminContext(**_SETTINGS_GENERATOR.get_admin_context_settings(threadpool))  # type: ignore
     overhave_admin_factory().set_context(context)
+    if threadpool:
+        _prepare_test_execution_factory()
+        _prepare_publication_factory()
     _run_admin(port=8076, debug=True)
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")
-def admin() -> None:
-    _run_demo_admin()
+@click.option(
+    "-t",
+    "--threadpool",
+    is_flag=True,
+    help="Run Overhave admin without consumers, which produces tasks into Threadpool",
+)
+def admin(threadpool: bool) -> None:
+    _run_demo_admin(threadpool)
 
 
 def _run_demo_consumer(stream: OverhaveRedisStream) -> None:
     if stream is OverhaveRedisStream.TEST:
-        test_execution_context: OverhaveTestExecutionContext = OverhaveTestExecutionContext(
-            **_SETTINGS_GENERATOR.default_context_settings  # type: ignore
-        )
-        overhave_test_execution_factory().set_context(test_execution_context)
+        _prepare_test_execution_factory()
     if stream is OverhaveRedisStream.PUBLICATION:
-        publication_context: OverhavePublicationContext = OverhavePublicationContext(
-            **_SETTINGS_GENERATOR.publication_settings  # type: ignore
-        )
-        overhave_publication_factory().set_context(publication_context)
+        _prepare_publication_factory()
     _run_consumer(stream=stream)
 
 

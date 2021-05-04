@@ -7,7 +7,7 @@ import py
 import pytest
 import sqlalchemy_utils as sau
 from _pytest.python import Metafunc
-from pytest_mock import MockFixture
+from pytest_mock import MockerFixture
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import close_all_sessions
 
@@ -90,7 +90,7 @@ def clean_proxy_manager() -> Callable[[], IProxyManager]:
 
 
 @pytest.fixture()
-def mocked_context(session_mocker: MockFixture, tmpdir: py.path.local) -> BaseFactoryContext:
+def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> BaseFactoryContext:
     context_mock = session_mocker.MagicMock()
     context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False

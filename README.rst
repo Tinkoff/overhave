@@ -161,6 +161,17 @@ provides a CLI entrypoints for easy server run in debug mode:
     overhave-demo admin  # start Overhave admin on port 8076 in debug mode
     overhave-demo consumer -s TEST  # start Overhave test execution consumer
 
+**Note**: you could run admin in special mode, which does not require
+consumers. This mode uses *threadpool* for running testing and publication
+tasks asynchronously:
+
+.. code-block:: shell
+
+    overhave-demo admin --threadpool
+
+But this *threadpool* mode is unscalable in *kubernetes* paradigm. So,
+it's highly recommended to use corresponding consumers exactly.
+
 Command-line interface
 ----------------------
 

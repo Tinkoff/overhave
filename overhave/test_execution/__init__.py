@@ -1,5 +1,5 @@
 # flake8: noqa
-from .execution_manager import ITestExecutionManager, TestExecutionManager
+from .executor import ITestExecutor, TestExecutor
 from .settings import OverhaveProjectSettings, OverhaveTestSettings
 from .step_collector import StepCollector
 from .test_runner import PytestRunner

@@ -15,7 +15,7 @@ from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import get_admin_factory
+from overhave.factory import get_admin_factory, get_test_execution_factory
 from overhave.transport import TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
@@ -142,7 +142,11 @@ class FeatureView(ModelViewConfigured):
             flask.flash("Scenario does not exist, so could not run test.", category="error")
             return rendered
         test_run_id = factory.test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=current_user.login)
-        if not factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id))):
+        if not factory.context.admin_settings.consumer_based:
+            factory.threadpool.apply_async(get_test_execution_factory().test_executor.execute_test, args=(test_run_id,))
+        if factory.context.admin_settings.consumer_based and not factory.redis_producer.add_task(
+            TestRunTask(data=TestRunData(test_run_id=test_run_id))
+        ):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return rendered
         logger.debug("Redirect to TestRun details view with test_run_id='%s'...", test_run_id)

@@ -9,7 +9,6 @@ from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport import (
-    PublicationTask,
     StashBranch,
     StashErrorResponse,
     StashHttpClient,
@@ -71,8 +70,8 @@ class StashVersionPublisher(GitVersionPublisher):
             opened=True,
         )
 
-    def publish_version(self, task: PublicationTask) -> None:
-        draft_id = task.data.draft_id
+    def publish_version(self, draft_id: int) -> None:
+        logger.info("Start processing draft_id=%s...", draft_id)
         context = self._push_version(draft_id)
         if not isinstance(context, PublisherContext):
             return
