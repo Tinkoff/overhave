@@ -18,7 +18,7 @@ def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[
     def wrapper(obj: Any) -> werkzeug.Response:
         try:
             return function_view(obj)
-        except StatementError:
+        except (ValueError, StatementError):
             flask.flash("Unsupported symbols in tag name!")
             return flask.redirect(flask.request.url)
 
