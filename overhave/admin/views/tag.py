@@ -1,11 +1,11 @@
 import logging
+import re
 from typing import Any, Callable
 
 import flask
 import werkzeug as werkzeug
 from flask_admin import expose
 from flask_login import current_user
-from sqlalchemy.exc import StatementError
 from wtforms import Form, ValidationError
 
 from overhave import db
@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 
 def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[[Any], werkzeug.Response]:
     def wrapper(obj: Any) -> werkzeug.Response:
-        try:
+        data = flask.request.form
+        tag = data.get("value")
+        if not tag or re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
             return function_view(obj)
-        except (ValueError, StatementError):
-            flask.flash("Unsupported symbols in tag name!")
-            return flask.redirect(flask.request.url)
+        flask.flash("Unsupported symbols in tag name!")
+        return flask.redirect(flask.request.url)
 
     return wrapper
 
