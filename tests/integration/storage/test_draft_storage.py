@@ -41,6 +41,8 @@ class TestDraftStorage:
         assert new_test_draft.pr_url == pr_url
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
-    def test_get_previous_feature_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
+    def test_get_previous_feature_draft_with_error(
+        self, test_draft_storage: DraftStorage, test_draft: DraftModel
+    ) -> None:
         with pytest.raises(NullableDraftsError):
             test_draft_storage.get_previous_feature_draft(test_draft.feature_id)
