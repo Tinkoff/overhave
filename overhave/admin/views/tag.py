@@ -1,10 +1,6 @@
 import logging
 import re
-from typing import Any, Callable
 
-import flask
-import werkzeug as werkzeug
-from flask_admin import expose
 from flask_login import current_user
 from wtforms import Form, ValidationError
 
@@ -12,18 +8,6 @@ from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 
 logger = logging.getLogger(__name__)
-
-
-def view_wrapper(function_view: Callable[[Any], werkzeug.Response]) -> Callable[[Any], werkzeug.Response]:
-    def wrapper(obj: Any) -> werkzeug.Response:
-        data = flask.request.form
-        tag = data.get("value")
-        if not tag or re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
-            return function_view(obj)
-        flask.flash("Unsupported symbols in tag name!")
-        return flask.redirect(flask.request.url)
-
-    return wrapper
 
 
 class TagsView(ModelViewConfigured):
@@ -46,17 +30,10 @@ class TagsView(ModelViewConfigured):
                 return
             raise ValidationError("Only tag creator or administrator could edit it!")
         model.created_by = current_user.login
+        tag = form.get("value")
+        if tag and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
+            raise ValidationError("Unsupported symbols in tag name!")
 
     def on_model_delete(self, model: db.Tags) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
             raise ValidationError("Only author or administrator could delete tags!")
-
-    @expose("/edit/", methods=("GET", "POST"))
-    @view_wrapper
-    def edit_view(self) -> Any:
-        return super().edit_view()
-
-    @expose("/new/", methods=("GET", "POST"))
-    @view_wrapper
-    def crate_view(self) -> Any:
-        return super().create_view()
