@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from faker import Faker
 from wtforms import ValidationError
 
 from overhave import db
@@ -10,13 +9,6 @@ from overhave.admin import views
 
 class TestTagView:
     """ Unit tests for TagsView. """
-
-    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
-    def test_get_tag_created_by(
-        self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, test_tags_row: db.Tags, faker: Faker
-    ) -> None:
-        test_tags_view.on_model_change(form={"value": faker.word()}, model=test_tags_row, is_created=True)
-        assert test_tags_row.created_by == current_user_mock.login
 
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_get_tag_created_not_change(
@@ -38,10 +30,3 @@ class TestTagView:
     ) -> None:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_delete(model=test_tags_row)
-
-    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
-    def test_incorrect_tag_raises_error(
-        self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, test_tags_row: db.Tags
-    ) -> None:
-        with pytest.raises(ValidationError):
-            test_tags_view.on_model_change(form={"value": "@!# "}, model=test_tags_row, is_created=True)

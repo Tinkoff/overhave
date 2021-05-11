@@ -1,6 +1,7 @@
 import logging
 import re
 
+import flask
 from flask_login import current_user
 from wtforms import Form, ValidationError
 
@@ -30,7 +31,7 @@ class TagsView(ModelViewConfigured):
                 return
             raise ValidationError("Only tag creator or administrator could edit it!")
         model.created_by = current_user.login
-        tag = form.get("value")
+        tag = flask.request.form.get("value")
         if tag and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
             raise ValidationError("Unsupported symbols in tag name!")
 
