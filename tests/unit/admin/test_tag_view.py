@@ -53,7 +53,8 @@ class TestTagView:
         test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
         assert test_tags_row.created_by == current_user_mock.login
 
-    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
+    @pytest.mark.parametrize("value", ["Дайте танк (!)", "Заказ суши и роллов +79533830551", "k$ek", "@", "(*"])
     def test_incorrect_tag_raises_error(
         self,
         test_tags_view: views.TagsView,
@@ -61,7 +62,8 @@ class TestTagView:
         test_tags_row: db.Tags,
         faker: Faker,
         form_mock: mock.MagicMock,
+        value: str,
     ) -> None:
-        form_mock.data["value"] = f"{faker.word()}! "
+        form_mock.data["value"] = value
         with pytest.raises(ValidationError):
             test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
