@@ -1,7 +1,6 @@
 import logging
 import re
 
-import flask
 from flask_login import current_user
 from wtforms import Form, ValidationError
 
@@ -26,14 +25,14 @@ class TagsView(ModelViewConfigured):
     form_excluded_columns = ("created_at",)
 
     def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
+        tag = form.data.get("value")
+        if tag and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
+            raise ValidationError("Unsupported symbols in tag name!")
         if not is_created:
             if current_user.login == model.created_by or current_user.role == db.Role.admin:
                 return
             raise ValidationError("Only tag creator or administrator could edit it!")
         model.created_by = current_user.login
-        tag = flask.request.form.get("value")
-        if tag and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
-            raise ValidationError("Unsupported symbols in tag name!")
 
     def on_model_delete(self, model: db.Tags) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):

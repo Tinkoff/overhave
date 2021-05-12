@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from faker import Faker
 from wtforms import ValidationError
 
 from overhave import db
@@ -12,17 +13,25 @@ class TestTagView:
 
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_get_tag_created_not_change(
-        self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, test_tags_row: db.Tags
+        self,
+        test_tags_view: views.TagsView,
+        current_user_mock: mock.MagicMock,
+        test_tags_row: db.Tags,
+        form_mock: mock.MagicMock,
     ) -> None:
-        test_tags_view.on_model_change(form=mock.MagicMock(), model=test_tags_row, is_created=False)
+        test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
         assert test_tags_row.created_by is None
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_created_error(
-        self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, test_tags_row: db.Tags
+        self,
+        test_tags_view: views.TagsView,
+        current_user_mock: mock.MagicMock,
+        test_tags_row: db.Tags,
+        form_mock: mock.MagicMock,
     ) -> None:
         with pytest.raises(ValidationError):
-            test_tags_view.on_model_change(form=mock.MagicMock(), model=test_tags_row, is_created=False)
+            test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_delete_error(
@@ -30,3 +39,29 @@ class TestTagView:
     ) -> None:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_delete(model=test_tags_row)
+
+    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
+    def test_get_tag_created_by(
+        self,
+        test_tags_view: views.TagsView,
+        current_user_mock: mock.MagicMock,
+        test_tags_row: db.Tags,
+        faker: Faker,
+        form_mock: mock.MagicMock,
+    ) -> None:
+        form_mock.data["value"] = faker.word()
+        test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
+        assert test_tags_row.created_by == current_user_mock.login
+
+    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
+    def test_incorrect_tag_raises_error(
+        self,
+        test_tags_view: views.TagsView,
+        current_user_mock: mock.MagicMock,
+        test_tags_row: db.Tags,
+        faker: Faker,
+        form_mock: mock.MagicMock,
+    ) -> None:
+        form_mock.data["value"] = f"{faker.word()}! "
+        with pytest.raises(ValidationError):
+            test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
