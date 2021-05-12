@@ -40,7 +40,7 @@ class TestTagView:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_delete(model=test_tags_row)
 
-    @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_get_tag_created_by(
         self,
         test_tags_view: views.TagsView,

@@ -26,7 +26,7 @@ class TagsView(ModelViewConfigured):
 
     def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
         tag = form.data.get("value")
-        if tag and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
+        if tag is not None and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
             raise ValidationError("Unsupported symbols in tag name!")
         if not is_created:
             if current_user.login == model.created_by or current_user.role == db.Role.admin:
