@@ -116,3 +116,10 @@ def test_tags_view() -> views.TagsView:
 @pytest.fixture()
 def test_tags_row() -> db.Tags:
     return db.Tags()
+
+
+@pytest.fixture()
+def form_mock() -> mock.MagicMock:
+    form_mock = mock.MagicMock()
+    form_mock.data = {}
+    return form_mock
