@@ -166,12 +166,12 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
             return [int(x.strip()) for x in v.split(",")]
         return v
 
-    def get_emulation_url(self, port: str) -> URL:
+    def get_emulation_url(self, port: str) -> str:
         if isinstance(self.emulation_service_mount, str):
             return (
                 self.emulation_service_url / self.emulation_service_mount / port / ""
-            )  # NGINX should redirect to `service:port` by mount point and specified port
-        return self.emulation_service_url.with_port(int(port))  # only for local debug
+            ).human_repr()  # NGINX should redirect to `service:port` by mount point and specified port
+        return self.emulation_service_url.with_port(int(port)).human_repr()  # only for local debug
 
     @property
     def wait_timeout_seconds(self) -> int:

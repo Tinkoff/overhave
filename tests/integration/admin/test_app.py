@@ -43,6 +43,10 @@ class TestAppCommon:
         )
         assert response.status_code == HTTPStatus.FOUND
 
+    def test_app_get_emulation_run(self, test_app: OverhaveAdminApp, test_client: FlaskClient) -> None:
+        response: Response = test_client.get("http://localhost/emulations/kek:8000")
+        assert response.status_code == HTTPStatus.FOUND
+
 
 class TestAppReport:
     """ Integration tests for OverhaveApp::get_report. """
