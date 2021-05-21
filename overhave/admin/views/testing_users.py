@@ -30,7 +30,7 @@ class TestUserView(ModelViewConfigured):
     can_view_details = False
     column_list = ["id", "name", "feature_type", "specification", "created_by"]
     column_searchable_list = ["name", "created_by"]
-    form_excluded_columns = "created_at"
+    form_excluded_columns = ("created_at", "emulations")
     form_overrides = dict(specification=JSONField)
 
     form_extra_fields = {"template": JSONField("Specification format")}

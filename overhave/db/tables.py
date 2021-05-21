@@ -151,7 +151,7 @@ class Emulation(BaseTable, PrimaryKeyMixin):
     test_user_id = sa.Column(INT_TYPE, sa.ForeignKey(TestUser.id), nullable=False, doc="Test user ID")
     command = sa.Column(TEXT_TYPE, nullable=False, doc="Command for emulator's execution")
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
-    test_user = so.relationship(TestUser)
+    test_user = so.relationship(TestUser, backref=so.backref("emulations", cascade="all, delete-orphan"))
 
 
 class EmulationRun(BaseTable, PrimaryKeyMixin):
