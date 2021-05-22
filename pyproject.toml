@@ -52,7 +52,6 @@ walrus = "^0.8.0"
 docker = "*"
 pydantic-sqlalchemy = "^0.0.6"
 sqlalchemy-utc = "0.10.0"
-Jinja2 = "^2.11.2"
 httptools = "^0.1.1"
 python-dateutil = "^2.8.1"
 alembic = "^1.4.3"
@@ -61,6 +60,7 @@ boto3-type-annotations = "^0.3.1"
 SQLAlchemy-Utils = "^0.37.0"
 transliterate = "^1.10.2"
 GitPython = "^3.1.15"
+Flask = "^2.0.1"
 
 
 [tool.poetry.dev-dependencies]
