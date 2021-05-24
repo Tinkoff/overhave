@@ -4,7 +4,7 @@ from .models import (
     GitlabBranch,
     GitlabErrorResponse,
     GitlabMrRequest,
-    GitlabPrCreationResponse,
+    GitlabMrCreationResponse,
     GitlabProject,
     GitlabRepository,
     GitlabReviewer,
