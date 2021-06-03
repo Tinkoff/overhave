@@ -1592,17 +1592,6 @@ notebook = ["ipywidgets (>=6)"]
 telegram = ["requests"]
 
 [[package]]
-name = "transliterate"
-version = "1.10.2"
-description = "Bi-directional transliterator for Python"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-six = ">=1.1.0"
-
-[[package]]
 name = "twine"
 version = "3.3.0"
 description = "Collection of utilities for publishing packages on PyPI"
@@ -1766,7 +1755,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "c63a688f517f487d538f6e09dab8b4a7a707176133ddaf103714f3548fd71634"
+content-hash = "568c2ba6601f74dd0cfebd0c9516b81814a43750fe0ea1f76823f5032837e234"
 
 [metadata.files]
 alabaster = [
@@ -2652,10 +2641,6 @@ tox = [
 tqdm = [
     {file = "tqdm-4.60.0-py2.py3-none-any.whl", hash = "sha256:daec693491c52e9498632dfbe9ccfc4882a557f5fa08982db1b4d3adbe0887c3"},
     {file = "tqdm-4.60.0.tar.gz", hash = "sha256:ebdebdb95e3477ceea267decfc0784859aa3df3e27e22d23b83e9b272bf157ae"},
-]
-transliterate = [
-    {file = "transliterate-1.10.2-py2.py3-none-any.whl", hash = "sha256:010a5021bf6021689c4fade0985f3f7b3db1f2f16a48a09a56797f171c08ed42"},
-    {file = "transliterate-1.10.2.tar.gz", hash = "sha256:bc608e0d48e687db9c2b1d7ea7c381afe0d1849cad216087d8e03d8d06a57c85"},
 ]
 twine = [
     {file = "twine-3.3.0-py3-none-any.whl", hash = "sha256:2f6942ec2a17417e19d2dd372fc4faa424c87ee9ce49b4e20c427eb00a0f3f41"},
