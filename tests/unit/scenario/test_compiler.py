@@ -3,7 +3,7 @@ from typing import List, Optional
 import pytest
 
 from overhave.entities import FeatureModel, OverhaveLanguageSettings, ScenarioModel, TestExecutorContext
-from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+from overhave.extra import RUSSIAN_PREFIXES
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 
 
@@ -28,11 +28,7 @@ class TestGenerateTaskInfo:
 
 @pytest.mark.parametrize("task_links_keyword", [None, "Tasks"])
 @pytest.mark.parametrize(
-    "language_settings",
-    [
-        OverhaveLanguageSettings(),
-        OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES, translit_pack=RUSSIAN_TRANSLIT_PACK),
-    ],
+    "language_settings", [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
 )
 class TestScenarioCompiler:
     """ Unit tests for :class:`ScenarioCompiler`. """

@@ -81,14 +81,16 @@ class FeatureView(ModelViewConfigured):
         "name",
         "task",
         "author",
+        "file_path",
         "last_edited_by",
         "feature_tags.value",
     ]
     column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
     column_sortable_list = ("id", "name", "author", "last_edited_by")
-    column_labels = {"feature_tags.value": "Tags"}
+    column_labels = {"file_path": "File path", "feature_tags.value": "Tags"}
 
     _task_pattern = re.compile(r"\w+[-]\d+")
+    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\]+$")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -103,8 +105,17 @@ class FeatureView(ModelViewConfigured):
                 "Supported: <PROJECT>-<NUMBER>, for example 'PRJ-1234'."
             )
 
+    @classmethod
+    def _validate_file_path(cls, file_path: str) -> None:
+        if not cls._file_path_pattern.match(file_path):
+            raise ValidationError(
+                f"Incorrect format of file path specification: '{file_path}'! "
+                f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder/my_filename'."
+            )
+
     def on_model_change(self, form, model, is_created) -> None:  # type: ignore
         self._validate_tasks(model.task)
+        self._validate_file_path(model.file_path)
         if is_created:
             model.author = current_user.login
         model.last_edited_by = current_user.login

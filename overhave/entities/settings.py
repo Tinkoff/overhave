@@ -6,7 +6,7 @@ from pydantic.datetime_parse import timedelta
 from yarl import URL
 
 from overhave.base_settings import BaseOverhavePrefix
-from overhave.entities.language import StepPrefixesModel, TranslitPack
+from overhave.entities.language import StepPrefixesModel
 
 
 class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
@@ -25,7 +25,6 @@ class OverhaveLanguageSettings(BaseOverhavePrefix):
     """ Settings for language definitions. """
 
     step_prefixes: Optional[StepPrefixesModel]
-    translit_pack: Optional[TranslitPack]
 
 
 class OverhaveFileSettings(BaseOverhavePrefix):

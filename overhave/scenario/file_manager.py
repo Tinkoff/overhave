@@ -3,7 +3,6 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
 from overhave.entities import IFeatureExtractor, OverhaveFileSettings, OverhaveLanguageSettings, TestExecutorContext
 from overhave.scenario.compiler import ScenarioCompiler
@@ -16,7 +15,7 @@ class FileSavingMixin:
     """ Mixin for files saving. """
 
     @staticmethod
-    def _write_data(file: Any, data: str, entity_name: str) -> None:
+    def _write_data(file: tempfile._TemporaryFileWrapper, data: str, entity_name: str) -> None:  # type: ignore
         file.write(data)
         file.flush()
         logger.debug("Generated %s file: '%s'", entity_name, file.name)
@@ -44,15 +43,9 @@ class FileManager(FileSavingMixin):
         self._feature_extractor = feature_extractor
         self._scenario_compiler = scenario_compiler
 
-    def _compile_feature_file_name_prefix(self, context: TestExecutorContext) -> str:
-        feature_name = context.feature.name
-        if self._language_settings.translit_pack is not None:
-            feature_name = self._language_settings.translit_pack.translate(feature_name)
-        return self._get_feature_name(feature_name=feature_name, feature_id=context.feature.id)
-
     @contextmanager
     def tmp_feature_file(self, context: TestExecutorContext) -> Iterator:  # type: ignore
-        run_prefix = self._compile_feature_file_name_prefix(context)
+        run_prefix = self._get_feature_name(feature_name=context.feature.name, feature_id=context.feature.id)
         logger.debug("Feature prefix: '%s'", run_prefix)
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_features_dir,
@@ -66,7 +59,9 @@ class FileManager(FileSavingMixin):
             yield file
 
     @contextmanager
-    def tmp_fixture_file(self, context: TestExecutorContext, feature_file: Any) -> Iterator:  # type: ignore
+    def tmp_fixture_file(
+        self, context: TestExecutorContext, feature_file: tempfile._TemporaryFileWrapper  # type: ignore
+    ) -> Iterator[tempfile._TemporaryFileWrapper]:  # type: ignore
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_fixtures_dir,
             prefix=f"{context.test_run.id}_",
@@ -83,7 +78,10 @@ class FileManager(FileSavingMixin):
     def produce_feature_file(self, context: TestExecutorContext) -> Path:
         feature_file_path: Path = (
             self._feature_extractor.feature_type_to_dir_mapping[context.feature.feature_type.name]
-            / f"{self._compile_feature_file_name_prefix(context)}{self._file_settings.feature_suffix}"
+            / (
+                f"{self._get_feature_name(feature_name=context.feature.name, feature_id=context.feature.id)}"
+                f"{self._file_settings.feature_suffix}"
+            )
         )
         if not feature_file_path.exists():
             logger.info("Create feature file '%s' for commit", feature_file_path.as_posix())

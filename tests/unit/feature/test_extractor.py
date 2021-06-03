@@ -34,5 +34,5 @@ class TestFeatureExtractor:
     ) -> None:
         assert set(test_feature_extractor.feature_types) == {feature.type for feature in test_feature_containers}
         assert test_feature_extractor.feature_type_to_dir_mapping == {
-            feature.type: feature.path.parent for feature in test_feature_containers
+            feature.type: feature.project_path.parent for feature in test_feature_containers
         }

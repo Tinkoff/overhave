@@ -47,6 +47,7 @@ def test_feature() -> FeatureModel:
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
         feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],
+        file_path="my_folder/my_feature",
     )
 
 

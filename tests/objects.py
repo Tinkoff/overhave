@@ -56,7 +56,7 @@ class FeatureTestContainer(BaseModel):
 
     type: FeatureTypeName
     name: str
-    path: Path
+    project_path: Path
     content: str
     scenario: str
     language: TestLanguageName
@@ -78,6 +78,13 @@ class FeatureTestContainer(BaseModel):
         values["language"] = lang
         return values
 
+    @property
+    def file_path(self) -> str:
+        feature_type_dir = get_feature_extractor().feature_type_to_dir_mapping.get(self.type)
+        if feature_type_dir is None:
+            raise RuntimeError(f"Could not find folder for feature type '{self.type}'!")
+        return self.project_path.relative_to(feature_type_dir).as_posix()
+
 
 @lru_cache(maxsize=None)
 def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
@@ -87,7 +94,7 @@ def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
             if item.is_file() and not any((item.name.startswith("."), item.name.startswith("_"))):
                 content = item.read_text(encoding="utf-8")
                 container = FeatureTestContainer(  # type: ignore
-                    type=value.name, name=item.name, path=item, content=content
+                    type=value.name, name=item.name, project_path=item, content=content
                 )
                 feature_containers.append(container)
             continue
