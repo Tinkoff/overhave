@@ -21,10 +21,6 @@ class FileSavingMixin:
         logger.debug("Generated %s file: '%s'", entity_name, file.name)
         assert Path(file.name).exists(), f"{entity_name.upper()} file not created!"
 
-    @staticmethod
-    def _get_feature_name(feature_name: str, feature_id: int) -> str:
-        return f"{feature_name}_id{feature_id}"
-
 
 class FileManager(FileSavingMixin):
     """ Class for feature files management. """
@@ -44,12 +40,14 @@ class FileManager(FileSavingMixin):
         self._scenario_compiler = scenario_compiler
 
     @contextmanager
-    def tmp_feature_file(self, context: TestExecutorContext) -> Iterator:  # type: ignore
-        run_prefix = self._get_feature_name(feature_name=context.feature.name, feature_id=context.feature.id)
-        logger.debug("Feature prefix: '%s'", run_prefix)
+    def tmp_feature_file(
+        self, context: TestExecutorContext
+    ) -> Iterator[tempfile._TemporaryFileWrapper]:  # type: ignore
+        file_path = Path(context.feature.file_path)
+        logger.debug("Feature file path: '%s'", file_path)
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_features_dir,
-            prefix=f"{run_prefix}_",
+            prefix=f"{file_path.name}_id{context.feature.id}",
             suffix=self._file_settings.feature_suffix,
             mode="w",
         ) as file:
@@ -76,20 +74,16 @@ class FileManager(FileSavingMixin):
             yield file
 
     def produce_feature_file(self, context: TestExecutorContext) -> Path:
-        feature_file_path: Path = (
+        feature_file_path = (
             self._feature_extractor.feature_type_to_dir_mapping[context.feature.feature_type.name]
-            / (
-                f"{self._get_feature_name(feature_name=context.feature.name, feature_id=context.feature.id)}"
-                f"{self._file_settings.feature_suffix}"
-            )
+            / context.feature.file_path
         )
-        if not feature_file_path.exists():
-            logger.info("Create feature file '%s' for commit", feature_file_path.as_posix())
-            feature_file_path.touch()
         logger.info("Write scenario to feature file '%s'...", feature_file_path.as_posix())
-        with feature_file_path.open("w") as feature_file:
-            scenario_text = self._scenario_compiler.compile(context=context)
-            logger.debug(scenario_text)
-            feature_file.write(scenario_text)
+
+        scenario_text = self._scenario_compiler.compile(context=context)
+        logger.debug(scenario_text)
+        feature_file_path.parent.mkdir(exist_ok=True)
+        feature_file_path.write_text(scenario_text)
+
         logger.info("Scenario has successfully written")
         return feature_file_path

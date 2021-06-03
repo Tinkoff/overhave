@@ -53,6 +53,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     last_edited_by: str
     task: List[str]
     feature_tags: List[TagsTypeModel]
+    file_path: str
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore

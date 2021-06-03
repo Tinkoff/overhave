@@ -13,7 +13,8 @@ class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
     """ Settings for scenario compiling and parsing. """
 
     tag_prefix: str = "@"
-    created_by_prefix: str = "# created by"
+    id_prefix: str = "# ID:"
+    created_by_prefix: str = "created by"
     last_edited_by_prefix: str = "last edited by"
     published_by_prefix: str = "published by"
 
