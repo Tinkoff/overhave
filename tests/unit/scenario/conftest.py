@@ -1,4 +1,5 @@
 from typing import Optional
+from unittest import mock
 
 import py
 import pytest
@@ -110,6 +111,7 @@ def test_scenario_parser(
 def test_file_settings(tmpdir: py.path.local) -> OverhaveFileSettings:
     settings = OverhaveFileSettings(work_dir=tmpdir, root_dir=tmpdir, tmp_dir=tmpdir / "tmp")
     settings.tmp_features_dir.mkdir(parents=True)
+    settings.tmp_fixtures_dir.mkdir(parents=True)
     return settings
 
 
@@ -125,3 +127,10 @@ def test_file_manager(
         feature_extractor=get_test_feature_extractor(),
         scenario_compiler=test_scenario_compiler,
     )
+
+
+@pytest.fixture()
+def test_tmp_feature_file(faker: Faker) -> mock.MagicMock:
+    feature_file_mock = mock.MagicMock()
+    feature_file_mock.name = faker.word()
+    return feature_file_mock
