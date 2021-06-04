@@ -35,7 +35,7 @@ def get_test_file_settings() -> OverhaveFileSettings:
 
 
 @lru_cache(maxsize=None)
-def get_feature_extractor() -> FeatureExtractor:
+def get_test_feature_extractor() -> FeatureExtractor:
     """ Method for getting :class:`FeatureExtractor` with OverhaveFileSettings, based on docs files and examples.
 
     One of class functions is mocked to prevent the creation of additional files in docs includes.
@@ -80,7 +80,7 @@ class FeatureTestContainer(BaseModel):
 
     @property
     def file_path(self) -> str:
-        feature_type_dir = get_feature_extractor().feature_type_to_dir_mapping.get(self.type)
+        feature_type_dir = get_test_feature_extractor().feature_type_to_dir_mapping.get(self.type)
         if feature_type_dir is None:
             raise RuntimeError(f"Could not find folder for feature type '{self.type}'!")
         return self.project_path.relative_to(feature_type_dir).as_posix()
@@ -89,7 +89,7 @@ class FeatureTestContainer(BaseModel):
 @lru_cache(maxsize=None)
 def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
     feature_containers: List[FeatureTestContainer] = []
-    for value in get_feature_extractor().feature_type_to_dir_mapping.values():
+    for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():
         for item in value.iterdir():
             if item.is_file() and not any((item.name.startswith("."), item.name.startswith("_"))):
                 content = item.read_text(encoding="utf-8")

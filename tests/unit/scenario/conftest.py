@@ -1,22 +1,21 @@
 from typing import Optional
 
+import py
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
-from overhave.entities import (
-    FeatureModel,
-    FeatureTypeModel,
+from overhave import (
+    OverhaveFileSettings,
     OverhaveLanguageSettings,
+    OverhaveProjectSettings,
     OverhaveScenarioCompilerSettings,
-    ScenarioModel,
-    TestExecutorContext,
-    TestRunModel,
 )
+from overhave.entities import FeatureModel, FeatureTypeModel, ScenarioModel, TestExecutorContext, TestRunModel
 from overhave.entities.converters import TagsTypeModel
-from overhave.scenario import ScenarioCompiler, ScenarioParser
+from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
-from tests.objects import TestLanguageName, get_feature_extractor, get_test_feature_containers
+from tests.objects import TestLanguageName, get_test_feature_containers, get_test_feature_extractor
 
 
 @pytest.fixture()
@@ -45,7 +44,7 @@ def test_feature() -> FeatureModel:
         task=["OVERHAVE-1"],
         last_edited_by="overlord",
         released=False,
-        feature_type=FeatureTypeModel(id=1, name=get_feature_extractor().feature_types[0]),
+        feature_type=FeatureTypeModel(id=1, name=get_test_feature_extractor().feature_types[0]),
         feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],
         file_path="my_folder/my_feature",
     )
@@ -74,7 +73,7 @@ def test_scenario(test_scenario_text: str, faker: Faker) -> ScenarioModel:
 
 
 @pytest.fixture()
-def test_processing_ctx(
+def test_executor_ctx(
     test_feature: FeatureModel, test_scenario: ScenarioModel, test_testrun: TestRunModel
 ) -> TestExecutorContext:
     return TestExecutorContext(feature=test_feature, scenario=test_scenario, test_run=test_testrun)
@@ -102,6 +101,27 @@ def test_scenario_parser(
     return ScenarioParser(
         compilation_settings=test_compilation_settings,
         language_settings=language_settings,
-        feature_extractor=get_feature_extractor(),
+        feature_extractor=get_test_feature_extractor(),
         task_links_keyword=task_links_keyword,
+    )
+
+
+@pytest.fixture()
+def test_file_settings(tmpdir: py.path.local) -> OverhaveFileSettings:
+    settings = OverhaveFileSettings(work_dir=tmpdir, root_dir=tmpdir, tmp_dir=tmpdir / "tmp")
+    settings.tmp_features_dir.mkdir(parents=True)
+    return settings
+
+
+@pytest.fixture()
+def test_file_manager(
+    test_project_settings: OverhaveProjectSettings,
+    test_file_settings: OverhaveFileSettings,
+    test_scenario_compiler: ScenarioCompiler,
+) -> FileManager:
+    return FileManager(
+        project_settings=test_project_settings,
+        file_settings=test_file_settings,
+        feature_extractor=get_test_feature_extractor(),
+        scenario_compiler=test_scenario_compiler,
     )

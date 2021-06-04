@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from overhave.entities import IFeatureExtractor, OverhaveFileSettings, OverhaveLanguageSettings, TestExecutorContext
+from overhave.entities import IFeatureExtractor, OverhaveFileSettings, TestExecutorContext
 from overhave.scenario.compiler import ScenarioCompiler
 from overhave.test_execution.settings import OverhaveProjectSettings
 
@@ -29,11 +29,9 @@ class FileManager(FileSavingMixin):
         self,
         project_settings: OverhaveProjectSettings,
         file_settings: OverhaveFileSettings,
-        language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
         scenario_compiler: ScenarioCompiler,
     ):
-        self._language_settings = language_settings
         self._project_settings = project_settings
         self._file_settings = file_settings
         self._feature_extractor = feature_extractor
@@ -43,11 +41,11 @@ class FileManager(FileSavingMixin):
     def tmp_feature_file(
         self, context: TestExecutorContext
     ) -> Iterator[tempfile._TemporaryFileWrapper]:  # type: ignore
-        file_path = Path(context.feature.file_path)
-        logger.debug("Feature file path: '%s'", file_path)
+        file_name = Path(context.feature.file_path).name
+        logger.debug("Feature file name: '%s'", file_name)
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_features_dir,
-            prefix=f"{file_path.name}_id{context.feature.id}",
+            prefix=f"{file_name}_id{context.feature.id}",
             suffix=self._file_settings.feature_suffix,
             mode="w",
         ) as file:

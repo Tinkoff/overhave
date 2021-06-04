@@ -35,13 +35,10 @@ class TestScenarioCompiler:
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self,
-        test_scenario_compiler: ScenarioCompiler,
-        test_scenario_text: str,
-        test_processing_ctx: TestExecutorContext,
+        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_executor_ctx: TestExecutorContext,
     ) -> None:
         with pytest.raises(IncorrectScenarioTextError):
-            test_scenario_compiler.compile(context=test_processing_ctx)
+            test_scenario_compiler.compile(context=test_executor_ctx)
 
     def test_compile_scenario_from_correct_text(
         self,
@@ -50,9 +47,9 @@ class TestScenarioCompiler:
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,
         test_scenario: ScenarioModel,
-        test_processing_ctx: TestExecutorContext,
+        test_executor_ctx: TestExecutorContext,
     ) -> None:
-        feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
+        feature_txt = test_scenario_compiler.compile(context=test_executor_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)
         assert parsed_info.name == test_feature.name
         assert parsed_info.type == test_feature.feature_type.name
