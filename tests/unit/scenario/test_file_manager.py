@@ -5,15 +5,12 @@ import pytest
 
 from overhave import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveProjectSettings
 from overhave.entities import FeatureExtractor, TestExecutorContext
-from overhave.extra import RUSSIAN_PREFIXES
 from overhave.scenario import FileManager, ScenarioCompiler
 
 
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
-@pytest.mark.parametrize("task_links_keyword", [None, "Tasks"])
-@pytest.mark.parametrize(
-    "language_settings", [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
-)
+@pytest.mark.parametrize("task_links_keyword", ["Tasks"])
+@pytest.mark.parametrize("language_settings", [OverhaveLanguageSettings()])
 class TestFileManager:
     """ Unit tests for :class:`FileManager`. """
 

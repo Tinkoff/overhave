@@ -51,6 +51,7 @@ class TestScenarioCompiler:
     ) -> None:
         feature_txt = test_scenario_compiler.compile(context=test_executor_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)
+        assert parsed_info.id == test_feature.id
         assert parsed_info.name == test_feature.name
         assert parsed_info.type == test_feature.feature_type.name
         assert parsed_info.author == test_feature.author

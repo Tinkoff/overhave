@@ -17,6 +17,7 @@ _DEFAULT_ID = 1
 class FeatureInfo(BaseModel):
     """ Model for feature info keeping. """
 
+    id: Optional[int]
     name: Optional[str]
     type: Optional[str]
     author: Optional[str]
@@ -52,6 +53,9 @@ class ScenarioParser(PrefixMixin):
             return self._as_prefix(self._task_links_keyword)
         return None
 
+    def _get_id(self, id_line: str) -> int:
+        return int(id_line.lstrip(self._compilation_settings.id_prefix).strip())
+
     def _get_name(self, name_line: str) -> str:
         name_parts = name_line.split(self._feature_prefix)
         if not name_parts:
@@ -81,6 +85,9 @@ class ScenarioParser(PrefixMixin):
     def _parse_feature_info(self, header: str) -> FeatureInfo:
         feature_info = FeatureInfo()
         for line in header.split("\n"):
+            if line.startswith(self._compilation_settings.id_prefix):
+                feature_info.id = self._get_id(line)
+                continue
             if line.startswith(self._compilation_settings.tag_prefix):
                 feature_info.type = self._get_feature_type(line)
                 continue
