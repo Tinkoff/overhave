@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, validator
 class GitlabRepository(BaseModel):
     """ Model for Gitlab merge-request repository. """
 
-    name: str = Field(..., alias="slug")
+    id: str = Field(..., alias="slug")
 
 
 class GitlabBranch(BaseModel):
@@ -92,7 +92,9 @@ class GitlabErrorResponse(BaseModel):
     @property
     def duplicate(self) -> bool:
         for error in self.errors:
-            if len(error.message) == 0 or not error.message[0].startswith("Another open merge request already exists for this source branch"):
+            if len(error.message) == 0 or not error.message[0].startswith(
+                "Another open merge request already exists for this source branch"
+            ):
                 continue
             return True
         return False

@@ -89,7 +89,7 @@ class GitlabVersionPublisher(GitVersionPublisher):
                 self._draft_storage.save_response(
                     draft_id=draft_id,
                     pr_url=response.get_mr_url(),
-                    published_at=response.created_date,
+                    published_at=response.created_at,
                     opened=response.open,
                 )
                 return

@@ -3,9 +3,8 @@ from .client import GitlabHttpClient, GitlabHttpClientConflictError
 from .models import (
     GitlabBranch,
     GitlabErrorResponse,
-    GitlabMrRequest,
     GitlabMrCreationResponse,
-    GitlabProject,
+    GitlabMrRequest,
     GitlabRepository,
     GitlabReviewer,
     GitlabReviewerInfo,

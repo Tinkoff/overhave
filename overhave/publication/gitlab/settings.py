@@ -2,13 +2,7 @@ from typing import List, Mapping
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.feature import FeatureTypeName
-from overhave.transport.http.gitlab_client import (
-    GitlabBranch,
-    GitlabProject,
-    GitlabRepository,
-    GitlabReviewer,
-    GitlabReviewerInfo,
-)
+from overhave.transport.http.gitlab_client import GitlabBranch, GitlabRepository, GitlabReviewer, GitlabReviewerInfo
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
@@ -22,8 +16,7 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     Some merge-request parameters are also could be defined through these settings.
     """
 
-    repository_name: str  # for example 'bdd-features'
-    project_key: str  # for example 'PRJ'
+    repository_id: str  # for example '2034'
     default_target_branch_name: str = "master"
 
     # Pull-request default reviewers as list
@@ -33,7 +26,7 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
 
     @property
     def repository(self) -> GitlabRepository:
-        return GitlabRepository(slug=self.repository_name, project=GitlabProject(key=self.project_key))
+        return GitlabRepository(slug=self.repository_id)
 
     @property
     def target_branch(self) -> GitlabBranch:
