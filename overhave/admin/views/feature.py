@@ -91,7 +91,7 @@ class FeatureView(ModelViewConfigured):
     column_labels = {"file_path": "File path", "feature_tags.value": "Tags"}
 
     _task_pattern = re.compile(r"\w+[-]\d+")
-    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]+$")
+    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -115,6 +115,7 @@ class FeatureView(ModelViewConfigured):
             raise ValidationError(
                 f"Incorrect format of file path specification: '{file_path}'! "
                 f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
+                " At least 8 characters long."
             )
         path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
         logger.debug("Processed feature file path: '%s'", path)
@@ -184,6 +185,10 @@ class FeatureView(ModelViewConfigured):
             return rendered
 
         logger.debug("Process feature 'RUN' request")
-        tasks = data.get("task").split(",")  # type: ignore
+        tasks = data["task"].split(",")
         self._validate_tasks(tasks=tasks)
+
+        mutable_data = dict(data)
+        mutable_data["file_path"] = self._make_file_path(data["file_path"])
+
         return self._run_test(data, rendered)
