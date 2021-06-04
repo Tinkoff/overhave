@@ -12,7 +12,14 @@ from overhave import (
     OverhaveProjectSettings,
     OverhaveScenarioCompilerSettings,
 )
-from overhave.entities import FeatureModel, FeatureTypeModel, ScenarioModel, TestExecutorContext, TestRunModel
+from overhave.entities import (
+    FeatureExtractor,
+    FeatureModel,
+    FeatureTypeModel,
+    ScenarioModel,
+    TestExecutorContext,
+    TestRunModel,
+)
 from overhave.entities.converters import TagsTypeModel
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
@@ -134,3 +141,21 @@ def test_tmp_feature_file(faker: Faker) -> mock.MagicMock:
     feature_file_mock = mock.MagicMock()
     feature_file_mock.name = faker.word()
     return feature_file_mock
+
+
+@pytest.fixture()
+def mocked_feature_extractor(test_file_settings: OverhaveFileSettings) -> FeatureExtractor:
+    extractor_mock = mock.MagicMock()
+    extractor_mock.feature_type_to_dir_mapping = {
+        feature_type: test_file_settings.features_dir / feature_type
+        for feature_type, path in get_test_feature_extractor().feature_type_to_dir_mapping.items()
+    }
+    return extractor_mock
+
+
+@pytest.fixture()
+def test_file_manager_with_mocked_extractor(
+    test_file_manager: FileManager, mocked_feature_extractor: FeatureExtractor,
+) -> FileManager:
+    test_file_manager._feature_extractor = mocked_feature_extractor
+    return test_file_manager

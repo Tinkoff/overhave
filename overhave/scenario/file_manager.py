@@ -80,7 +80,7 @@ class FileManager(FileSavingMixin):
 
         scenario_text = self._scenario_compiler.compile(context=context)
         logger.debug(scenario_text)
-        feature_file_path.parent.mkdir(exist_ok=True)
+        feature_file_path.parent.mkdir(parents=True, exist_ok=True)
         feature_file_path.write_text(scenario_text)
 
         logger.info("Scenario has successfully written")
