@@ -4,17 +4,10 @@ from typing import Dict, Final, List, Optional, Union
 from pydantic import BaseModel, Field, validator
 
 
-class GitlabProject(BaseModel):
-    """ Model for Gitlab merge-request project slug. """
-
-    key: str
-
-
 class GitlabRepository(BaseModel):
     """ Model for Gitlab merge-request repository. """
 
     name: str = Field(..., alias="slug")
-    project: GitlabProject
 
 
 class GitlabBranch(BaseModel):
@@ -51,7 +44,7 @@ class GitlabMrRequest(GitlabBasicMrInfo):
     """ Model for Gitlab merge-request request. """
 
     description: str
-    state: str = "OPEN"
+    state: str = "opened"
     closed: bool = False
     source_branch: GitlabBranch = Field(..., alias="fromRef")
     target_branch: GitlabBranch = Field(..., alias="toRef")
@@ -66,9 +59,9 @@ GitlabLinksType = Dict[str, List[Dict[str, str]]]
 class GitlabMrCreationResponse(GitlabBasicMrInfo):
     """ Model for Gitlab merge-request creation response. """
 
-    created_date: datetime = Field(..., alias="createdDate")
-    updated_date: datetime = Field(..., alias="updatedDate")
-    merge_request_url: Optional[str]
+    created_at: datetime = Field(..., alias="createdDate")
+    updated_at: datetime = Field(..., alias="updatedDate")
+    web_url: Optional[str]
     traceback: Optional[Exception]
     links: Optional[GitlabLinksType]
 
@@ -76,8 +69,8 @@ class GitlabMrCreationResponse(GitlabBasicMrInfo):
         arbitrary_types_allowed = True
 
     def get_mr_url(self) -> str:
-        if isinstance(self.merge_request_url, str):
-            return self.merge_request_url
+        if isinstance(self.web_url, str):
+            return self.web_url
         if self.links is not None:
             return self.links["self"][0]["href"]
         raise RuntimeError("Could not get merge-request URL from response!")
@@ -87,7 +80,7 @@ class GitlabRequestError(BaseModel):
     """ Model for Gitlab request error. """
 
     context: Optional[str]
-    message: str
+    message: List[str]
     exception_name: str = Field(..., alias="exceptionName")
 
 
@@ -99,7 +92,7 @@ class GitlabErrorResponse(BaseModel):
     @property
     def duplicate(self) -> bool:
         for error in self.errors:
-            if not error.exception_name.endswith("DuplicateMergeRequestException"):
+            if len(error.message) == 0 or not error.message[0].startswith("Another open merge request already exists for this source branch"):
                 continue
             return True
         return False
