@@ -1,5 +1,17 @@
 # flake8: noqa
 from .base_client import BaseHttpClient, BaseHttpClientSettings
+from .gitlab_client import (
+    GitlabBranch,
+    GitlabErrorResponse,
+    GitlabHttpClient,
+    GitlabHttpClientConflictError,
+    GitlabMrCreationResponse,
+    GitlabMrRequest,
+    GitlabRepository,
+    GitlabReviewer,
+    GitlabReviewerInfo,
+    OverhaveGitlabClientSettings,
+)
 from .stash_client import (
     OverhaveStashClientSettings,
     StashBranch,

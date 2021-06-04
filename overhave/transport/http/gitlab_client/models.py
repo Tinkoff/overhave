@@ -37,7 +37,7 @@ class GitlabBasicMrInfo(BaseModel):
     """ Model for Gitlab basic merge-request information. """
 
     title: Optional[str]
-    open: bool
+    state: str
 
 
 class GitlabMrRequest(GitlabBasicMrInfo):
@@ -59,8 +59,8 @@ GitlabLinksType = Dict[str, List[Dict[str, str]]]
 class GitlabMrCreationResponse(GitlabBasicMrInfo):
     """ Model for Gitlab merge-request creation response. """
 
-    created_at: datetime = Field(..., alias="createdDate")
-    updated_at: datetime = Field(..., alias="updatedDate")
+    created_at: datetime = Field(..., alias="created_at")
+    updated_at: datetime = Field(..., alias="updated_at")
     web_url: Optional[str]
     traceback: Optional[Exception]
     links: Optional[GitlabLinksType]

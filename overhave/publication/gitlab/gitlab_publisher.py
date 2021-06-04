@@ -90,7 +90,7 @@ class GitlabVersionPublisher(GitVersionPublisher):
                     draft_id=draft_id,
                     pr_url=response.get_mr_url(),
                     published_at=response.created_at,
-                    opened=response.open,
+                    opened=response.state == "opened",
                 )
                 return
             if isinstance(response, GitlabErrorResponse) and response.duplicate:

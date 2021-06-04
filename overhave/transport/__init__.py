@@ -1,5 +1,15 @@
 # flake8: noqa
 from .http import (
+    GitlabBranch,
+    GitlabErrorResponse,
+    GitlabHttpClient,
+    GitlabHttpClientConflictError,
+    GitlabMrCreationResponse,
+    GitlabMrRequest,
+    GitlabRepository,
+    GitlabReviewer,
+    GitlabReviewerInfo,
+    OverhaveGitlabClientSettings,
     OverhaveStashClientSettings,
     StashBranch,
     StashErrorResponse,
