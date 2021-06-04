@@ -78,7 +78,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     flask_app = _resolved_app(factory=factory, template_dir=template_dir)
     flask_app.config["FILES_DIR"] = files_dir
 
-    @flask_app.teardown_request
+    @flask_app.teardown_request  # type: ignore
     def remove_session(exception: typing.Optional[BaseException]) -> None:
         db.current_session.remove()
 
