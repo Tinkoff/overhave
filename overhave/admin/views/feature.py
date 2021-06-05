@@ -2,6 +2,7 @@ import json
 import logging
 import re
 from functools import cached_property
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import flask
@@ -81,14 +82,16 @@ class FeatureView(ModelViewConfigured):
         "name",
         "task",
         "author",
+        "file_path",
         "last_edited_by",
         "feature_tags.value",
     ]
     column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
     column_sortable_list = ("id", "name", "author", "last_edited_by")
-    column_labels = {"feature_tags.value": "Tags"}
+    column_labels = {"file_path": "File path", "feature_tags.value": "Tags"}
 
     _task_pattern = re.compile(r"\w+[-]\d+")
+    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -103,8 +106,24 @@ class FeatureView(ModelViewConfigured):
                 "Supported: <PROJECT>-<NUMBER>, for example 'PRJ-1234'."
             )
 
-    def on_model_change(self, form, model, is_created) -> None:  # type: ignore
+    @classmethod
+    def _make_file_path(cls, file_path: str) -> str:
+        feature_suffix = get_admin_factory().context.file_settings.feature_suffix
+        if file_path.rstrip().endswith(feature_suffix):
+            file_path = file_path.removesuffix(feature_suffix)
+        if not cls._file_path_pattern.match(file_path):
+            raise ValidationError(
+                f"Incorrect format of file path specification: '{file_path}'! "
+                f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
+                " At least 8 characters long."
+            )
+        path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
+        logger.debug("Processed feature file path: '%s'", path)
+        return path
+
+    def on_model_change(self, form, model: db.Feature, is_created) -> None:  # type: ignore
         self._validate_tasks(model.task)
+        model.file_path = self._make_file_path(model.file_path)
         if is_created:
             model.author = current_user.login
         model.last_edited_by = current_user.login
@@ -166,6 +185,10 @@ class FeatureView(ModelViewConfigured):
             return rendered
 
         logger.debug("Process feature 'RUN' request")
-        tasks = data.get("task").split(",")  # type: ignore
+        tasks = data["task"].split(",")
         self._validate_tasks(tasks=tasks)
+
+        mutable_data = dict(data)
+        mutable_data["file_path"] = self._make_file_path(data["file_path"])
+
         return self._run_test(data, rendered)

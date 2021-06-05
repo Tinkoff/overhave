@@ -135,7 +135,6 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
         return FileManager(
             project_settings=self.context.project_settings,
             file_settings=self.context.file_settings,
-            language_settings=self.context.language_settings,
             feature_extractor=self._feature_extractor,
             scenario_compiler=self._scenario_compiler,
         )
