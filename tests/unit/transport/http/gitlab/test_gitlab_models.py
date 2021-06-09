@@ -15,13 +15,8 @@ class TestGitlabHttpClientModels:
                 "state": "opened",
                 "created_at": "2021-06-04T07:50:56.457Z",
                 "updated_at": "2021-06-04T07:50:56.457Z",
-                "merged_by": None,
-                "merged_at": None,
-                "closed_by": None,
-                "closed_at": None,
                 "target_branch": "kekekse",
                 "source_branch": "test2",
-                "user_notes_count": 0,
                 "upvotes": 0,
                 "downvotes": 0,
                 "author": {

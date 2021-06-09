@@ -3,7 +3,7 @@ import logging
 from requests import HTTPError
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
-from overhave.publication.git_publisher import BaseGitVersionPublisherError, GitVersionPublisher
+from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
@@ -17,14 +17,6 @@ from overhave.transport.http.gitlab_client import (
 from overhave.transport.http.gitlab_client.models import GitlabBranch, GitlabMrCreationResponse
 
 logger = logging.getLogger(__name__)
-
-
-class BaseGitlabVersionPublisherException(BaseGitVersionPublisherError):
-    """ Base exception for :class:`MergeVersionPublisher`. """
-
-
-class NullablePullRequestUrlError(BaseGitlabVersionPublisherException):
-    """ Exception for nullable merge-request in selected Draft. """
 
 
 class GitlabVersionPublisher(GitVersionPublisher):
@@ -53,21 +45,6 @@ class GitlabVersionPublisher(GitVersionPublisher):
         )
         self._gitlab_publisher_settings = gitlab_publisher_settings
         self._client = client
-
-    def _save_as_duplicate(self, context: PublisherContext) -> None:
-        previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
-        if previous_draft.pr_url is None:
-            raise NullablePullRequestUrlError(
-                "Previous draft with id=%s has not got merge-request URL!", previous_draft.id
-            )
-        if previous_draft.published_at is None:
-            raise RuntimeError
-        self._draft_storage.save_response(
-            draft_id=context.draft.id,
-            pr_url=previous_draft.pr_url,
-            published_at=previous_draft.published_at,
-            opened=True,
-        )
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)

@@ -3,7 +3,7 @@ import logging
 from requests import HTTPError
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
-from overhave.publication.git_publisher import BaseGitVersionPublisherError, GitVersionPublisher
+from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
@@ -18,14 +18,6 @@ from overhave.transport import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-class BaseStashVersionPublisherException(BaseGitVersionPublisherError):
-    """ Base exception for :class:`StashVersionPublisher`. """
-
-
-class NullablePullRequestUrlError(BaseStashVersionPublisherException):
-    """ Exception for nullable pull-request in selected Draft. """
 
 
 class StashVersionPublisher(GitVersionPublisher):
@@ -54,21 +46,6 @@ class StashVersionPublisher(GitVersionPublisher):
         )
         self._stash_publisher_settings = stash_publisher_settings
         self._client = client
-
-    def _save_as_duplicate(self, context: PublisherContext) -> None:
-        previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
-        if previous_draft.pr_url is None:
-            raise NullablePullRequestUrlError(
-                "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
-            )
-        if previous_draft.published_at is None:
-            raise RuntimeError
-        self._draft_storage.save_response(
-            draft_id=context.draft.id,
-            pr_url=previous_draft.pr_url,
-            published_at=previous_draft.published_at,
-            opened=True,
-        )
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)
