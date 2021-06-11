@@ -24,6 +24,7 @@ from overhave.admin.views.formatters.formatters import (
     draft_prurl_formatter,
     draft_testrun_formatter,
     feature_link_formatter,
+    file_path_formatter,
     json_formatter,
 )
 from overhave.admin.views.formatters.helpers import (
@@ -49,6 +50,7 @@ class TestSafeFormatter:
             draft_feature_formatter,
             draft_testrun_formatter,
             draft_prurl_formatter,
+            file_path_formatter,
         ],
     )
     def test_with_nullable_attribute(
@@ -319,3 +321,26 @@ class TestDraftPrUrlFormatter:
             model=db.Draft(**{column_name: test_prurl}),  # type: ignore
             name=column_name,
         ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")
+
+
+@pytest.mark.parametrize("column_name", ["file_path"])
+@pytest.mark.parametrize("value", ["my_file.feature", "my_folder/my_file.feature"])
+@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+class TestFilePathFormatter:
+    """ Unit tests for file_path_formatter. """
+
+    def test_task_without_url(
+        self,
+        test_browse_url: None,
+        test_feature_view: FeatureView,
+        column_name: str,
+        value: str,
+        mocker: MockerFixture,
+    ) -> None:
+        correct_value = value.rstrip(test_feature_view.feature_suffix).split("/")[-1]
+        assert file_path_formatter(
+            view=test_feature_view,
+            context=mocker.MagicMock(),
+            model=db.Feature(**{column_name: value}),  # type: ignore
+            name=column_name,
+        ) == Markup(f"<i>{correct_value}</i>")
