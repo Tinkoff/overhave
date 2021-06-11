@@ -62,6 +62,7 @@ class FeatureView(ModelViewConfigured):
         "id",
         "name",
         "feature_type",
+        "file_path",
         "feature_tags",
         "task",
         "author",
@@ -88,7 +89,13 @@ class FeatureView(ModelViewConfigured):
     ]
     column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
     column_sortable_list = ("id", "name", "author", "last_edited_by")
-    column_labels = {"file_path": "File path", "feature_tags.value": "Tags"}
+    column_labels = {
+        "file_path": "File",
+        "feature_tags": "Tags",
+        "feature_type": "Type",
+        "name": "Name",
+        "task": "Tasks",
+    }
 
     _task_pattern = re.compile(r"\w+[-]\d+")
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
@@ -147,6 +154,10 @@ class FeatureView(ModelViewConfigured):
         if browse_url_value is not None:
             return browse_url_value.human_repr()
         return None
+
+    @property
+    def feature_suffix(self) -> str:
+        return get_admin_factory().context.file_settings.feature_suffix
 
     @staticmethod
     def _run_test(data: Dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:

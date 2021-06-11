@@ -10,6 +10,7 @@ from overhave.admin.views.formatters.formatters import (
     draft_prurl_formatter,
     draft_testrun_formatter,
     feature_link_formatter,
+    file_path_formatter,
     json_formatter,
     result_report_formatter,
     task_formatter,
@@ -58,6 +59,7 @@ class ModelViewConfigured(ModelView):
         "feature_id": draft_feature_formatter,
         "test_run_id": draft_testrun_formatter,
         "pr_url": draft_prurl_formatter,
+        "file_path": file_path_formatter,
     }
     column_descriptions = dict(
         name="Feature header for business scenarios",

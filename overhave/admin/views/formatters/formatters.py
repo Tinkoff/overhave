@@ -35,7 +35,7 @@ def datetime_formatter(view: ModelView, context: Any, model: db.BaseTable, value
 
 
 @safe_formatter(type=list, supported_models=(db.Feature,))
-def task_formatter(view: ModelView, context: Any, model: db.BaseTable, value: List[str]) -> Markup:
+def task_formatter(view: ModelView, context: Any, model: db.Feature, value: List[str]) -> Markup:
     browse_url = getattr(view, "browse_url")
     if not browse_url:
         return Markup(", ".join(value))
@@ -43,6 +43,14 @@ def task_formatter(view: ModelView, context: Any, model: db.BaseTable, value: Li
     for task in value:
         task_links.append(f"<a href='{browse_url}/{task}' target='blank'>{task}</a>")
     return Markup(", ".join(task_links))
+
+
+@safe_formatter(type=str, supported_models=(db.Feature,))
+def file_path_formatter(view: ModelView, context: Any, model: db.Feature, value: str) -> Markup:
+    if isinstance(model, db.Feature):
+        value_to_visualize = value.rstrip(view.feature_suffix).split("/")[-1]
+        return Markup(f"<i>{value_to_visualize}</i>")
+    raise NotImplementedError
 
 
 @safe_formatter(type=str, supported_models=(db.TestRun,))
