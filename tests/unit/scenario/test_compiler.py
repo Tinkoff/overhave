@@ -3,7 +3,7 @@ from typing import List, Optional
 import pytest
 
 from overhave.entities import FeatureModel, OverhaveLanguageSettings, ScenarioModel, TestExecutorContext
-from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+from overhave.extra import RUSSIAN_PREFIXES
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 
 
@@ -28,24 +28,17 @@ class TestGenerateTaskInfo:
 
 @pytest.mark.parametrize("task_links_keyword", [None, "Tasks"])
 @pytest.mark.parametrize(
-    "language_settings",
-    [
-        OverhaveLanguageSettings(),
-        OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES, translit_pack=RUSSIAN_TRANSLIT_PACK),
-    ],
+    "language_settings", [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
 )
 class TestScenarioCompiler:
     """ Unit tests for :class:`ScenarioCompiler`. """
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self,
-        test_scenario_compiler: ScenarioCompiler,
-        test_scenario_text: str,
-        test_processing_ctx: TestExecutorContext,
+        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_executor_ctx: TestExecutorContext,
     ) -> None:
         with pytest.raises(IncorrectScenarioTextError):
-            test_scenario_compiler.compile(context=test_processing_ctx)
+            test_scenario_compiler.compile(context=test_executor_ctx)
 
     def test_compile_scenario_from_correct_text(
         self,
@@ -54,10 +47,11 @@ class TestScenarioCompiler:
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,
         test_scenario: ScenarioModel,
-        test_processing_ctx: TestExecutorContext,
+        test_executor_ctx: TestExecutorContext,
     ) -> None:
-        feature_txt = test_scenario_compiler.compile(context=test_processing_ctx)
+        feature_txt = test_scenario_compiler.compile(context=test_executor_ctx)
         parsed_info = test_scenario_parser.parse(feature_txt)
+        assert parsed_info.id == test_feature.id
         assert parsed_info.name == test_feature.name
         assert parsed_info.type == test_feature.feature_type.name
         assert parsed_info.author == test_feature.author

@@ -68,6 +68,7 @@ def test_testrun_button_css_class(status: str) -> str:
 def test_feature_view(test_browse_url: Optional[str], mocker: MockerFixture) -> views.FeatureView:
     mock = mocker.create_autospec(views.FeatureView)
     mock.browse_url = test_browse_url
+    mock.feature_suffix = ".feature"
     return mock
 
 

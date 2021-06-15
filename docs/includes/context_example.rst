@@ -22,9 +22,7 @@
         file_settings=OverhaveFileSettings(
             features_base_dir=path_settings.features_base_dir, tmp_dir=path_settings.tmp_dir
         ),
-        language_settings=OverhaveLanguageSettings(
-            step_prefixes=RUSSIAN_PREFIXES, translit_pack=RUSSIAN_TRANSLIT_PACK,
-        ),
+        language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES),
         project_settings=OverhaveProjectSettings(
             browse_url="https://jira.company.com/browse",
             links_keyword="Tasks",

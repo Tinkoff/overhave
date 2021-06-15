@@ -12,7 +12,6 @@ from overhave.entities import (
     OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
     StepPrefixesModel,
-    TranslitPack,
 )
 from overhave.entities.authorization.settings import (
     AuthorizationStrategy,

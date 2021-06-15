@@ -3,9 +3,8 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
-from overhave.entities import IFeatureExtractor, OverhaveFileSettings, OverhaveLanguageSettings, TestExecutorContext
+from overhave.entities import IFeatureExtractor, OverhaveFileSettings, TestExecutorContext
 from overhave.scenario.compiler import ScenarioCompiler
 from overhave.test_execution.settings import OverhaveProjectSettings
 
@@ -16,15 +15,11 @@ class FileSavingMixin:
     """ Mixin for files saving. """
 
     @staticmethod
-    def _write_data(file: Any, data: str, entity_name: str) -> None:
+    def _write_data(file: tempfile._TemporaryFileWrapper, data: str, entity_name: str) -> None:  # type: ignore
         file.write(data)
         file.flush()
         logger.debug("Generated %s file: '%s'", entity_name, file.name)
         assert Path(file.name).exists(), f"{entity_name.upper()} file not created!"
-
-    @staticmethod
-    def _get_feature_name(feature_name: str, feature_id: int) -> str:
-        return f"{feature_name}_id{feature_id}"
 
 
 class FileManager(FileSavingMixin):
@@ -34,29 +29,23 @@ class FileManager(FileSavingMixin):
         self,
         project_settings: OverhaveProjectSettings,
         file_settings: OverhaveFileSettings,
-        language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
         scenario_compiler: ScenarioCompiler,
     ):
-        self._language_settings = language_settings
         self._project_settings = project_settings
         self._file_settings = file_settings
         self._feature_extractor = feature_extractor
         self._scenario_compiler = scenario_compiler
 
-    def _compile_feature_file_name_prefix(self, context: TestExecutorContext) -> str:
-        feature_name = context.feature.name
-        if self._language_settings.translit_pack is not None:
-            feature_name = self._language_settings.translit_pack.translate(feature_name)
-        return self._get_feature_name(feature_name=feature_name, feature_id=context.feature.id)
-
     @contextmanager
-    def tmp_feature_file(self, context: TestExecutorContext) -> Iterator:  # type: ignore
-        run_prefix = self._compile_feature_file_name_prefix(context)
-        logger.debug("Feature prefix: '%s'", run_prefix)
+    def tmp_feature_file(
+        self, context: TestExecutorContext
+    ) -> Iterator[tempfile._TemporaryFileWrapper]:  # type: ignore
+        file_name = Path(context.feature.file_path).name
+        logger.debug("Feature file name: '%s'", file_name)
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_features_dir,
-            prefix=f"{run_prefix}_",
+            prefix=f"{file_name}_id{context.feature.id}",
             suffix=self._file_settings.feature_suffix,
             mode="w",
         ) as file:
@@ -66,7 +55,9 @@ class FileManager(FileSavingMixin):
             yield file
 
     @contextmanager
-    def tmp_fixture_file(self, context: TestExecutorContext, feature_file: Any) -> Iterator:  # type: ignore
+    def tmp_fixture_file(
+        self, context: TestExecutorContext, feature_file: tempfile._TemporaryFileWrapper  # type: ignore
+    ) -> Iterator[tempfile._TemporaryFileWrapper]:  # type: ignore
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_fixtures_dir,
             prefix=f"{context.test_run.id}_",
@@ -81,17 +72,16 @@ class FileManager(FileSavingMixin):
             yield file
 
     def produce_feature_file(self, context: TestExecutorContext) -> Path:
-        feature_file_path: Path = (
+        feature_file_path = (
             self._feature_extractor.feature_type_to_dir_mapping[context.feature.feature_type.name]
-            / f"{self._compile_feature_file_name_prefix(context)}{self._file_settings.feature_suffix}"
+            / context.feature.file_path
         )
-        if not feature_file_path.exists():
-            logger.info("Create feature file '%s' for commit", feature_file_path.as_posix())
-            feature_file_path.touch()
         logger.info("Write scenario to feature file '%s'...", feature_file_path.as_posix())
-        with feature_file_path.open("w") as feature_file:
-            scenario_text = self._scenario_compiler.compile(context=context)
-            logger.debug(scenario_text)
-            feature_file.write(scenario_text)
+
+        scenario_text = self._scenario_compiler.compile(context=context)
+        logger.debug(scenario_text)
+        feature_file_path.parent.mkdir(parents=True, exist_ok=True)
+        feature_file_path.write_text(scenario_text)
+
         logger.info("Scenario has successfully written")
         return feature_file_path

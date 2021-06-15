@@ -33,7 +33,7 @@ class OverhaveDemoSettingsGenerator:
             client_settings=OverhaveGitlabClientSettings(
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             ),
-            publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034",),
+            publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
         )
         settings.update(self.default_context_settings)
         return settings

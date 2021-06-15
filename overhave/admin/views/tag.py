@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class TagsView(ModelViewConfigured):
-    """ View for :class:`Feature` table. """
+    """ View for :class:`Tags` table. """
 
     can_view_details = False
 
@@ -24,9 +24,11 @@ class TagsView(ModelViewConfigured):
 
     form_excluded_columns = ("created_at",)
 
+    _tag_name_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_]+$")
+
     def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
         tag = form.data.get("value")
-        if tag is not None and not re.match(r"^[a-z0-9A-Zа-яА-ЯёЁ_]+$", tag):
+        if tag is not None and not self._tag_name_pattern.match(tag):
             raise ValidationError("Unsupported symbols in tag name!")
         if not is_created:
             if current_user.login == model.created_by or current_user.role == db.Role.admin:
