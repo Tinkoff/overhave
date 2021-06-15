@@ -5,7 +5,8 @@ from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
-from overhave.transport import PublicationTask, StashHttpClient
+from overhave.publication.gitlab import GitlabVersionPublisher
+from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
 
 class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask], abc.ABC):
@@ -24,7 +25,11 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @cached_property
     def _stash_client(self) -> StashHttpClient:
-        return StashHttpClient(settings=self.context.stash_client_settings)
+        return StashHttpClient(settings=self.context.client_settings)  # type: ignore
+
+    @cached_property
+    def _gitlab_client(self) -> GitlabHttpClient:
+        return GitlabHttpClient(settings=self.context.client_settings)  # type: ignore
 
     @cached_property
     def _stash_publisher(self) -> StashVersionPublisher:
@@ -36,8 +41,22 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             test_run_storage=self._test_run_storage,
             draft_storage=self._draft_storage,
             file_manager=self._file_manager,
-            stash_publisher_settings=self.context.stash_publisher_settings,
+            stash_publisher_settings=self.context.publisher_settings,  # type: ignore
             client=self._stash_client,
+        )
+
+    @cached_property
+    def _gitlab_publisher(self) -> GitlabVersionPublisher:
+        return GitlabVersionPublisher(
+            file_settings=self.context.file_settings,
+            project_settings=self.context.project_settings,
+            feature_storage=self._feature_storage,
+            scenario_storage=self._scenario_storage,
+            test_run_storage=self._test_run_storage,
+            draft_storage=self._draft_storage,
+            file_manager=self._file_manager,
+            gitlab_publisher_settings=self.context.publisher_settings,  # type: ignore
+            client=self._gitlab_client,
         )
 
     @property

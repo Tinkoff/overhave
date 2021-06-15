@@ -96,8 +96,8 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
 
     def _push_version(self, draft_id: int) -> Optional[PublisherContext]:
         try:
-            logger.debug("Initialize git repository in '%s'...", self._file_settings.features_dir)
-            repository = git.Repo(self._file_settings.features_dir)
+            logger.debug("Initialize git repository in '%s'...", self._file_settings.work_dir)
+            repository = git.Repo(self._file_settings.work_dir)
             logger.info("Repository: %s", repository)
             logger.info("Working dir: %s", repository.working_dir)
             logger.info("Active head: %s", repository.active_branch)

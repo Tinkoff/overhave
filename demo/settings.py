@@ -4,14 +4,10 @@ from typing import Dict
 
 from pydantic import BaseSettings
 
-from overhave import (
-    OverhaveAdminSettings,
-    OverhaveFileSettings,
-    OverhaveLanguageSettings,
-    OverhaveStashClientSettings,
-    OverhaveStashPublisherSettings,
-)
+from overhave import OverhaveAdminSettings, OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.extra import RUSSIAN_PREFIXES
+from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
+from overhave.transport import OverhaveGitlabClientSettings
 
 
 class OverhaveDemoSettingsGenerator:
@@ -34,10 +30,10 @@ class OverhaveDemoSettingsGenerator:
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:
         settings = dict(
-            stash_client_settings=OverhaveStashClientSettings(
+            client_settings=OverhaveGitlabClientSettings(
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             ),
-            stash_publisher_settings=OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
+            publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034",),
         )
         settings.update(self.default_context_settings)
         return settings
