@@ -4,7 +4,7 @@ import pytest
 from faker import Faker
 
 from overhave.entities import FeatureTypeName
-from tests.objects import get_feature_extractor
+from tests.objects import get_test_feature_extractor
 
 
 @pytest.fixture()
@@ -31,5 +31,5 @@ def test_default_reviewers(faker: Faker) -> Sequence[str]:
 def test_reviewers_mapping(faker: Faker) -> Mapping[FeatureTypeName, List[str]]:
     return {
         feature_type: cast(List[str], faker.words(faker.random.randint(1, 10)))
-        for feature_type in get_feature_extractor().feature_types
+        for feature_type in get_test_feature_extractor().feature_types
     }
