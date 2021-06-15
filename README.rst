@@ -314,11 +314,10 @@ in framework and available for usage:
 
 .. code-block:: python
 
-    from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+    from overhave.extra import RUSSIAN_PREFIXES
 
     language_settings = OverhaveLanguageSettings(
-        step_prefixes=RUSSIAN_PREFIXES,
-        translit_pack=RUSSIAN_TRANSLIT_PACK
+        step_prefixes=RUSSIAN_PREFIXES
     )
 
 **Note**: you could create your own prefix-value mapping for your language:

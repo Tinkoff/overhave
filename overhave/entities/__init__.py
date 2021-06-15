@@ -20,7 +20,7 @@ from .feature import (
     IFeatureExtractor,
     ScenariosTestFileNotFound,
 )
-from .language import StepPrefixesModel, TranslitPack
+from .language import StepPrefixesModel
 from .report_manager import ReportManager, ReportPresenceResolution
 from .settings import (
     OverhaveDescriptionManagerSettings,

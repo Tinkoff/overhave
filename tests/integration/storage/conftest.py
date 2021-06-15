@@ -110,6 +110,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
             last_edited_by=test_system_user.login,
+            file_path="my_folder/my_feature",
         )
         session.add(feature)
         session.flush()

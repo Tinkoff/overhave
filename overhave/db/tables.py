@@ -31,7 +31,7 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
 
 
 class Tags(BaseTable, PrimaryKeyMixin):
-    """ Tags table. """
+    """ Feature tags table. """
 
     value = sa.Column(sa.String(256), nullable=False, doc="Feature tags choice", unique=True)
     created_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
@@ -49,6 +49,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
         SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Feature author login", nullable=False, index=True
     )
     type_id = sa.Column(INT_TYPE, sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
+    file_path = sa.Column(sa.String, doc="Feature file path", nullable=False, unique=True)
     task = sa.Column(ARRAY_TYPE, doc="Feature tasks list", nullable=False)
     last_edited_by = sa.Column(SHORT_STR_TYPE, doc="Last feature editor login", nullable=False)
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
