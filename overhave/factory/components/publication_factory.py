@@ -61,7 +61,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @property
     def publisher(self) -> IVersionPublisher:
-        return self._stash_publisher
+        return self._gitlab_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        return self._stash_publisher.process_publish_task(task)
+        return self._gitlab_publisher.process_publish_task(task)
