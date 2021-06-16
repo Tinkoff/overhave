@@ -1,3 +1,4 @@
+import enum
 from typing import Any, Dict, List, Mapping, Optional, Type
 
 from pydantic import BaseModel, validator
@@ -5,6 +6,13 @@ from yarl import URL
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
+
+
+class PublicationManagerType(str, enum.Enum):
+    """ Enum that declares remotely manager for publication pull requests. """
+
+    GITLAB = "gitlab"
+    STASH = "stash"
 
 
 class EmptyBrowseURLError(ValueError):
@@ -38,7 +46,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
 
     # Choose gitlab or stash as a publication manager
-    publication_manager_type: str = "gitlab"
+    publication_manager_type: str = PublicationManagerType.GITLAB
 
     @validator("browse_url", pre=True)
     def make_browse_url(cls, v: Optional[str]) -> Optional[URL]:
