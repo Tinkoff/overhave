@@ -13,4 +13,4 @@ class OverhaveGitlabClientSettings(BaseHttpClientSettings):
         env_prefix = "OVERHAVE_GITLAB_"
 
     def get_mr_url(self, repository_id: str) -> URL:
-        return self.url / self.mr_path.format(repository_name=repository_id)
+        return self.url / self.mr_path.format(repository_id=repository_id)
