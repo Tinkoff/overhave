@@ -111,8 +111,6 @@ class TestGitlabHttpClientModels:
             }
         )
 
-        assert response.source_branch == "test1"
-        assert response.target_branch == "master"
         assert response.web_url == "http://gitlab.example.com/my-group/my-project/merge_requests/1"
         assert response.state == "merged"
         assert response.traceback is None
@@ -121,13 +119,7 @@ class TestGitlabHttpClientModels:
 
     def test_bullshit_mr_creation_response(self) -> None:
         response: GitlabMrCreationResponse = GitlabMrCreationResponse.parse_obj(
-            {
-                "state": "merged",
-                "created_at": "2017-04-29T08:46:00Z",
-                "updated_at": "2017-04-29T08:46:00Z",
-                "source_branch": "test1",
-                "target_branch": "master",
-            }
+            {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
         )
         with pytest.raises(RuntimeError):
             response.get_mr_url()

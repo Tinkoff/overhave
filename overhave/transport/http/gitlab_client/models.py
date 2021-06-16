@@ -31,8 +31,6 @@ class GitlabMrRequest(BaseModel):
 class GitlabMrCreationResponse(BaseModel):
     """ Model for Gitlab merge-request creation response. """
 
-    target_branch: str
-    source_branch: str
     created_at: datetime
     updated_at: datetime
     web_url: Optional[str]
