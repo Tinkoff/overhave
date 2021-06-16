@@ -1,4 +1,7 @@
 import datetime
+
+import pytest
+
 from overhave.transport import GitlabMrCreationResponse
 
 
@@ -26,7 +29,7 @@ class TestGitlabHttpClientModels:
                     "username": "admin",
                     "state": "active",
                     "avatar_url": None,
-                    "web_url": "https://gitlab.example.com/admin"
+                    "web_url": "https://gitlab.example.com/admin",
                 },
                 "assignee": {
                     "id": 1,
@@ -34,14 +37,11 @@ class TestGitlabHttpClientModels:
                     "username": "admin",
                     "state": "active",
                     "avatar_url": None,
-                    "web_url": "https://gitlab.example.com/admin"
+                    "web_url": "https://gitlab.example.com/admin",
                 },
                 "source_project_id": 2,
                 "target_project_id": 3,
-                "labels": [
-                    "Community contribution",
-                    "Manage"
-                ],
+                "labels": ["Community contribution", "Manage"],
                 "draft": False,
                 "work_in_progress": False,
                 "milestone": {
@@ -55,7 +55,7 @@ class TestGitlabHttpClientModels:
                     "updated_at": "2015-02-02T19:49:26.013Z",
                     "due_date": "2018-09-22",
                     "start_date": "2018-08-08",
-                    "web_url": "https://gitlab.example.com/my-group/my-project/milestones/1"
+                    "web_url": "https://gitlab.example.com/my-group/my-project/milestones/1",
                 },
                 "merge_when_pipeline_succeeds": True,
                 "merge_status": "can_be_merged",
@@ -70,16 +70,12 @@ class TestGitlabHttpClientModels:
                 "allow_collaboration": False,
                 "allow_maintainer_to_push": False,
                 "web_url": "http://gitlab.example.com/my-group/my-project/merge_requests/1",
-                "references": {
-                    "short": "!1",
-                    "relative": "!1",
-                    "full": "my-group/my-project!1"
-                },
+                "references": {"short": "!1", "relative": "!1", "full": "my-group/my-project!1"},
                 "time_stats": {
                     "time_estimate": 0,
                     "total_time_spent": 0,
                     "human_time_estimate": None,
-                    "human_total_time_spent": None
+                    "human_total_time_spent": None,
                 },
                 "squash": False,
                 "subscribed": False,
@@ -90,7 +86,7 @@ class TestGitlabHttpClientModels:
                     "username": "DouweM",
                     "state": "active",
                     "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/87854/avatar.png",
-                    "web_url": "https://gitlab.com/DouweM"
+                    "web_url": "https://gitlab.com/DouweM",
                 },
                 "merged_at": "2018-09-07T11:16:17.520Z",
                 "closed_by": None,
@@ -103,18 +99,15 @@ class TestGitlabHttpClientModels:
                     "sha": "2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f",
                     "ref": "patch-28",
                     "status": "success",
-                    "web_url": "https://gitlab.example.com/my-group/my-project/pipelines/29626725"
+                    "web_url": "https://gitlab.example.com/my-group/my-project/pipelines/29626725",
                 },
                 "diff_refs": {
                     "base_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00",
                     "head_sha": "2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f",
-                    "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
+                    "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00",
                 },
                 "diverged_commits_count": 2,
-                "task_completion_status": {
-                    "count": 0,
-                    "completed_count": 0
-                }
+                "task_completion_status": {"count": 0, "completed_count": 0},
             }
         )
         assert response.web_url == "http://gitlab.example.com/my-group/my-project/merge_requests/1"
@@ -122,3 +115,10 @@ class TestGitlabHttpClientModels:
         assert response.traceback is None
         assert response.created_at == datetime.datetime(2017, 4, 29, 8, 46, 0, tzinfo=datetime.timezone.utc)
         assert response.updated_at == datetime.datetime(2017, 4, 29, 8, 46, 0, tzinfo=datetime.timezone.utc)
+
+    def test_bullshit_mr_creation_response(self) -> None:
+        response: GitlabMrCreationResponse = GitlabMrCreationResponse.parse_obj(
+            {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
+        )
+        with pytest.raises(RuntimeError):
+            response.get_mr_url()

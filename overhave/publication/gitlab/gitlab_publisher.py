@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class GitlabVersionPublisher(GitVersionPublisher):
-    """ Class for feature version's merge requests management relative to Atlassian Gitlab API. """
+    """ Class for feature version's merge requests management relative to Gitlab API. """
 
     def __init__(
         self,
