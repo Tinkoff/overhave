@@ -21,10 +21,10 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     default_target_branch_name: str = "master"
 
     # Merge-request default reviewers as list
-    default_reviewers: List[str] = []
+    default_reviewers: List[int] = []
 
     # Merge-request default reviewers as mapping with :class:```FeatureTypeName```
-    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
+    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[int]] = {}
 
     @property
     def repository(self) -> GitlabRepository:
