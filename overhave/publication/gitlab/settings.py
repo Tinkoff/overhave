@@ -18,8 +18,8 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
 
     @property
     def repository(self) -> GitlabRepository:
-        return GitlabRepository(slug=self.repository_id)
+        return GitlabRepository(project_id=self.repository_id)
 
     @property
     def target_branch(self) -> GitlabBranch:
-        return GitlabBranch(id=self.repository_id, branch=self.default_target_branch_name)
+        return GitlabBranch(project_id=self.repository_id, branch=self.default_target_branch_name)

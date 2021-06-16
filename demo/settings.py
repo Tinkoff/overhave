@@ -1,11 +1,18 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 
 from pydantic import BaseSettings
 
-from overhave import OverhaveAdminSettings, OverhaveFileSettings, OverhaveLanguageSettings
+from overhave import (
+    OverhaveAdminSettings,
+    OverhaveFileSettings,
+    OverhaveLanguageSettings,
+    OverhaveStashClientSettings,
+    OverhaveStashPublisherSettings,
+)
 from overhave.extra import RUSSIAN_PREFIXES
+from overhave.factory import get_admin_factory
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
 from overhave.transport import OverhaveGitlabClientSettings
 
@@ -29,11 +36,22 @@ class OverhaveDemoSettingsGenerator:
 
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:
-        settings = dict(
-            client_settings=OverhaveGitlabClientSettings(
-                url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
-            ),
-            publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
-        )
+        client_settings, publisher_settings = self._get_client_and_publisher_settings()
+        settings = dict(client_settings=client_settings, publisher_settings=publisher_settings)
         settings.update(self.default_context_settings)
         return settings
+
+    @staticmethod
+    def _get_client_and_publisher_settings() -> Tuple[BaseSettings, BaseSettings]:
+        admin_factory = get_admin_factory()
+        if admin_factory.context.project_settings.publication_manager_type == "gitlab":
+            return (
+                OverhaveGitlabClientSettings(
+                    url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
+                ),
+                OverhaveGitlabPublisherSettings(repository_id="2034"),
+            )
+        return (
+            OverhaveStashClientSettings(url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"),
+            OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
+        )

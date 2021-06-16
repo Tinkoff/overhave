@@ -7,22 +7,23 @@ from pydantic import BaseModel, Field
 class GitlabRepository(BaseModel):
     """ Model for Gitlab merge-request repository. """
 
-    id: str = Field(..., alias="slug")
+    id: str = Field(..., alias="project_id")
 
 
 class GitlabBranch(BaseModel):
     """ Model for Gitlab merge-request branch. """
 
-    id: str = Field(..., alias="id")
-    branch: str = Field(..., alias="branch")
+    id: str = Field(..., alias="project_id")
+    branch: str = Field(...)
+    ref: str = "master"
 
 
 class GitlabMrRequest(BaseModel):
     """ Model for Gitlab merge-request request. """
 
-    id: str = Field(...)
-    source_branch: GitlabBranch = Field(..., alias="fromRef")
-    target_branch: GitlabBranch = Field(..., alias="toRef")
+    id: str = Field(..., alias="project_id")
+    source_branch: GitlabBranch = Field(...)
+    target_branch: GitlabBranch = Field(...)
     title: Optional[str]
     description: Optional[str]
 
@@ -30,8 +31,10 @@ class GitlabMrRequest(BaseModel):
 class GitlabMrCreationResponse(BaseModel):
     """ Model for Gitlab merge-request creation response. """
 
-    created_at: datetime = Field(..., alias="created_at")
-    updated_at: datetime = Field(..., alias="updated_at")
+    target_branch: str
+    source_branch: str
+    created_at: datetime
+    updated_at: datetime
     web_url: Optional[str]
     traceback: Optional[Exception]
     state: str

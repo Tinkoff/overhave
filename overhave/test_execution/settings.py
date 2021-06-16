@@ -37,6 +37,9 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     # Keys for specification mapping are still the same - feature types.
     user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
 
+    # Choose gitlab or stash as a publication manager
+    publication_manager_type: str = "gitlab"
+
     @validator("browse_url", pre=True)
     def make_browse_url(cls, v: Optional[str]) -> Optional[URL]:
         return make_url(v)

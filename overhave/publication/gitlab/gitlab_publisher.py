@@ -47,11 +47,13 @@ class GitlabVersionPublisher(GitVersionPublisher):
         if not isinstance(context, PublisherContext):
             return
         merge_request = GitlabMrRequest(
-            id=self._gitlab_publisher_settings.repository_id,
+            project_id=self._gitlab_publisher_settings.repository_id,
             title=context.feature.name,
             description=self._compile_publication_description(context),
-            fromRef=GitlabBranch(id=self._gitlab_publisher_settings.repository.id, branch=context.target_branch),
-            toRef=self._gitlab_publisher_settings.target_branch,
+            source_branch=GitlabBranch(
+                project_id=self._gitlab_publisher_settings.repository.id, branch=context.target_branch
+            ),
+            target_branch=self._gitlab_publisher_settings.target_branch,
         )
         logger.info("Prepared pull-request: %s", merge_request.json(by_alias=True))
         try:
