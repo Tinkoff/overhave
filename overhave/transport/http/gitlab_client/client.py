@@ -27,7 +27,7 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
     """ Client for communication with remote Gitlab server. """
 
     def send_merge_request(self, merge_request: GitlabMrRequest) -> AnyGitlabResponseModel:
-        url = self._settings.get_mr_url(merge_request.target_branch.id)
+        url = self._settings.get_mr_url(merge_request.id)
         response = self._make_request(
             method=HttpMethod.POST,
             url=url,

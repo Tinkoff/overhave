@@ -10,32 +10,18 @@ class GitlabRepository(BaseModel):
     id: str = Field(..., alias="project_id")
 
 
-class GitlabBranch(BaseModel):
-    """ Model for Gitlab merge-request branch. """
-
-    id: str = Field(..., alias="project_id")
-    branch: str = Field(...)
-    ref: str = "master"
-
-
-class GitlabReviewerInfo(BaseModel):
-    """ Model for Gitlab merge-request reviewer information. """
-
-    id: str
-
-
 class GitlabReviewer(BaseModel):
     """ Model for Gitlab merge-request reviewer. """
 
-    user: GitlabReviewerInfo
+    id: int
 
 
 class GitlabMrRequest(BaseModel):
     """ Model for Gitlab merge-request request. """
 
     id: str = Field(..., alias="project_id")
-    source_branch: GitlabBranch = Field(...)
-    target_branch: GitlabBranch = Field(...)
+    source_branch: str = Field(...)
+    target_branch: str = Field(...)
     title: Optional[str]
     description: Optional[str]
     reviewer_ids: List[GitlabReviewer]

@@ -9,7 +9,7 @@ from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabHttpClientConflictError, GitlabMrRequest
-from overhave.transport.http.gitlab_client.models import GitlabBranch, GitlabMrCreationResponse
+from overhave.transport.http.gitlab_client.models import GitlabMrCreationResponse
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +49,9 @@ class GitlabVersionPublisher(GitVersionPublisher):
         merge_request = GitlabMrRequest(
             project_id=self._gitlab_publisher_settings.repository_id,
             title=context.feature.name,
-            description=self._compile_publication_description(context),
-            source_branch=GitlabBranch(
-                project_id=self._gitlab_publisher_settings.repository.id, branch=context.target_branch
-            ),
+            source_branch=context.target_branch,
             target_branch=self._gitlab_publisher_settings.target_branch,
+            description=self._compile_publication_description(context),
             reviewer_ids=self._gitlab_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
         logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))

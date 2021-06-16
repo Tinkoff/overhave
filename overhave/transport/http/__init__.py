@@ -1,7 +1,6 @@
 # flake8: noqa
 from .base_client import BaseHttpClient, BaseHttpClientSettings
 from .gitlab_client import (
-    GitlabBranch,
     GitlabHttpClient,
     GitlabHttpClientConflictError,
     GitlabMrCreationResponse,

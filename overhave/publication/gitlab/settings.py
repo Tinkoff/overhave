@@ -2,8 +2,8 @@ from typing import List, Mapping
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities import FeatureTypeName
-from overhave.transport.http.gitlab_client import GitlabBranch, GitlabRepository
-from overhave.transport.http.gitlab_client.models import GitlabReviewer, GitlabReviewerInfo
+from overhave.transport.http.gitlab_client import GitlabRepository
+from overhave.transport.http.gitlab_client.models import GitlabReviewer
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
@@ -31,8 +31,8 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
         return GitlabRepository(project_id=self.repository_id)
 
     @property
-    def target_branch(self) -> GitlabBranch:
-        return GitlabBranch(project_id=self.repository_id, branch=self.default_target_branch_name)
+    def target_branch(self) -> str:
+        return self.default_target_branch_name
 
     def get_reviewers(self, feature_type: FeatureTypeName) -> List[GitlabReviewer]:
         if self.feature_type_to_reviewers_mapping:
@@ -43,4 +43,4 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
                 )
         else:
             reviewers = self.default_reviewers
-        return [GitlabReviewer(user=GitlabReviewerInfo(id=reviewer_id)) for reviewer_id in reviewers]
+        return [GitlabReviewer(id=reviewer_id) for reviewer_id in reviewers]
