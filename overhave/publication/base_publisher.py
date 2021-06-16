@@ -24,6 +24,10 @@ class ScenarioNotExistsError(BaseVersionPublisherException):
     """ Exception for situation with not existing Scenario. """
 
 
+class NullablePullRequestUrlError(BaseVersionPublisherException):
+    """ Exception for nullable merge-request in selected Draft. """
+
+
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
     """ Class for feature version's pull requests management relative to Atlassian Stash API. """
 
@@ -77,4 +81,19 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
                 f"Published by: @{context.draft.published_by}.",
                 generate_task_info(tasks=context.feature.task, header=self._project_settings.links_keyword),
             )
+        )
+
+    def _save_as_duplicate(self, context: PublisherContext) -> None:
+        previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
+        if previous_draft.pr_url is None:
+            raise NullablePullRequestUrlError(
+                "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
+            )
+        if previous_draft.published_at is None:
+            raise RuntimeError
+        self._draft_storage.save_response(
+            draft_id=context.draft.id,
+            pr_url=previous_draft.pr_url,
+            published_at=previous_draft.published_at,
+            opened=True,
         )
