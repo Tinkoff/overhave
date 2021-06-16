@@ -10,12 +10,6 @@ class GitlabRepository(BaseModel):
     id: str = Field(..., alias="project_id")
 
 
-class GitlabReviewer(BaseModel):
-    """ Model for Gitlab merge-request reviewer. """
-
-    id: int
-
-
 class GitlabMrRequest(BaseModel):
     """ Model for Gitlab merge-request request. """
 
@@ -24,7 +18,7 @@ class GitlabMrRequest(BaseModel):
     target_branch: str = Field(...)
     title: Optional[str]
     description: Optional[str]
-    reviewer_ids: List[GitlabReviewer]
+    reviewer_ids: List[str]
 
 
 class GitlabMrCreationResponse(BaseModel):

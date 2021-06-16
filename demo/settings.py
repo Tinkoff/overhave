@@ -46,7 +46,9 @@ class OverhaveDemoSettingsGenerator:
         admin_factory = get_admin_factory()
         if admin_factory.context.project_settings.publication_manager_type == "gitlab":
             return (
-                OverhaveGitlabClientSettings(url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"),
+                OverhaveGitlabClientSettings(
+                    url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
+                ),
                 OverhaveGitlabPublisherSettings(repository_id="2034"),
             )
         return (

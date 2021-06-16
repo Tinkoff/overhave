@@ -3,7 +3,6 @@ from typing import List, Mapping
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities import FeatureTypeName
 from overhave.transport.http.gitlab_client import GitlabRepository
-from overhave.transport.http.gitlab_client.models import GitlabReviewer
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
@@ -21,10 +20,10 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     default_target_branch_name: str = "master"
 
     # Merge-request default reviewers as list
-    default_reviewers: List[int] = []
+    default_reviewers: List[str] = []
 
     # Merge-request default reviewers as mapping with :class:```FeatureTypeName```
-    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[int]] = {}
+    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
     @property
     def repository(self) -> GitlabRepository:
@@ -34,13 +33,12 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     def target_branch(self) -> str:
         return self.default_target_branch_name
 
-    def get_reviewers(self, feature_type: FeatureTypeName) -> List[GitlabReviewer]:
+    def get_reviewers(self, feature_type: FeatureTypeName) -> List[str]:
         if self.feature_type_to_reviewers_mapping:
             reviewers = self.feature_type_to_reviewers_mapping.get(feature_type)
             if not reviewers:
                 raise NotSpecifiedFeatureTypeError(
                     f"'{feature_type}' reviewers are not specified in " "'feature_type_to_reviewers_mapping' dict!"
                 )
-        else:
-            reviewers = self.default_reviewers
-        return [GitlabReviewer(id=reviewer_id) for reviewer_id in reviewers]
+            return reviewers
+        return self.default_reviewers
