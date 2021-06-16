@@ -54,8 +54,9 @@ class GitlabVersionPublisher(GitVersionPublisher):
                 project_id=self._gitlab_publisher_settings.repository.id, branch=context.target_branch
             ),
             target_branch=self._gitlab_publisher_settings.target_branch,
+            reviewers=self._gitlab_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
-        logger.info("Prepared pull-request: %s", merge_request.json(by_alias=True))
+        logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
         try:
             response = self._client.send_merge_request(merge_request)
             if isinstance(response, GitlabMrCreationResponse):

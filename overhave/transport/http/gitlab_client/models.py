@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Final, Optional
+from typing import Final, Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -18,6 +18,18 @@ class GitlabBranch(BaseModel):
     ref: str = "master"
 
 
+class GitlabReviewerInfo(BaseModel):
+    """ Model for Gitlab merge-request reviewer information. """
+
+    id: str
+
+
+class GitlabReviewer(BaseModel):
+    """ Model for Gitlab merge-request reviewer. """
+
+    user: GitlabReviewerInfo
+
+
 class GitlabMrRequest(BaseModel):
     """ Model for Gitlab merge-request request. """
 
@@ -26,6 +38,7 @@ class GitlabMrRequest(BaseModel):
     target_branch: GitlabBranch = Field(...)
     title: Optional[str]
     description: Optional[str]
+    reviewers: List[GitlabReviewer]
 
 
 class GitlabMrCreationResponse(BaseModel):
