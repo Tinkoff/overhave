@@ -61,7 +61,11 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @property
     def publisher(self) -> IVersionPublisher:
-        return self._gitlab_publisher
+        if self.context.project_settings.publication_manager_type == "gitlab":
+            return self._gitlab_publisher
+        return self._stash_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        return self._gitlab_publisher.process_publish_task(task)
+        if self.context.project_settings.publication_manager_type == "gitlab":
+            return self._gitlab_publisher.process_publish_task(task)
+        return self._stash_publisher.process_publish_task(task)
