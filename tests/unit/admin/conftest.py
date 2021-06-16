@@ -124,3 +124,21 @@ def form_mock() -> mock.MagicMock:
     form_mock = mock.MagicMock()
     form_mock.data = {}
     return form_mock
+
+
+@pytest.fixture()
+def test_testing_user_view(faker: Faker) -> views.TestUserView:
+    return views.TestUserView(model=db.TestUser, session=UnifiedAlchemyMagicMock)
+
+
+@pytest.fixture()
+def test_testing_user_row(faker: Faker) -> db.TestUser:
+    return db.TestUser()
+
+
+@pytest.fixture()
+def current_testing_users_user_mock(user_role: db.Role, faker: Faker) -> mock.MagicMock:
+    with mock.patch("overhave.admin.views.testing_users.current_user", return_value=mock.MagicMock()) as mocked:
+        mocked.login = faker.word()
+        mocked.role = user_role
+        yield mocked
