@@ -17,7 +17,7 @@ class TestEmulationStorage:
         with pytest.raises(NotFoundEmulationError):
             test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_create_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
     ) -> None:
@@ -29,7 +29,7 @@ class TestEmulationStorage:
         assert emulation_run.initiated_by == test_system_user.login
         assert emulation_run.port is None
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_get_requested_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
     ) -> None:
@@ -41,7 +41,7 @@ class TestEmulationStorage:
         assert requested_emulation_run.emulation_id == test_emulation.id
         assert not test_emulation_storage._is_port_in_use(requested_emulation_run.port)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_set_error_run_status(
         self,
         test_emulation_storage: EmulationStorage,
@@ -60,7 +60,7 @@ class TestEmulationStorage:
         assert emulation_run.status == EmulationStatus.ERROR
         assert emulation_run.port is None
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         "emulation_status",
         [EmulationStatus.READY, EmulationStatus.REQUESTED, EmulationStatus.ERROR, EmulationStatus.CREATED],
