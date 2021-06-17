@@ -14,8 +14,8 @@ class GitlabMrRequest(BaseModel):
     """ Model for Gitlab merge-request request. """
 
     id: str = Field(..., alias="project_id")
-    source_branch: str = Field(...)
-    target_branch: str = Field(...)
+    source_branch: str
+    target_branch: str
     title: Optional[str]
     description: Optional[str]
     reviewer_ids: List[str]
