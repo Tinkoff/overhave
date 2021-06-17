@@ -11,6 +11,7 @@ from overhave.admin import views
 class TestTagView:
     """ Unit tests for TagsView. """
 
+    @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_get_tag_created_not_change(
         self,
@@ -22,6 +23,7 @@ class TestTagView:
         test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
         assert test_tags_row.created_by is None
 
+    @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_created_error(
         self,
@@ -33,6 +35,7 @@ class TestTagView:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
 
+    @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_delete_error(
         self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, test_tags_row: db.Tags
@@ -40,6 +43,7 @@ class TestTagView:
         with pytest.raises(ValidationError):
             test_tags_view.on_model_delete(model=test_tags_row)
 
+    @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
     @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_get_tag_created_by(
         self,
@@ -53,8 +57,9 @@ class TestTagView:
         test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
         assert test_tags_row.created_by == current_user_mock.login
 
+    @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
     @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
-    @pytest.mark.parametrize("value", ["Дайте танк (!)", "Заказ суши и роллов +79533830551", "k$ek", "@", "(*"])
+    @pytest.mark.parametrize("value", [f"{Faker().word()} (!)", f"{Faker().word()}+5", "k$ek", "@", "(*"])
     def test_incorrect_tag_raises_error(
         self,
         test_tags_view: views.TagsView,
