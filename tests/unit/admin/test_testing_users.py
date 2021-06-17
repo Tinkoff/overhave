@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from faker import Faker
 from wtforms.validators import ValidationError
 
 from overhave import db
@@ -43,3 +44,15 @@ class TestTestingUsers:
             test_testing_user_view.on_model_change(
                 form=form_mock, model=test_incorrect_testing_user_row, is_created=test_is_created
             )
+
+    @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_on_form_prefill(
+        self,
+        test_testing_user_view: TestUserView,
+        current_testing_users_user_mock: mock.MagicMock,
+        form_mock: mock.MagicMock,
+        faker: Faker,
+    ) -> None:
+        assert test_testing_user_view._feature_type is None
+        test_testing_user_view.on_form_prefill(form=form_mock, id=faker.word())
+        assert test_testing_user_view._feature_type is not None

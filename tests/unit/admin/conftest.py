@@ -120,9 +120,10 @@ def test_tags_row() -> db.Tags:
 
 
 @pytest.fixture()
-def form_mock() -> mock.MagicMock:
+def form_mock(test_incorrect_testing_user_row: db.TestUser) -> mock.MagicMock:
     form_mock = mock.MagicMock()
     form_mock.data = {}
+    form_mock._obj = test_incorrect_testing_user_row
     return form_mock
 
 
@@ -137,9 +138,10 @@ def test_testing_user_row() -> db.TestUser:
 
 
 @pytest.fixture()
-def test_incorrect_testing_user_row() -> db.TestUser:
+def test_incorrect_testing_user_row(faker: Faker) -> db.TestUser:
     test_user: db.TestUser = db.TestUser()
     test_user.feature_type = db.FeatureType()
+    test_user.feature_type.name = faker.word()
     return test_user
 
 
