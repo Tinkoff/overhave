@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from faker import Faker
 from wtforms.validators import ValidationError
 
 from overhave import db

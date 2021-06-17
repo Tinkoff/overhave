@@ -122,4 +122,4 @@ class TestGitlabHttpClientModels:
             {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
         )
         with pytest.raises(RuntimeError):
-            response.get_mr_url()
+            response.get_mr_url

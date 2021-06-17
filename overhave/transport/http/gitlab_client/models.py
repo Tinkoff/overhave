@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Final, List, Optional
 
 from pydantic import BaseModel, Field
-from yarl import URL
 
 
 class GitlabRepository(BaseModel):
@@ -27,7 +26,7 @@ class GitlabMrCreationResponse(BaseModel):
 
     created_at: datetime
     updated_at: datetime
-    web_url: URL
+    web_url: Optional[str]
     traceback: Optional[Exception]
     state: str
 
@@ -35,8 +34,8 @@ class GitlabMrCreationResponse(BaseModel):
         arbitrary_types_allowed = True
 
     @property
-    def get_mr_url(self) -> URL:
-        if isinstance(self.web_url, URL):
+    def get_mr_url(self) -> str:
+        if isinstance(self.web_url, str):
             return self.web_url
         raise RuntimeError("Could not get merge-request URL from response!")
 
