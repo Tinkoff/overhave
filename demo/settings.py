@@ -40,7 +40,7 @@ class OverhaveDemoSettingsGenerator:
     def publication_settings(self) -> Dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
         publication_manager_type = PublicationSettings().publication_manager_type
-        if publication_manager_type is PublicationManagerType.GITLAB:
+        if publication_manager_type == PublicationManagerType.GITLAB:
             settings["client_settings"] = OverhaveGitlabClientSettings(
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             )
