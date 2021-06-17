@@ -6,4 +6,4 @@ class PublicationSettings(BaseOverhavePrefix):
     """ Publication settings where you can specify publcation manager and its behavior. """
 
     # Choose gitlab or stash as a publication manager
-    publication_manager_type: str = PublicationManagerType.GITLAB
+    publication_manager_type: PublicationManagerType = PublicationManagerType.GITLAB
