@@ -78,3 +78,27 @@ class TestEmulationStorage:
         test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
         emulation_run = test_emulation_storage.get_emulation_run_by_id(emulation_run.id)
         assert emulation_run.status == emulation_status
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_get_emulation_run_by_incorrect_id(
+        self,
+        test_emulation_storage: EmulationStorage,
+        test_system_user: SystemUserModel,
+        test_emulation: db.Emulation,
+        faker: Faker,
+    ) -> None:
+        with pytest.raises(NotFoundEmulationError):
+            test_emulation_storage.get_emulation_run_by_id(faker.pyint())
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_get_emulation_run_by_id(
+        self,
+        test_emulation_storage: EmulationStorage,
+        test_system_user: SystemUserModel,
+        test_emulation: db.Emulation,
+        faker: Faker,
+    ) -> None:
+        emulation_run = test_emulation_storage.create_emulation_run(
+            emulation_id=test_emulation.id, initiated_by=test_system_user.login
+        )
+        assert test_emulation_storage.get_emulation_run_by_id(test_emulation.id) == emulation_run

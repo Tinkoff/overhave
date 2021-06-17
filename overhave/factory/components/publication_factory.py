@@ -7,7 +7,6 @@ from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
 from overhave.publication.gitlab import GitlabVersionPublisher
 from overhave.publication.objects import PublicationManagerType
-from overhave.publication.settings import PublicationSettings
 from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
 
