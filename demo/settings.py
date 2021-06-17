@@ -39,8 +39,7 @@ class OverhaveDemoSettingsGenerator:
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
-        publication_manager_type = PublicationSettings().publication_manager_type
-        if publication_manager_type == PublicationManagerType.GITLAB:
+        if PublicationSettings().publication_manager_type == PublicationManagerType.GITLAB:
             repository_id: str = "2034"
             settings["publisher_settings"] = OverhaveGitlabPublisherSettings(repository_id=repository_id)
             settings["client_settings"] = OverhaveGitlabClientSettings(

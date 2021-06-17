@@ -67,6 +67,6 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         return self._stash_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        if isinstance(self.publisher, GitlabVersionPublisher):
+        if self.context.publication_settings.publication_manager_type == PublicationManagerType.GITLAB:
             return self._gitlab_publisher.process_publish_task(task)
         return self._stash_publisher.process_publish_task(task)
