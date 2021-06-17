@@ -62,7 +62,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @property
     def publisher(self) -> IVersionPublisher:
-        if self.context.publication_settings.publication_manager_type == PublicationManagerType.GITLAB:
+        if self.context.publication_settings.publication_manager_type is PublicationManagerType.GITLAB:
             return self._gitlab_publisher
         return self._stash_publisher
 
