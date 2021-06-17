@@ -21,7 +21,6 @@ class TestFeatueView:
         test_feature_view: FeatureView,
         current_user_mock: mock.MagicMock,
         test_feature_row: db.Feature,
-        form_mock: mock.MagicMock,
     ) -> None:
         test_feature_view.on_model_delete(model=test_feature_row)
 
@@ -35,7 +34,6 @@ class TestFeatueView:
         test_feature_view: FeatureView,
         current_user_mock: mock.MagicMock,
         test_feature_row: db.Feature,
-        form_mock: mock.MagicMock,
     ) -> None:
         with pytest.raises(ValidationError):
             test_feature_view.on_model_delete(model=test_feature_row)
