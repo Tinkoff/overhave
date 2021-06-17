@@ -1,4 +1,3 @@
-import enum
 from typing import Any, Dict, List, Mapping, Optional, Type
 
 from pydantic import BaseModel, validator
@@ -37,9 +36,6 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     # Templates are used for creation of test user and system specifications.
     # Keys for specification mapping are still the same - feature types.
     user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
-
-    # Choose gitlab or stash as a publication manager
-    publication_manager_type: str = PublicationManagerType.GITLAB
 
     @validator("browse_url", pre=True)
     def make_browse_url(cls, v: Optional[str]) -> Optional[URL]:

@@ -132,8 +132,15 @@ def test_testing_user_view(faker: Faker) -> views.TestUserView:
 
 
 @pytest.fixture()
-def test_testing_user_row(faker: Faker) -> db.TestUser:
+def test_testing_user_row() -> db.TestUser:
     return db.TestUser()
+
+
+@pytest.fixture()
+def test_incorrect_testing_user_row() -> db.TestUser:
+    test_user: db.TestUser = db.TestUser()
+    test_user.feature_type = db.FeatureType()
+    return test_user
 
 
 @pytest.fixture()
