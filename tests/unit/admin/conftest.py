@@ -112,13 +112,6 @@ def user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_feature_model_task(request: FixtureRequest) -> List[str]:
-    if hasattr(request, "param"):
-        return request.param
-    raise NotImplementedError
-
-
-@pytest.fixture()
 def test_tags_view() -> views.TagsView:
     return views.TagsView(model=db.Tags, session=UnifiedAlchemyMagicMock)
 
