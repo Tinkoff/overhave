@@ -1,11 +1,13 @@
 import abc
 from functools import cached_property
 
+from overhave import OverhaveProjectSettings
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
 from overhave.publication.gitlab import GitlabVersionPublisher
+from overhave.publication.objects import PublicationManagerType
 from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
 
@@ -22,6 +24,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
     """ Factory for Overhave publication application. """
 
     context_cls = OverhavePublicationContext
+    publication_manager_type = OverhaveProjectSettings().publication_manager_type
 
     @cached_property
     def _stash_client(self) -> StashHttpClient:
@@ -61,11 +64,11 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @property
     def publisher(self) -> IVersionPublisher:
-        if self.context.project_settings.publication_manager_type == "gitlab":
+        if self.publication_manager_type == PublicationManagerType.GITLAB:
             return self._gitlab_publisher
         return self._stash_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        if self.context.project_settings.publication_manager_type == "gitlab":
+        if self.publication_manager_type == PublicationManagerType.GITLAB:
             return self._gitlab_publisher.process_publish_task(task)
         return self._stash_publisher.process_publish_task(task)

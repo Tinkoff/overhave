@@ -15,7 +15,7 @@ from overhave import (
 from overhave.extra import RUSSIAN_PREFIXES
 from overhave.factory import get_admin_factory
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
-from overhave.test_execution.settings import PublicationManagerType
+from overhave.test_execution.settings import OverhaveProjectSettings, PublicationManagerType
 from overhave.transport import OverhaveGitlabClientSettings
 
 
@@ -39,8 +39,8 @@ class OverhaveDemoSettingsGenerator:
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
-        admin_factory = get_admin_factory()
-        if admin_factory.context.project_settings.publication_manager_type is PublicationManagerType.GITLAB:
+        publication_manager_type = OverhaveProjectSettings().publication_manager_type
+        if publication_manager_type is PublicationManagerType.GITLAB:
             settings["client_settings"] = OverhaveGitlabClientSettings(
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             )

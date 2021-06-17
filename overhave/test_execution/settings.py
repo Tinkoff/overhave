@@ -8,13 +8,6 @@ from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
 
 
-class PublicationManagerType(str, enum.Enum):
-    """ Enum that declares remotely manager for publication pull requests. """
-
-    GITLAB = "gitlab"
-    STASH = "stash"
-
-
 class EmptyBrowseURLError(ValueError):
     """ Exception for situation with empty ```browse_url``` while trying to ```get_link_url```. """
 
