@@ -8,12 +8,12 @@ from overhave import db
 from overhave.admin.views.testing_users import TestUserView
 
 
+@pytest.mark.parametrize(
+    "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
+)
 class TestTestingUsers:
     """ Unit tests for View. """
 
-    @pytest.mark.parametrize(
-        "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
-    )
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_admin_delete_testing_users(
         self,
@@ -23,9 +23,6 @@ class TestTestingUsers:
     ) -> None:
         test_testing_user_view.on_model_delete(model=test_testing_user_row)
 
-    @pytest.mark.parametrize(
-        "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
-    )
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_user_doesnt_delete_testing_users(
         self,
@@ -36,9 +33,6 @@ class TestTestingUsers:
         with pytest.raises(ValidationError):
             test_testing_user_view.on_model_delete(model=test_testing_user_row)
 
-    @pytest.mark.parametrize(
-        "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
-    )
     @pytest.mark.parametrize("user_role", [db.Role.user, db.Role.admin], indirect=True)
     @pytest.mark.parametrize("test_is_created", [False, True])
     def test_incorrect_model_raises_error(
@@ -54,9 +48,6 @@ class TestTestingUsers:
                 form=form_mock, model=test_incorrect_testing_user_row, is_created=test_is_created
             )
 
-    @pytest.mark.parametrize(
-        "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
-    )
     @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_on_form_prefill(
         self,
