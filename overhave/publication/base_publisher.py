@@ -90,7 +90,7 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
                 "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
             )
         if previous_draft.published_at is None:
-            raise RuntimeError
+            raise RuntimeError(f"Somebody has published this scenario at {previous_draft.published_at}")
         self._draft_storage.save_response(
             draft_id=context.draft.id,
             pr_url=previous_draft.pr_url,
