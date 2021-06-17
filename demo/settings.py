@@ -41,10 +41,13 @@ class OverhaveDemoSettingsGenerator:
         settings = deepcopy(self.default_context_settings)
         publication_manager_type = PublicationSettings().publication_manager_type
         if publication_manager_type == PublicationManagerType.GITLAB:
+            repository_id: str = "2034"
+            settings["publisher_settings"] = OverhaveGitlabPublisherSettings(repository_id=repository_id)
             settings["client_settings"] = OverhaveGitlabClientSettings(
-                url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
+                url="https://overhave.readthedocs.io/not-a-handler",
+                auth_token="secret_token",
+                repository_id=repository_id,
             )
-            settings["publisher_settings"] = OverhaveGitlabPublisherSettings(repository_id="2034")
             return settings
         settings["client_settings"] = OverhaveStashClientSettings(
             url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
