@@ -40,18 +40,21 @@ class OverhaveDemoSettingsGenerator:
     def publication_settings(self) -> Dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
         if PublicationSettings().publication_manager_type is PublicationManagerType.GITLAB:
-            repository_id: str = "2034"
-            settings["publisher_settings"] = OverhaveGitlabPublisherSettings(repository_id=repository_id)
-            settings["client_settings"] = OverhaveGitlabClientSettings(
-                url="https://overhave.readthedocs.io/not-a-handler",
-                auth_token="secret_token",
-                repository_id=repository_id,
+            publication_manager_settings = dict(
+                publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
+                client_settings=OverhaveGitlabClientSettings(
+                    url="https://overhave.readthedocs.io/not-a-handler",
+                    auth_token="secret_token",
+                    repository_id="2034",
+                ),
             )
+            settings.update(publication_manager_settings)
             return settings
-        settings["client_settings"] = OverhaveStashClientSettings(
-            url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
+        publication_manager_settings = dict(
+            publisher_settings=OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
+            client_settings=OverhaveStashClientSettings(
+                url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
+            ),
         )
-        settings["publisher_settings"] = OverhaveStashPublisherSettings(
-            repository_name="bdd-features", project_key="OVH"
-        )
+        settings.update(publication_manager_settings)
         return settings
