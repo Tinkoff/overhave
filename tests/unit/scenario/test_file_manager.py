@@ -3,9 +3,10 @@ from unittest import mock
 
 import pytest
 
-from overhave import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveProjectSettings
+from overhave import OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.entities import FeatureExtractor, TestExecutorContext
 from overhave.scenario import FileManager, ScenarioCompiler
+from overhave.test_execution import OverhaveProjectSettings
 
 
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)

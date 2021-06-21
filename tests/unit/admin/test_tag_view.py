@@ -8,6 +8,7 @@ from overhave import db
 from overhave.admin import views
 
 
+@pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
 class TestTagView:
     """ Unit tests for TagsView. """
 
@@ -54,7 +55,7 @@ class TestTagView:
         assert test_tags_row.created_by == current_user_mock.login
 
     @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
-    @pytest.mark.parametrize("value", ["Дайте танк (!)", "Заказ суши и роллов +79533830551", "k$ek", "@", "(*"])
+    @pytest.mark.parametrize("value", ["(!)", "+5", "k$ek", "@", "(*"])
     def test_incorrect_tag_raises_error(
         self,
         test_tags_view: views.TagsView,

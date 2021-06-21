@@ -17,11 +17,13 @@ class TestStashProjectManager:
     def test_stash_project_settings_basic(
         self,
         test_target_branch: str,
-        test_repository_name: str,
+        test_repository_id_or_name: str,
         test_project_key: str,
         test_stash_publisher_with_default_reviewers: StashVersionPublisher,
     ) -> None:
-        correct_repository = StashRepository(slug=test_repository_name, project=StashProject(key=test_project_key))
+        correct_repository = StashRepository(
+            slug=test_repository_id_or_name, project=StashProject(key=test_project_key)
+        )
         assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.repository == correct_repository
         assert test_stash_publisher_with_default_reviewers._stash_publisher_settings.target_branch == StashBranch(
             id=test_target_branch, repository=correct_repository
