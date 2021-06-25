@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -48,7 +49,8 @@ def task_formatter(view: ModelView, context: Any, model: db.Feature, value: List
 @safe_formatter(type=str, supported_models=(db.Feature,))
 def file_path_formatter(view: ModelView, context: Any, model: db.Feature, value: str) -> Markup:
     if isinstance(model, db.Feature):
-        value_to_visualize = value.rstrip(view.feature_suffix).split("/")[-1]
+        value_without_suffix = re.sub(rf"({view.feature_suffix})", "", value)
+        value_to_visualize = value_without_suffix.split("/")[-1]
         return Markup(f"<i>{value_to_visualize}</i>")
     raise NotImplementedError
 

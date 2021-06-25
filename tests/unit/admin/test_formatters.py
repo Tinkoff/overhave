@@ -324,7 +324,14 @@ class TestDraftPrUrlFormatter:
 
 
 @pytest.mark.parametrize("column_name", ["file_path"])
-@pytest.mark.parametrize("value", ["my_file.feature", "my_folder/my_file.feature"])
+@pytest.mark.parametrize(
+    ("value", "correct_value"),
+    [
+        ("my_file.feature", "my_file"),
+        ("my_folder/my_file.feature", "my_file"),
+        ("individ/credit_account_closing_chatbot.feature", "credit_account_closing_chatbot"),
+    ],
+)
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
 class TestFilePathFormatter:
     """ Unit tests for file_path_formatter. """
@@ -335,9 +342,9 @@ class TestFilePathFormatter:
         test_feature_view_mocked: FeatureView,
         column_name: str,
         value: str,
+        correct_value: str,
         mocker: MockerFixture,
     ) -> None:
-        correct_value = value.rstrip(test_feature_view_mocked.feature_suffix).split("/")[-1]
         assert file_path_formatter(
             view=test_feature_view_mocked,
             context=mocker.MagicMock(),
