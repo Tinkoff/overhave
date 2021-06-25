@@ -3,7 +3,7 @@ import socket
 from logging.config import DictConfigurator  # type: ignore
 from typing import Any, Dict, Optional
 
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings, Field, validator
 from sqlalchemy import engine_from_config
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.url import URL, make_url
@@ -18,22 +18,30 @@ class BaseOverhavePrefix(BaseSettings):
         env_prefix = "OVERHAVE_"
 
 
+class SAUrl(URL):
+    """ Custom SQLAlchemy URL for Pydantic BaseSettings validation. """
+
+    @classmethod
+    def __get_validators__(cls):  # type: ignore
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v: str) -> URL:
+        try:
+            return make_url(v)
+        except ArgumentError as e:
+            raise ValueError from e
+
+
 class DataBaseSettings(BaseOverhavePrefix):
     """ Overhave database settings. """
 
-    db_url: URL = "postgresql://postgres:postgres@localhost/overhave"
+    db_url: SAUrl = Field(SAUrl.validate("postgresql://postgres:postgres@localhost/overhave"))
     db_pool_recycle: int = 500
     db_pool_size: int = 6
     db_echo: bool = False
     db_application_name: str = socket.gethostname()
     db_connect_timeout: int = 30
-
-    @validator("db_url", pre=True, always=True)
-    def validate_url(cls, v: str) -> URL:
-        try:
-            return make_url(v)
-        except ArgumentError as e:
-            raise ValueError from e
 
     def create_engine(self) -> Engine:
         return engine_from_config(
