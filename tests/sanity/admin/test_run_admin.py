@@ -20,7 +20,7 @@ class TestOverhaveRunAdmin:
     def test_factory_resolved(
         self, flask_run_mock: mock.MagicMock, test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
-        flask_run_mock.assert_called_once_with(host="0.0.0.0", port=8076, debug=True)
+        flask_run_mock.assert_called_once_with(host="localhost", port=8076, debug=True)
         assert cast(AdminFactory, test_resolved_admin_proxy_manager.factory)._context
         assert test_resolved_admin_proxy_manager.pytest_patched
 

@@ -56,13 +56,15 @@ class Emulator(ExternalCommandCheckMixin):
             feature_type=emulation_run.emulation.test_user.feature_type.name
         ).split(" ")
 
+        formatted_prefix = self._settings.emulation_prefix.format(
+            address=self._settings.emulation_bind_ip,
+            port=emulation_run.port,
+            timeout=self._settings.wait_timeout_seconds,
+        )
+
         emulation_cmd = (
             [self._settings.emulation_core_path]
-            + self._settings.emulation_prefix.format(
-                address=self._settings.emulation_bind_ip,
-                port=emulation_run.port,
-                timeout=self._settings.wait_timeout_seconds,
-            ).split(" ")
+            + formatted_prefix.split(" ")
             + emulation_base_cmd
             + cmd_from_user.split(" ")
         )

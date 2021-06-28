@@ -30,17 +30,13 @@ TEST_LDAP_GROUPS = ["group1", "group2"]
 
 
 def mocked_ldap_connection(cls: Any, *args: Any, **kwargs: Any) -> None:
+    member_groups = [
+        bytes(f"CN={TEST_LDAP_GROUPS[0]},OU=dep1,OU=Security Groups,DC=mydomain,DC=ru", encoding="utf-8"),
+        bytes(f"CN={TEST_LDAP_GROUPS[1]},OU=dep2,OU=Security Groups,DC=mydomain,DC=ru", encoding="utf-8"),
+    ]
     cls._ldap_connection = mock.MagicMock()
     cls._ldap_connection.search_st.return_value = [
-        (
-            "CN=Very cool member,OU=dep1,DC=mydomain,DC=ru",
-            {
-                "memberOf": [
-                    bytes(f"CN={TEST_LDAP_GROUPS[0]},OU=dep1,OU=Security Groups,DC=mydomain,DC=ru", encoding="utf-8"),
-                    bytes(f"CN={TEST_LDAP_GROUPS[1]},OU=dep2,OU=Security Groups,DC=mydomain,DC=ru", encoding="utf-8"),
-                ]
-            },
-        )
+        ("CN=Very cool member,OU=dep1,DC=mydomain,DC=ru", {"memberOf": member_groups},)
     ]
 
 

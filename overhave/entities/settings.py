@@ -55,7 +55,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     steps_dir: Path
 
     # Temporary directory for scenarios test runs
-    tmp_dir: Path = Path("/tmp/overhave")
+    tmp_dir: Path = Path("/tmp/overhave")  # noqa: S108
 
     @root_validator(pre=True)
     def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -140,7 +140,7 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     # Optional additional terminal tool usage description
     emulation_desc_link: Optional[str]
 
-    emulation_bind_ip: str = "0.0.0.0"
+    emulation_bind_ip: str = "0.0.0.0"  # noqa: S104
     # Ports for emulation binding. Expects as string with format `["port1", "port2", ...]`
     emulation_ports: List[int] = [8080]
 

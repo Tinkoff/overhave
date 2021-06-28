@@ -37,11 +37,12 @@ class ScenarioCompiler(PrefixMixin):
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
 
-    def _get_additional_tags(self, scenario_text: str, tag: Optional[List[str]]) -> str:
-        if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
+    def _get_additional_tags(self, scenario_text: str, tags: Optional[List[str]]) -> str:
+        if f"{self._compilation_settings.tag_prefix}{tags}" in scenario_text:
             return ""
-        if tag is not None:
-            return f"{' '.join(f'{self._compilation_settings.tag_prefix}{tag}' for tag in tag)}"
+        if tags is not None:
+            tags_with_prefix = (f"{self._compilation_settings.tag_prefix}{tag}" for tag in tags)
+            return f"{' '.join(tags_with_prefix)}"
         return ""
 
     def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:
@@ -82,7 +83,7 @@ class ScenarioCompiler(PrefixMixin):
         return "\n".join(
             (
                 f"{self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name)} "
-                f"{self._get_additional_tags(scenario_text=text, tag=generate_tags_list(context))}",
+                f"{self._get_additional_tags(scenario_text=text, tags=generate_tags_list(context))}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 f"{self._compilation_settings.id_prefix} {context.feature.id}",
                 (
