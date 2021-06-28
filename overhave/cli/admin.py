@@ -9,7 +9,7 @@ from overhave.factory import get_admin_factory
 def _run_admin(port: int, debug: bool) -> None:
     DataBaseSettings().setup_db()
     LoggingSettings().setup_logging()
-    overhave_app(get_admin_factory()).run(host="0.0.0.0", port=port, debug=debug)
+    overhave_app(get_admin_factory()).run(host="localhost", port=port, debug=debug)
 
 
 @overhave.command(short_help="Run Overhave web-service")

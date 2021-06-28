@@ -42,7 +42,7 @@ class OverhaveDemoSettingsGenerator:
         if PublicationSettings().publication_manager_type is PublicationManagerType.GITLAB:
             publication_manager_settings = dict(
                 publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
-                client_settings=OverhaveGitlabClientSettings(
+                client_settings=OverhaveGitlabClientSettings(  # noqa: S106
                     url="https://overhave.readthedocs.io/not-a-handler",
                     auth_token="secret_token",
                     repository_id="2034",
@@ -52,7 +52,7 @@ class OverhaveDemoSettingsGenerator:
             return settings
         publication_manager_settings = dict(
             publisher_settings=OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
-            client_settings=OverhaveStashClientSettings(
+            client_settings=OverhaveStashClientSettings(  # noqa: S106
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             ),
         )

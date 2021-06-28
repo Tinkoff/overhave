@@ -66,13 +66,15 @@ class EmulationStorage(IEmulationStorage):
         raise NotFoundEmulationError(f"Not found emulation run with ID {emulation_run_id}!")
 
     def _get_next_port(self, session: so.Session) -> int:
-        allocated_sorted_runs = sorted(
+        runs_with_allocated_ports = (  # noqa: ECE001
             session.query(db.EmulationRun)
             .filter(db.EmulationRun.port.isnot(None))
             .order_by(db.EmulationRun.id.desc())
             .limit(len(self._settings.emulation_ports))
-            .all(),
-            key=lambda t: t.changed_at,  # type: ignore
+            .all()
+        )
+        allocated_sorted_runs = sorted(
+            runs_with_allocated_ports, key=lambda t: t.changed_at,  # type: ignore
         )
 
         allocated_ports = {run.port for run in allocated_sorted_runs}
