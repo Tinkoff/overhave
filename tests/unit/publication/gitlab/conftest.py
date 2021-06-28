@@ -13,7 +13,10 @@ from overhave.transport import GitlabHttpClient
 
 @pytest.fixture()
 def test_gitlab_publisher_settings_with_default_reviewers(
-    test_repository_id_or_name: str, test_target_branch: str, test_default_reviewers: Sequence[str],
+    test_repository_id_or_name: str,
+    test_project_key: str,
+    test_target_branch: str,
+    test_default_reviewers: Sequence[str],
 ) -> OverhaveGitlabPublisherSettings:
     return OverhaveGitlabPublisherSettings(
         repository_id=test_repository_id_or_name,

@@ -69,9 +69,9 @@ class DraftStorage(IDraftStorage):
     def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
         with db.create_session() as session:
             selection_num = 2
-            drafts: List[db.Draft] = session.query(db.Draft).filter(db.Draft.feature_id == feature_id).order_by(
-                db.Draft.id.asc()
-            ).limit(selection_num).all()
+            drafts: List[db.Draft] = session.query(db.Draft).filter(  # noqa: ECE001
+                db.Draft.feature_id == feature_id
+            ).order_by(db.Draft.id.asc()).limit(selection_num).all()
             if not drafts or len(drafts) != selection_num:
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))

@@ -3,9 +3,10 @@ from unittest import mock
 
 import pytest
 
-from overhave import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveProjectSettings
+from overhave import OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.entities import FeatureExtractor, TestExecutorContext
 from overhave.scenario import FileManager, ScenarioCompiler
+from overhave.test_execution import OverhaveProjectSettings
 
 
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
@@ -52,9 +53,6 @@ class TestFileManager:
         test_file_manager_with_mocked_extractor: FileManager,
     ) -> None:
         file_path = test_file_manager_with_mocked_extractor.produce_feature_file(test_executor_ctx)
-        assert (
-            file_path
-            == Path(mocked_feature_extractor.feature_type_to_dir_mapping[test_executor_ctx.feature.feature_type.name])
-            / test_executor_ctx.feature.file_path
-        )
+        feature_dir = mocked_feature_extractor.feature_type_to_dir_mapping[test_executor_ctx.feature.feature_type.name]
+        assert file_path == Path(feature_dir) / test_executor_ctx.feature.file_path
         assert file_path.read_text() == test_scenario_compiler.compile(test_executor_ctx)

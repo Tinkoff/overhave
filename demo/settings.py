@@ -1,3 +1,4 @@
+from copy import deepcopy
 from functools import cached_property
 from pathlib import Path
 from typing import Dict
@@ -12,6 +13,10 @@ from overhave import (
     OverhaveStashPublisherSettings,
 )
 from overhave.extra import RUSSIAN_PREFIXES
+from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
+from overhave.publication.objects import PublicationManagerType
+from overhave.publication.settings import PublicationSettings
+from overhave.transport import OverhaveGitlabClientSettings
 
 
 class OverhaveDemoSettingsGenerator:
@@ -33,11 +38,23 @@ class OverhaveDemoSettingsGenerator:
 
     @cached_property
     def publication_settings(self) -> Dict[str, BaseSettings]:
-        settings = dict(
-            stash_client_settings=OverhaveStashClientSettings(
+        settings = deepcopy(self.default_context_settings)
+        if PublicationSettings().publication_manager_type is PublicationManagerType.GITLAB:
+            publication_manager_settings = dict(
+                publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
+                client_settings=OverhaveGitlabClientSettings(  # noqa: S106
+                    url="https://overhave.readthedocs.io/not-a-handler",
+                    auth_token="secret_token",
+                    repository_id="2034",
+                ),
+            )
+            settings.update(publication_manager_settings)
+            return settings
+        publication_manager_settings = dict(
+            publisher_settings=OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
+            client_settings=OverhaveStashClientSettings(  # noqa: S106
                 url="https://overhave.readthedocs.io/not-a-handler", auth_token="secret_token"
             ),
-            stash_publisher_settings=OverhaveStashPublisherSettings(repository_name="bdd-features", project_key="OVH"),
         )
-        settings.update(self.default_context_settings)
+        settings.update(publication_manager_settings)
         return settings

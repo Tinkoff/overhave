@@ -26,10 +26,6 @@ class CommitNotCreatedError(BaseGitVersionPublisherError):
     """ Exception for situation with not created commit. """
 
 
-class NullablePullRequestUrlError(BaseGitVersionPublisherError):
-    """ Exception for nullable merge-request in selected Draft. """
-
-
 class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
     """ Class for feature version's management, based on git. """
 
@@ -111,18 +107,3 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
         except (git.GitCommandError, BaseGitVersionPublisherError):
             logger.exception("Error while trying to push scenario version!")
         return None
-
-    def _save_as_duplicate(self, context: PublisherContext) -> None:
-        previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
-        if previous_draft.pr_url is None:
-            raise NullablePullRequestUrlError(
-                "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
-            )
-        if previous_draft.published_at is None:
-            raise RuntimeError
-        self._draft_storage.save_response(
-            draft_id=context.draft.id,
-            pr_url=previous_draft.pr_url,
-            published_at=previous_draft.published_at,
-            opened=True,
-        )

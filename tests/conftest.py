@@ -8,7 +8,7 @@ import pytest
 import sqlalchemy_utils as sau
 from _pytest.python import Metafunc
 from pytest_mock import MockerFixture
-from sqlalchemy.engine import create_engine
+from sqlalchemy.engine import create_engine, make_url
 from sqlalchemy.orm import close_all_sessions
 
 from overhave import (
@@ -33,7 +33,7 @@ def setup_logging() -> None:
 @pytest.fixture(scope="session")
 def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
     settings = OverhaveDBSettings()
-    settings.db_url = f"{settings.db_url}/overhave_{worker_id}"
+    settings.db_url = make_url(f"{settings.db_url}/overhave_{worker_id}")
     return settings
 
 

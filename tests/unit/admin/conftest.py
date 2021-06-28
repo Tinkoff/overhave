@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import List, Optional, cast
 from unittest import mock
 from uuid import uuid1
 
@@ -65,11 +65,16 @@ def test_testrun_button_css_class(status: str) -> str:
 
 
 @pytest.fixture()
-def test_feature_view(test_browse_url: Optional[str], mocker: MockerFixture) -> views.FeatureView:
+def test_feature_view_mocked(test_browse_url: Optional[str], mocker: MockerFixture) -> views.FeatureView:
     mock = mocker.create_autospec(views.FeatureView)
     mock.browse_url = test_browse_url
     mock.feature_suffix = ".feature"
     return mock
+
+
+@pytest.fixture()
+def test_feature_view() -> views.FeatureView:
+    return views.FeatureView(model=db.Feature, session=UnifiedAlchemyMagicMock)
 
 
 @pytest.fixture()
@@ -80,6 +85,11 @@ def test_feature_id(faker: Faker) -> int:
 @pytest.fixture()
 def test_feature_name(faker: Faker) -> str:
     return faker.word()
+
+
+@pytest.fixture()
+def test_feature_row(faker: Faker, test_feature_model_task: List[str]) -> db.Feature:
+    return db.Feature(name=faker.word(), author=faker.word(), task=test_feature_model_task)
 
 
 @pytest.fixture(scope="session")
@@ -102,14 +112,6 @@ def user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def current_user_mock(user_role: db.Role, faker: Faker) -> mock.MagicMock:
-    with mock.patch("overhave.admin.views.tag.current_user", return_value=mock.MagicMock()) as mocked:
-        mocked.login = faker.word()
-        mocked.role = user_role
-        yield mocked
-
-
-@pytest.fixture()
 def test_tags_view() -> views.TagsView:
     return views.TagsView(model=db.Tags, session=UnifiedAlchemyMagicMock)
 
@@ -120,7 +122,39 @@ def test_tags_row() -> db.Tags:
 
 
 @pytest.fixture()
-def form_mock() -> mock.MagicMock:
+def form_mock(test_incorrect_testing_user_row: db.TestUser) -> mock.MagicMock:
     form_mock = mock.MagicMock()
     form_mock.data = {}
+    form_mock._obj = test_incorrect_testing_user_row
     return form_mock
+
+
+@pytest.fixture()
+def test_testing_user_view(faker: Faker) -> views.TestUserView:
+    return views.TestUserView(model=db.TestUser, session=UnifiedAlchemyMagicMock)
+
+
+@pytest.fixture()
+def test_testing_user_row() -> db.TestUser:
+    return db.TestUser()
+
+
+@pytest.fixture()
+def test_incorrect_testing_user_row(faker: Faker) -> db.TestUser:
+    test_user: db.TestUser = db.TestUser(feature_type=db.FeatureType(name=faker.word()))
+    return test_user
+
+
+@pytest.fixture()
+def current_user_mock(user_role: db.Role, faker: Faker, test_mock_patch_user_directory: str) -> mock.MagicMock:
+    with mock.patch(test_mock_patch_user_directory, return_value=mock.MagicMock()) as mocked:
+        mocked.login = faker.word()
+        mocked.role = user_role
+        yield mocked
+
+
+@pytest.fixture()
+def test_mock_patch_user_directory(request: FixtureRequest) -> List[str]:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError

@@ -1,3 +1,5 @@
+import datetime
+
 from overhave.transport import StashPrCreationResponse
 
 
@@ -5,7 +7,7 @@ class TestStashHttpClientModels:
     """ Unit tests for :class:`StashHttpClient` models. """
 
     def test_pr_creation_response(self) -> None:
-        StashPrCreationResponse.parse_obj(
+        response = StashPrCreationResponse.parse_obj(  # noqa: ECE001
             {
                 "id": 270,
                 "version": 0,
@@ -210,3 +212,8 @@ class TestStashHttpClientModels:
                 },
             }
         )
+        assert response.title == "BDD test scenario"
+        assert response.traceback is None
+        assert response.created_date == datetime.datetime(2021, 3, 5, 10, 8, 19, 839000, tzinfo=datetime.timezone.utc)
+        assert response.updated_date == datetime.datetime(2021, 3, 5, 10, 8, 19, 839000, tzinfo=datetime.timezone.utc)
+        assert response.pull_request_url is None

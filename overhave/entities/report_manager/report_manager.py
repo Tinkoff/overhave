@@ -1,5 +1,5 @@
 import logging
-import subprocess
+import subprocess  # noqa: S404
 from os import makedirs
 from pathlib import Path
 from typing import Optional
@@ -44,7 +44,7 @@ class ReportManager:
         logger.debug("Allure report generation command: %s", " ".join(generation_cmd))
         makedirs(report_dir.as_posix(), exist_ok=True)
         try:
-            return subprocess.run(
+            return subprocess.run(  # noqa: S603
                 generation_cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

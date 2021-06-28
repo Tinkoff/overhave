@@ -1,8 +1,8 @@
 from typing import List, Mapping
 
 from overhave.base_settings import BaseOverhavePrefix
-from overhave.entities.feature import FeatureTypeName
-from overhave.transport.http.gitlab_client import GitlabBranch, GitlabRepository, GitlabReviewer, GitlabReviewerInfo
+from overhave.entities import FeatureTypeName
+from overhave.transport.http.gitlab_client import GitlabRepository
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
@@ -19,26 +19,26 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     repository_id: str  # for example '2034'
     default_target_branch_name: str = "master"
 
-    # Pull-request default reviewers as list
+    # Merge-request default reviewers as list
     default_reviewers: List[str] = []
-    # Pull-request default reviewers as mapping with :class:```FeatureTypeName```
+
+    # Merge-request default reviewers as mapping with :class:```FeatureTypeName```
     feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
     @property
     def repository(self) -> GitlabRepository:
-        return GitlabRepository(slug=self.repository_id)
+        return GitlabRepository(project_id=self.repository_id)
 
     @property
-    def target_branch(self) -> GitlabBranch:
-        return GitlabBranch(id=self.default_target_branch_name, repository=self.repository)
+    def target_branch(self) -> str:
+        return self.default_target_branch_name
 
-    def get_reviewers(self, feature_type: FeatureTypeName) -> List[GitlabReviewer]:
+    def get_reviewers(self, feature_type: FeatureTypeName) -> List[str]:
         if self.feature_type_to_reviewers_mapping:
-            reviewers = self.feature_type_to_reviewers_mapping[feature_type]
+            reviewers = self.feature_type_to_reviewers_mapping.get(feature_type)
             if not reviewers:
                 raise NotSpecifiedFeatureTypeError(
-                    f"'{feature_type}' reviewers are not specified in " "'feature_type_to_reviewers_mapping' dict!"
+                    f"'{feature_type}' reviewers are not specified in 'feature_type_to_reviewers_mapping' dict!"
                 )
-        else:
-            reviewers = self.default_reviewers
-        return [GitlabReviewer(user=GitlabReviewerInfo(name=reviewer)) for reviewer in reviewers]
+            return reviewers
+        return self.default_reviewers

@@ -115,13 +115,13 @@ class TestTaskFormatter:
     def test_task_without_url(
         self,
         test_browse_url: None,
-        test_feature_view: FeatureView,
+        test_feature_view_mocked: FeatureView,
         column_name: str,
         value: Sequence[str],
         mocker: MockerFixture,
     ) -> None:
         assert task_formatter(
-            view=test_feature_view,
+            view=test_feature_view_mocked,
             context=mocker.MagicMock(),
             model=db.Feature(**{column_name: value}),  # type: ignore
             name=column_name,
@@ -131,7 +131,7 @@ class TestTaskFormatter:
     def test_task_with_url(
         self,
         test_browse_url: str,
-        test_feature_view: FeatureView,
+        test_feature_view_mocked: FeatureView,
         column_name: str,
         value: Sequence[str],
         mocker: MockerFixture,
@@ -140,7 +140,7 @@ class TestTaskFormatter:
         for task in value:
             task_links.append(f"<a href='{test_browse_url}/{task}' target='blank'>{task}</a>")
         assert task_formatter(
-            view=test_feature_view,
+            view=test_feature_view_mocked,
             context=mocker.MagicMock(),
             model=db.Feature(**{column_name: value}),  # type: ignore
             name=column_name,
@@ -239,14 +239,14 @@ class TestFeatureLinkFormatter:
     @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
     def test_with_feature(
         self,
-        test_feature_view: FeatureView,
+        test_feature_view_mocked: FeatureView,
         mocker: MockerFixture,
         column_name: str,
         test_feature_id: int,
         test_feature_name: str,
     ) -> None:
         assert feature_link_formatter(
-            view=test_feature_view,
+            view=test_feature_view_mocked,
             context=mocker.MagicMock(),
             model=db.Feature(**{"id": test_feature_id, column_name: test_feature_name}),  # type: ignore
             name=column_name,
@@ -324,7 +324,14 @@ class TestDraftPrUrlFormatter:
 
 
 @pytest.mark.parametrize("column_name", ["file_path"])
-@pytest.mark.parametrize("value", ["my_file.feature", "my_folder/my_file.feature"])
+@pytest.mark.parametrize(
+    ("value", "correct_value"),
+    [
+        ("my_file.feature", "my_file"),
+        ("my_folder/my_file.feature", "my_file"),
+        ("individ/credit_account_closing_chatbot.feature", "credit_account_closing_chatbot"),
+    ],
+)
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
 class TestFilePathFormatter:
     """ Unit tests for file_path_formatter. """
@@ -332,14 +339,14 @@ class TestFilePathFormatter:
     def test_task_without_url(
         self,
         test_browse_url: None,
-        test_feature_view: FeatureView,
+        test_feature_view_mocked: FeatureView,
         column_name: str,
         value: str,
+        correct_value: str,
         mocker: MockerFixture,
     ) -> None:
-        correct_value = value.rstrip(test_feature_view.feature_suffix).split("/")[-1]
         assert file_path_formatter(
-            view=test_feature_view,
+            view=test_feature_view_mocked,
             context=mocker.MagicMock(),
             model=db.Feature(**{column_name: value}),  # type: ignore
             name=column_name,

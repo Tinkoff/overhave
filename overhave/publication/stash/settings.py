@@ -35,10 +35,10 @@ class OverhaveStashPublisherSettings(BaseOverhavePrefix):
 
     def get_reviewers(self, feature_type: FeatureTypeName) -> List[StashReviewer]:
         if self.feature_type_to_reviewers_mapping:
-            reviewers = self.feature_type_to_reviewers_mapping[feature_type]
+            reviewers = self.feature_type_to_reviewers_mapping.get(feature_type)
             if not reviewers:
                 raise NotSpecifiedFeatureTypeError(
-                    f"'{feature_type}' reviewers are not specified in " "'feature_type_to_reviewers_mapping' dict!"
+                    f"'{feature_type}' reviewers are not specified in 'feature_type_to_reviewers_mapping' dict!"
                 )
         else:
             reviewers = self.default_reviewers
