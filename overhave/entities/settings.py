@@ -192,3 +192,4 @@ class OverhaveDescriptionManagerSettings(BaseOverhavePrefix):
     """ Settings for DescriptionManager, which sets the description to Allure report dynamically after test. """
 
     blocks_delimiter: str = ""
+    html: bool = True
