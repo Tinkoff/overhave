@@ -12,7 +12,13 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
-from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
+from overhave.pytest_plugin import (
+    DescriptionManager,
+    IProxyManager,
+    StepContextNotDefinedError,
+    get_scenario,
+    has_issue_links,
+)
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
@@ -294,7 +300,7 @@ class TestPytestCommonHooks:
     def test_pytest_runtest_makereport_clean(
         self,
         clear_get_description_manager: None,
-            description_html_handler_mock,
+        description_html_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
@@ -312,7 +318,7 @@ class TestPytestCommonHooks:
     def test_pytest_runtest_makereport_bdd(
         self,
         clear_get_description_manager: None,
-            description_html_handler_mock,
+        description_html_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_pytest_bdd_item: Item,

@@ -105,15 +105,12 @@ def test_description_manager_settings(test_blocks_delimiter: str) -> OverhaveDes
 
 
 @pytest.fixture()
-def test_description_html_manager(
-        test_description_html_manager_settings,
-) -> DescriptionManager:
+def test_description_html_manager(test_description_html_manager_settings,) -> DescriptionManager:
     return DescriptionManager(settings=test_description_html_manager_settings)
 
+
 @pytest.fixture()
-def test_description_manager(
-        test_description_manager_settings,
-) -> DescriptionManager:
+def test_description_manager(test_description_manager_settings,) -> DescriptionManager:
     return DescriptionManager(settings=test_description_manager_settings)
 
 
