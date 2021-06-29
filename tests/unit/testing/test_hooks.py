@@ -12,13 +12,7 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
-from overhave.pytest_plugin import (
-    DescriptionManager,
-    IProxyManager,
-    StepContextNotDefinedError,
-    get_scenario,
-    has_issue_links,
-)
+from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
