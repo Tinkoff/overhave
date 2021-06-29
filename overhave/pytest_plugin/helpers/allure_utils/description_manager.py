@@ -11,7 +11,7 @@ class DescriptionManager:
 
     def __init__(self, settings: OverhaveDescriptionManagerSettings):
         self._settings = settings
-        self._description: List[str] = ["odin", "dva"]
+        self._description: List[str] = []
 
     def apply_description(self) -> None:
         if self._description:
