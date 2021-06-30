@@ -106,11 +106,11 @@ def test_description_manager(test_description_manager_settings,) -> DescriptionM
 
 @pytest.fixture()
 def description_handler_mock(enable_html: bool) -> mock.MagicMock:
-    if not enable_html:
-        with mock.patch("allure.dynamic.description", return_value=mock.MagicMock()) as mocked_description_handler:
+    if enable_html:
+        with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
             yield mocked_description_handler
             return
-    with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
+    with mock.patch("allure.dynamic.description", return_value=mock.MagicMock()) as mocked_description_handler:
         yield mocked_description_handler
 
 
