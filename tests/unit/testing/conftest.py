@@ -95,12 +95,16 @@ def test_blocks_delimiter(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_description_manager_settings(test_blocks_delimiter: str, enable_html) -> OverhaveDescriptionManagerSettings:
+def test_description_manager_settings(
+    test_blocks_delimiter: str, enable_html: bool
+) -> OverhaveDescriptionManagerSettings:
     return OverhaveDescriptionManagerSettings(blocks_delimiter=test_blocks_delimiter, html=enable_html)
 
 
 @pytest.fixture()
-def test_description_manager(test_description_manager_settings,) -> DescriptionManager:
+def test_description_manager(
+    test_description_manager_settings: OverhaveDescriptionManagerSettings,
+) -> DescriptionManager:
     return DescriptionManager(settings=test_description_manager_settings)
 
 

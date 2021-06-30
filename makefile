@@ -29,7 +29,7 @@ precommit-install:
 	chmod +x .git/hooks/pre-commit
 
 test:
-	$(VENV)/bin/poetry run pytest -n auto --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE) --cov-report=html
+	$(VENV)/bin/poetry run pytest -n auto --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
 lint:
 	$(VENV)/bin/poetry run black --check $(ALL)
