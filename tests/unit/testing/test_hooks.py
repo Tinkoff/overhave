@@ -291,10 +291,11 @@ class TestPytestCommonHooks:
             pytest_runtest_setup(item=test_clean_item)
             mocked_description_manager.assert_not_called()
 
+    @pytest.mark.parametrize("enable_html", [True])
     def test_pytest_runtest_makereport_clean(
         self,
         clear_get_description_manager: None,
-        description_html_handler_mock: mock.MagicMock,
+        description_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
@@ -303,16 +304,17 @@ class TestPytestCommonHooks:
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
         pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
-        description_html_handler_mock.assert_called_once()
+        description_handler_mock.assert_called_once()
         link_handler_mock.assert_not_called()
 
     @pytest.mark.parametrize(
-        ("browse_url", "links_keyword"), [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")]
+        ("browse_url", "links_keyword", "enable_html"),
+        [(None, None, True), ("https://overhave.readthedocs.io/browse", "Tasks", True)],
     )
     def test_pytest_runtest_makereport_bdd(
         self,
         clear_get_description_manager: None,
-        description_html_handler_mock: mock.MagicMock,
+        description_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_pytest_bdd_item: Item,
@@ -329,7 +331,7 @@ class TestPytestCommonHooks:
 
         pytest_collection_modifyitems(test_pytest_bdd_session)
         pytest_runtest_makereport(item=test_pytest_bdd_item, call=mock.MagicMock())
-        description_html_handler_mock.assert_called_once()
+        description_handler_mock.assert_called_once()
 
         if browse_url is None:
             link_handler_mock.assert_not_called()
