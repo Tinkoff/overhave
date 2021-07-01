@@ -1,7 +1,8 @@
 import logging
+from http import HTTPStatus
 from typing import cast
 
-from gitlab import GitlabCreateError
+from gitlab import GitlabCreateError, GitlabHttpError
 from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 from requests import HTTPError
 
@@ -69,8 +70,9 @@ class GitlabVersionPublisher(GitVersionPublisher):
                     opened=parsed_response.state == "opened",
                 )
                 return
-        except GitlabCreateError:
-            logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
-            self._save_as_duplicate(context)
-        except HTTPError:
+        except (GitlabCreateError, GitlabHttpError) as e:
+            if e.response_code == HTTPStatus.CONFLICT:
+                logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
+                self._save_as_duplicate(context)
+                return
             logger.exception("Got HTTP error while trying to sent merge-request!")
