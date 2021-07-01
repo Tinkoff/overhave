@@ -4,7 +4,6 @@ from typing import cast
 
 from gitlab import GitlabCreateError, GitlabHttpError
 from gitlab.v4.objects.merge_requests import ProjectMergeRequest
-from requests import HTTPError
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
