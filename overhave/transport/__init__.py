@@ -2,7 +2,6 @@
 from .http import (
     GitlabHttpClient,
     GitlabHttpClientConflictError,
-    GitlabMrCreationResponse,
     GitlabMrRequest,
     GitlabRepository,
     OverhaveGitlabClientSettings,

@@ -25,6 +25,9 @@ class OverhaveStashPublisherSettings(BaseOverhavePrefix):
     # Pull-request default reviewers as mapping with :class:```FeatureTypeName```
     feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
+    class Config:
+        env_prefix = "OVERHAVE_GITLAB_"
+
     @property
     def repository(self) -> StashRepository:
         return StashRepository(slug=self.repository_name, project=StashProject(key=self.project_key))
