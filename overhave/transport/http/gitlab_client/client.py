@@ -1,8 +1,7 @@
 import logging
-
+from typing import Any
 
 import gitlab
-from typing import Any
 
 from overhave.transport.http import BaseHttpClient
 from overhave.transport.http.base_client import BaseHttpClientException
