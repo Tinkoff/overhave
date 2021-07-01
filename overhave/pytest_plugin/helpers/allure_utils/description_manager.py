@@ -16,6 +16,9 @@ class DescriptionManager:
     def apply_description(self) -> None:
         if self._description:
             joined_description = self._settings.blocks_delimiter.join(self._description)
+            if not self._settings.html:
+                allure.dynamic.description(joined_description)
+                return
             allure.dynamic.description_html(Markup(joined_description))
 
     def add_description(self, value: str) -> None:

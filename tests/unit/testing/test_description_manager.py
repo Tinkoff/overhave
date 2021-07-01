@@ -1,10 +1,12 @@
 from unittest import mock
 
+import pytest
 from faker import Faker
 
 from overhave.pytest_plugin import DescriptionManager
 
 
+@pytest.mark.parametrize("enable_html", [True, False])
 class TestDescriptionManager:
     """ Unit tests for DescriptionManager. """
 
