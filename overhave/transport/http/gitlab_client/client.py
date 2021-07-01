@@ -1,7 +1,7 @@
 import logging
+from typing import Any
 
 import gitlab
-from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 
 from overhave.transport.http import BaseHttpClient
 from overhave.transport.http.base_client import BaseHttpClientException
@@ -22,7 +22,7 @@ class GitlabHttpClientConflictError(BaseGitlabHttpClientException):
 class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
     """ Client for communication with remote Gitlab server. """
 
-    def send_merge_request(self, merge_request: GitlabMrRequest) -> ProjectMergeRequest:
+    def send_merge_request(self, merge_request: GitlabMrRequest) -> Any:
         url = self._settings.url
         gl = gitlab.Gitlab(url.human_repr(), private_token=self._settings.auth_token)
         project = gl.projects.get(self._settings.repository_id, lazy=True)

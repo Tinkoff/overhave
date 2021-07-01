@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 
 from gitlab import GitlabCreateError
 from gitlab.v4.objects.merge_requests import ProjectMergeRequest
@@ -11,6 +12,7 @@ from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
+from overhave.transport.http.gitlab_client.models import GitlabMrCreationResponse
 
 logger = logging.getLogger(__name__)
 
@@ -59,12 +61,12 @@ class GitlabVersionPublisher(GitVersionPublisher):
         try:
             response = self._client.send_merge_request(merge_request)
             if isinstance(response, ProjectMergeRequest):
-                response_attributes = response.attributes
+                parsed_response = cast(GitlabMrCreationResponse, response.attributes)
                 self._draft_storage.save_response(
                     draft_id=draft_id,
-                    pr_url=response_attributes.get("web_url"),
-                    published_at=response_attributes.get("created_at"),
-                    opened=response_attributes.get("state") == "opened",
+                    pr_url=parsed_response.web_url,  # type: ignore
+                    published_at=parsed_response.created_at,
+                    opened=parsed_response.state == "opened",
                 )
                 return
         except GitlabCreateError:
