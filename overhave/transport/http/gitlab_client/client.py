@@ -41,6 +41,6 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
         project = gl.projects.get(self._settings.repository_id, lazy=True)
         try:
             return project.mergerequests.create(merge_request.dict(by_alias=True))
-        except Exception as e:
+        except Exception:
             logging.exception("Please verify your token or URL! Maybe they are invalid")
             raise GitlabInvalidTokenError("Please verify your token or URL! Maybe they are invalid")
