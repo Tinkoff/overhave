@@ -13,16 +13,12 @@ class OverhaveGitlabClientSettings(BaseHttpClientSettings):
 
     auth_token: str
     repository_id: str
-    tokenizer_url: URL
     token_type: TokenType
+    token: str
 
     @validator("tokenizer_url", pre=True)
     def make_url(cls, v: Optional[str]) -> Optional[URL]:
         return make_url(v)
-
-    @property
-    def get_token_url(self) -> URL:
-        return self.tokenizer_url / self.token_path
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_"
