@@ -4,6 +4,7 @@ from pydantic import validator
 from yarl import URL
 
 from overhave.transport.http import BaseHttpClientSettings
+from overhave.transport.http.gitlab_client.utils import TokenType
 from overhave.utils import make_url
 
 
@@ -13,9 +14,7 @@ class OverhaveGitlabClientSettings(BaseHttpClientSettings):
     auth_token: str
     repository_id: str
     tokenizer_url: URL
-    token_path: str
-    vault_server_name: str
-    initiator: str
+    token_type: TokenType
 
     @validator("tokenizer_url", pre=True)
     def make_url(cls, v: Optional[str]) -> Optional[URL]:
