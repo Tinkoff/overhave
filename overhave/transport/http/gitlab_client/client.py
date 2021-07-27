@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from overhave.transport.http import BaseHttpClient
 from overhave.transport.http.base_client import BaseHttpClientException
@@ -25,9 +25,11 @@ class GitlabInvalidTokenError(BaseGitlabHttpClientException):
 class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
     """ Client for communication with remote Gitlab server. """
 
-    def send_merge_request(self, merge_request: GitlabMrRequest) -> Any:
+    def send_merge_request(self, merge_request: GitlabMrRequest, token: Optional[str] = None) -> Any:
         gl = get_gl(
-            url=self._settings.url.human_repr(), token_type=self._settings.token_type, token=self._settings.token
+            url=self._settings.url.human_repr(),
+            token_type=self._settings.token_type,
+            token=token or self._settings.token,
         )
         project = gl.projects.get(self._settings.repository_id, lazy=True)
         try:

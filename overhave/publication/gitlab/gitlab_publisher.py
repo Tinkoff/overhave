@@ -8,6 +8,7 @@ from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
+from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
@@ -31,6 +32,7 @@ class GitlabVersionPublisher(GitVersionPublisher):
         file_manager: FileManager,
         gitlab_publisher_settings: OverhaveGitlabPublisherSettings,
         client: GitlabHttpClient,
+        tokenizer_client: TokenizerClient,
     ):
         super().__init__(
             file_settings=file_settings,
@@ -43,6 +45,7 @@ class GitlabVersionPublisher(GitVersionPublisher):
         )
         self._gitlab_publisher_settings = gitlab_publisher_settings
         self._client = client
+        self._tokenizer_client = tokenizer_client
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)
@@ -59,7 +62,8 @@ class GitlabVersionPublisher(GitVersionPublisher):
         )
         logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
         try:
-            response = self._client.send_merge_request(merge_request)
+            token = self._tokenizer_client.get_token(initiator="overlord", draft_id=draft_id)
+            response = self._client.send_merge_request(merge_request, token.token)
             if isinstance(response, ProjectMergeRequest):
                 parsed_response = cast(GitlabMrCreationResponse, response.attributes)
                 self._draft_storage.save_response(

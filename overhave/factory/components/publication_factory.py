@@ -6,6 +6,7 @@ from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
 from overhave.publication.gitlab import GitlabVersionPublisher
+from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.publication.objects import PublicationManagerType
 from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
@@ -47,6 +48,10 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         )
 
     @cached_property
+    def _tokenizer_client(self) -> TokenizerClient:
+        return TokenizerClient()
+
+    @cached_property
     def _gitlab_publisher(self) -> GitlabVersionPublisher:
         return GitlabVersionPublisher(
             file_settings=self.context.file_settings,
@@ -58,6 +63,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             file_manager=self._file_manager,
             gitlab_publisher_settings=self.context.publisher_settings,  # type: ignore
             client=self._gitlab_client,
+            tokenizer_client=self._tokenizer_client,
         )
 
     @property
