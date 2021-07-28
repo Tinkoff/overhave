@@ -4,6 +4,7 @@ from pydantic.main import BaseModel
 
 from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
 from overhave.transport.http import BaseHttpClient
+from overhave.transport.http.base_client import HttpMethod
 
 
 class TokenizerResponse(BaseModel):
@@ -23,6 +24,7 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         if self._settings.vault_server_name is None:
             return TokenizerResponse(token=None)
         response = self._make_request(
+            HttpMethod.POST,
             self._settings.url,
             params={"initiator": initiator, "id": draft_id, "vault_server_name": self._settings.vault_server_name},
         )
