@@ -21,7 +21,6 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         self._settings = settings
 
     def get_token(self, draft_id: int) -> TokenizerResponse:
-        print(self._settings)
         response = self._make_request(
             HttpMethod.POST,
             self._settings.url,

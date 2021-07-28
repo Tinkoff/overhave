@@ -1,11 +1,11 @@
-from faker import Faker
-
-from overhave.publication.gitlab.tokenizer.client import TokenizerClient
+import pytest
+from pydantic import ValidationError
 
 
 class TestTokenizerClient:
     """ Tests for :class:`TokenizerClient`. """
 
-    def test_get_token_if_vault_server_name_is_none(self, test_tokenizer_client: TokenizerClient, faker: Faker) -> None:
-        token = test_tokenizer_client.get_token(initiator=faker.word(), draft_id=faker.random_int())
-        assert token.token is None
+    @pytest.mark.parametrize(("initiator", "vault_server_name"), [("kek", None), (None, "lol"), (None, None)])
+    def test_tokenizer_settings_validation(self, test_tokenizer_client_settings_factory) -> None:
+        with pytest.raises(ValidationError):
+            test_tokenizer_client_settings_factory()

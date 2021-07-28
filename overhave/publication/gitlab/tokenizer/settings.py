@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import validator
+from yarl import URL
 
 from overhave.transport.http import BaseHttpClientSettings
 
@@ -8,6 +9,7 @@ from overhave.transport.http import BaseHttpClientSettings
 class TokenizerClientSettings(BaseHttpClientSettings):
     """ Important environments and settings for :class:`TokenizerClient`. """
 
+    url: Optional[URL] = None
     enabled: bool = False
     initiator: Optional[str] = None
     vault_server_name: Optional[str] = None

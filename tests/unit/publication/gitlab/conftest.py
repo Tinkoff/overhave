@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence, cast
+from typing import Callable, List, Mapping, Optional, Sequence, cast
 
 import pytest
 from pytest_mock import MockFixture
@@ -46,8 +46,13 @@ def mocked_gitlab_client(mocker: MockFixture) -> GitlabHttpClient:
 
 
 @pytest.fixture()
-def mocked_tokenizer_client(mocker: MockFixture) -> TokenizerClient:
-    return cast(TokenizerClient, mocker.create_autospec(TokenizerClient))
+def test_tokenizer_client_settings_factory(
+    initiator: Optional[str], vault_server_name: Optional[str]
+) -> Callable[[], TokenizerClientSettings]:
+    def get_tokenizer_settings():
+        return TokenizerClientSettings(initiator=initiator, vault_server_name=vault_server_name, enabled=True)
+
+    return get_tokenizer_settings
 
 
 @pytest.fixture()
@@ -96,13 +101,3 @@ def test_gitlab_publisher_with_reviewers_mapping(
         gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
     )
-
-
-@pytest.fixture()
-def test_tokenizer_client_settings() -> TokenizerClientSettings:
-    return TokenizerClientSettings(url="http://kek.com")
-
-
-@pytest.fixture()
-def test_tokenizer_client(test_tokenizer_client_settings: TokenizerClientSettings) -> TokenizerClient:
-    return TokenizerClient(test_tokenizer_client_settings)
