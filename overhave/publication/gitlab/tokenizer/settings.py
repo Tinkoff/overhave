@@ -3,7 +3,7 @@ from typing import Optional
 from overhave.transport.http import BaseHttpClientSettings
 
 
-class TokenizerSettings(BaseHttpClientSettings):
+class TokenizerClientSettings(BaseHttpClientSettings):
     """ Important environments and settings for :class:`TokenizerClient`. """
 
     vault_server_name: Optional[str] = None

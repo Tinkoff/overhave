@@ -7,6 +7,7 @@ from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import FeatureTypeName
 from overhave.publication.gitlab import GitlabVersionPublisher, OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
+from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import GitlabHttpClient
@@ -95,3 +96,13 @@ def test_gitlab_publisher_with_reviewers_mapping(
         client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
     )
+
+
+@pytest.fixture()
+def test_tokenizer_client_settings() -> TokenizerClientSettings:
+    return TokenizerClientSettings(url="http://kek.com")
+
+
+@pytest.fixture()
+def test_tokenizer_client(test_tokenizer_client_settings: TokenizerClientSettings) -> TokenizerClient:
+    return TokenizerClient(test_tokenizer_client_settings)

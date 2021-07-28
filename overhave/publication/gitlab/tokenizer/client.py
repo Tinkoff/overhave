@@ -2,7 +2,7 @@ from typing import Optional, cast
 
 from pydantic.main import BaseModel
 
-from overhave.publication.gitlab.tokenizer.settings import TokenizerSettings
+from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
 from overhave.transport.http import BaseHttpClient
 
 
@@ -12,10 +12,10 @@ class TokenizerResponse(BaseModel):
     token: Optional[str]
 
 
-class TokenizerClient(BaseHttpClient[TokenizerSettings]):
+class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
     """ Client for sending requests for getting tokens for gitlab. """
 
-    def __init__(self, settings: TokenizerSettings):
+    def __init__(self, settings: TokenizerClientSettings):
         super().__init__(settings)
         self._settings = settings
 
