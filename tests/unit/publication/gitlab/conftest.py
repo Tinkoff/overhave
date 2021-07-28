@@ -69,7 +69,7 @@ def test_gitlab_publisher_with_default_reviewers(
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
         gitlab_publisher_settings=test_gitlab_publisher_settings_with_default_reviewers,
-        client=mocked_gitlab_client,
+        gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
     )
 
@@ -93,7 +93,7 @@ def test_gitlab_publisher_with_reviewers_mapping(
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
         gitlab_publisher_settings=test_gitlab_project_settings_with_reviewers_mapping,
-        client=mocked_gitlab_client,
+        gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
     )
 

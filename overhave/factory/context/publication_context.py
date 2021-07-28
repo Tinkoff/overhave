@@ -4,6 +4,7 @@ from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings, Ov
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.publication import OverhaveStashPublisherSettings
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
+from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
 from overhave.publication.settings import PublicationSettings
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport import OverhaveGitlabClientSettings, OverhaveStashClientSettings
@@ -24,6 +25,7 @@ class OverhavePublicationContext(BaseFactoryContext):
         client_settings: Optional[Union[OverhaveStashClientSettings, OverhaveGitlabClientSettings]] = None,
         publisher_settings: Optional[Union[OverhaveStashPublisherSettings, OverhaveGitlabPublisherSettings]] = None,
         publication_settings: Optional[PublicationSettings] = None,
+        tokenizer_client_settings: Optional[TokenizerClientSettings] = None,
     ) -> None:
         super().__init__(
             compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),
@@ -34,3 +36,4 @@ class OverhavePublicationContext(BaseFactoryContext):
         self.client_settings = client_settings or OverhaveGitlabClientSettings()
         self.publisher_settings = publisher_settings or OverhaveGitlabPublisherSettings()
         self.publication_settings = publication_settings or PublicationSettings()
+        self.tokenizer_client_settings = tokenizer_client_settings or TokenizerClientSettings()

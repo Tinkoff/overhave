@@ -1,6 +1,6 @@
-import enum
-
 import gitlab
+
+from overhave.transport.http.gitlab_client.objects import TokenType
 
 
 class InvalidTokenTypeError(Exception):
@@ -9,15 +9,7 @@ class InvalidTokenTypeError(Exception):
     pass
 
 
-class TokenType(enum.Enum):
-    """ Enum for token types you want. """
-
-    OAUTH = "oauth"
-    PRIVATE = "private"
-    JOB = "job"
-
-
-def get_gl(url: str, token_type: TokenType, token: str) -> gitlab.Gitlab:
+def get_gitlab_python_client(url: str, token_type: TokenType, token: str) -> gitlab.Gitlab:
     if token_type is TokenType.OAUTH:
         return gitlab.Gitlab(url, oauth_token=token)
     if token_type is TokenType.PRIVATE:

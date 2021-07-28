@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 from pydantic.main import BaseModel
 
@@ -10,7 +10,7 @@ from overhave.transport.http.base_client import HttpMethod
 class TokenizerResponse(BaseModel):
     """ Response from service tokenizer with token. """
 
-    token: Optional[str]
+    token: str
 
 
 class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
@@ -20,12 +20,15 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         super().__init__(settings)
         self._settings = settings
 
-    def get_token(self, initiator: str, draft_id: int) -> TokenizerResponse:
-        if self._settings.vault_server_name is None:
-            return TokenizerResponse(token=None)
+    def get_token(self, draft_id: int) -> TokenizerResponse:
+        print(self._settings)
         response = self._make_request(
             HttpMethod.POST,
             self._settings.url,
-            params={"initiator": initiator, "id": draft_id, "vault_server_name": self._settings.vault_server_name},
+            params={
+                "initiator": self._settings.initiator,
+                "id": draft_id,
+                "vault_server_name": self._settings.vault_server_name,
+            },
         )
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))

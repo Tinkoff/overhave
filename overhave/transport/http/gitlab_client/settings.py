@@ -8,7 +8,6 @@ class OverhaveGitlabClientSettings(BaseHttpClientSettings):
     auth_token: str
     repository_id: str
     token_type: TokenType
-    token: str
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_"
