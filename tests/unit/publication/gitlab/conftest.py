@@ -1,7 +1,9 @@
 from typing import Callable, List, Mapping, Optional, Sequence, cast
 
 import pytest
+from faker import Faker
 from pytest_mock import MockFixture
+from yarl import URL
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import FeatureTypeName
@@ -52,10 +54,15 @@ def mocked_tokenizer_client(mocker: MockFixture) -> TokenizerClient:
 
 @pytest.fixture()
 def test_tokenizer_client_settings_factory(
-    initiator: Optional[str], vault_server_name: Optional[str]
+    initiator: Optional[str], vault_server_name: Optional[str], faker: Faker
 ) -> Callable[[], TokenizerClientSettings]:
     def get_tokenizer_settings():
-        return TokenizerClientSettings(initiator=initiator, vault_server_name=vault_server_name, enabled=True)
+        return TokenizerClientSettings(
+            enabled=True,
+            url=URL(f"http://{faker.word()}.com"),
+            initiator=initiator,
+            vault_server_name=vault_server_name,
+        )
 
     return get_tokenizer_settings
 
