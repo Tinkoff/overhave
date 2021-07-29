@@ -46,6 +46,11 @@ def mocked_gitlab_client(mocker: MockFixture) -> GitlabHttpClient:
 
 
 @pytest.fixture()
+def mocked_tokenizer_client(mocker: MockFixture) -> TokenizerClient:
+    return cast(TokenizerClient, mocker.create_autospec(TokenizerClient))
+
+
+@pytest.fixture()
 def test_tokenizer_client_settings_factory(
     initiator: Optional[str], vault_server_name: Optional[str]
 ) -> Callable[[], TokenizerClientSettings]:
