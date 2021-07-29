@@ -11,12 +11,15 @@ from flask_admin import expose
 from flask_admin.model import InlineFormAdmin
 from flask_login import current_user
 from markupsafe import Markup
+from pytest_bdd.types import STEP_TYPES
 from wtforms import Field, TextAreaField, ValidationError
 from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.factory import get_admin_factory, get_test_execution_factory
+from overhave.entities import FeatureTypeName
+from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
+from overhave.test_execution import BddStepModel, StepTypeName
 from overhave.transport import TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
@@ -48,7 +51,69 @@ class ScenarioInlineModelForm(InlineFormAdmin):
     form_excluded_columns = ("created_at", "test_runs")
 
 
-class FeatureView(ModelViewConfigured):
+class FactoryViewUtilsMixin:
+    """ Mixin for :class:`FeatureView`. Extra methods for working with cached instance of :class:`IAdminFactory`. """
+
+    _task_pattern = re.compile(r"\w+[-]\d+")
+    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
+
+    @classmethod
+    def _validate_tasks(cls, tasks: List[str]) -> None:
+        for task in tasks:
+            if cls._task_pattern.match(task):
+                continue
+            raise ValidationError(
+                f"Incorrect format of task specification: '{task}'! "
+                "Supported: <PROJECT>-<NUMBER>, for example 'PRJ-1234'."
+            )
+
+    @classmethod
+    def _make_file_path(cls, file_path: str) -> str:
+        feature_suffix = get_admin_factory().context.file_settings.feature_suffix
+        if file_path.rstrip().endswith(feature_suffix):
+            file_path = file_path.removesuffix(feature_suffix)
+        if not cls._file_path_pattern.match(file_path):
+            raise ValidationError(
+                f"Incorrect format of file path specification: '{file_path}'! "
+                f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
+                " At least 8 characters long."
+            )
+        path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
+        logger.debug("Processed feature file path: '%s'", path)
+        return path
+
+    @property
+    def browse_url(self) -> Optional[str]:
+        browse_url_value = get_admin_factory().context.project_settings.browse_url
+        if browse_url_value is not None:
+            return browse_url_value.human_repr()
+        return None
+
+    @property
+    def feature_suffix(self) -> str:
+        return get_admin_factory().context.file_settings.feature_suffix
+
+    @staticmethod
+    def _get_feature_type_steps(factory: IAdminFactory, feature_type: FeatureTypeName) -> List[BddStepModel]:
+        return factory.step_collector.get_steps(feature_type) or []
+
+    @cached_property
+    def get_bdd_steps(self) -> Dict[FeatureTypeName, Dict[StepTypeName, List[BddStepModel]]]:
+        factory = get_admin_factory()
+        return {
+            feature_type: {
+                step_type: [
+                    step
+                    for step in self._get_feature_type_steps(factory=factory, feature_type=feature_type)
+                    if step.type == step_type
+                ]
+                for step_type in STEP_TYPES
+            }
+            for feature_type in factory.feature_extractor.feature_types
+        }
+
+
+class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
     """ View for :class:`Feature` table. """
 
     can_view_details = False
@@ -97,36 +162,8 @@ class FeatureView(ModelViewConfigured):
         "task": "Tasks",
     }
 
-    _task_pattern = re.compile(r"\w+[-]\d+")
-    _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-
-    @classmethod
-    def _validate_tasks(cls, tasks: List[str]) -> None:
-        for task in tasks:
-            if cls._task_pattern.match(task):
-                continue
-            raise ValidationError(
-                f"Incorrect format of task specification: '{task}'! "
-                "Supported: <PROJECT>-<NUMBER>, for example 'PRJ-1234'."
-            )
-
-    @classmethod
-    def _make_file_path(cls, file_path: str) -> str:
-        feature_suffix = get_admin_factory().context.file_settings.feature_suffix
-        if file_path.rstrip().endswith(feature_suffix):
-            file_path = file_path.removesuffix(feature_suffix)
-        if not cls._file_path_pattern.match(file_path):
-            raise ValidationError(
-                f"Incorrect format of file path specification: '{file_path}'! "
-                f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
-                " At least 8 characters long."
-            )
-        path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
-        logger.debug("Processed feature file path: '%s'", path)
-        return path
 
     def on_model_change(self, form, model: db.Feature, is_created) -> None:  # type: ignore
         self._validate_tasks(model.task)
@@ -139,25 +176,6 @@ class FeatureView(ModelViewConfigured):
     def on_model_delete(self, model) -> None:  # type: ignore
         if not (current_user.login == model.author or current_user.role == db.Role.admin):
             raise ValidationError("Only feature author or administrator could delete feature!")
-
-    @cached_property
-    def get_bdd_steps(self) -> Dict[str, Dict[str, List[str]]]:
-        factory = get_admin_factory()
-        return {
-            feature_type: factory.step_collector.get_steps(feature_type)
-            for feature_type in factory.feature_extractor.feature_types
-        }
-
-    @property
-    def browse_url(self) -> Optional[str]:
-        browse_url_value = get_admin_factory().context.project_settings.browse_url
-        if browse_url_value is not None:
-            return browse_url_value.human_repr()
-        return None
-
-    @property
-    def feature_suffix(self) -> str:
-        return get_admin_factory().context.file_settings.feature_suffix
 
     @staticmethod
     def _run_test(data: Dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
