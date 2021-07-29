@@ -44,20 +44,12 @@ class OverhaveDemoSettingsGenerator:
             publication_manager_settings = dict(
                 publisher_settings=OverhaveGitlabPublisherSettings(repository_id="4687"),
                 client_settings=OverhaveGitlabClientSettings(  # noqa: S106
-                    url="https://overhave.readthedocs.io/not-a-handler",
-                    auth_token="secret_token",
-                    repository_id="4687",
-                    token_type="oauth",
+                    url="https://overhave.readthedocs.io/not-a-handler", token_type="oauth",
                 ),
                 tokenizer_client_settings=TokenizerClientSettings(
                     url="https://overhave.readthedocs.io/not-a-handler", enabled=False
                 ),
             )
-            if (
-                not publication_manager_settings["tokenizer_client_settings"].enabled  # type: ignore
-                and publication_manager_settings["client_settings"].auth_token == "secret_token"  # type: ignore
-            ):
-                raise ValueError("Please set correct auth_token!")
             settings.update(publication_manager_settings)
             return settings
         publication_manager_settings = dict(

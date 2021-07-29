@@ -25,13 +25,15 @@ class GitlabInvalidTokenError(BaseGitlabHttpClientException):
 class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
     """ Client for communication with remote Gitlab server. """
 
-    def send_merge_request(self, merge_request: GitlabMrRequest, token: Optional[str] = None) -> Any:
+    def send_merge_request(
+        self, repository_id: str, merge_request: GitlabMrRequest, token: Optional[str] = None
+    ) -> Any:
         gitlab_python_client = get_gitlab_python_client(
             url=self._settings.url.human_repr(),
             token_type=self._settings.token_type,
             token=token or self._settings.auth_token,  # type: ignore
         )
-        project = gitlab_python_client.projects.get(self._settings.repository_id, lazy=True)
+        project = gitlab_python_client.projects.get(repository_id, lazy=True)
         try:
             return project.mergerequests.create(merge_request.dict(by_alias=True))
         except Exception as e:

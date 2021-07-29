@@ -53,6 +53,8 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @cached_property
     def _gitlab_publisher(self) -> GitlabVersionPublisher:
+        if not self._tokenizer_client._settings.enabled and self._gitlab_client._settings.auth_token is None:
+            raise ValueError("Please set correct auth_token!")
         return GitlabVersionPublisher(
             file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,

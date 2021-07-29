@@ -65,7 +65,9 @@ class GitlabVersionPublisher(GitVersionPublisher):
             token = None
             if self._tokenizer_client._settings.enabled:
                 token = self._tokenizer_client.get_token(draft_id=draft_id).token
-            response = self._gitlab_client.send_merge_request(merge_request, token)
+            response = self._gitlab_client.send_merge_request(
+                merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
+            )
             if isinstance(response, ProjectMergeRequest):
                 parsed_response = cast(GitlabMrCreationResponse, response.attributes)
                 self._draft_storage.save_response(
