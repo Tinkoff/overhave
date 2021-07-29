@@ -5,9 +5,9 @@ from demo.steps.parser import step_with_args
 
 @then(step_with_args("бот говорит {phrase:Str}"))
 def then_bot_responds(phrase: str) -> None:
-    pass
+    """ Тогда бот говорит конкретную фразу. """
 
 
 @then("бот показывает виджет")
 def then_bot_shows_widget():
-    pass
+    """ Тогда бот показывает виджет. """

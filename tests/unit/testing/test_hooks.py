@@ -291,6 +291,7 @@ class TestPytestCommonHooks:
             pytest_runtest_setup(item=test_clean_item)
             mocked_description_manager.assert_not_called()
 
+    @pytest.mark.parametrize("enable_html", [True])
     def test_pytest_runtest_makereport_clean(
         self,
         clear_get_description_manager: None,
@@ -307,7 +308,8 @@ class TestPytestCommonHooks:
         link_handler_mock.assert_not_called()
 
     @pytest.mark.parametrize(
-        ("browse_url", "links_keyword"), [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")]
+        ("browse_url", "links_keyword", "enable_html"),
+        [(None, None, True), ("https://overhave.readthedocs.io/browse", "Tasks", True)],
     )
     def test_pytest_runtest_makereport_bdd(
         self,

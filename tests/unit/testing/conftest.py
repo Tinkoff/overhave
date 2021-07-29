@@ -95,8 +95,10 @@ def test_blocks_delimiter(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_description_manager_settings(test_blocks_delimiter: str) -> OverhaveDescriptionManagerSettings:
-    return OverhaveDescriptionManagerSettings(blocks_delimiter=test_blocks_delimiter)
+def test_description_manager_settings(
+    test_blocks_delimiter: str, enable_html: bool
+) -> OverhaveDescriptionManagerSettings:
+    return OverhaveDescriptionManagerSettings(blocks_delimiter=test_blocks_delimiter, html=enable_html)
 
 
 @pytest.fixture()
@@ -107,8 +109,12 @@ def test_description_manager(
 
 
 @pytest.fixture()
-def description_handler_mock() -> mock.MagicMock:
-    with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
+def description_handler_mock(enable_html: bool) -> mock.MagicMock:
+    if enable_html:
+        with mock.patch("allure.dynamic.description_html", return_value=mock.MagicMock()) as mocked_description_handler:
+            yield mocked_description_handler
+            return
+    with mock.patch("allure.dynamic.description", return_value=mock.MagicMock()) as mocked_description_handler:
         yield mocked_description_handler
 
 

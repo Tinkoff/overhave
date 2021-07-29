@@ -227,7 +227,7 @@
             {% for bdd_step in bdd_fixtures[feature_type][step_type] %}
                 <tr class="inserter {{ step_classes[step_type] }}">
                     <th>●</th>
-                    <td class="code {{ step_type }}">{{ bdd_step }}</td>
+                    <td class="code {{ step_type }}">{{ bdd_step.name }}</td>
                     <td style="width:10%;"><a href="#" class="btn btn-success btn-xs">insert</a></td>
                 </tr>
             {% endfor %}
