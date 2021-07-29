@@ -10,7 +10,7 @@ class TokenizerClientSettings(BaseHttpClientSettings):
     """ Important environments and settings for :class:`TokenizerClient`. """
 
     enabled: bool = False
-    url: URL = "https://overhave.readthedocs.io/not-a-handler"
+    url: URL = URL("https://overhave.readthedocs.io/not-a-handler")
     initiator: Optional[str] = None
     vault_server_name: Optional[str] = None
 
