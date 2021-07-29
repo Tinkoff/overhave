@@ -1,3 +1,5 @@
+from typing import Optional
+
 from overhave.transport.http import BaseHttpClientSettings
 from overhave.transport.http.gitlab_client.utils import TokenType
 
@@ -5,7 +7,7 @@ from overhave.transport.http.gitlab_client.utils import TokenType
 class OverhaveGitlabClientSettings(BaseHttpClientSettings):
     """ Settings for :class:`GitlabHttpClient`. """
 
-    auth_token: str
+    auth_token: Optional[str] = None
     repository_id: str
     token_type: TokenType
 

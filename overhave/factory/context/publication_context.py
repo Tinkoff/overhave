@@ -37,3 +37,5 @@ class OverhavePublicationContext(BaseFactoryContext):
         self.publisher_settings = publisher_settings or OverhaveGitlabPublisherSettings()
         self.publication_settings = publication_settings or PublicationSettings()
         self.tokenizer_client_settings = tokenizer_client_settings or TokenizerClientSettings()
+        if not self.tokenizer_client_settings.enabled and self.client_settings.auth_token is None:
+            raise ValueError("Please set correct auth_token!")

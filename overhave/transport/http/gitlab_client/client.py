@@ -29,7 +29,7 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
         gitlab_python_client = get_gitlab_python_client(
             url=self._settings.url.human_repr(),
             token_type=self._settings.token_type,
-            token=token or self._settings.auth_token,
+            token=token or self._settings.auth_token,  # type: ignore
         )
         project = gitlab_python_client.projects.get(self._settings.repository_id, lazy=True)
         try:
