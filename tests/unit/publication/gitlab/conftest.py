@@ -8,8 +8,7 @@ from yarl import URL
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import FeatureTypeName
 from overhave.publication.gitlab import GitlabVersionPublisher, OverhaveGitlabPublisherSettings
-from overhave.publication.gitlab.tokenizer.client import TokenizerClient
-from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
+from overhave.publication.gitlab.tokenizer import TokenizerClient, TokenizerClientSettings
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import GitlabHttpClient

@@ -3,8 +3,7 @@ from typing import Optional, Union
 from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.publication import OverhaveStashPublisherSettings
-from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
-from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
+from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
 from overhave.publication.settings import PublicationSettings
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport import OverhaveGitlabClientSettings, OverhaveStashClientSettings

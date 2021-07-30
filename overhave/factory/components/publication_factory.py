@@ -5,10 +5,17 @@ from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
 from overhave.publication import IVersionPublisher, StashVersionPublisher
-from overhave.publication.gitlab import GitlabVersionPublisher
-from overhave.publication.gitlab.tokenizer.client import TokenizerClient
+from overhave.publication.gitlab import GitlabVersionPublisher, TokenizerClient
 from overhave.publication.objects import PublicationManagerType
 from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
+
+
+class BasePublicationFactoryException(Exception):
+    """ Base exception for :class:`PublicationFactory`. """
+
+
+class AuthTokenNotSpecifiedError(BasePublicationFactoryException):
+    """ Exception for situation AuthToken env was not set. """
 
 
 class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask], abc.ABC):
@@ -27,11 +34,11 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @cached_property
     def _stash_client(self) -> StashHttpClient:
-        return StashHttpClient(settings=self.context.client_settings)  # type: ignore
+        return StashHttpClient(self.context.client_settings)  # type: ignore
 
     @cached_property
     def _gitlab_client(self) -> GitlabHttpClient:
-        return GitlabHttpClient(settings=self.context.client_settings)  # type: ignore
+        return GitlabHttpClient(self.context.client_settings)  # type: ignore
 
     @cached_property
     def _stash_publisher(self) -> StashVersionPublisher:
@@ -49,12 +56,12 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @cached_property
     def _tokenizer_client(self) -> TokenizerClient:
-        return TokenizerClient(settings=self.context.tokenizer_client_settings)
+        return TokenizerClient(self.context.tokenizer_client_settings)
 
     @cached_property
     def _gitlab_publisher(self) -> GitlabVersionPublisher:
         if not self._tokenizer_client._settings.enabled and self._gitlab_client._settings.auth_token is None:
-            raise ValueError("Please set correct auth_token!")
+            raise AuthTokenNotSpecifiedError("Please set correct auth_token!")
         return GitlabVersionPublisher(
             file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,

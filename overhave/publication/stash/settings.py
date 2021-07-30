@@ -26,7 +26,7 @@ class OverhaveStashPublisherSettings(BaseOverhavePrefix):
     feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
     class Config:
-        env_prefix = "OVERHAVE_GITLAB_"
+        env_prefix = "OVERHAVE_STASH_"
 
     @property
     def repository(self) -> StashRepository:

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from overhave.transport.http import BaseHttpClientSettings
-from overhave.transport.http.gitlab_client.utils import TokenType
+from overhave.transport.http.gitlab_client.objects import TokenType
 
 
 class OverhaveGitlabClientSettings(BaseHttpClientSettings):

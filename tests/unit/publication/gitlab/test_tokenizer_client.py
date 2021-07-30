@@ -3,7 +3,7 @@ from typing import Callable
 import pytest
 from pydantic import ValidationError
 
-from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
+from overhave.publication.gitlab import TokenizerClientSettings
 
 
 class TestTokenizerClient:

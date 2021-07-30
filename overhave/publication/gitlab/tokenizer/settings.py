@@ -10,12 +10,12 @@ class TokenizerClientSettings(BaseHttpClientSettings):
     """ Important environments and settings for :class:`TokenizerClient`. """
 
     enabled: bool = False
-    url: URL = URL("https://overhave.readthedocs.io/not-a-handler")
+    url: Optional[URL] = None  # type: ignore
     initiator: Optional[str] = None
     vault_server_name: Optional[str] = None
 
     class Config:
-        env_prefix = "GITLAB_TOKENIZER_"
+        env_prefix = "OVERHAVE_GITLAB_TOKENIZER_"
 
     @validator("vault_server_name", "initiator")
     def validate_vault_server_name(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:

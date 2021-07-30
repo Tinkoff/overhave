@@ -12,8 +12,7 @@ from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
-from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
-from overhave.transport.http.gitlab_client.models import GitlabMrCreationResponse
+from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrCreationResponse, GitlabMrRequest
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +61,9 @@ class GitlabVersionPublisher(GitVersionPublisher):
         )
         logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
         try:
-            token = None
-            if self._tokenizer_client._settings.enabled:
-                token = self._tokenizer_client.get_token(draft_id=draft_id).token
+            token = (
+                self._gitlab_client._settings.auth_token or self._tokenizer_client.get_token(draft_id=draft_id).token
+            )
             response = self._gitlab_client.send_merge_request(
                 merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
             )

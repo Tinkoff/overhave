@@ -4,8 +4,7 @@ import gitlab
 import pytest
 from faker import Faker
 
-from overhave.transport.http.gitlab_client.objects import TokenType
-from overhave.transport.http.gitlab_client.utils import get_gitlab_python_client
+from overhave.transport.http.gitlab_client import TokenType, get_gitlab_python_client
 
 
 @pytest.fixture()
