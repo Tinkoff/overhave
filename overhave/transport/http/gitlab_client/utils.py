@@ -6,8 +6,6 @@ from overhave.transport.http.gitlab_client.objects import TokenType
 class InvalidTokenTypeError(Exception):
     """ Error for choosing invalid token type value. """
 
-    pass
-
 
 def get_gitlab_python_client(url: str, token_type: TokenType, token: str) -> gitlab.Gitlab:
     if token_type is TokenType.OAUTH:
