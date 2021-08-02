@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Optional
+from typing import Optional, cast
 
 import git
 
@@ -30,7 +30,7 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
     """ Class for feature version's management, based on git. """
 
     @staticmethod
-    def _create_head(name: str, repository: git.Repo) -> git.Head:
+    def _create_head(name: str, repository: git.Repo) -> git.SymbolicReference:
         origin: git.Head = repository.remotes.origin
         origin.pull()
         logger.info("Origin successfully pulled")
@@ -46,7 +46,7 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
         return branch
 
     def _create_commit_and_push(self, context: PublisherContext, repository: git.Repo, target_branch: git.Head) -> None:
-        original_branch = repository.active_branch
+        original_branch = cast(git.Head, repository.active_branch)
         changes_pushed = False
         try:
             target_branch.checkout()
@@ -99,7 +99,7 @@ class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
             logger.info("Active head: %s", repository.active_branch)
 
             ctx = self._compile_context(draft_id)
-            git_branch = self._create_head(repository=repository, name=ctx.target_branch)
+            git_branch = cast(git.Head, self._create_head(repository=repository, name=ctx.target_branch))
             self._create_commit_and_push(context=ctx, repository=repository, target_branch=git_branch)
             return ctx
         except git.InvalidGitRepositoryError:
