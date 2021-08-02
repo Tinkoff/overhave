@@ -16,7 +16,7 @@ class TestTokenizerClient:
         with pytest.raises(ValidationError):
             test_tokenizer_client_settings_factory()
 
-    @pytest.mark.parametrize(("initiator", "remote_key"), [("peka", "pepe")])
+    @pytest.mark.parametrize(("initiator", "remote_key", "remote_key_name"), [("peka", "pepe", "sad-pepe")])
     def test_tokenizer_settings_validation_not_raises_error(
         self, test_tokenizer_client_settings_factory: Callable[[], TokenizerClientSettings]
     ) -> None:
