@@ -1,6 +1,5 @@
 from typing import cast
 
-from pydantic.fields import Field
 from pydantic.main import BaseModel
 
 from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
@@ -19,7 +18,7 @@ class TokenizerRequestParamsModel(BaseModel):
 
     initiator: str
     id: int
-    remote_key = Field(str, alias="vault_server_name")
+    remote_key: str
 
 
 class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
@@ -30,11 +29,14 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         self._settings = settings
 
     def get_token(self, draft_id: int) -> TokenizerResponse:
+        params = TokenizerRequestParamsModel(
+            initiator=self._settings.initiator, id=draft_id, remote_key=self._settings.remote_key
+        ).dict()
+        params[self._settings.remote_key_name] = params["remote_key"]  # type: ignore
+        params.pop("remote_key")
         response = self._make_request(
             HttpMethod.POST,
             self._settings.url,  # type: ignore
-            params=TokenizerRequestParamsModel(
-                initiator=self._settings.initiator, id=draft_id, remote_key=self._settings.remote_key
-            ).dict(by_alias=True),
+            params=params,
         )
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))
