@@ -1,11 +1,44 @@
 {% macro render_style() %}
-    <style type="text/css" media="screen">
+    <style media="screen">
         .editor {
             height: 500px;
             margin-bottom: 20px;
         }
         .toggle-block {
             cursor: pointer;
+        }
+    </style>
+{% endmacro %}
+
+{% macro render_step_hints_style() %}
+    <style media="screen">
+        span.step_hint_block {
+            background:#F8F8F8;
+            border: 3px solid #0084bd;
+            color: black;
+            white-space: pre-wrap;
+            width:400px;
+            letter-spacing: 1px;
+            line-height: 20px;
+            position:absolute;
+            text-align: justify;
+            top: auto;
+            left:auto;
+            display:none;
+            padding:10px;
+        }
+        div.step_hint {
+            background-color:#00a6ed;
+            float:left;
+            position:relative;
+            cursor:pointer;
+        }
+        div.step_hint:hover {
+            background-color: #0084bd;
+        }
+        div.step_hint:hover span {
+            display:block;
+            z-index:1
         }
     </style>
 {% endmacro %}
@@ -226,9 +259,14 @@
             <tbody>
             {% for bdd_step in bdd_fixtures[feature_type][step_type] %}
                 <tr class="inserter {{ step_classes[step_type] }}">
-                    <th>●</th>
-                    <td class="code {{ step_type }}">{{ bdd_step.name }}</td>
                     <td style="width:10%;"><a href="#" class="btn btn-success btn-xs">insert</a></td>
+                    <td style="width:10%;">
+                        <div class="btn btn-default btn-xs step_hint">
+                            info
+                            <span class="step_hint_block">{{ bdd_step.html_doc }}</span>
+                        </div>
+                    </td>
+                    <td class="code {{ step_type }}">{{ bdd_step.name }}</td>
                 </tr>
             {% endfor %}
             </tbody>
