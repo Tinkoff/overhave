@@ -32,8 +32,9 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         params = TokenizerRequestParamsModel(
             initiator=self._settings.initiator, id=draft_id, remote_key=self._settings.remote_key
         ).dict()
-        params[self._settings.remote_key_name] = params["remote_key"]  # type: ignore
-        params.pop("remote_key")
+        if self._settings.remote_key_name != "remote_key":
+            params[self._settings.remote_key_name] = params["remote_key"]  # type: ignore
+            params.pop("remote_key")
         response = self._make_request(
             HttpMethod.POST,
             self._settings.url,  # type: ignore
