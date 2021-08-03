@@ -17,6 +17,14 @@ from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrCrea
 logger = logging.getLogger(__name__)
 
 
+class BaseGitlabVersionPublisherException(Exception):
+    """ Base exception for :class:`GitlabVersionPublisher`."""
+
+
+class InvalidWebUrlException(BaseGitlabVersionPublisherException):
+    """ Exception for case when web url is None. """
+
+
 class GitlabVersionPublisher(GitVersionPublisher):
     """ Class for feature version's merge requests management relative to Gitlab API. """
 
@@ -69,9 +77,11 @@ class GitlabVersionPublisher(GitVersionPublisher):
             )
             if isinstance(response, ProjectMergeRequest):
                 parsed_response = cast(GitlabMrCreationResponse, response.attributes)
+                if parsed_response.web_url is None:
+                    raise InvalidWebUrlException("Please verify your gitlab url environment! It is invalid!")
                 self._draft_storage.save_response(
                     draft_id=draft_id,
-                    pr_url=parsed_response.web_url,  # type: ignore
+                    pr_url=parsed_response.web_url,
                     published_at=parsed_response.created_at,
                     opened=parsed_response.state == "opened",
                 )
