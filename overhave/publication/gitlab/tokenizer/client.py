@@ -48,9 +48,9 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
             initiator=self._settings.initiator, id=draft_id, remote_key=self._settings.remote_key
         )
         if self._settings.url is None:
-            raise InvalidUrlException("Please check OVERHAVE_GITLAB_TOKENIZER_URL! Value is invalid!")
+            raise InvalidUrlException("Please check tokenizer url! Value is invalid!")
         if self._settings.remote_key_name is None:
-            raise InvalidRemoteKeyNameException("Please check OVERHAVE_GITLAB_REMOTE_KEY_NAME! Value is invalid!")
+            raise InvalidRemoteKeyNameException("Please check remote key name! Value is invalid!")
         response = self._make_request(
             HttpMethod.POST, self._settings.url, params=params_model.get_request_params(self._settings.remote_key_name),
         )
