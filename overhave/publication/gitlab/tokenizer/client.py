@@ -24,6 +24,18 @@ class TokenizerRequestParamsModel(BaseModel):
         return {"initiator": self.initiator, "id": self.id, remote_key_name: self.remote_key}
 
 
+class BaseTokenizerException(Exception):
+    """ Base tokenizer exception. """
+
+
+class InvalidUrlException(BaseTokenizerException):
+    """ Exception for case when tokenizer url is None. """
+
+
+class InvalidRemoteKeyNameException(BaseTokenizerException):
+    """ Exception for case when tokenizer remote key name is None. """
+
+
 class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
     """ Client for sending requests for getting tokens for gitlab. """
 
@@ -35,9 +47,11 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         params_model = TokenizerRequestParamsModel(
             initiator=self._settings.initiator, id=draft_id, remote_key=self._settings.remote_key
         )
+        if self._settings.url is None:
+            raise InvalidUrlException("Please check OVERHAVE_GITLAB_TOKENIZER_URL! Value is invalid!")
+        if self._settings.remote_key_name is None:
+            raise InvalidRemoteKeyNameException("Please check OVERHAVE_GITLAB_REMOTE_KEY_NAME! Value is invalid!")
         response = self._make_request(
-            HttpMethod.POST,
-            self._settings.url,  # type: ignore
-            params=params_model.get_request_params(self._settings.remote_key_name),  # type: ignore
+            HttpMethod.POST, self._settings.url, params=params_model.get_request_params(self._settings.remote_key_name),
         )
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))
