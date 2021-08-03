@@ -9,7 +9,7 @@ from overhave.transport.http import BaseHttpClientSettings
 class TokenizerClientSettings(BaseHttpClientSettings):
     """ Important environments and settings for :class:`TokenizerClient`. """
 
-    enabled: bool = True
+    enabled: bool = False
     url: Optional[URL] = None  # type: ignore
     initiator: Optional[str] = None
     remote_key: Optional[str] = None
