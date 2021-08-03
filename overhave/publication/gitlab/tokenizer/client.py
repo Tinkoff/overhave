@@ -38,6 +38,6 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         response = self._make_request(
             HttpMethod.POST,
             self._settings.url,  # type: ignore
-            params=params_model.get_request_params(self._settings.remote_key_name),
+            params=params_model.get_request_params(self._settings.remote_key_name),  # type: ignore
         )
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))
