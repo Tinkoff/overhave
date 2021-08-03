@@ -13,7 +13,7 @@ from overhave import (
     OverhaveStashPublisherSettings,
 )
 from overhave.extra import RUSSIAN_PREFIXES
-from overhave.publication.gitlab import OverhaveGitlabPublisherSettings
+from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
 from overhave.publication.objects import PublicationManagerType
 from overhave.publication.settings import PublicationSettings
 from overhave.transport import OverhaveGitlabClientSettings
@@ -41,12 +41,11 @@ class OverhaveDemoSettingsGenerator:
         settings = deepcopy(self.default_context_settings)
         if PublicationSettings().publication_manager_type is PublicationManagerType.GITLAB:
             publication_manager_settings = dict(
-                publisher_settings=OverhaveGitlabPublisherSettings(repository_id="2034"),
+                publisher_settings=OverhaveGitlabPublisherSettings(repository_id="4687"),
                 client_settings=OverhaveGitlabClientSettings(  # noqa: S106
                     url="https://overhave.readthedocs.io/not-a-handler",
-                    auth_token="secret_token",
-                    repository_id="2034",
                 ),
+                tokenizer_client_settings=TokenizerClientSettings(),
             )
             settings.update(publication_manager_settings)
             return settings

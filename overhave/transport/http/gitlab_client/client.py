@@ -1,16 +1,13 @@
 import logging
-from http import HTTPStatus
-from typing import cast
+from typing import Any
+
+from gitlab.exceptions import GitlabAuthenticationError
 
 from overhave.transport.http import BaseHttpClient
-from overhave.transport.http.base_client import (
-    BaseHttpClientException,
-    BearerAuth,
-    HttpClientValidationError,
-    HttpMethod,
-)
-from overhave.transport.http.gitlab_client.models import GITLAB_RESPONSE_MODELS, AnyGitlabResponseModel, GitlabMrRequest
+from overhave.transport.http.base_client import BaseHttpClientException
+from overhave.transport.http.gitlab_client.models import GitlabMrRequest
 from overhave.transport.http.gitlab_client.settings import OverhaveGitlabClientSettings
+from overhave.transport.http.gitlab_client.utils import get_gitlab_python_client
 
 logger = logging.getLogger(__name__)
 
@@ -23,27 +20,20 @@ class GitlabHttpClientConflictError(BaseGitlabHttpClientException):
     """ Exception for situation with `HTTPStatus.CONFLICT` response.status_code. """
 
 
+class GitlabInvalidTokenError(BaseGitlabHttpClientException):
+    """ Exception for situation with invalid token or gitlab url. """
+
+
 class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
     """ Client for communication with remote Gitlab server. """
 
-    def send_merge_request(self, merge_request: GitlabMrRequest) -> AnyGitlabResponseModel:
-        url = self._settings.get_mr_url
-        response = self._make_request(
-            method=HttpMethod.POST,
-            url=url,
-            json=merge_request.dict(by_alias=True),
-            auth=BearerAuth(self._settings.auth_token),
-            raise_for_status=False,
+    def send_merge_request(self, repository_id: str, merge_request: GitlabMrRequest, token: str) -> Any:
+        gitlab_python_client = get_gitlab_python_client(
+            url=self._settings.url.human_repr(), token_type=self._settings.token_type, token=token,
         )
-        if response.status_code == HTTPStatus.CONFLICT:
-            raise GitlabHttpClientConflictError("Got conflict when trying to send merge-request!")
-        response.raise_for_status()
-        for model in GITLAB_RESPONSE_MODELS:
-            try:
-                logger.debug("Trying to parse '%s'...", model)
-                return cast(AnyGitlabResponseModel, self._parse_or_raise(response, model))
-            except HttpClientValidationError:
-                logger.debug("Could not convert response to '%s'!", model, exc_info=True)
-        raise HttpClientValidationError(
-            f"Could not parse Gitlab response while trying to create merge-request!\nResponse: {response.json()}"
-        )
+        project = gitlab_python_client.projects.get(repository_id, lazy=True)
+        try:
+            return project.mergerequests.create(merge_request.dict(by_alias=True))
+        except GitlabAuthenticationError as e:
+            logging.exception("Please verify your token or URL! Maybe they are invalid")
+            raise GitlabInvalidTokenError("Please verify your token or URL! Maybe they are invalid") from e

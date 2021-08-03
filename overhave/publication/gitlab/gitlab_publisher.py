@@ -1,17 +1,28 @@
 import logging
+from http import HTTPStatus
+from typing import cast
 
-from requests import HTTPError
+from gitlab import GitlabCreateError, GitlabHttpError
+from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
+from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
-from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabHttpClientConflictError, GitlabMrRequest
-from overhave.transport.http.gitlab_client.models import GitlabMrCreationResponse
+from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrCreationResponse, GitlabMrRequest
 
 logger = logging.getLogger(__name__)
+
+
+class BaseGitlabVersionPublisherException(Exception):
+    """ Base exception for :class:`GitlabVersionPublisher`."""
+
+
+class InvalidWebUrlException(BaseGitlabVersionPublisherException):
+    """ Exception for case when web url is None. """
 
 
 class GitlabVersionPublisher(GitVersionPublisher):
@@ -27,7 +38,8 @@ class GitlabVersionPublisher(GitVersionPublisher):
         draft_storage: IDraftStorage,
         file_manager: FileManager,
         gitlab_publisher_settings: OverhaveGitlabPublisherSettings,
-        client: GitlabHttpClient,
+        gitlab_client: GitlabHttpClient,
+        tokenizer_client: TokenizerClient,
     ):
         super().__init__(
             file_settings=file_settings,
@@ -39,7 +51,8 @@ class GitlabVersionPublisher(GitVersionPublisher):
             file_manager=file_manager,
         )
         self._gitlab_publisher_settings = gitlab_publisher_settings
-        self._client = client
+        self._gitlab_client = gitlab_client
+        self._tokenizer_client = tokenizer_client
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)
@@ -56,17 +69,26 @@ class GitlabVersionPublisher(GitVersionPublisher):
         )
         logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
         try:
-            response = self._client.send_merge_request(merge_request)
-            if isinstance(response, GitlabMrCreationResponse):
+            token = (
+                self._gitlab_client._settings.auth_token or self._tokenizer_client.get_token(draft_id=draft_id).token
+            )
+            response = self._gitlab_client.send_merge_request(
+                merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
+            )
+            if isinstance(response, ProjectMergeRequest):
+                parsed_response = cast(GitlabMrCreationResponse, response.attributes)
+                if parsed_response.web_url is None:
+                    raise InvalidWebUrlException("Please verify your gitlab url environment! It is invalid!")
                 self._draft_storage.save_response(
                     draft_id=draft_id,
-                    pr_url=response.get_mr_url,
-                    published_at=response.created_at,
-                    opened=response.state == "opened",
+                    pr_url=parsed_response.web_url,
+                    published_at=parsed_response.created_at,
+                    opened=parsed_response.state == "opened",
                 )
                 return
-        except GitlabHttpClientConflictError:
-            logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
-            self._save_as_duplicate(context)
-        except HTTPError:
+        except (GitlabCreateError, GitlabHttpError) as e:
+            if e.response_code == HTTPStatus.CONFLICT:
+                logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
+                self._save_as_duplicate(context)
+                return
             logger.exception("Got HTTP error while trying to sent merge-request!")

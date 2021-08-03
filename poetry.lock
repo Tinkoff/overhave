@@ -1208,6 +1208,22 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "python-gitlab"
+version = "2.10.0"
+description = "Interact with GitLab API"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.dependencies]
+requests = ">=2.22.0"
+requests-toolbelt = ">=0.9.1"
+
+[package.extras]
+autocompletion = ["argcomplete (>=1.10.0,<2)"]
+yaml = ["PyYaml (>=5.2)"]
+
+[[package]]
 name = "python-ldap"
 version = "3.3.1"
 description = "Python modules for implementing LDAP clients"
@@ -1317,7 +1333,7 @@ test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.1
 name = "requests-toolbelt"
 version = "0.9.1"
 description = "A utility belt for advanced users of python-requests"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1801,7 +1817,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "80ca7380ed699ad1f9c1ac12b9d314d207edc5ff3334c33b60cbe879cddaffd6"
+content-hash = "9587ab02d421e0628cd8963bb711ce108f61afbce05bee229a9678ca6c24e65b"
 
 [metadata.files]
 alabaster = [
@@ -2162,6 +2178,7 @@ greenlet = [
     {file = "greenlet-1.1.0.tar.gz", hash = "sha256:c87df8ae3f01ffb4483c796fe1b15232ce2b219f0b18126948616224d3f658ee"},
 ]
 gunicorn = [
+    {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
     {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 httptools = [
@@ -2532,6 +2549,10 @@ python-editor = [
     {file = "python_editor-1.0.4-py2.7.egg", hash = "sha256:ea87e17f6ec459e780e4221f295411462e0d0810858e055fc514684350a2f522"},
     {file = "python_editor-1.0.4-py3-none-any.whl", hash = "sha256:1bf6e860a8ad52a14c3ee1252d5dc25b2030618ed80c022598f00176adc8367d"},
     {file = "python_editor-1.0.4-py3.5.egg", hash = "sha256:c3da2053dbab6b29c94e43c486ff67206eafbe7eb52dbec7390b5e2fb05aac77"},
+]
+python-gitlab = [
+    {file = "python-gitlab-2.10.0.tar.gz", hash = "sha256:376b3e982381cec734471c502b3da2c6e7858a8df4d03c993499e6a7593950e6"},
+    {file = "python_gitlab-2.10.0-py3-none-any.whl", hash = "sha256:707767f11a3cbc1207b30bf69219e53ff7da5404fa49710096fb9298384d4be0"},
 ]
 python-ldap = [
     {file = "python-ldap-3.3.1.tar.gz", hash = "sha256:4711cacf013e298754abd70058ccc995758177fb425f1c2d30e71adfc1d00aa5"},

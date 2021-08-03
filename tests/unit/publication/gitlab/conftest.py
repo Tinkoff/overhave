@@ -1,11 +1,14 @@
-from typing import List, Mapping, Sequence, cast
+from typing import Callable, List, Mapping, Optional, Sequence, cast
 
 import pytest
+from faker import Faker
 from pytest_mock import MockFixture
+from yarl import URL
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import FeatureTypeName
 from overhave.publication.gitlab import GitlabVersionPublisher, OverhaveGitlabPublisherSettings
+from overhave.publication.gitlab.tokenizer import TokenizerClient, TokenizerClientSettings
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import GitlabHttpClient
@@ -44,6 +47,27 @@ def mocked_gitlab_client(mocker: MockFixture) -> GitlabHttpClient:
 
 
 @pytest.fixture()
+def mocked_tokenizer_client(mocker: MockFixture) -> TokenizerClient:
+    return cast(TokenizerClient, mocker.create_autospec(TokenizerClient))
+
+
+@pytest.fixture()
+def test_tokenizer_client_settings_factory(
+    initiator: Optional[str], remote_key: Optional[str], remote_key_name: Optional[str], faker: Faker
+) -> Callable[[], TokenizerClientSettings]:
+    def get_tokenizer_settings():
+        return TokenizerClientSettings(
+            enabled=True,
+            url=URL(f"http://{faker.word()}.com"),
+            initiator=initiator,
+            remote_key=remote_key,
+            remote_key_name=remote_key_name,
+        )
+
+    return get_tokenizer_settings
+
+
+@pytest.fixture()
 def test_gitlab_publisher_with_default_reviewers(
     test_file_settings: OverhaveFileSettings,
     test_project_settings: OverhaveProjectSettings,
@@ -51,6 +75,7 @@ def test_gitlab_publisher_with_default_reviewers(
     mocked_file_manager: FileManager,
     mocked_gitlab_client: GitlabHttpClient,
     mocker: MockFixture,
+    mocked_tokenizer_client: TokenizerClient,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -61,7 +86,8 @@ def test_gitlab_publisher_with_default_reviewers(
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
         gitlab_publisher_settings=test_gitlab_publisher_settings_with_default_reviewers,
-        client=mocked_gitlab_client,
+        gitlab_client=mocked_gitlab_client,
+        tokenizer_client=mocked_tokenizer_client,
     )
 
 
@@ -73,6 +99,7 @@ def test_gitlab_publisher_with_reviewers_mapping(
     mocked_file_manager: FileManager,
     mocked_gitlab_client: GitlabHttpClient,
     mocker: MockFixture,
+    mocked_tokenizer_client: TokenizerClient,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -83,5 +110,6 @@ def test_gitlab_publisher_with_reviewers_mapping(
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
         gitlab_publisher_settings=test_gitlab_project_settings_with_reviewers_mapping,
-        client=mocked_gitlab_client,
+        gitlab_client=mocked_gitlab_client,
+        tokenizer_client=mocked_tokenizer_client,
     )

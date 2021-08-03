@@ -1,18 +1,14 @@
-from yarl import URL
+from typing import Optional
 
 from overhave.transport.http import BaseHttpClientSettings
+from overhave.transport.http.gitlab_client.objects import TokenType
 
 
 class OverhaveGitlabClientSettings(BaseHttpClientSettings):
     """ Settings for :class:`GitlabHttpClient`. """
 
-    mr_path: str = "api/v4/projects/{repository_id}/merge_requests"
-    auth_token: str
-    repository_id: str
+    auth_token: Optional[str] = None
+    token_type: TokenType
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_"
-
-    @property
-    def get_mr_url(self) -> URL:
-        return self.url / self.mr_path.format(repository_id=self.repository_id)

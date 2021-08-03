@@ -11,7 +11,7 @@ from tests.objects import get_test_file_settings
 
 @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
 @pytest.mark.parametrize("test_file_settings", [get_test_file_settings()], indirect=True)
-class TestgitlabProjectManager:
+class TestGitlabProjectManager:
     """ Unit tests for :class:`GitlabVersionPublisher`. """
 
     def test_gitlab_project_settings_basic(

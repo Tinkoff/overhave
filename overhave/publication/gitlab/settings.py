@@ -25,6 +25,9 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     # Merge-request default reviewers as mapping with :class:```FeatureTypeName```
     feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
+    class Config:
+        env_prefix = "OVERHAVE_GITLAB_"
+
     @property
     def repository(self) -> GitlabRepository:
         return GitlabRepository(project_id=self.repository_id)
