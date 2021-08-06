@@ -58,9 +58,17 @@ class TestOverhaveRunAdmin:
                 "demo.steps.parser",
             }
 
-    def test_injector_collect_steps(
+
+class TestOverhaveRunAdminCollectedSteps:
+    """ Sanity tests for application admin mode: steps collection. """
+
+    @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
+    def test_injector_collect_steps_ru(
         self, test_feature_types: Tuple[str, ...], test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
+        from pytest_bdd.parser import STEP_PREFIXES
+
+        assert len(STEP_PREFIXES) == 23  # len of base STEP_PREFIXES + appended RUSSIAN_PREFIXES
         # TODO: check steps content
         for feature_type in test_feature_types:
             assert test_resolved_admin_proxy_manager.factory.step_collector.get_steps(FeatureTypeName(feature_type))

@@ -1,7 +1,8 @@
 import logging
 import os
+from copy import deepcopy
 from pathlib import Path
-from typing import Callable, Dict, Iterator, Optional, Sequence, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
 import py
 import pytest
@@ -106,6 +107,22 @@ def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> Base
     context_mock.file_settings.tmp_reports_dir = reports_dir
 
     return cast(BaseFactoryContext, context_mock)
+
+
+@pytest.fixture(scope="session")
+def step_prefixes_backup() -> List[Tuple[Any]]:
+    from pytest_bdd.parser import STEP_PREFIXES
+
+    return deepcopy(STEP_PREFIXES)
+
+
+@pytest.fixture(autouse=True)
+def step_prefixes_clean(step_prefixes_backup: List[Tuple[Any]]) -> None:
+    from pytest_bdd.parser import STEP_PREFIXES
+
+    STEP_PREFIXES.clear()
+    for step in step_prefixes_backup:
+        STEP_PREFIXES.append(step)
 
 
 @pytest.fixture(scope="session")
