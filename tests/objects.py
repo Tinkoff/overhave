@@ -1,4 +1,3 @@
-import enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, NamedTuple, NewType, Sequence
@@ -9,6 +8,7 @@ from pydantic.main import BaseModel
 from sqlalchemy import MetaData
 from sqlalchemy.engine import Engine
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave.entities import FeatureExtractor, FeatureTypeName, OverhaveFileSettings
 
 _BLOCKS_DELIMITER = "\n\n"
@@ -44,13 +44,6 @@ def get_test_feature_extractor() -> FeatureExtractor:
         return FeatureExtractor(file_settings=get_test_file_settings())
 
 
-class TestLanguageName(str, enum.Enum):
-    """ Enum that declares languages for using in tests. """
-
-    ENG = "en"
-    RUS = "ru"
-
-
 class FeatureTestContainer(BaseModel):
     """ Class for simple test feature operating. """
 
@@ -59,7 +52,7 @@ class FeatureTestContainer(BaseModel):
     project_path: Path
     content: str
     scenario: str
-    language: TestLanguageName
+    language: OverhaveDemoAppLanguage
 
     @root_validator(pre=True)
     def make_scenario(cls, values: Dict[str, str]) -> Dict[str, str]:
@@ -71,10 +64,10 @@ class FeatureTestContainer(BaseModel):
         blocks = content.split(_BLOCKS_DELIMITER)
         values["scenario"] = _BLOCKS_DELIMITER.join(blocks[1:])
 
-        if TestLanguageName.RUS in name:
-            lang = TestLanguageName.RUS
+        if OverhaveDemoAppLanguage.RU in name:
+            lang = OverhaveDemoAppLanguage.RU
         else:
-            lang = TestLanguageName.ENG
+            lang = OverhaveDemoAppLanguage.EN
         values["language"] = lang
         return values
 

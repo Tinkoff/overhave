@@ -23,8 +23,8 @@ from overhave.transport import OverhaveGitlabClientSettings
 class OverhaveDemoAppLanguage(str, enum.Enum):
     """ Enum for choice of Overhave demo application language. """
 
-    RU = "RU"
-    EN = "EN"
+    RU = "ru"
+    EN = "en"
 
 
 class OverhaveDemoSettingsGenerator:

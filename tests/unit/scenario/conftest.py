@@ -6,6 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave import (
     OverhaveFileSettings,
     OverhaveLanguageSettings,
@@ -23,7 +24,7 @@ from overhave.entities import (
 from overhave.entities.converters import TagsTypeModel
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
-from tests.objects import TestLanguageName, get_test_feature_containers, get_test_feature_extractor
+from tests.objects import get_test_feature_containers, get_test_feature_extractor
 
 
 @pytest.fixture()
@@ -32,9 +33,9 @@ def test_scenario_text(request: FixtureRequest, language_settings: OverhaveLangu
         return str(request.param)  # type: ignore
     features = get_test_feature_containers()
     if language_settings.step_prefixes is None:
-        lang = TestLanguageName.ENG
+        lang = OverhaveDemoAppLanguage.EN
     else:
-        lang = TestLanguageName.RUS
+        lang = OverhaveDemoAppLanguage.RU
     return next(
         iter(
             feature.scenario for feature in features if feature.language is lang and feature.name.startswith("scenario")
