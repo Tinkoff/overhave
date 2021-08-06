@@ -1,5 +1,5 @@
 from os import chdir
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, Optional, Tuple, cast
 from unittest import mock
 
 import pytest
@@ -8,6 +8,7 @@ from _pytest.fixtures import FixtureRequest
 from flask import Flask
 
 from demo.demo import _run_demo_admin
+from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import OverhaveDBSettings, db
 from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
 from overhave.entities import ScenarioModel, SystemUserModel
@@ -67,13 +68,25 @@ def flask_run_mock() -> mock.MagicMock:
 
 
 @pytest.fixture(scope="module")
-def test_feature_types() -> List[str]:
-    return ["feature_type_1", "feature_type_2", "feature_type_3"]
+def test_feature_types() -> Tuple[str, ...]:
+    return "feature_type_1", "feature_type_2", "feature_type_3"
 
 
 @pytest.fixture()
 def test_admin_factory(clean_admin_factory: Callable[[], IAdminFactory]) -> IAdminFactory:
     return clean_admin_factory()
+
+
+@pytest.fixture()
+def test_demo_language(request: FixtureRequest) -> Optional[str]:
+    if hasattr(request, "param"):
+        return cast(OverhaveDemoAppLanguage, request.param)
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_demo_settings_generator(test_demo_language: OverhaveDemoAppLanguage) -> OverhaveDemoSettingsGenerator:
+    return OverhaveDemoSettingsGenerator(language=test_demo_language, threadpool=False)
 
 
 @pytest.fixture()
@@ -83,9 +96,10 @@ def test_resolved_admin_proxy_manager(
     test_proxy_manager: IProxyManager,
     mock_envs: None,
     database: None,
+    test_demo_settings_generator: OverhaveDemoSettingsGenerator,
 ) -> IProxyManager:
     chdir(PROJECT_WORKDIR)
-    _run_demo_admin()
+    _run_demo_admin(settings_generator=test_demo_settings_generator)
     return test_proxy_manager
 
 

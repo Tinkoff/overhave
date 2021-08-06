@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 import werkzeug
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
 from overhave.admin.views.feature import _SCENARIO_PREFIX
 from overhave.entities import ScenarioModel, SystemUserModel, TestRunModel
@@ -12,6 +13,7 @@ from tests.objects import FeatureTestContainer
 
 
 @pytest.mark.usefixtures("database")
+@pytest.mark.parametrize("test_demo_language", list(OverhaveDemoAppLanguage), indirect=True)
 class TestOverhaveAdminRunTest:
     """ Sanity tests for application test run. """
 

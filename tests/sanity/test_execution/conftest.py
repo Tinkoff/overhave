@@ -6,6 +6,7 @@ import werkzeug
 from _pytest.fixtures import FixtureRequest
 
 from demo.demo import _run_demo_consumer
+from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import OverhaveRedisStream
 from overhave.db import TestReportStatus
 from overhave.entities import ScenarioModel
@@ -41,9 +42,10 @@ def test_resolved_testexecution_proxy_manager(
     clean_test_execution_factory: Callable[[], ITestExecutionFactory],
     redisconsumer_run_mock: mock.MagicMock,
     subprocess_run_mock: mock.MagicMock,
+    test_demo_settings_generator: OverhaveDemoSettingsGenerator,
 ) -> IProxyManager:
     test_resolved_admin_proxy_manager._factory = None  # reset ProxyManager factory
-    _run_demo_consumer(stream=OverhaveRedisStream.TEST)
+    _run_demo_consumer(stream=OverhaveRedisStream.TEST, settings_generator=test_demo_settings_generator)
     return test_resolved_admin_proxy_manager
 
 

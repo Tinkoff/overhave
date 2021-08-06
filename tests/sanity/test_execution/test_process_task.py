@@ -3,11 +3,13 @@ from unittest import mock
 
 import pytest
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
 from overhave.entities import TestRunModel
 
 
 @pytest.mark.usefixtures("database")
+@pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
 class TestOverhaveTestExecution:
     """ Sanity tests for application test run. """
 
@@ -16,7 +18,7 @@ class TestOverhaveTestExecution:
         [(0, db.TestReportStatus.GENERATED), (1, db.TestReportStatus.GENERATION_FAILED)],
         indirect=True,
     )
-    def test_correct_run_created(
+    def test_correct_run_executed(
         self, test_executed_testruntask_id: int, subprocess_run_mock: mock.MagicMock, report_status: db.TestReportStatus
     ) -> None:
         subprocess_run_mock.assert_called_once()
