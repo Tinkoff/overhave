@@ -365,6 +365,15 @@ created when you click the button `Create pull request` on
 test run result's page. This button is available only for `success`
 test run's result.
 
+**Note**: one of the most popular cases of GitLab API
+authentication is the OAUTH2 schema with service account.
+In according to this schema, you should have OAUTH2 token,
+which is might have a short life-time and could not be
+specified through environment. For this situation, **Overhave**
+has special `TokenizerClient` with it's own
+`TokenizerClientSettings` - this simple client could take
+the token from a remote custom GitLab tokenizer service.
+
 
 Custom index
 ------------
