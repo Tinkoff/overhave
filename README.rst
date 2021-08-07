@@ -41,7 +41,7 @@ Features
 * Simple business-alike scenarios structure, easy horizontal scaling
 * Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
-* Versioning and deployment of scenario drafts to `Bitbucket`_
+* Versioning and deployment of scenario drafts to `Bitbucket`_ or `GitLab`_
 * Built-in configurable management of users and groups permissions
 * Configurable strategy for user authorization, LDAP also provided
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
@@ -167,7 +167,7 @@ tasks asynchronously:
 
 .. code-block:: shell
 
-    overhave-demo admin --threadpool
+    overhave-demo admin --threadpool --language=ru
 
 But this *threadpool* mode is unscalable in *kubernetes* paradigm. So,
 it's highly recommended to use corresponding consumers exactly.
@@ -316,9 +316,7 @@ in framework and available for usage:
 
     from overhave.extra import RUSSIAN_PREFIXES
 
-    language_settings = OverhaveLanguageSettings(
-        step_prefixes=RUSSIAN_PREFIXES
-    )
+    language_settings = OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)
 
 **Note**: you could create your own prefix-value mapping for your language:
 
@@ -339,6 +337,34 @@ in framework and available for usage:
         AND="Und ",
         BUT="Aber ",
     )
+
+
+Git integration
+---------------
+
+**Overhave** gives an ability to sent your new features or changes to
+remote git repository, which is hosted by `Bitbucket`_ or `GitLab`_.
+Integration with bitbucket is native, while integration with GitLab
+uses `python-gitlab`_ library.
+
+You are able to set necessary settings for your project:
+
+.. code-block:: python
+
+    publisher_settings = OverhaveGitlabPublisherSettings(
+        repository_id='123',
+        default_target_branch_name='master',
+    )
+    client_settings=OverhaveGitlabClientSettings(
+        url="https://gitlab.mycompany.com",
+        auth_token=os.environ.get("MY_GITLAB_AUTH_TOKEN"),
+    )
+
+The pull-request (for Bitbucket) or merge-request (for GitLab)
+created when you click the button `Create pull request` on
+test run result's page. This button is available only for `success`
+test run's result.
+
 
 Custom index
 ------------
@@ -366,7 +392,7 @@ Authorization strategy
 * `Default` - strategy with real authorization.
     Every user could use only registered credentials.
 
-* LDAP - strategy with authorization using remote LDAP server.
+* `LDAP` - strategy with authorization using remote LDAP server.
     Every user should use his LDAP credentials. LDAP
     server returns user groups. If user in default 'admin' group or his groups
     list contains admin group - user will be authorized. If user already placed
@@ -481,6 +507,8 @@ with a detailed description.
 .. _`Allure`: https://github.com/allure-framework/allure-python
 .. _`Allure CLI`: https://docs.qameta.io/allure/#_get_started
 .. _`Bitbucket`: https://www.atlassian.com/git
+.. _`GitLab`: https://about.gitlab.com
+.. _`python-gitlab`: https://python-gitlab.readthedocs.io
 .. _`SQLAlchemy`: https://github.com/sqlalchemy/sqlalchemy
 .. _`Walrus`: https://github.com/coleifer/walrus
 .. _`GoTTY`: https://github.com/yudai/gotty

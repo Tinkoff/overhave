@@ -16,11 +16,17 @@
         OverhaveStashClientSettings,
         OverhaveStashPublisherSettings,
     )
-    from overhave.extra import RUSSIAN_PREFIXES, RUSSIAN_TRANSLIT_PACK
+    from overhave.extra import RUSSIAN_PREFIXES
+
+    from my_project import MyCustomPathSettings
+
+    path_settings = MyCustomPathSettings()  # it's your settings with paths to project directories
 
     my_custom_context = OverhaveAdminContext(
         file_settings=OverhaveFileSettings(
-            features_base_dir=path_settings.features_base_dir, tmp_dir=path_settings.tmp_dir
+            features_dir=path_settings.features_dir,
+            fixtures_dir=path_settings.fixtures_dir,
+            tmp_dir=path_settings.tmp_dir,
         ),
         language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES),
         project_settings=OverhaveProjectSettings(
