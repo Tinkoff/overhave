@@ -88,8 +88,53 @@ def test_feature_name(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_feature_row(faker: Faker, test_feature_model_task: List[str]) -> db.Feature:
-    return db.Feature(name=faker.word(), author=faker.word(), task=test_feature_model_task)
+def test_feature_model_task() -> List[str]:
+    return ["KEK-1111"]
+
+
+@pytest.fixture()
+def test_feature_type_id(faker: Faker) -> int:
+    return faker.random_int()
+
+
+@pytest.fixture()
+def test_system_user_login(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
+def test_feature_filepath(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
+def test_feature_row(
+    faker: Faker,
+    test_feature_id: int,
+    test_feature_name: str,
+    test_system_user_login: str,
+    test_feature_type_id: int,
+    test_feature_filepath: str,
+    test_feature_model_task: List[str],
+) -> db.Feature:
+    row = db.Feature(
+        name=test_feature_name,
+        author=test_system_user_login,
+        type_id=test_feature_type_id,
+        file_path=test_feature_filepath,
+        task=test_feature_model_task,
+    )
+    row.id = test_feature_id
+    return row
+
+
+@pytest.fixture()
+def test_draft_row(faker: Faker, test_feature_id: int, test_testrun_id: int, test_feature_row: db.Feature) -> db.Draft:
+    row = db.Draft(
+        feature_id=test_feature_id, test_run_id=test_testrun_id, text=faker.word(), published_by=faker.word()
+    )
+    row.feature = test_feature_row
+    return row
 
 
 @pytest.fixture(scope="session")

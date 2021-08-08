@@ -5,7 +5,6 @@ import sqlalchemy as sa
 import sqlalchemy_utils as su
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin
-from overhave.db.types import LONG_STR_TYPE, SHORT_STR_TYPE
 
 
 class Role(str, enum.Enum):
@@ -18,8 +17,8 @@ class Role(str, enum.Enum):
 class BaseUser:
     """ Base user class. """
 
-    login: str = sa.Column(SHORT_STR_TYPE, nullable=False, unique=True)
-    password: Optional[str] = sa.Column(LONG_STR_TYPE, nullable=True)
+    login: str = sa.Column(sa.String(), nullable=False, unique=True)
+    password: Optional[str] = sa.Column(sa.String(), nullable=True)
     role: str = sa.Column(sa.Enum(Role), nullable=False, default=Role.user)
 
     if TYPE_CHECKING:
@@ -62,7 +61,7 @@ class UserRole(BaseTable, PrimaryKeyMixin, BaseUser):
 class GroupRole(BaseTable, PrimaryKeyMixin):
     """ Group access table. """
 
-    group = sa.Column(SHORT_STR_TYPE, nullable=False, unique=True)
+    group = sa.Column(sa.String(), nullable=False, unique=True)
 
     def __init__(self, group: str) -> None:
         self.group = group

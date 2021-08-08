@@ -34,12 +34,14 @@ class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
     """ Model for :class:`FeatureType` row. """
 
+    id: int
     name: FeatureTypeName
 
 
 class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
     """ Model for :class:`Tags` row. """
 
+    id: int
     value: str
 
 
@@ -49,11 +51,12 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     id: int
     name: str
     author: str
-    feature_type: FeatureTypeModel
     last_edited_by: str
     task: List[str]
-    feature_tags: List[TagsTypeModel]
     file_path: str
+
+    feature_type: FeatureTypeModel
+    feature_tags: List[TagsTypeModel]
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore

@@ -109,7 +109,6 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             author=test_system_user.login,
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
-            last_edited_by=test_system_user.login,
             file_path="my_folder/my_feature",
         )
         session.add(feature)
@@ -152,10 +151,10 @@ def test_draft(
             feature_id=test_feature.id,
             test_run_id=test_created_test_run_id,
             text=faker.word(),
-            pr_url=faker.word(),
             published_by=test_system_user.login,
-            published_at=datetime.datetime.now(),
         )
+        draft.pr_url = faker.word()
+        draft.published_at = datetime.datetime.now()
         session.add(draft)
         session.flush()
         return cast(DraftModel, DraftModel.from_orm(draft))

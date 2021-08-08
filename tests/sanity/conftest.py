@@ -50,7 +50,6 @@ def test_db_scenario(test_feature_container: FeatureTestContainer, test_db_user:
             author=test_db_user.login,
             type_id=db_feature_type.id,
             task=["PRJ-123"],
-            last_edited_by=test_db_user.login,
             file_path=test_feature_container.file_path,
         )
         session.add(db_feature)
