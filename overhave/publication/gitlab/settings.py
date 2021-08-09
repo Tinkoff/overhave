@@ -1,7 +1,7 @@
-from typing import List, Mapping
+from typing import List
 
-from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities import FeatureTypeName
+from overhave.publication.settings import BaseGitPublisherSettings
 from overhave.transport.http.gitlab_client import GitlabRepository
 
 
@@ -9,7 +9,7 @@ class NotSpecifiedFeatureTypeError(RuntimeError):
     """ Exception for not specified reviewers relative to feature type. """
 
 
-class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
+class OverhaveGitlabPublisherSettings(BaseGitPublisherSettings):
     """ Settings for :class:`GitlabVersionPublisher`.
 
     This is a representation of Gitlab project parameters.
@@ -17,13 +17,6 @@ class OverhaveGitlabPublisherSettings(BaseOverhavePrefix):
     """
 
     repository_id: str  # for example '2034'
-    default_target_branch_name: str = "master"
-
-    # Merge-request default reviewers as list
-    default_reviewers: List[str] = []
-
-    # Merge-request default reviewers as mapping with :class:```FeatureTypeName```
-    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_"
