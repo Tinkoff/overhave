@@ -129,9 +129,11 @@ def test_feature_row(
 
 
 @pytest.fixture()
-def test_draft_row(faker: Faker, test_feature_id: int, test_testrun_id: int, test_feature_row: db.Feature) -> db.Draft:
+def test_draft_row(
+    faker: Faker, test_feature_id: int, test_testrun_id: int, test_feature_row: db.Feature, test_system_user_login: str
+) -> db.Draft:
     row = db.Draft(
-        feature_id=test_feature_id, test_run_id=test_testrun_id, text=faker.word(), published_by=faker.word()
+        feature_id=test_feature_id, test_run_id=test_testrun_id, text=faker.word(), published_by=test_system_user_login
     )
     row.feature = test_feature_row
     return row
@@ -162,8 +164,8 @@ def test_tags_view() -> views.TagsView:
 
 
 @pytest.fixture()
-def test_tags_row() -> db.Tags:
-    return db.Tags()
+def test_tags_row(faker: Faker, test_system_user_login: str) -> db.Tags:
+    return db.Tags(value=faker.word(), created_by=test_system_user_login)
 
 
 @pytest.fixture()

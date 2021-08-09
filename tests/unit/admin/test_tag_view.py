@@ -1,3 +1,4 @@
+from copy import deepcopy
 from unittest import mock
 
 import pytest
@@ -20,8 +21,11 @@ class TestTagView:
         test_tags_row: db.Tags,
         form_mock: mock.MagicMock,
     ) -> None:
+        previous_row = deepcopy(test_tags_row)
         test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
-        assert test_tags_row.created_by is None
+        assert test_tags_row.id == previous_row.id
+        assert test_tags_row.value == previous_row.value
+        assert test_tags_row.created_by == previous_row.created_by
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_created_error(

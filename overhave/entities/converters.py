@@ -43,6 +43,7 @@ class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
 
     id: int
     value: str
+    created_by: str
 
 
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore

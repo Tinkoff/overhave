@@ -25,7 +25,12 @@ class IFeatureStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def create_feature(session: so.Session, model: FeatureModel) -> None:
+    def create_feature(session: so.Session, model: FeatureModel) -> int:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def update_feature(session: so.Session, model: FeatureModel) -> None:
         pass
 
 
@@ -39,7 +44,7 @@ class FeatureStorage(IFeatureStorage):
             return cast(FeatureModel, FeatureModel.from_orm(feature))
 
     @staticmethod
-    def create_feature(session: so.Session, model: FeatureModel) -> None:
+    def create_feature(session: so.Session, model: FeatureModel) -> int:
         feature = db.Feature(
             name=model.name,
             author=model.author,
@@ -48,6 +53,8 @@ class FeatureStorage(IFeatureStorage):
             task=model.task,
         )
         session.add(feature)
+        session.flush()
+        return cast(int, feature.id)
 
     @staticmethod
     def update_feature(session: so.Session, model: FeatureModel) -> None:
