@@ -1,11 +1,12 @@
 import abc
 import logging
-from typing import Optional, cast
+from typing import Generic, Optional, cast
 
 import git
 
 from overhave.entities import PublisherContext
 from overhave.publication.base_publisher import BaseVersionPublisher, BaseVersionPublisherException
+from overhave.publication.settings import GitPublisherSettings
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class CommitNotCreatedError(BaseGitVersionPublisherError):
     """ Exception for situation with not created commit. """
 
 
-class GitVersionPublisher(BaseVersionPublisher, abc.ABC):
+class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, abc.ABC):
     """ Class for feature version's management, based on git. """
 
     @staticmethod
