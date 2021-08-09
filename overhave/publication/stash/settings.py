@@ -1,7 +1,7 @@
-from typing import List, Mapping
+from typing import List
 
-from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.feature import FeatureTypeName
+from overhave.publication.settings import BaseGitPublisherSettings
 from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 
 
@@ -9,7 +9,7 @@ class NotSpecifiedFeatureTypeError(RuntimeError):
     """ Exception for not specified reviewers relative to feature type. """
 
 
-class OverhaveStashPublisherSettings(BaseOverhavePrefix):
+class OverhaveStashPublisherSettings(BaseGitPublisherSettings):
     """ Settings for :class:`StashVersionPublisher`.
 
     This is a representation of BitBucket project parameters.
@@ -18,12 +18,6 @@ class OverhaveStashPublisherSettings(BaseOverhavePrefix):
 
     repository_name: str  # for example 'bdd-features'
     project_key: str  # for example 'PRJ'
-    default_target_branch_name: str = "master"
-
-    # Pull-request default reviewers as list
-    default_reviewers: List[str] = []
-    # Pull-request default reviewers as mapping with :class:```FeatureTypeName```
-    feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
 
     class Config:
         env_prefix = "OVERHAVE_STASH_"

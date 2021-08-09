@@ -1,9 +1,7 @@
 import logging
 from http import HTTPStatus
-from typing import cast
 
 from gitlab import GitlabCreateError, GitlabHttpError
-from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
@@ -25,7 +23,7 @@ class InvalidWebUrlException(BaseGitlabVersionPublisherException):
     """ Exception for case when web url is None. """
 
 
-class GitlabVersionPublisher(GitVersionPublisher):
+class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings]):
     """ Class for feature version's merge requests management relative to Gitlab API. """
 
     def __init__(
@@ -75,15 +73,14 @@ class GitlabVersionPublisher(GitVersionPublisher):
             response = self._gitlab_client.send_merge_request(
                 merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
             )
-            if isinstance(response, ProjectMergeRequest):
-                parsed_response = cast(GitlabMrCreationResponse, response.attributes)
-                if parsed_response.web_url is None:
+            if isinstance(response, GitlabMrCreationResponse):
+                if response.web_url is None:
                     raise InvalidWebUrlException("Please verify your gitlab url environment! It is invalid!")
                 self._draft_storage.save_response(
                     draft_id=draft_id,
-                    pr_url=parsed_response.web_url,
-                    published_at=parsed_response.created_at,
-                    opened=parsed_response.state == "opened",
+                    pr_url=response.web_url,
+                    published_at=response.created_at,
+                    opened=response.state == "opened",
                 )
                 return
         except (GitlabCreateError, GitlabHttpError) as e:

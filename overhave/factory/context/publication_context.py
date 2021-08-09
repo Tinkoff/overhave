@@ -1,12 +1,12 @@
-from typing import Optional, Union
+from typing import Optional
 
 from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
 from overhave.factory.context.base_context import BaseFactoryContext
-from overhave.publication import OverhaveStashPublisherSettings
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
-from overhave.publication.settings import PublicationSettings
+from overhave.publication.settings import BaseGitPublisherSettings, PublicationSettings
 from overhave.test_execution import OverhaveProjectSettings
-from overhave.transport import OverhaveGitlabClientSettings, OverhaveStashClientSettings
+from overhave.transport import OverhaveGitlabClientSettings
+from overhave.transport.http.base_client.settings import HttpSettingsType
 
 
 class OverhavePublicationContext(BaseFactoryContext):
@@ -21,8 +21,8 @@ class OverhavePublicationContext(BaseFactoryContext):
         file_settings: Optional[OverhaveFileSettings] = None,
         language_settings: Optional[OverhaveLanguageSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
-        client_settings: Optional[Union[OverhaveStashClientSettings, OverhaveGitlabClientSettings]] = None,
-        publisher_settings: Optional[Union[OverhaveStashPublisherSettings, OverhaveGitlabPublisherSettings]] = None,
+        client_settings: Optional[HttpSettingsType] = None,
+        publisher_settings: Optional[BaseGitPublisherSettings] = None,
         publication_settings: Optional[PublicationSettings] = None,
         tokenizer_client_settings: Optional[TokenizerClientSettings] = None,
     ) -> None:

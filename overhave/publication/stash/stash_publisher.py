@@ -20,7 +20,7 @@ from overhave.transport import (
 logger = logging.getLogger(__name__)
 
 
-class StashVersionPublisher(GitVersionPublisher):
+class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings]):
     """ Class for feature version's pull requests management relative to Atlassian Stash API. """
 
     def __init__(
