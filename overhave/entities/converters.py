@@ -52,9 +52,11 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     id: int
     name: str
     author: str
+    type_id: int
     last_edited_by: str
     task: List[str]
     file_path: str
+    released: bool
 
     feature_type: FeatureTypeModel
     feature_tags: List[TagsTypeModel]

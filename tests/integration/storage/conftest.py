@@ -19,7 +19,7 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import DraftStorage, FeatureTypeStorage, TestRunStorage
+from overhave.storage import DraftStorage, FeatureStorage, FeatureTypeStorage, TestRunStorage
 from overhave.storage.emulation_storage import EmulationStorage
 
 
@@ -97,6 +97,11 @@ def test_test_run_storage() -> TestRunStorage:
 
 
 @pytest.fixture(scope="class")
+def test_feature_storage() -> FeatureStorage:
+    return FeatureStorage()
+
+
+@pytest.fixture(scope="class")
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 
@@ -109,7 +114,7 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             author=test_system_user.login,
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
-            file_path="my_folder/my_feature",
+            file_path=f"{faker.word()}/{faker.word()}",
         )
         session.add(feature)
         session.flush()
