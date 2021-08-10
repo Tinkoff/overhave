@@ -4,7 +4,7 @@ import pytest
 
 from overhave import db
 from overhave.entities import FeatureModel, FeatureTypeModel
-from overhave.storage import FeatureStorage
+from overhave.storage import FeatureStorage, SystemUserStorage
 
 
 def _check_base_feature_attrs(test_model: FeatureModel, validation_model: FeatureModel) -> None:
@@ -49,3 +49,33 @@ class TestFeatureStorage:
         assert feature_model.id == feature_id
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
         _check_base_feature_type_attrs(test_model=feature_model.feature_type, validation_model=test_feature_type)
+
+    def test_update_feature(
+        self,
+        test_feature_storage: FeatureStorage,
+        test_system_user_storage: SystemUserStorage,
+        test_feature_type: FeatureTypeModel,
+        test_feature: FeatureModel,
+    ) -> None:
+        new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
+        new_feature_model = FeatureModel(
+            id=test_feature.id,
+            name=uuid1().hex,
+            author=test_feature.author,
+            type_id=test_feature_type.id,
+            last_edited_by=new_system_user.login,
+            task=[uuid1().hex],
+            file_path=uuid1().hex,
+            released=True,
+            feature_type=test_feature_type,
+            feature_tags=[],
+        )
+        with db.create_session() as session:
+            test_feature_storage.update_feature(session=session, model=new_feature_model)
+        updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)
+        assert updated_feature_model is not None
+        assert updated_feature_model.id == new_feature_model.id
+        _check_base_feature_attrs(test_model=updated_feature_model, validation_model=new_feature_model)
+        _check_base_feature_type_attrs(
+            test_model=updated_feature_model.feature_type, validation_model=test_feature_type
+        )

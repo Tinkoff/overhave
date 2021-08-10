@@ -62,7 +62,6 @@ class FeatureStorage(IFeatureStorage):
         if feature is None:
             raise FeatureNotExistsError(f"Feature with id {model.id} does not exist!")
         feature.name = model.name
-        feature.type_id = model.feature_type.id
         feature.file_path = model.file_path
         feature.task = model.task
         feature.last_edited_by = model.last_edited_by

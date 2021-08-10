@@ -19,8 +19,14 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import DraftStorage, FeatureStorage, FeatureTypeStorage, TestRunStorage
-from overhave.storage.emulation_storage import EmulationStorage
+from overhave.storage import (
+    DraftStorage,
+    EmulationStorage,
+    FeatureStorage,
+    FeatureTypeStorage,
+    SystemUserStorage,
+    TestRunStorage,
+)
 
 
 @pytest.fixture(scope="module")
@@ -104,6 +110,11 @@ def test_feature_storage() -> FeatureStorage:
 @pytest.fixture(scope="class")
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
+
+
+@pytest.fixture(scope="class")
+def test_system_user_storage() -> SystemUserStorage:
+    return SystemUserStorage()
 
 
 @pytest.fixture()

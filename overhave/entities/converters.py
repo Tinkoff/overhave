@@ -27,7 +27,7 @@ class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
     """ Model for :class:`UserRole`. """
 
     login: str
-    password: SecretStr
+    password: Optional[SecretStr]
     role: Role
 
 
