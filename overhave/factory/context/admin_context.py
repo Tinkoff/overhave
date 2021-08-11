@@ -1,17 +1,17 @@
 from typing import Optional
 
+from overhave.authorization import (
+    AuthorizationStrategy,
+    OverhaveAdminSettings,
+    OverhaveAuthorizationSettings,
+    OverhaveLdapClientSettings,
+)
 from overhave.entities import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
-)
-from overhave.entities.authorization import AuthorizationStrategy
-from overhave.entities.authorization.settings import (
-    OverhaveAdminSettings,
-    OverhaveAuthorizationSettings,
-    OverhaveLdapClientSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings

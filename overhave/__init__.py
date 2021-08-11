@@ -1,5 +1,11 @@
 # flake8: noqa
 from overhave.admin import OverhaveAdminApp, overhave_app
+from overhave.authorization import (
+    AuthorizationStrategy,
+    OverhaveAdminSettings,
+    OverhaveAuthorizationSettings,
+    OverhaveLdapClientSettings,
+)
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import LoggingSettings as OverhaveLoggingSettings
 from overhave.cli import group, set_config_to_context
@@ -12,12 +18,6 @@ from overhave.entities import (
     OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
     StepPrefixesModel,
-)
-from overhave.entities.authorization.settings import (
-    AuthorizationStrategy,
-    OverhaveAdminSettings,
-    OverhaveAuthorizationSettings,
-    OverhaveLdapClientSettings,
 )
 from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
 from overhave.factory import IAdminFactory as OverhaveAdminFactory

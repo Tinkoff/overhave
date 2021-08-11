@@ -12,7 +12,7 @@ from wtforms.validators import ValidationError
 
 from overhave.admin.views.index.custom_page import CustomPageForm
 from overhave.admin.views.index.login_form import LoginForm
-from overhave.entities.authorization.manager import IAdminAuthorizationManager
+from overhave.authorization import IAdminAuthorizationManager
 
 logger = logging.getLogger(__name__)
 

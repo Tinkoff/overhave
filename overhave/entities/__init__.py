@@ -1,6 +1,5 @@
 # flake8: noqa
 from .archiver import ArchiveManager
-from .authorization import IAdminAuthorizationManager
 from .converters import (
     DraftModel,
     EmulationRunModel,

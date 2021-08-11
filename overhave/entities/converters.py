@@ -26,9 +26,28 @@ from overhave.entities.feature import FeatureTypeName
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
     """ Model for :class:`UserRole`. """
 
+    id: int
     login: str
     password: Optional[SecretStr]
     role: Role
+
+    @property
+    def is_authenticated(self) -> bool:
+        return True
+
+    @property
+    def is_active(self) -> bool:
+        return True
+
+    @property
+    def is_anonymous(self) -> bool:
+        return False
+
+    def get_id(self) -> int:
+        return self.id
+
+    def __unicode__(self) -> str:
+        return self.login
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
