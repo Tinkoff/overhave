@@ -91,9 +91,11 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             )
         if previous_draft.published_at is None:
             raise RuntimeError(f"Somebody has published this scenario at {previous_draft.published_at}")
+
         self._draft_storage.save_response(
             draft_id=context.draft.id,
-            pr_url=previous_draft.pr_url,
+            pr_url=context.draft.pr_url or previous_draft.pr_url,
             published_at=previous_draft.published_at,
-            opened=True,
+            status=context.draft.status,
+            traceback=context.draft.traceback,
         )

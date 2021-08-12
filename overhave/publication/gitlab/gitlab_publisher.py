@@ -11,7 +11,7 @@ from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.test_execution import OverhaveProjectSettings
-from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrCreationResponse, GitlabMrRequest
+from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +81,8 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                     draft_id=draft_id,
                     pr_url=response.web_url,
                     published_at=response.created_at,
-                    opened=response.state == "opened",
+                    status=response.state,
+                    traceback="kek =)",
                 )
                 return
         except (GitlabCreateError, GitlabHttpError) as e:

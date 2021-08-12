@@ -63,12 +63,16 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         logger.info("Prepared pull-request: %s", pull_request.json(by_alias=True))
         try:
             response = self._client.send_pull_request(pull_request)
+            status = "closed"
+            if response.open:
+                status = "opened"
             if isinstance(response, StashPrCreationResponse):
                 self._draft_storage.save_response(
                     draft_id=draft_id,
                     pr_url=response.get_pr_url(),
                     published_at=response.created_date,
-                    opened=response.open,
+                    traceback="kek",
+                    status=status,
                 )
                 return
             if isinstance(response, StashErrorResponse) and response.duplicate:

@@ -122,6 +122,8 @@ class Draft(BaseTable, PrimaryKeyMixin):
     pr_url = sa.Column(sa.Text, doc="Absolute pull-request URL", nullable=True)
     published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
     published_at = sa.Column(DATETIME_TYPE, doc="Publication time")
+    traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback")
+    status = sa.Column(SHORT_STR_TYPE, doc="Pull request status. It may be closed/open")
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 

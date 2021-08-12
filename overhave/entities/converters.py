@@ -91,6 +91,8 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
     pr_url: Optional[str]
     published_by: str
     published_at: Optional[datetime]
+    traceback: Optional[str]
+    status: Optional[str]
 
 
 class TestExecutorContext(BaseModel):
