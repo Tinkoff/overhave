@@ -2,6 +2,7 @@ import logging
 from http import HTTPStatus
 
 from gitlab import GitlabCreateError, GitlabHttpError
+from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
@@ -73,7 +74,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             response = self._gitlab_client.send_merge_request(
                 merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
             )
-            if isinstance(response, GitlabMrCreationResponse):
+            if isinstance(response, ProjectMergeRequest):
                 if response.web_url is None:
                     raise InvalidWebUrlException("Please verify your gitlab url environment! It is invalid!")
                 self._draft_storage.save_response(
