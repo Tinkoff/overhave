@@ -6,6 +6,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.entities import DraftModel
+from overhave.entities.objects import DraftStatus
 from overhave.storage.draft_storage import DraftStorage, NullableDraftsError, UniqueDraftCreationError
 
 
@@ -35,7 +36,13 @@ class TestDraftStorage:
     def test_save_response(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
         pr_url: str = faker.word()
         published_at: datetime.datetime = datetime.datetime.now()
-        test_draft_storage.save_response(draft_id=test_draft.id, pr_url=pr_url, published_at=published_at, opened=False)
+        test_draft_storage.save_response(
+            draft_id=test_draft.id,
+            pr_url=pr_url,
+            published_at=published_at,
+            status=DraftStatus.OPENED,
+            traceback=faker.word(),
+        )
         new_test_draft: Optional[DraftModel] = test_draft_storage.get_draft(test_draft.id)
         assert new_test_draft is not None
         assert new_test_draft.pr_url == pr_url

@@ -21,6 +21,7 @@ from overhave.db import (
     UserRole,
 )
 from overhave.entities.feature import FeatureTypeName
+from overhave.entities.objects import DraftStatus
 
 
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
@@ -92,7 +93,7 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
     published_by: str
     published_at: Optional[datetime]
     traceback: Optional[str]
-    status: Optional[str]
+    status: Optional[DraftStatus]
 
 
 class TestExecutorContext(BaseModel):

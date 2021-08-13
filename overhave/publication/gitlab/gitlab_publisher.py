@@ -82,11 +82,12 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                     pr_url=response.web_url,
                     published_at=response.created_at,
                     status=response.state,
-                    traceback="kek =)",
+                    traceback="",
                 )
                 return
         except (GitlabCreateError, GitlabHttpError) as e:
             if e.response_code == HTTPStatus.CONFLICT:
+                context.draft.traceback = str(e)
                 logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
                 self._save_as_duplicate(context)
                 return

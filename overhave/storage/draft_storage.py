@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 
 from overhave import db
 from overhave.entities import DraftModel
+from overhave.entities.objects import DraftStatus
 
 
 class IDraftStorage(abc.ABC):
@@ -18,7 +19,9 @@ class IDraftStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def save_response(self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: str) -> None:
+    def save_response(
+        self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: DraftStatus
+    ) -> None:
         pass
 
     @abc.abstractmethod
@@ -58,7 +61,9 @@ class DraftStorage(IDraftStorage):
             session.flush()
             return cast(int, draft.id)
 
-    def save_response(self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: str) -> None:
+    def save_response(
+        self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: DraftStatus
+    ) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.pr_url = pr_url
