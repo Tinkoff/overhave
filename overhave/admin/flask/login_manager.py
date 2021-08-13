@@ -6,23 +6,25 @@ from flask_login import LoginManager
 from werkzeug import Response
 
 from overhave.entities import SystemUserModel
-from overhave.storage import SystemUserStorage
+from overhave.storage import ISystemUserStorage
 
 logger = logging.getLogger(__name__)
 
 
-def _load_user(user_id: int) -> Optional[SystemUserModel]:
-    logger.info("Get user by id=%s...", user_id)
-    return SystemUserStorage().get_user(user_id=user_id)
+class FlaskLoginManager(LoginManager):
+    """ Custom Flask LoginManager for user acknowledgement. """
 
+    def __init__(self, system_user_storage: ISystemUserStorage, login_view: str) -> None:
+        super().__init__()
+        self.login_view = login_view
+        self.user_loader(self._get_user)
+        self.unauthorized_handler(self._unathorized_response)
 
-def _unathorized_response() -> Response:
-    return redirect("/login")
+        self._system_user_storage = system_user_storage
 
+    def _get_user(self, user_id: int) -> Optional[SystemUserModel]:
+        logger.info("Get user by id=%s...", user_id)
+        return self._system_user_storage.get_user(user_id=user_id)
 
-def get_flask_login_manager() -> LoginManager:
-    login_manager = LoginManager()
-    login_manager.login_view = "login"
-    login_manager.user_loader(_load_user)
-    login_manager.unauthorized_handler(_unathorized_response)
-    return login_manager
+    def _unathorized_response(self) -> Response:
+        return redirect(f"/{self.login_view}")

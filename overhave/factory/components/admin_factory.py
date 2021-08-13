@@ -29,6 +29,11 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
 
     @property
     @abc.abstractmethod
+    def system_user_storage(self) -> ISystemUserStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
     def auth_manager(self) -> IAdminAuthorizationManager:
         pass
 
@@ -56,6 +61,10 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
     @cached_property
     def _system_user_storage(self) -> ISystemUserStorage:
         return SystemUserStorage()
+
+    @property
+    def system_user_storage(self) -> ISystemUserStorage:
+        return self._system_user_storage
 
     @cached_property
     def _simple_auth_manager(self) -> SimpleAdminAuthorizationManager:

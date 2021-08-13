@@ -7,7 +7,7 @@ import flask
 import werkzeug
 
 from overhave import db
-from overhave.admin.flask import get_flask_admin, get_flask_app, get_flask_login_manager
+from overhave.admin.flask import FlaskLoginManager, get_flask_admin, get_flask_app
 from overhave.factory import IAdminFactory, get_publication_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import UniqueDraftCreationError
@@ -62,7 +62,7 @@ def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
     )
     flask_app = get_flask_app(template_folder=template_dir.as_posix())
     flask_admin.init_app(app=flask_app)
-    login_manager = get_flask_login_manager()
+    login_manager = FlaskLoginManager(system_user_storage=factory.system_user_storage, login_view="login")
     login_manager.init_app(flask_app)
     db.ensure_feature_types_exist(factory.feature_extractor.feature_types)  # type: ignore
     return flask_app
