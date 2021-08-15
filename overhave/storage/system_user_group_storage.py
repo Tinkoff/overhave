@@ -19,4 +19,5 @@ class SystemUserGroupStorage(ISystemUserGroupStorage):
     @staticmethod
     def has_any_group(user_groups: List[str]) -> bool:
         with db.create_session() as session:
-            return bool(session.query(db.GroupRole).filter(db.GroupRole.group.in_(user_groups)).all())
+            group = session.query(db.GroupRole).filter(db.GroupRole.group.in_(user_groups)).first()
+            return group is not None
