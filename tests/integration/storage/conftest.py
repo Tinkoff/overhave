@@ -7,6 +7,7 @@ from uuid import uuid1
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
+from pydantic import SecretStr
 
 from overhave import db
 from overhave.entities.converters import (
@@ -19,7 +20,14 @@ from overhave.entities.converters import (
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import DraftStorage, EmulationStorage, FeatureStorage, FeatureTypeStorage, TestRunStorage
+from overhave.storage import (
+    DraftStorage,
+    EmulationStorage,
+    FeatureStorage,
+    FeatureTypeStorage,
+    SystemUserStorage,
+    TestRunStorage,
+)
 
 
 @pytest.fixture(scope="module")
@@ -57,16 +65,16 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_system_user(database: None, faker: Faker, test_user_role: db.Role) -> SystemUserModel:
-    with db.create_session() as session:
-        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
-        session.add(app_user)
-        session.flush()
-        return cast(SystemUserModel, SystemUserModel.from_orm(app_user))
+def test_system_user(
+    test_system_user_storage: SystemUserStorage, database: None, faker: Faker, test_user_role: db.Role
+) -> SystemUserModel:
+    return test_system_user_storage.create_user(
+        login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
+    )
 
 
 @pytest.fixture()
-def test_user(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
+def test_testuser(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
             feature_type_id=test_feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
@@ -77,12 +85,12 @@ def test_user(test_system_user: SystemUserModel, faker: Faker, test_feature_type
 
 
 @pytest.fixture()
-def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, faker: Faker) -> EmulationModel:
+def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
     with db.create_session() as session:
         emulation = db.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
-            test_user_id=test_user.id,
+            test_user_id=test_testuser.id,
             created_by=test_system_user.login,
         )
         session.add(emulation)
