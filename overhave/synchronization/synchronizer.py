@@ -84,7 +84,9 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             if feature_model.last_edited_at is None:
                 raise NullableLastEditedAtError("last_edited_at value should not be None!")
             comparison_time = feature_model.last_edited_at
-
+            if comparison_time == feature_file_ts and feature_model.released:
+                logger.warning("Feature has been already synchronized.")
+                continue
             draft_models = self._draft_storage.get_drafts_by_feature_id(feature_model.id)
             if draft_models:
                 logger.info("Feature has got drafts.")
@@ -99,7 +101,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             else:
                 logger.info("Feature hasn't got any published version.")
 
-            if comparison_time < feature_file_ts:  # TODO: будет обновляться постоянно, надо понять как обновлять 1 раз
+            if comparison_time < feature_file_ts:
                 logger.info("Feature is gonna be updated...")
                 scenario_model = self._scenario_storage.get_scenario_by_feature_id(feature_model.id)
                 self._update_feature_model_with_info(model=feature_model, info=feature_info, file_ts=feature_file_ts)
