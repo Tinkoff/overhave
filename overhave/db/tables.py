@@ -55,6 +55,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     file_path = sa.Column(sa.String(), doc="Feature file path", nullable=False, unique=True)
     task = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=False)
     last_edited_by = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
+    last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)

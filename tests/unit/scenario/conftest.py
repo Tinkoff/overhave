@@ -52,6 +52,7 @@ def test_feature() -> FeatureModel:
         type_id=1,
         task=["OVERHAVE-1"],
         last_edited_by="overlord",
+        last_edited_at=get_current_time(),
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_test_feature_extractor().feature_types[0]),
         feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],

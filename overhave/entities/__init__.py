@@ -20,6 +20,7 @@ from .feature import (
     IFeatureExtractor,
     ScenariosTestFileNotFound,
 )
+from .file_extractor import BaseFileExtractor
 from .language import StepPrefixesModel
 from .report_manager import ReportManager, ReportPresenceResolution
 from .settings import (

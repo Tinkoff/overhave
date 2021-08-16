@@ -12,6 +12,10 @@ class BaseVersionPublisherException(Exception):
     """ Base exception for :class:`BaseVersionPublisher`. """
 
 
+class FeatureNotExistsError(BaseVersionPublisherException):
+    """ Exception for situation with not existing Feature. """
+
+
 class DraftNotExistsError(BaseVersionPublisherException):
     """ Exception for situation with not existing Draft. """
 
@@ -60,6 +64,8 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         if not test_run:
             raise TestRunNotExistsError(f"TestRun with id={draft.test_run_id} does not exist!")
         feature = self._feature_storage.get_feature(draft.feature_id)
+        if not feature:
+            raise FeatureNotExistsError(f"Feature with id={draft.feature_id} does not exist!")
         scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
         if not scenario:
             raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")

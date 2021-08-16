@@ -8,5 +8,5 @@ from .helpers import (
     get_step_context_runner,
     has_issue_links,
 )
-from .plugin_resolver import PluginResolver
+from .plugin_resolver import IPluginResolver, PluginResolver
 from .proxy_manager import IProxyManager, ProxyManager, get_proxy_manager

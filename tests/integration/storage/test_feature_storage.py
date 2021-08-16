@@ -5,6 +5,7 @@ import pytest
 from overhave import db
 from overhave.entities import FeatureModel, FeatureTypeModel
 from overhave.storage import FeatureStorage, SystemUserStorage
+from overhave.utils import get_current_time
 
 
 def _check_base_feature_attrs(test_model: FeatureModel, validation_model: FeatureModel) -> None:
@@ -42,8 +43,7 @@ class TestFeatureStorage:
     ) -> None:
         test_feature.name = uuid1().hex
         test_feature.file_path = uuid1().hex
-        with db.create_session() as session:
-            feature_id = test_feature_storage.create_feature(session=session, model=test_feature)
+        feature_id = test_feature_storage.create_feature(model=test_feature)
         feature_model = test_feature_storage.get_feature(feature_id)
         assert feature_model is not None
         assert feature_model.id == feature_id
@@ -64,14 +64,14 @@ class TestFeatureStorage:
             author=test_feature.author,
             type_id=test_feature_type.id,
             last_edited_by=new_system_user.login,
+            last_edited_at=get_current_time(),
             task=[uuid1().hex],
             file_path=uuid1().hex,
             released=True,
             feature_type=test_feature_type,
             feature_tags=[],
         )
-        with db.create_session() as session:
-            test_feature_storage.update_feature(session=session, model=new_feature_model)
+        test_feature_storage.update_feature(model=new_feature_model)
         updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)
         assert updated_feature_model is not None
         assert updated_feature_model.id == new_feature_model.id

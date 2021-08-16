@@ -21,6 +21,7 @@ from overhave.entities import FeatureTypeName
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
 from overhave.test_execution import BddStepModel, StepTypeName
 from overhave.transport import TestRunData, TestRunTask
+from overhave.utils import get_current_time
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +139,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
     form_excluded_columns = (
         "created_at",
         "last_edited_by",
+        "last_edited_at",
         "released",
         "versions",
         "feature_tags.value",
@@ -171,6 +173,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         if is_created:
             model.author = current_user.login
         model.last_edited_by = current_user.login
+        model.last_edited_at = get_current_time()
         model.released = False
 
     def on_model_delete(self, model) -> None:  # type: ignore

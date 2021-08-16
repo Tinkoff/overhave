@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.pytest_plugin.config_injector import ConfigInjector
-from overhave.pytest_plugin.plugin_resolver import PluginResolver
+from overhave.pytest_plugin.plugin_resolver import IPluginResolver, PluginResolver
 
 AnyProxyFactory = Union[IAdminFactory, ITestExecutionFactory]
 
@@ -41,7 +41,7 @@ class IProxyManager(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def plugin_resolver(self) -> PluginResolver:
+    def plugin_resolver(self) -> IPluginResolver:
         pass
 
     @property
@@ -113,11 +113,11 @@ class ProxyManager(IProxyManager):
             self._pytest_patched = True
 
     @cached_property
-    def _plugin_resolver(self) -> PluginResolver:
+    def _plugin_resolver(self) -> IPluginResolver:
         return PluginResolver(self.factory.context.file_settings)
 
     @property
-    def plugin_resolver(self) -> PluginResolver:
+    def plugin_resolver(self) -> IPluginResolver:
         return self._plugin_resolver
 
     @property

@@ -9,20 +9,29 @@ from overhave.entities import DraftModel
 class IDraftStorage(abc.ABC):
     """ Abstract class for scenario versions storage. """
 
+    @staticmethod
     @abc.abstractmethod
-    def get_draft(self, draft_id: int) -> Optional[DraftModel]:
+    def get_draft(draft_id: int) -> Optional[DraftModel]:
         pass
 
+    @staticmethod
     @abc.abstractmethod
-    def save_draft(self, test_run_id: int, published_by: str) -> int:
+    def get_drafts_by_feature_id(feature_id: int) -> List[DraftModel]:
         pass
 
+    @staticmethod
     @abc.abstractmethod
-    def save_response(self, draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
+    def save_draft(test_run_id: int, published_by: str) -> int:
         pass
 
+    @staticmethod
     @abc.abstractmethod
-    def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
+    def save_response(draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_previous_feature_draft(feature_id: int) -> DraftModel:
         pass
 
 
@@ -41,14 +50,25 @@ class NullableDraftsError(BaseDraftStorageException):
 class DraftStorage(IDraftStorage):
     """ Class for scenario versions storage. """
 
-    def get_draft(self, draft_id: int) -> Optional[DraftModel]:
+    @staticmethod
+    def get_draft(draft_id: int) -> Optional[DraftModel]:
         with db.create_session() as session:
             draft: Optional[db.Draft] = session.query(db.Draft).get(draft_id)
             if draft is not None:
                 return cast(DraftModel, DraftModel.from_orm(draft))
             return None
 
-    def save_draft(self, test_run_id: int, published_by: str) -> int:
+    @staticmethod
+    def get_drafts_by_feature_id(feature_id: int) -> List[DraftModel]:
+        draft_model_list: List[DraftModel] = []
+        with db.create_session() as session:
+            drafts: List[db.Draft] = session.query(db.Draft).filter(db.Draft.feature_id == feature_id).all()
+            for draft in drafts:
+                draft_model_list.append(cast(DraftModel, DraftModel.from_orm(draft)))
+        return draft_model_list
+
+    @staticmethod
+    def save_draft(test_run_id: int, published_by: str) -> int:
         with db.create_session() as session:
             try:
                 draft = session.query(db.Draft).as_unique(test_run_id=test_run_id, published_by=published_by)
@@ -58,7 +78,8 @@ class DraftStorage(IDraftStorage):
             session.flush()
             return cast(int, draft.id)
 
-    def save_response(self, draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
+    @staticmethod
+    def save_response(draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.pr_url = pr_url
@@ -66,7 +87,8 @@ class DraftStorage(IDraftStorage):
             feature: db.Feature = session.query(db.Feature).get(draft.feature_id)
             feature.released = opened
 
-    def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
+    @staticmethod
+    def get_previous_feature_draft(feature_id: int) -> DraftModel:
         with db.create_session() as session:
             selection_num = 2
             drafts: List[db.Draft] = session.query(db.Draft).filter(  # noqa: ECE001

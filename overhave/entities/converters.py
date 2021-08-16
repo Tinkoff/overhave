@@ -73,6 +73,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     author: str
     type_id: int
     last_edited_by: str
+    last_edited_at: datetime
     task: List[str]
     file_path: str
     released: bool

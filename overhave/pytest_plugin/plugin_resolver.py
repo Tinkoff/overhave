@@ -1,49 +1,35 @@
+import abc
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
-from overhave.entities import OverhaveFileSettings
+from overhave.entities import BaseFileExtractor, OverhaveFileSettings
 
 logger = logging.getLogger(__name__)
 
 
-class PluginResolver:
+class IPluginResolver(abc.ABC):
+    """ Abstract class for custom pytest-bdd steps modules resolution. """
+
+    @abc.abstractmethod
+    def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:
+        pass
+
+
+class PluginResolver(BaseFileExtractor, IPluginResolver):
     """ Class for custom pytest-bdd steps modules resolution. """
 
     def __init__(self, file_settings: OverhaveFileSettings):
+        super().__init__(extenstion=".py")
         self._file_settings = file_settings
         self._plugins = self._resolve_plugins(directory=self._file_settings.steps_dir)
         logger.debug("Available Overhave pytest plugin modules: %s", self._plugins)
 
-    @staticmethod
-    def _check_dir_compliance(path: Path) -> bool:
-        return all((path.is_dir(), not path.name.startswith("."), not path.name.startswith("_")))
+    def _resolve_plugins(self, directory: Path) -> Dict[str, List[Path]]:
+        plugin_folders = [d for d in directory.iterdir() if self._check_dir_compliance(d)]
+        plugin_dict = {folder.name: self._extract_recursively(folder) for folder in plugin_folders}
 
-    @staticmethod
-    def _check_module_compliance(path: Path) -> bool:
-        return all(
-            (not path.is_dir(), path.name.endswith(".py"), not path.name.startswith("."), not path.name.startswith("_"))
-        )
-
-    @classmethod
-    def _extract_recursively(cls, folder: Path) -> List[Path]:
-        modules = []
-        for path in folder.iterdir():
-            if cls._check_dir_compliance(path):
-                submodules = cls._extract_recursively(path)
-                modules.extend(submodules)
-                continue
-            if not cls._check_module_compliance(path):
-                continue
-            modules.append(path)
-        return modules
-
-    @classmethod
-    def _resolve_plugins(cls, directory: Path) -> Dict[str, List[Path]]:
-        plugin_folders = [d for d in directory.iterdir() if cls._check_dir_compliance(d)]
-        plugin_dict = {folder.name: cls._extract_recursively(folder) for folder in plugin_folders}
-
-        plugin_modules = [m for m in directory.iterdir() if cls._check_module_compliance(m)]
+        plugin_modules = [m for m in directory.iterdir() if self._check_file_compliance(m)]
         for folder in plugin_dict:
             plugin_dict[folder].extend(plugin_modules)
         return plugin_dict
