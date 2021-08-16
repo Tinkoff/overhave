@@ -20,7 +20,7 @@ class IDraftStorage(abc.ABC):
 
     @abc.abstractmethod
     def save_response(
-        self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: DraftStatus
+        self, draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
     ) -> None:
         pass
 
@@ -51,7 +51,7 @@ class DraftStorage(IDraftStorage):
                 return cast(DraftModel, DraftModel.from_orm(draft))
             return None
 
-    def save_draft(self, test_run_id: int, published_by: str, status: DraftStatus) -> int:
+    def save_draft(self, test_run_id: int, published_by: str, status: Optional[DraftStatus] = None) -> int:
         with db.create_session() as session:
             try:
                 draft = session.query(db.Draft).as_unique(
@@ -64,7 +64,7 @@ class DraftStorage(IDraftStorage):
             return cast(int, draft.id)
 
     def save_response(
-        self, draft_id: int, pr_url: str, published_at: datetime, traceback: str, status: DraftStatus
+        self, draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
     ) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
@@ -86,7 +86,7 @@ class DraftStorage(IDraftStorage):
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))
 
     @staticmethod
-    def set_run_status(draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+    def set_draft_status(draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.status = status
