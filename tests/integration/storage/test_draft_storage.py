@@ -56,9 +56,11 @@ class TestDraftStorage:
     )
     def test_set_draft_status(
         self, test_draft_storage: DraftStorage, test_draft: DraftModel, draft_status: DraftStatus
-    ):
+    ) -> None:
         test_draft_storage.set_draft_status(test_draft.id, draft_status)
-        assert test_draft_storage.get_draft(test_draft.id).status is draft_status
+        draft = test_draft_storage.get_draft(test_draft.id)
+        assert draft is not None
+        assert draft.status is draft_status
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_get_previous_feature_draft_with_error(

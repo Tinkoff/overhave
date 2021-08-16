@@ -93,7 +93,7 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
     published_by: str
     published_at: Optional[datetime]
     traceback: Optional[str]
-    status: Optional[DraftStatus]
+    status: DraftStatus
 
 
 class TestExecutorContext(BaseModel):
