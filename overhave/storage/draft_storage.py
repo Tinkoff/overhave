@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import List, Optional, cast
 
 from overhave import db
+from overhave.db.statuses import DraftStatus
 from overhave.entities import DraftModel
-from overhave.entities.objects import DraftStatus
 
 
 class IDraftStorage(abc.ABC):
@@ -15,7 +15,7 @@ class IDraftStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def save_draft(self, test_run_id: int, published_by: str) -> int:
+    def save_draft(self, test_run_id: int, published_by: str, status: DraftStatus) -> int:
         pass
 
     @abc.abstractmethod
@@ -51,10 +51,12 @@ class DraftStorage(IDraftStorage):
                 return cast(DraftModel, DraftModel.from_orm(draft))
             return None
 
-    def save_draft(self, test_run_id: int, published_by: str) -> int:
+    def save_draft(self, test_run_id: int, published_by: str, status: DraftStatus) -> int:
         with db.create_session() as session:
             try:
-                draft = session.query(db.Draft).as_unique(test_run_id=test_run_id, published_by=published_by)
+                draft = session.query(db.Draft).as_unique(
+                    test_run_id=test_run_id, published_by=published_by, status=status
+                )
             except RuntimeError as e:
                 raise UniqueDraftCreationError("Could not get unique draft!") from e
             session.add(draft)
@@ -71,7 +73,7 @@ class DraftStorage(IDraftStorage):
             draft.traceback = traceback
             draft.status = status
             feature: db.Feature = session.query(db.Feature).get(draft.feature_id)
-            feature.released = status == "opened"
+            feature.released = status == "SUCCESS"
 
     def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
         with db.create_session() as session:
@@ -82,3 +84,11 @@ class DraftStorage(IDraftStorage):
             if not drafts or len(drafts) != selection_num:
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))
+
+    @staticmethod
+    def set_run_status(draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+        with db.create_session() as session:
+            draft: db.Draft = session.query(db.Draft).get(draft_id)
+            draft.status = status
+            if isinstance(traceback, str):
+                draft.traceback = traceback

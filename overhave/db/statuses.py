@@ -43,3 +43,14 @@ class EmulationStatus(str, enum.Enum):
     @property
     def processed(self) -> bool:
         return self in (EmulationStatus.READY, EmulationStatus.ERROR)
+
+
+class DraftStatus(str, enum.Enum):
+    """ Enum for draft statuses. """
+
+    __test__ = False
+
+    STARTED = "STARTED"
+    RUNNING = "RUNNING"
+    SUCCESS = "SUCCESS"
+    INTERNAL_ERROR = "INTERNAL_ERROR"

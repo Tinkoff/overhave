@@ -22,14 +22,13 @@ class DraftView(ModelViewProtected):
         "status",
         "traceback",
     )
-
     column_sortable_list = ("id", "feature_id")
     column_searchable_list = (
         "test_run_id",
         "published_by",
         "pr_url",
     )
-    column_filters = ("feature_id", "published_by", "created_at")
+    column_filters = ("feature_id", "published_by", "created_at", "status")
 
     def on_model_delete(self, model) -> None:  # type: ignore
         if not current_user.role == Role.admin:

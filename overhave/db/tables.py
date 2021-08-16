@@ -8,7 +8,7 @@ from flask import url_for
 from sqlalchemy import orm as so
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
-from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
+from overhave.db.statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.types import ARRAY_TYPE, DATETIME_TYPE, INT_TYPE, LONG_STR_TYPE, SHORT_STR_TYPE, TEXT_TYPE
 from overhave.db.users import UserRole
 
@@ -89,7 +89,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
 class DraftQuery(so.Query):
     """ Scenario versions table. """
 
-    def as_unique(self, test_run_id: int, published_by: str) -> Draft:
+    def as_unique(self, test_run_id: int, published_by: str, status: DraftStatus) -> Draft:
         with self.session.no_autoflush:
             run = self.session.query(TestRun).get(test_run_id)
             if run is None:
@@ -108,6 +108,7 @@ class DraftQuery(so.Query):
             feature_id=run.scenario.feature_id,
             text=run.scenario.text,
             published_by=published_by,
+            status=status,
         )
 
 
@@ -123,7 +124,7 @@ class Draft(BaseTable, PrimaryKeyMixin):
     published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
     published_at = sa.Column(DATETIME_TYPE, doc="Publication time")
     traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback")
-    status = sa.Column(SHORT_STR_TYPE, doc="Pull request status. It may be closed/open")
+    status = sa.Column(sa.Enum(DraftStatus), doc="Pull request status")
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 

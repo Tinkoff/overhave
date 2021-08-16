@@ -20,8 +20,8 @@ from overhave.db import (
     TestUser,
     UserRole,
 )
+from overhave.db.statuses import DraftStatus
 from overhave.entities.feature import FeatureTypeName
-from overhave.entities.objects import DraftStatus
 
 
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore

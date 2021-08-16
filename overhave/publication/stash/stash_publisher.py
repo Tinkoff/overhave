@@ -2,8 +2,8 @@ import logging
 
 from requests import HTTPError
 
+from overhave.db.statuses import DraftStatus
 from overhave.entities import OverhaveFileSettings, PublisherContext
-from overhave.entities.objects import DraftStatus
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
@@ -64,9 +64,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         logger.info("Prepared pull-request: %s", pull_request.json(by_alias=True))
         try:
             response = self._client.send_pull_request(pull_request)
-            status = DraftStatus.CLOSED
-            if response.open:
-                status = DraftStatus.OPENED
             if isinstance(response, StashPrCreationResponse):
                 self._draft_storage.save_response(
                     draft_id=draft_id,
