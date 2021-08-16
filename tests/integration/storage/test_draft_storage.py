@@ -5,8 +5,8 @@ import pytest
 from faker import Faker
 
 from overhave import db
+from overhave.db.statuses import DraftStatus
 from overhave.entities import DraftModel
-from overhave.entities.objects import DraftStatus
 from overhave.storage.draft_storage import DraftStorage, NullableDraftsError, UniqueDraftCreationError
 
 
@@ -40,12 +40,13 @@ class TestDraftStorage:
             draft_id=test_draft.id,
             pr_url=pr_url,
             published_at=published_at,
-            status=DraftStatus.OPENED,
+            status=DraftStatus.STARTED,
             traceback=faker.word(),
         )
         new_test_draft: Optional[DraftModel] = test_draft_storage.get_draft(test_draft.id)
         assert new_test_draft is not None
         assert new_test_draft.pr_url == pr_url
+        assert new_test_draft.status is DraftStatus.STARTED
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_get_previous_feature_draft_with_error(
