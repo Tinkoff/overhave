@@ -77,7 +77,7 @@ class DraftStorage(IDraftStorage):
             draft.traceback = traceback
             draft.status = status
             feature: db.Feature = session.query(db.Feature).get(draft.feature_id)
-            feature.released = status == "SUCCESS"
+            feature.released = status is DraftStatus.CREATED
 
     def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
         with db.create_session() as session:
