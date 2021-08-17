@@ -124,7 +124,7 @@ class Draft(BaseTable, PrimaryKeyMixin):
     published_by = sa.Column(SHORT_STR_TYPE, sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
     published_at = sa.Column(DATETIME_TYPE, doc="Publication time")
     traceback = sa.Column(TEXT_TYPE, doc="Text storage for error traceback", nullable=True)
-    status = sa.Column(sa.Enum(DraftStatus), doc="Pull request status")
+    status = sa.Column(sa.Enum(DraftStatus), doc="Version publishing status")
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 

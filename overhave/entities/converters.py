@@ -7,6 +7,7 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from overhave.db import (
     Draft,
+    DraftStatus,
     Emulation,
     EmulationRun,
     Feature,
@@ -20,7 +21,6 @@ from overhave.db import (
     TestUser,
     UserRole,
 )
-from overhave.db.statuses import DraftStatus
 from overhave.entities.feature import FeatureTypeName
 
 

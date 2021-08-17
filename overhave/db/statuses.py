@@ -50,7 +50,12 @@ class DraftStatus(str, enum.Enum):
 
     __test__ = False
 
-    STARTED = "STARTED"
-    RUNNING = "RUNNING"
-    SUCCESS = "SUCCESS"
+    REQUESTED = "REQUESTED"
+    CREATING = "CREATING"
+    CREATED = "CREATED"
     INTERNAL_ERROR = "INTERNAL_ERROR"
+    DUPLICATE = "DUPLICATE"
+
+    @property
+    def success(self) -> bool:
+        return self in (DraftStatus.CREATED, DraftStatus.DUPLICATE)

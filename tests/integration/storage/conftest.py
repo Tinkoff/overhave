@@ -9,7 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from faker import Faker
 
 from overhave import db
-from overhave.db.statuses import DraftStatus
+from overhave.db import DraftStatus
 from overhave.entities.converters import (
     DraftModel,
     EmulationModel,
@@ -156,7 +156,7 @@ def test_draft(
             pr_url=faker.word(),
             published_by=test_system_user.login,
             published_at=datetime.datetime.now(),
-            status=DraftStatus.STARTED,
+            status=DraftStatus.REQUESTED,
         )
         session.add(draft)
         session.flush()

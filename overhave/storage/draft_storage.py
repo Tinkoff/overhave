@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List, Optional, cast
 
 from overhave import db
-from overhave.db.statuses import DraftStatus
+from overhave.db import DraftStatus
 from overhave.entities import DraftModel
 
 
@@ -26,6 +26,10 @@ class IDraftStorage(abc.ABC):
 
     @abc.abstractmethod
     def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
+        pass
+
+    @abc.abstractmethod
+    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
         pass
 
 
@@ -85,8 +89,7 @@ class DraftStorage(IDraftStorage):
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))
 
-    @staticmethod
-    def set_draft_status(draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.status = status

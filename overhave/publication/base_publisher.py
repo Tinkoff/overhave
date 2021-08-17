@@ -1,5 +1,6 @@
 import abc
 
+from overhave.db import DraftStatus
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.scenario import FileManager, generate_task_info
@@ -96,6 +97,6 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             draft_id=context.draft.id,
             pr_url=context.draft.pr_url or previous_draft.pr_url,
             published_at=previous_draft.published_at,
-            status=context.draft.status,
+            status=DraftStatus.DUPLICATE,
             traceback=context.draft.traceback,
         )
