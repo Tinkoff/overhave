@@ -55,7 +55,7 @@ class DraftStorage(IDraftStorage):
                 return cast(DraftModel, DraftModel.from_orm(draft))
             return None
 
-    def save_draft(self, test_run_id: int, published_by: str, status: Optional[DraftStatus] = None) -> int:
+    def save_draft(self, test_run_id: int, published_by: str, status: DraftStatus) -> int:
         with db.create_session() as session:
             try:
                 draft = session.query(db.Draft).as_unique(
@@ -74,10 +74,11 @@ class DraftStorage(IDraftStorage):
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.pr_url = pr_url
             draft.published_at = published_at
-            draft.traceback = traceback
+            if traceback is not None:
+                draft.traceback = traceback
             draft.status = status
             feature: db.Feature = session.query(db.Feature).get(draft.feature_id)
-            feature.released = status is DraftStatus.CREATED
+            feature.released = status.success
 
     def get_previous_feature_draft(self, feature_id: int) -> DraftModel:
         with db.create_session() as session:

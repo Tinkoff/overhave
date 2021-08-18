@@ -30,7 +30,7 @@ class TestDraftStorage:
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_save_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
         with pytest.raises(UniqueDraftCreationError):
-            test_draft_storage.save_draft(faker.random_int(), test_draft.published_by)
+            test_draft_storage.save_draft(faker.random_int(), test_draft.published_by, DraftStatus.REQUESTED)
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_save_response(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:

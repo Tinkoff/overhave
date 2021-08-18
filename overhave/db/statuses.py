@@ -48,8 +48,6 @@ class EmulationStatus(str, enum.Enum):
 class DraftStatus(str, enum.Enum):
     """ Enum for draft statuses. """
 
-    __test__ = False
-
     REQUESTED = "REQUESTED"
     CREATING = "CREATING"
     CREATED = "CREATED"
