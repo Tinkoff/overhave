@@ -50,7 +50,6 @@ wsgi_intercept = "^1.8"
 redis = "^3.4.1"
 walrus = "^0.8.0"
 docker = "*"
-pydantic-sqlalchemy = "^0.0.6"
 sqlalchemy-utc = "0.10.0"
 httptools = "^0.1.1"
 python-dateutil = "^2.8.1"
@@ -61,6 +60,7 @@ SQLAlchemy-Utils = "^0.37.0"
 GitPython = "^3.1.15"
 Flask = "^2.0.1"
 python-gitlab = "^2.9.0"
+pydantic-sqlalchemy = "^0.0.9"
 
 
 [tool.poetry.dev-dependencies]
