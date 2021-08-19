@@ -1,5 +1,6 @@
 import abc
 
+from overhave.db import DraftStatus
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.scenario import FileManager, generate_task_info
@@ -91,9 +92,11 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             )
         if previous_draft.published_at is None:
             raise RuntimeError(f"Somebody has published this scenario at {previous_draft.published_at}")
+
         self._draft_storage.save_response(
             draft_id=context.draft.id,
-            pr_url=previous_draft.pr_url,
+            pr_url=context.draft.pr_url or previous_draft.pr_url,
             published_at=previous_draft.published_at,
-            opened=True,
+            status=DraftStatus.DUPLICATE,
+            traceback=context.draft.traceback,
         )

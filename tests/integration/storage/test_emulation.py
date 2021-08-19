@@ -4,7 +4,7 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.db.statuses import EmulationStatus
+from overhave.db import EmulationStatus
 from overhave.entities import SystemUserModel
 from overhave.storage.emulation_storage import EmulationStorage, NotFoundEmulationError
 

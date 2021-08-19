@@ -8,6 +8,7 @@ import werkzeug
 
 from overhave import db
 from overhave.admin.flask import get_flask_admin, get_flask_app, get_flask_login_manager
+from overhave.db import DraftStatus
 from overhave.factory import IAdminFactory, get_publication_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import UniqueDraftCreationError
@@ -110,7 +111,9 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
             flask.flash("Parameter 'published_by' should be specified for version's creation!", category="error")
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
         try:
-            draft_id = factory.draft_storage.save_draft(test_run_id=run_id, published_by=published_by)
+            draft_id = factory.draft_storage.save_draft(
+                test_run_id=run_id, published_by=published_by, status=DraftStatus.REQUESTED
+            )
         except UniqueDraftCreationError:
             logger.exception("Error while creation draft!")
             flask.flash(

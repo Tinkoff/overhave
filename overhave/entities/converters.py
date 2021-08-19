@@ -7,6 +7,7 @@ from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from overhave.db import (
     Draft,
+    DraftStatus,
     Emulation,
     EmulationRun,
     Feature,
@@ -91,6 +92,8 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
     pr_url: Optional[str]
     published_by: str
     published_at: Optional[datetime]
+    traceback: Optional[str]
+    status: DraftStatus
 
 
 class TestExecutorContext(BaseModel):
