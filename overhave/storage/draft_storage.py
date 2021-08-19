@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Optional, cast
 
 from overhave import db
+from overhave.db import DraftStatus
 from overhave.entities import DraftModel
 
 
@@ -21,17 +22,23 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def save_draft(test_run_id: int, published_by: str) -> int:
+    def save_draft(test_run_id: int, published_by: str, status: DraftStatus) -> int:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def save_response(draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
+    def save_response(
+        draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
+    ) -> None:
         pass
 
     @staticmethod
     @abc.abstractmethod
     def get_previous_feature_draft(feature_id: int) -> DraftModel:
+        pass
+
+    @abc.abstractmethod
+    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
         pass
 
 
@@ -68,10 +75,12 @@ class DraftStorage(IDraftStorage):
         return draft_model_list
 
     @staticmethod
-    def save_draft(test_run_id: int, published_by: str) -> int:
+    def save_draft(test_run_id: int, published_by: str, status: DraftStatus) -> int:
         with db.create_session() as session:
             try:
-                draft = session.query(db.Draft).as_unique(test_run_id=test_run_id, published_by=published_by)
+                draft = session.query(db.Draft).as_unique(
+                    test_run_id=test_run_id, published_by=published_by, status=status
+                )
             except RuntimeError as e:
                 raise UniqueDraftCreationError("Could not get unique draft!") from e
             session.add(draft)
@@ -79,13 +88,18 @@ class DraftStorage(IDraftStorage):
             return cast(int, draft.id)
 
     @staticmethod
-    def save_response(draft_id: int, pr_url: str, published_at: datetime, opened: bool) -> None:
+    def save_response(
+        draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
+    ) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.pr_url = pr_url
             draft.published_at = published_at
+            if traceback is not None:
+                draft.traceback = traceback
+            draft.status = status
             feature: db.Feature = session.query(db.Feature).get(draft.feature_id)
-            feature.released = opened
+            feature.released = status.success
 
     @staticmethod
     def get_previous_feature_draft(feature_id: int) -> DraftModel:
@@ -97,3 +111,11 @@ class DraftStorage(IDraftStorage):
             if not drafts or len(drafts) != selection_num:
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))
+
+    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+        with db.create_session() as session:
+            draft: db.Draft = session.query(db.Draft).get(draft_id)
+            draft.status = status
+            if not isinstance(traceback, str):
+                return
+            draft.traceback = traceback

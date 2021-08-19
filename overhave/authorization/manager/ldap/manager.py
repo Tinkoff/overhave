@@ -61,5 +61,5 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
             user = self._system_user_storage.create_user(login=username)
             self._reassign_role_if_neccessary(user=user, user_groups=user_groups)
             return user
-        logger.debug("Received user groups are not supplied with database groups!", user_groups)
+        logger.debug("Received user groups (%s) are not supplied with database groups!", user_groups)
         return None

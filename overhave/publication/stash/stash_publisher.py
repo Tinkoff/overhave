@@ -2,6 +2,7 @@ import logging
 
 from requests import HTTPError
 
+from overhave.db import DraftStatus
 from overhave.entities import OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
@@ -49,6 +50,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)
+        self._draft_storage.set_draft_status(draft_id, DraftStatus.CREATING)
         context = self._push_version(draft_id)
         if not isinstance(context, PublisherContext):
             return
@@ -68,7 +70,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
                     draft_id=draft_id,
                     pr_url=response.get_pr_url(),
                     published_at=response.created_date,
-                    opened=response.open,
+                    status=DraftStatus.CREATED,
                 )
                 return
             if isinstance(response, StashErrorResponse) and response.duplicate:
@@ -78,5 +80,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         except StashHttpClientConflictError:
             logger.exception("Gotten conflict. Try to return last pull-request for Draft with id=%s...", draft_id)
             self._save_as_duplicate(context)
-        except HTTPError:
+        except HTTPError as e:
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, str(e))
             logger.exception("Got HTTP error while trying to sent pull-request!")

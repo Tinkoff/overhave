@@ -43,3 +43,17 @@ class EmulationStatus(str, enum.Enum):
     @property
     def processed(self) -> bool:
         return self in (EmulationStatus.READY, EmulationStatus.ERROR)
+
+
+class DraftStatus(str, enum.Enum):
+    """ Enum for draft statuses. """
+
+    REQUESTED = "REQUESTED"
+    CREATING = "CREATING"
+    CREATED = "CREATED"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+    DUPLICATE = "DUPLICATE"
+
+    @property
+    def success(self) -> bool:
+        return self in (DraftStatus.CREATED, DraftStatus.DUPLICATE)

@@ -26,9 +26,10 @@ from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_logging() -> None:
-    OverhaveLoggingSettings(log_level=logging.DEBUG).setup_logging()
+@pytest.fixture(autouse=True)
+def setup_logging(caplog) -> None:
+    caplog.set_level(logging.DEBUG)
+    OverhaveLoggingSettings().setup_logging()
 
 
 @pytest.fixture(scope="session")

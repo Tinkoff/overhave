@@ -133,7 +133,11 @@ def test_draft_row(
     faker: Faker, test_feature_id: int, test_testrun_id: int, test_feature_row: db.Feature, test_system_user_login: str
 ) -> db.Draft:
     row = db.Draft(
-        feature_id=test_feature_id, test_run_id=test_testrun_id, text=faker.word(), published_by=test_system_user_login
+        feature_id=test_feature_id,
+        test_run_id=test_testrun_id,
+        text=faker.word(),
+        published_by=test_system_user_login,
+        status=db.DraftStatus.REQUESTED,
     )
     row.feature = test_feature_row
     return row
@@ -142,6 +146,11 @@ def test_draft_row(
 @pytest.fixture(scope="session")
 def test_draft_view(session_mocker: MockerFixture) -> views.DraftView:
     return session_mocker.create_autospec(views.DraftView)
+
+
+@pytest.fixture(scope="session")
+def test_not_mocked_draft_view() -> views.DraftView:
+    return views.DraftView(model=db.Draft, session=UnifiedAlchemyMagicMock)
 
 
 @pytest.fixture()

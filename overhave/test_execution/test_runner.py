@@ -36,7 +36,6 @@ class PytestRunner:
         pytest_cmd = [
             fixture_file.as_posix(),
             "--collect-only",
-            "-qq",
             "--disable-pytest-warnings",
         ]
         self._extend_cmd_args(cmd=pytest_cmd, addoptions=self._settings.extra_pytest_addoptions)

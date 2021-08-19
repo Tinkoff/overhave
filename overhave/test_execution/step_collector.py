@@ -36,6 +36,7 @@ class StepCollector:
             and fixture.argname.startswith(_PYTESTBDD_FIXTURE_MARK)
             and not fixture.argname.endswith(_PYTESTBDD_FIXTURE_TRACE_MARK)
         )
+        logger.debug("Fixture: %s - is_bdd_step=%s", fixture.argname, is_bdd_step)
         if is_bdd_step and not isinstance(fixture.func.__doc__, str):
             raise BddStepWithoutDocsError(
                 f"Fixture {fixture} does not have description! Please, set it via docstrings."
@@ -78,6 +79,7 @@ class StepCollector:
         ]
 
     def collect_steps(self, session: Session, feature_type: FeatureTypeName) -> None:
+        logger.debug("Collecting steps for feature_type=%s...", feature_type)
         step_fixtures = self._get_pytestbdd_step_fixtures(session)
         bdd_steps = self._compile_step_models(step_fixtures)
         if bdd_steps:

@@ -8,7 +8,7 @@ from flask import url_for
 from sqlalchemy import orm as so
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
-from overhave.db.statuses import EmulationStatus, TestReportStatus, TestRunStatus
+from overhave.db.statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.users import UserRole
 
 tags_association_table = sa.Table(
@@ -101,7 +101,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
 class DraftQuery(so.Query):
     """ Scenario versions table. """
 
-    def as_unique(self, test_run_id: int, published_by: str) -> Draft:
+    def as_unique(self, test_run_id: int, published_by: str, status: DraftStatus) -> Draft:
         with self.session.no_autoflush:
             run = self.session.query(TestRun).get(test_run_id)
             if run is None:
@@ -120,6 +120,7 @@ class DraftQuery(so.Query):
             test_run_id=test_run_id,
             text=run.scenario.text,
             published_by=published_by,
+            status=status,
         )
 
 
@@ -134,6 +135,8 @@ class Draft(BaseTable, PrimaryKeyMixin):
     pr_url = sa.Column(sa.String(), doc="Absolute pull-request URL", nullable=True)
     published_by = sa.Column(sa.String(), sa.ForeignKey(UserRole.login), doc="Draft publisher login", nullable=False)
     published_at = sa.Column(sa.DateTime(timezone=True), doc="Publication time")
+    traceback = sa.Column(sa.Text(), doc="Text storage for error traceback", nullable=True)
+    status = sa.Column(sa.Enum(DraftStatus), doc="Version publishing status", nullable=False)
 
     feature = so.relationship(Feature, backref=so.backref("versions", cascade="all, delete-orphan"))
 
@@ -142,11 +145,12 @@ class Draft(BaseTable, PrimaryKeyMixin):
     def __html__(self) -> str:
         return f'<a href="{url_for("draft.details_view", id=self.id)}">Draft: {self.id}</a>'
 
-    def __init__(self, feature_id: int, test_run_id: int, text: str, published_by: str) -> None:
+    def __init__(self, feature_id: int, test_run_id: int, text: str, published_by: str, status: DraftStatus) -> None:
         self.feature_id = feature_id
         self.test_run_id = test_run_id
         self.text = text
         self.published_by = published_by
+        self.status = status
 
 
 @su.generic_repr("id", "name", "created_by")
