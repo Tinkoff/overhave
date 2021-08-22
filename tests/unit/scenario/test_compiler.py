@@ -54,6 +54,8 @@ class TestScenarioCompiler:
         assert parsed_info.id == test_feature.id
         assert parsed_info.name == test_feature.name
         assert parsed_info.type == test_feature.feature_type.name
+        assert parsed_info.tags is not None
+        assert set(parsed_info.tags) == {model.value for model in test_feature.feature_tags}
         assert parsed_info.author == test_feature.author
         assert parsed_info.last_edited_by == test_feature.last_edited_by
         assert parsed_info.last_edited_at is not None

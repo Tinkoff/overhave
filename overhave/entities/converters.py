@@ -58,7 +58,7 @@ class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
     name: FeatureTypeName
 
 
-class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
+class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
     """ Model for :class:`Tags` row. """
 
     id: int
@@ -80,7 +80,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     released: bool
 
     feature_type: FeatureTypeModel
-    feature_tags: List[TagsTypeModel]
+    feature_tags: List[TagModel]
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore

@@ -8,7 +8,7 @@ from .converters import (
     PublisherContext,
     ScenarioModel,
     SystemUserModel,
-    TagsTypeModel,
+    TagModel,
     TestExecutorContext,
     TestRunModel,
 )

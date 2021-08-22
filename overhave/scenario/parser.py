@@ -26,6 +26,7 @@ class FeatureInfo(BaseModel):
     id: Optional[int]
     name: Optional[str]
     type: Optional[str]
+    tags: Optional[List[str]]
     author: Optional[str]
     last_edited_by: Optional[str]
     last_edited_at: Optional[datetime]
@@ -69,14 +70,15 @@ class ScenarioParser(PrefixMixin):
             raise FeatureNameParsingError(f"Could not parse feature name from '{name_line}'!",)
         return name_parts[-1].strip()
 
-    def _get_feature_type(self, tags_line: str) -> str:
-        tags = tags_line.split(self._compilation_settings.tag_prefix)
-        for tag in (x.strip() for x in tags if x):
+    def _get_tags(self, tags_line: str) -> List[str]:
+        return [tag.strip() for tag in tags_line.split(self._compilation_settings.tag_prefix) if tag]
+
+    def _get_feature_type(self, tags: List[str]) -> str:
+        for tag in tags:
             if tag not in self._feature_extractor.feature_types:
-                logger.debug("Unsupported tag: %s%s", self._compilation_settings.tag_prefix, tag)
                 continue
             return tag
-        raise FeatureTypeParsingError(f"Could not parse feature type from '{tags_line}'!",)
+        raise FeatureTypeParsingError(f"Could not get feature type from tags {tags}!",)
 
     @staticmethod
     def _get_additional_info(additional_line: str, left_pointer: str, right_pointer: str) -> str:
@@ -103,7 +105,10 @@ class ScenarioParser(PrefixMixin):
                 feature_info.id = self._get_id(line)
                 continue
             if line.startswith(self._compilation_settings.tag_prefix):
-                feature_info.type = self._get_feature_type(line)
+                tags = self._get_tags(line)
+                feature_info.type = self._get_feature_type(tags)
+                tags.remove(feature_info.type)
+                feature_info.tags = tags
                 continue
             if line.startswith(self._feature_prefix):
                 feature_info.name = self._get_name(line)

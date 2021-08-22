@@ -21,7 +21,7 @@ from overhave.entities import (
     TestExecutorContext,
     TestRunModel,
 )
-from overhave.entities.converters import TagsTypeModel
+from overhave.entities.converters import TagModel
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.utils import get_current_time
 from tests.objects import get_test_feature_containers, get_test_feature_extractor
@@ -55,7 +55,10 @@ def test_feature() -> FeatureModel:
         last_edited_at=get_current_time(),
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_test_feature_extractor().feature_types[0]),
-        feature_tags=[TagsTypeModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time())],
+        feature_tags=[
+            TagModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time()),
+            TagModel(id=2, value="tag2", created_by="qqq", created_at=get_current_time()),
+        ],
         file_path="my_folder/my_feature",
     )
 
