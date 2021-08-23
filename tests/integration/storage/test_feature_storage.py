@@ -1,11 +1,10 @@
-from typing import cast
 from uuid import uuid1
 
 import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.entities import FeatureModel, FeatureTypeModel, TagModel
+from overhave.entities import FeatureModel, FeatureTypeModel
 from overhave.storage import FeatureStorage, FeatureTagStorage, SystemUserStorage
 from overhave.utils import get_current_time
 
@@ -63,12 +62,7 @@ class TestFeatureStorage:
         faker: Faker,
     ) -> None:
         new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
-        with db.create_session() as session:
-            new_tag_id = test_tag_storage.get_or_create_tag(
-                session, value=faker.word(), created_by=new_system_user.login
-            )
-            db_new_tag: db.Tags = session.query(db.Tags).filter(db.Tags.id == new_tag_id).one()
-            new_tag_model = cast(TagModel, TagModel.from_orm(db_new_tag))
+        new_tag_model = test_tag_storage.get_or_create_tag(value=faker.word(), created_by=new_system_user.login)
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,
             name=uuid1().hex,

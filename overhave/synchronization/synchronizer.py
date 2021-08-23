@@ -1,11 +1,12 @@
 import abc
 import logging
 from datetime import datetime
+from typing import List
 
-from overhave.entities import BaseFileExtractor, FeatureModel, OverhaveFileSettings
+from overhave.entities import BaseFileExtractor, FeatureModel, OverhaveFileSettings, TagModel
 from overhave.scenario import ScenarioParser
 from overhave.scenario.parser import FeatureInfo
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage
+from overhave.storage import IDraftStorage, IFeatureStorage, IFeatureTagStorage, IScenarioStorage
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
         draft_storage: IDraftStorage,
+        tag_storage: IFeatureTagStorage,
         scenario_parser: ScenarioParser,
     ):
         super().__init__(extenstion=file_settings.feature_suffix)
@@ -50,10 +52,13 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self._feature_storage = feature_storage
         self._scenario_storage = scenario_storage
         self._draft_storage = draft_storage
+        self._tag_storage = tag_storage
         self._scenario_parser = scenario_parser
 
     @staticmethod
-    def _update_feature_model_with_info(model: FeatureModel, info: FeatureInfo, file_ts: datetime) -> None:
+    def _update_feature_model_with_info(
+        model: FeatureModel, info: FeatureInfo, file_ts: datetime, tags: List[TagModel]
+    ) -> None:
         if info.name is None:
             raise NullableInfoNameError("Feature info has not got feature name!")
         model.name = info.name
@@ -63,6 +68,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             model.last_edited_at = file_ts
         if info.tasks is not None:
             model.task = info.tasks
+        model.feature_tags = tags
 
     def synchronize(self) -> None:  # noqa: C901
         logger.info("Start synchronization...")
@@ -103,12 +109,24 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
 
             if comparison_time < feature_file_ts:
                 logger.info("Feature is gonna be updated...")
+                feature_tags: List[TagModel] = []
+                if feature_info.tags is not None:
+                    if feature_info.last_edited_by is None:
+                        logger.warning("Feature doesn't have last_edited_by info!")
+                    else:
+                        for tag in feature_info.tags:
+                            tag_model = self._tag_storage.get_or_create_tag(
+                                value=tag, created_by=feature_info.last_edited_by
+                            )
+                            feature_tags.append(tag_model)
+                self._update_feature_model_with_info(
+                    model=feature_model, info=feature_info, file_ts=feature_file_ts, tags=feature_tags
+                )
                 scenario_model = self._scenario_storage.get_scenario_by_feature_id(feature_model.id)
-                self._update_feature_model_with_info(model=feature_model, info=feature_info, file_ts=feature_file_ts)
                 self._feature_storage.update_feature(feature_model)
                 scenario_model.text = feature_info.scenarios
                 self._scenario_storage.update_scenario(model=scenario_model)
-                logger.info("Feature has been updated successfully.")  # TODO: update tags
+                logger.info("Feature has been updated successfully.")
                 continue
             if feature_model.released:
                 logger.info("Feature is already actual. Skip.")
