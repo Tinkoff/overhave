@@ -92,19 +92,9 @@ def test_feature_row(faker: Faker, test_feature_model_task: List[str]) -> db.Fea
     return db.Feature(name=faker.word(), author=faker.word(), task=test_feature_model_task)
 
 
-@pytest.fixture()
-def test_draft_row(faker: Faker, test_feature_row: db.Feature, test_testrun_id: int) -> db.Draft:
-    return db.Draft(feature_id=test_feature_row.id, test_run_id=test_testrun_id, published_by=faker.word())
-
-
 @pytest.fixture(scope="session")
 def test_draft_view(session_mocker: MockerFixture) -> views.DraftView:
     return session_mocker.create_autospec(views.DraftView)
-
-
-@pytest.fixture(scope="session")
-def test_not_mocked_draft_view() -> views.DraftView:
-    return views.DraftView(model=db.Draft, session=UnifiedAlchemyMagicMock)
 
 
 @pytest.fixture()

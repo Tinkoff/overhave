@@ -72,6 +72,8 @@ class FactoryViewUtilsMixin:
         feature_suffix = get_admin_factory().context.file_settings.feature_suffix
         if file_path.rstrip().endswith(feature_suffix):
             file_path = file_path.removesuffix(feature_suffix)
+        if file_path[0] == "/":
+            file_path = file_path[1:]
         if not cls._file_path_pattern.match(file_path):
             raise ValidationError(
                 f"Incorrect format of file path specification: '{file_path}'! "

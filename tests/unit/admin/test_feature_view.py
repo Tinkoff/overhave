@@ -25,3 +25,10 @@ class TestFeatueView:
     ) -> None:
         with pytest.raises(ValidationError):
             test_feature_view.on_model_delete(model=test_feature_row)
+
+    @pytest.mark.parametrize("test_feature_model_task", [["KEK-1111"]])
+    @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
+    def test_path_correctly(
+        self, test_feature_view: FeatureView, current_user_mock: mock.MagicMock, test_feature_row: db.Feature,
+    ) -> None:
+        assert test_feature_view._make_file_path("/oleg/chatbot_vas.feature") == "oleg/chatbot_vas.feature"
