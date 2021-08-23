@@ -1,10 +1,12 @@
+from typing import cast
 from uuid import uuid1
 
 import pytest
+from faker import Faker
 
 from overhave import db
-from overhave.entities import FeatureModel, FeatureTypeModel
-from overhave.storage import FeatureStorage, SystemUserStorage
+from overhave.entities import FeatureModel, FeatureTypeModel, TagModel
+from overhave.storage import FeatureStorage, FeatureTagStorage, SystemUserStorage
 from overhave.utils import get_current_time
 
 
@@ -16,6 +18,7 @@ def _check_base_feature_attrs(test_model: FeatureModel, validation_model: Featur
     assert test_model.task == validation_model.task
     assert test_model.last_edited_by == validation_model.last_edited_by
     assert test_model.released == validation_model.released
+    assert test_model.feature_tags == validation_model.feature_tags
 
 
 def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_model: FeatureTypeModel) -> None:
@@ -54,14 +57,22 @@ class TestFeatureStorage:
         self,
         test_feature_storage: FeatureStorage,
         test_system_user_storage: SystemUserStorage,
+        test_tag_storage: FeatureTagStorage,
         test_feature_type: FeatureTypeModel,
-        test_feature: FeatureModel,
+        test_feature_with_tag: FeatureModel,
+        faker: Faker,
     ) -> None:
         new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
+        with db.create_session() as session:
+            new_tag_id = test_tag_storage.get_or_create_tag(
+                session, value=faker.word(), created_by=new_system_user.login
+            )
+            db_new_tag: db.Tags = session.query(db.Tags).filter(db.Tags.id == new_tag_id).one()
+            new_tag_model = cast(TagModel, TagModel.from_orm(db_new_tag))
         new_feature_model = FeatureModel(
-            id=test_feature.id,
+            id=test_feature_with_tag.id,
             name=uuid1().hex,
-            author=test_feature.author,
+            author=test_feature_with_tag.author,
             type_id=test_feature_type.id,
             last_edited_by=new_system_user.login,
             last_edited_at=get_current_time(),
@@ -69,7 +80,7 @@ class TestFeatureStorage:
             file_path=uuid1().hex,
             released=True,
             feature_type=test_feature_type,
-            feature_tags=[],
+            feature_tags=[new_tag_model],
         )
         test_feature_storage.update_feature(model=new_feature_model)
         updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)

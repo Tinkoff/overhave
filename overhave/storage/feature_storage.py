@@ -1,8 +1,11 @@
 import abc
+import logging
 from typing import Optional, cast
 
 from overhave import db
 from overhave.entities import FeatureModel
+
+logger = logging.getLogger(__name__)
 
 
 class BaseFeatureStorageException(Exception):
@@ -11,6 +14,10 @@ class BaseFeatureStorageException(Exception):
 
 class FeatureNotExistsError(BaseFeatureStorageException):
     """ Error for situation when feature not found. """
+
+
+class FeatureTagNotExistsError(BaseFeatureStorageException):
+    """ Error for situation when tag not found. """
 
 
 class IFeatureStorage(abc.ABC):
@@ -68,3 +75,18 @@ class FeatureStorage(IFeatureStorage):
             feature.task = model.task
             feature.last_edited_by = model.last_edited_by
             feature.released = True
+
+            existing_tags = {tag.id for tag in feature.feature_tags}
+            model_tags = {tag.id for tag in model.feature_tags}
+            tags_to_delete = existing_tags.difference(model_tags)
+            for tag_id in tags_to_delete:
+                db_tag = next(tag for tag in feature.feature_tags if tag.id == tag_id)
+                logger.info("Remove tag with id=%s and value=%s", tag_id, db_tag.value)
+                feature.feature_tags.remove(db_tag)
+            tags_to_append = model_tags.difference(existing_tags)
+            for tag_id in tags_to_append:
+                db_tag = session.query(db.Tags).get(tag_id)
+                if db_tag is None:
+                    raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
+                logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
+                feature.feature_tags.append(db_tag)
