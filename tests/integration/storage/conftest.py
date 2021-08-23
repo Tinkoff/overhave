@@ -18,6 +18,7 @@ from overhave.entities.converters import (
     FeatureTypeModel,
     ScenarioModel,
     SystemUserModel,
+    TagModel,
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
@@ -25,6 +26,7 @@ from overhave.storage import (
     DraftStorage,
     EmulationStorage,
     FeatureStorage,
+    FeatureTagStorage,
     FeatureTypeStorage,
     SystemUserStorage,
     TestRunStorage,
@@ -114,8 +116,24 @@ def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 
 
+@pytest.fixture(scope="class")
+def test_tag_storage() -> FeatureTagStorage:
+    return FeatureTagStorage()
+
+
 @pytest.fixture()
-def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
+def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
+    with db.create_session() as session:
+        tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
+        session.add(tag)
+        session.flush()
+        return cast(TagModel, TagModel.from_orm(tag))
+
+
+@pytest.fixture()
+def test_feature(
+    test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, test_tag: TagModel, faker: Faker
+) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
             name=faker.word(),
@@ -125,6 +143,8 @@ def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_t
             file_path=f"{faker.word()}/{faker.word()}",
         )
         session.add(feature)
+        tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
+        feature.feature_tags.append(tag)
         session.flush()
         return cast(FeatureModel, FeatureModel.from_orm(feature))
 

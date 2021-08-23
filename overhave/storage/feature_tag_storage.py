@@ -6,7 +6,7 @@ import sqlalchemy.orm as so
 from overhave import db
 
 
-class IFeatureTagsStorage(abc.ABC):
+class IFeatureTagStorage(abc.ABC):
     """ Abstract class for feature tags storage. """
 
     @staticmethod
@@ -15,7 +15,7 @@ class IFeatureTagsStorage(abc.ABC):
         pass
 
 
-class FeatureTagsStorage(IFeatureTagsStorage):
+class FeatureTagStorage(IFeatureTagStorage):
     """ Class for feature tags storage. """
 
     @staticmethod
