@@ -1,12 +1,13 @@
 import abc
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
-from overhave.entities import BaseFileExtractor, FeatureModel, OverhaveFileSettings, TagModel
+from overhave.entities import BaseFileExtractor, FeatureExtractor, FeatureModel, OverhaveFileSettings, TagModel
 from overhave.scenario import ScenarioParser
 from overhave.scenario.parser import FeatureInfo
-from overhave.storage import IDraftStorage, IFeatureStorage, IFeatureTagStorage, IScenarioStorage
+from overhave.storage import IDraftStorage, IFeatureStorage, IFeatureTagStorage, IFeatureTypeStorage, IScenarioStorage
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,8 @@ class NullableLastEditedAtError(BaseOverhaveSynchronizerException):
     """ Exception for nullable last_edited_at. """
 
 
-class NullableLastEditedByError(BaseOverhaveSynchronizerException):
-    """ Exception for nullable last_edited_at. """
+class NullableInfoLastEditedByError(BaseOverhaveSynchronizerException):
+    """ Exception for nullable feature info last_edited_at. """
 
 
 class NullableInfoNameError(BaseOverhaveSynchronizerException):
@@ -29,6 +30,14 @@ class NullableInfoNameError(BaseOverhaveSynchronizerException):
 
 class NullableInfoScenariosError(BaseOverhaveSynchronizerException):
     """ Exception for situation without feature info scenarios. """
+
+
+class NullableInfoAuthorError(BaseOverhaveSynchronizerException):
+    """ Exception for situation without feature info author. """
+
+
+class NullableInfoFeatureTypeError(BaseOverhaveSynchronizerException):
+    """ Exception for situation without feature info type. """
 
 
 class IOverhaveSynchronizer(abc.ABC):
@@ -46,18 +55,22 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self,
         file_settings: OverhaveFileSettings,
         feature_storage: IFeatureStorage,
+        feature_type_storage: IFeatureTypeStorage,
         scenario_storage: IScenarioStorage,
         draft_storage: IDraftStorage,
         tag_storage: IFeatureTagStorage,
         scenario_parser: ScenarioParser,
+        feature_extractor: FeatureExtractor,
     ):
         super().__init__(extenstion=file_settings.feature_suffix)
         self._file_settings = file_settings
         self._feature_storage = feature_storage
+        self._feature_type_storage = feature_type_storage
         self._scenario_storage = scenario_storage
         self._draft_storage = draft_storage
         self._tag_storage = tag_storage
         self._scenario_parser = scenario_parser
+        self._feature_extractor = feature_extractor
 
     @staticmethod
     def _update_feature_model_with_info(
@@ -90,7 +103,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         tags: List[TagModel] = []
         if info.tags is not None:
             if info.last_edited_by is None:
-                raise NullableLastEditedByError("last_edited_by value should not be None!")
+                raise NullableInfoLastEditedByError("last_edited_by value should not be None!")
             for tag in info.tags:
                 tag_model = self._tag_storage.get_or_create_tag(value=tag, created_by=info.last_edited_by)
                 tags.append(tag_model)
@@ -108,14 +121,48 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self._scenario_storage.update_scenario(model=scenario_model)
         logger.info("Feature has been updated successfully.")
 
-    def synchronize(self) -> None:  # noqa: C901
+    def _create_feature(self, file: Path, info: FeatureInfo) -> None:
+        logger.info("Feature is gonna be created...")
+        if info.name is None:
+            raise NullableInfoNameError("Feature info has not got feature name!")
+        if info.type is None:
+            raise NullableInfoFeatureTypeError("Could not create feature without feature type!")
+        if info.author is None:
+            raise NullableInfoAuthorError("Could not create feature without author!")
+        feature_tags = self._get_feature_tags(info=info)
+        feature_type = self._feature_type_storage.get_feature_type_by_name(info.type)
+        if info.last_edited_by is None:
+            info.last_edited_by = info.author
+        feature_model = FeatureModel(
+            id=0,
+            name=info.name,
+            author=info.author,
+            type_id=feature_type.id,
+            last_edited_by=info.last_edited_by,
+            last_edited_at=info.last_edited_at,
+            task=info.tasks,
+            file_path=file.relative_to(
+                self._feature_extractor.feature_type_to_dir_mapping[feature_type.name]
+            ).as_posix(),
+            released=True,
+            feature_type=feature_type,
+            feature_tags=feature_tags,
+        )
+        self._feature_storage.create_feature(feature_model)
+        # TODO: add scenario with self._scenario_storage
+        logger.info("Feature has been created successfully.")
+
+    def synchronize(self, create_db_features: bool = False) -> None:  # noqa: C901
         logger.info("Start synchronization...")
         all_features = self._extract_recursively(self._file_settings.features_dir)
         for feature_file in all_features:
             logger.info("Synchronize feature from file %s...", feature_file.as_posix())
             feature_info = self._scenario_parser.parse(feature_file.read_text())
             if feature_info.id is None:
-                logger.warning("Feature doesn't have Overhave ID or ID format is incorrect - skip.")
+                if not create_db_features:
+                    logger.warning("Feature doesn't have Overhave ID or ID format is incorrect. Skip.")
+                    continue
+                self._create_feature(file=feature_file, info=feature_info)
                 continue
             feature_model = self._feature_storage.get_feature(feature_info.id)
             if feature_model is None:
