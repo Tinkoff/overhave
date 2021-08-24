@@ -166,9 +166,8 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
                 continue
             feature_model = self._feature_storage.get_feature(feature_info.id)
             if feature_model is None:
-                logger.warning("Feature doesn't exist in Overhave database, so drop it.")
-                feature_file.unlink()
-                continue
+                logger.warning("Feature doesn't exist in Overhave database.")
+                continue  # TODO: unlink file and create MR with deletions at the end
 
             feature_file_ts = datetime.fromtimestamp(feature_file.stat().st_mtime)
             if feature_model.last_edited_at is None:
