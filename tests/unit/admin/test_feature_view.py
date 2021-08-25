@@ -28,6 +28,9 @@ class TestFeatueView:
 
     @pytest.mark.parametrize("test_feature_model_task", [["KEK-1111"]])
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
+    @pytest.mark.parametrize(
+        "test_mock_patch_feature_suffix", ["overhave.admin.views.feature.feature_suffix"], indirect=True
+    )
     def test_path_correctly(
         self, test_feature_view: FeatureView, current_user_mock: mock.MagicMock, test_feature_row: db.Feature,
     ) -> None:

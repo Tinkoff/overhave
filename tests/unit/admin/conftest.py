@@ -1,5 +1,6 @@
 from typing import List, Optional, cast
 from unittest import mock
+from unittest.mock import patch
 from uuid import uuid1
 
 import pytest
@@ -158,3 +159,22 @@ def test_mock_patch_user_directory(request: FixtureRequest) -> List[str]:
     if hasattr(request, "param"):
         return request.param
     raise NotImplementedError
+
+
+@pytest.fixture()
+def feature_suffix_mock(user_role: db.Role, faker: Faker, test_mock_patch_feature_suffix: str) -> mock.MagicMock:
+    with mock.patch(test_mock_patch_feature_suffix, return_value=mock.MagicMock()) as mocked:
+        mocked.context.file_settings.feature_suffix = ".feature"
+        yield mocked
+
+
+@pytest.fixture()
+def test_mock_patch_feature_suffix(request: FixtureRequest) -> List[str]:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+with patch("overhave.factory.components.admin_factory.AdminFactory") as MockClass:
+    instance = MockClass.return_value
+    instance.get_admin_factory.return_value = ".feature"
