@@ -1,13 +1,20 @@
-import abc
 import logging
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from overhave.entities import BaseFileExtractor, FeatureExtractor, FeatureModel, OverhaveFileSettings, TagModel
+from overhave.entities import (
+    BaseFileExtractor,
+    FeatureExtractor,
+    FeatureModel,
+    OverhaveFileSettings,
+    ScenarioModel,
+    TagModel,
+)
 from overhave.scenario import ScenarioParser
 from overhave.scenario.parser import FeatureInfo
 from overhave.storage import IDraftStorage, IFeatureStorage, IFeatureTagStorage, IFeatureTypeStorage, IScenarioStorage
+from overhave.synchronization.abstract import IOverhaveSynchronizer
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +45,6 @@ class NullableInfoAuthorError(BaseOverhaveSynchronizerException):
 
 class NullableInfoFeatureTypeError(BaseOverhaveSynchronizerException):
     """ Exception for situation without feature info type. """
-
-
-class IOverhaveSynchronizer(abc.ABC):
-    """ Abstract class for synchronization between git and database. """
-
-    @abc.abstractmethod
-    def synchronize(self) -> None:
-        pass
 
 
 class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
@@ -148,8 +147,9 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             feature_type=feature_type,
             feature_tags=feature_tags,
         )
-        self._feature_storage.create_feature(feature_model)
-        # TODO: add scenario with self._scenario_storage
+        feature_model.id = self._feature_storage.create_feature(feature_model)
+        scenario_model = ScenarioModel(id=0, feature_id=feature_model.id, text=info.scenarios)
+        self._scenario_storage.create_scenario(scenario_model)
         logger.info("Feature has been created successfully.")
 
     def synchronize(self, create_db_features: bool = False) -> None:  # noqa: C901

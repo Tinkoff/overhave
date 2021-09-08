@@ -255,12 +255,16 @@ class TestFeatureLinkFormatter:
         column_name: str,
         test_feature_id: int,
         test_feature_name: str,
+        faker: Faker,
     ) -> None:
         assert feature_link_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=db.TestRun(
-                **{column_name: test_feature_name, "scenario": db.Scenario(feature_id=test_feature_id)}  # type: ignore
+            model=db.TestRun(  # type: ignore
+                **{
+                    column_name: test_feature_name,
+                    "scenario": db.Scenario(feature_id=test_feature_id, text=faker.word()),  # type: ignore
+                }
             ),
             name=column_name,
         ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)

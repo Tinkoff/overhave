@@ -31,6 +31,11 @@ class IScenarioStorage(abc.ABC):
     def update_scenario(model: ScenarioModel) -> None:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def create_scenario(model: ScenarioModel) -> int:
+        pass
+
 
 class ScenarioStorage(IScenarioStorage):
     """ Class for feature type storage. """
@@ -56,3 +61,11 @@ class ScenarioStorage(IScenarioStorage):
             if scenario is None:
                 raise ScenarioNotExistsError(f"Scenario with id={model.id} does not exist!")
             scenario.text = model.text
+
+    @staticmethod
+    def create_scenario(model: ScenarioModel) -> int:
+        with db.create_session() as session:
+            scenario = db.Scenario(feature_id=model.feature_id, text=model.text)  # type: ignore
+            session.add(scenario)
+            session.flush()
+            return cast(int, scenario.id)
