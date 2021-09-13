@@ -165,6 +165,13 @@ def current_user_mock(user_role: db.Role, faker: Faker, test_mock_patch_user_dir
 
 
 @pytest.fixture()
+def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
+    if hasattr(request, "param") and isinstance(request.param, str):
+        return request.param
+    return faker.word()
+
+
+@pytest.fixture()
 def test_mock_patch_user_directory(request: FixtureRequest) -> List[str]:
     if hasattr(request, "param"):
         return request.param
@@ -172,19 +179,8 @@ def test_mock_patch_user_directory(request: FixtureRequest) -> List[str]:
 
 
 @pytest.fixture()
-def feature_suffix_mock(user_role: db.Role, faker: Faker, test_mock_patch_feature_suffix: str) -> mock.MagicMock:
-    with mock.patch(test_mock_patch_feature_suffix, return_value=mock.MagicMock()) as mocked:
-        mocked.context.file_settings.feature_suffix = ".feature"
+def test_mock_admin_factory() -> mock.MagicMock:
+    with patch("overhave.admin.views.feature.get_admin_factory", return_value=mock.MagicMock()) as mocked:
+        instance = mocked.return_value
+        instance.context.file_settings.feature_suffix = ".feature"
         yield mocked
-
-
-@pytest.fixture()
-def test_mock_patch_feature_suffix(request: FixtureRequest) -> List[str]:
-    if hasattr(request, "param"):
-        return request.param
-    raise NotImplementedError
-
-
-with patch("overhave.factory.components.admin_factory.AdminFactory") as MockClass:
-    instance = MockClass.return_value
-    instance.get_admin_factory.return_value = ".feature"

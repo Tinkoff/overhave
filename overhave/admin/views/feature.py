@@ -72,15 +72,13 @@ class FactoryViewUtilsMixin:
         feature_suffix = get_admin_factory().context.file_settings.feature_suffix
         if file_path.rstrip().endswith(feature_suffix):
             file_path = file_path.removesuffix(feature_suffix)
-        if file_path[0] == "/":
-            file_path = file_path[1:]
         if not cls._file_path_pattern.match(file_path):
             raise ValidationError(
                 f"Incorrect format of file path specification: '{file_path}'! "
                 f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
                 " At least 8 characters long."
             )
-        path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
+        path = Path(file_path.replace(" ", "").lstrip("/")).with_suffix(feature_suffix).as_posix()
         logger.debug("Processed feature file path: '%s'", path)
         return path
 
