@@ -67,18 +67,16 @@ class FactoryViewUtilsMixin:
                 "Supported: <PROJECT>-<NUMBER>, for example 'PRJ-1234'."
             )
 
-    @classmethod
-    def _make_file_path(cls, file_path: str) -> str:
-        feature_suffix = get_admin_factory().context.file_settings.feature_suffix
-        if file_path.rstrip().endswith(feature_suffix):
-            file_path = file_path.removesuffix(feature_suffix)
-        if not cls._file_path_pattern.match(file_path):
+    def _make_file_path(self, file_path: str) -> str:
+        if file_path.rstrip().endswith(self.feature_suffix):
+            file_path = file_path.removesuffix(self.feature_suffix)
+        if not self._file_path_pattern.match(file_path):
             raise ValidationError(
                 f"Incorrect format of file path specification: '{file_path}'! "
-                f"Supported pattern: {cls._file_path_pattern.pattern}, for example 'my_folder / my_filename(.feature)'."
+                f"Supported pattern: {self._file_path_pattern.pattern}, for example 'my_folder/my_filename(.feature)'."
                 " At least 8 characters long."
             )
-        path = Path(file_path.replace(" ", "")).with_suffix(feature_suffix).as_posix()
+        path = Path(file_path.replace(" ", "").lstrip("/")).with_suffix(self.feature_suffix).as_posix()
         logger.debug("Processed feature file path: '%s'", path)
         return path
 
@@ -89,7 +87,7 @@ class FactoryViewUtilsMixin:
             return browse_url_value.human_repr()
         return None
 
-    @property
+    @cached_property
     def feature_suffix(self) -> str:
         return get_admin_factory().context.file_settings.feature_suffix
 
