@@ -47,7 +47,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         return branch
 
     def _create_commit_and_push(self, context: PublisherContext, repository: git.Repo, target_branch: git.Head) -> None:
-        original_branch = cast(git.Head, repository.active_branch)
+        original_branch = repository.active_branch
         changes_pushed = False
         try:
             target_branch.checkout()

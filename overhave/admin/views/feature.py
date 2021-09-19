@@ -77,7 +77,8 @@ class FactoryViewUtilsMixin:
                 f"Supported pattern: {self._file_path_pattern.pattern}, for example 'my_folder/my_filename(.feature)'."
                 " At least 8 characters long."
             )
-        path = Path(file_path.replace(" ", "").lstrip("/")).with_suffix(self.feature_suffix).as_posix()
+        prepared_file_path = file_path.replace(" ", "").lstrip("/")
+        path = Path(prepared_file_path).with_suffix(self.feature_suffix).as_posix()
         logger.debug("Processed feature file path: '%s'", path)
         return path
 

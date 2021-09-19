@@ -104,7 +104,9 @@ def test_system_user_login(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_feature_filepath(faker: Faker) -> str:
+def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
+    if hasattr(request, "param") and isinstance(request.param, str):
+        return request.param
     return faker.word()
 
 
@@ -208,13 +210,6 @@ def current_user_mock(user_role: db.Role, faker: Faker, test_mock_patch_user_dir
         mocked.login = faker.word()
         mocked.role = user_role
         yield mocked
-
-
-@pytest.fixture()
-def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
-    if hasattr(request, "param") and isinstance(request.param, str):
-        return request.param
-    return faker.word()
 
 
 @pytest.fixture()
