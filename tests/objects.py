@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Dict, List, NamedTuple, NewType, Sequence
 from unittest import mock
@@ -26,7 +26,7 @@ class DataBaseContext(NamedTuple):
     engine: Engine
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_file_settings() -> OverhaveFileSettings:
     """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
     work_dir = Path(__file__).parent.parent
@@ -34,7 +34,7 @@ def get_test_file_settings() -> OverhaveFileSettings:
     return OverhaveFileSettings(work_dir=work_dir, root_dir=root_dir)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_feature_extractor() -> FeatureExtractor:
     """ Method for getting :class:`FeatureExtractor` with OverhaveFileSettings, based on docs files and examples.
 
@@ -79,7 +79,7 @@ class FeatureTestContainer(BaseModel):
         return self.project_path.relative_to(feature_type_dir).as_posix()
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
     feature_containers: List[FeatureTestContainer] = []
     for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():

@@ -1,5 +1,5 @@
 import abc
-from functools import cached_property, lru_cache
+from functools import cache, cached_property
 from typing import Optional, Union
 
 from overhave.factory import IAdminFactory, ITestExecutionFactory
@@ -139,6 +139,6 @@ class ProxyManager(IProxyManager):
             self._collection_prepared = True
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_proxy_manager() -> IProxyManager:
     return ProxyManager()

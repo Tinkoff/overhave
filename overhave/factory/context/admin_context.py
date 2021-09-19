@@ -33,8 +33,8 @@ class OverhaveAdminContext(BaseFactoryContext):
         language_settings: Optional[OverhaveLanguageSettings] = None,
         ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
         redis_settings: Optional[OverhaveRedisSettings] = None,
-        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
+        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
     ) -> None:

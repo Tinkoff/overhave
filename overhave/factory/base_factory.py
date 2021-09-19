@@ -12,7 +12,6 @@ from overhave.storage import (
     FeatureTypeStorage,
     IDraftStorage,
     IEmulationStorage,
-    IFeatureStorage,
     IFeatureTypeStorage,
     IScenarioStorage,
     ITestRunStorage,
@@ -117,7 +116,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
         return self._feature_extractor
 
     @cached_property
-    def _feature_storage(self) -> IFeatureStorage:
+    def _feature_storage(self) -> FeatureStorage:
         return FeatureStorage()
 
     @cached_property

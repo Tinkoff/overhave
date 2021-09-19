@@ -8,10 +8,13 @@ from overhave import (
     OverhaveTestExecutionContext,
     overhave_admin_factory,
     overhave_publication_factory,
+    overhave_synchronizer_factory,
     overhave_test_execution_factory,
 )
 from overhave.cli.admin import _run_admin
 from overhave.cli.consumers import _run_consumer
+from overhave.cli.synchronization import _create_synchronizer
+from overhave.factory import OverhaveSynchronizerContext
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -35,6 +38,13 @@ def _prepare_publication_factory(settings_generator: OverhaveDemoSettingsGenerat
         **settings_generator.publication_context_settings  # type: ignore
     )
     overhave_publication_factory().set_context(publication_context)
+
+
+def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenerator) -> None:
+    synchronizer_context: OverhaveSynchronizerContext = OverhaveSynchronizerContext(
+        **settings_generator.default_context_settings  # type: ignore
+    )
+    overhave_synchronizer_factory().set_context(synchronizer_context)
 
 
 def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
@@ -87,3 +97,16 @@ def _run_demo_consumer(stream: OverhaveRedisStream, settings_generator: Overhave
 )
 def consumer(stream: OverhaveRedisStream, language: str) -> None:
     _run_demo_consumer(stream=stream, settings_generator=_get_overhave_settings_generator(language=language))
+
+
+@overhave_demo.command(short_help="Run Overhave feature synchronization")
+@click.option("-c", "--create-db-features", is_flag=True, help="Create features in database if necessary")
+@click.option(
+    "-l",
+    "--language",
+    default=OverhaveDemoAppLanguage.RU.value,
+    help="Overhave application language (defines step prefixes only right now)",
+)
+def synchronize(create_db_features: bool, language: str) -> None:
+    _prepare_synchronizer_factory(settings_generator=_get_overhave_settings_generator(language=language))
+    _create_synchronizer().synchronize(create_db_features)

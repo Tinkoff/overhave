@@ -33,6 +33,7 @@ from overhave.factory import (
 from overhave.factory import get_admin_factory as overhave_admin_factory
 from overhave.factory import get_emulation_factory as overhave_emulation_factory
 from overhave.factory import get_publication_factory as overhave_publication_factory
+from overhave.factory import get_synchronizer_factory as overhave_synchronizer_factory
 from overhave.factory import get_test_execution_factory as overhave_test_execution_factory
 from overhave.publication import OverhaveStashPublisherSettings
 from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
