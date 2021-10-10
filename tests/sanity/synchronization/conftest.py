@@ -7,7 +7,7 @@ from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import overhave_synchronizer_factory
 from overhave.cli.synchronization import _create_synchronizer
 from overhave.factory import ISynchronizerFactory
-from overhave.synchronization import OverhaveSynchronizer
+from overhave.synchronization import IOverhaveSynchronizer
 
 
 @pytest.fixture()
@@ -27,6 +27,6 @@ def test_resolved_synchronizer(
     mock_envs: None,
     database: None,
     test_demo_settings_generator: OverhaveDemoSettingsGenerator,
-) -> OverhaveSynchronizer:
+) -> IOverhaveSynchronizer:
     _prepare_synchronizer_factory(settings_generator=test_demo_settings_generator)
     return _create_synchronizer()

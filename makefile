@@ -57,7 +57,7 @@ build-docs:
 check-package:
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
 
-check: test lint check-package build-docs
+check: lint test check-package build-docs
 
 clear:
 	rm -rf ./.mypy_cache

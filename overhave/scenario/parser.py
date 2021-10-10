@@ -50,10 +50,11 @@ class ScenarioParser(PrefixMixin):
         self._task_links_keyword = task_links_keyword
 
     @cached_property
-    def _feature_prefix(self) -> str:
+    def _feature_prefixes(self) -> List[str]:
+        prefixes = [self._as_prefix(default_types.FEATURE)]
         if self._language_settings.step_prefixes is not None:
-            return self._as_prefix(self._language_settings.step_prefixes.FEATURE)
-        return self._as_prefix(default_types.FEATURE)
+            prefixes.append(self._as_prefix(self._language_settings.step_prefixes.FEATURE))
+        return prefixes
 
     @cached_property
     def _task_prefix(self) -> Optional[str]:
@@ -64,8 +65,8 @@ class ScenarioParser(PrefixMixin):
     def _get_id(self, id_line: str) -> int:
         return int(id_line.lstrip(self._compilation_settings.id_prefix).strip())
 
-    def _get_name(self, name_line: str) -> str:
-        name_parts = name_line.split(self._feature_prefix)
+    def _get_name(self, name_line: str, feature_prefix: str) -> str:
+        name_parts = name_line.split(feature_prefix)
         if not name_parts:
             raise FeatureNameParsingError(f"Could not parse feature name from '{name_line}'!",)
         return name_parts[-1].strip()
@@ -98,7 +99,7 @@ class ScenarioParser(PrefixMixin):
             return datetime.strptime(datetime_str, self._compilation_settings.time_format)
         raise DatetimeParsingError("Could not parse datetime from '%s'!", line)
 
-    def _parse_feature_info(self, header: str) -> FeatureInfo:
+    def _parse_feature_info(self, header: str) -> FeatureInfo:  # noqa: C901
         feature_info = FeatureInfo()
         for line in header.split("\n"):
             if line.startswith(self._compilation_settings.id_prefix):
@@ -110,9 +111,10 @@ class ScenarioParser(PrefixMixin):
                 tags.remove(feature_info.type)
                 feature_info.tags = tags
                 continue
-            if line.startswith(self._feature_prefix):
-                feature_info.name = self._get_name(line)
-                continue
+            for prefix in self._feature_prefixes:
+                if not line.startswith(prefix):
+                    continue
+                feature_info.name = self._get_name(name_line=line, feature_prefix=prefix)
             if self._compilation_settings.created_by_prefix in line:
                 feature_info.author = self._get_additional_info(
                     line,
@@ -133,6 +135,8 @@ class ScenarioParser(PrefixMixin):
             if self._task_prefix is not None and self._task_prefix in line:
                 feature_info.tasks = self._get_task_info(line)
                 continue
+        if feature_info.name is None:
+            raise FeatureNameParsingError(f"Could not parse feature name from header:\n{header}")
         return feature_info
 
     def parse(self, feature_txt: str) -> FeatureInfo:

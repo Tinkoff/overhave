@@ -164,6 +164,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
                     continue
                 self._create_feature(file=feature_file, info=feature_info)
                 continue
+            logger.info("Feature has ID=%s", feature_info.id)
             feature_model = self._feature_storage.get_feature(feature_info.id)
             if feature_model is None:
                 logger.warning("Feature doesn't exist in Overhave database.")
