@@ -84,6 +84,7 @@ twine = "^3.3.0"
 Sphinx = "^3.4.3"
 mypy-extensions = "^0.4.3"
 alchemy-mock = "^0.4.3"
+coverage = {version = "^6.0.1", extras = ["toml"]}
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
