@@ -156,7 +156,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             type_id=feature_type.id,
             last_edited_by=info.last_edited_by,
             last_edited_at=info.last_edited_at,
-            task=info.tasks,
+            task=info.tasks or [],
             file_path=file.relative_to(
                 self._feature_extractor.feature_type_to_dir_mapping[feature_type.name]
             ).as_posix(),
@@ -167,7 +167,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         feature_model.id = self._feature_storage.create_feature(feature_model)
         scenario_model = ScenarioModel(id=0, feature_id=feature_model.id, text=info.scenarios)
         self._scenario_storage.create_scenario(scenario_model)
-        logger.info("Feature has been created successfully.")
+        logger.info("Feature with ID=%s has been created successfully.", feature_model.id)
 
     def synchronize(self, create_db_features: bool = False) -> None:  # noqa: C901
         logger.info("Start synchronization...")
