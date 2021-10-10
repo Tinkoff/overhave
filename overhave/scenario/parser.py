@@ -63,7 +63,7 @@ class ScenarioParser(PrefixMixin):
         return None
 
     def _get_id(self, id_line: str) -> int:
-        return int(id_line.lstrip(self._compilation_settings.id_prefix).strip())
+        return int(id_line.removeprefix(self._compilation_settings.id_prefix).strip())
 
     def _get_name(self, name_line: str, feature_prefix: str) -> str:
         name_parts = name_line.split(feature_prefix)
@@ -85,17 +85,19 @@ class ScenarioParser(PrefixMixin):
     def _get_additional_info(additional_line: str, left_pointer: str, right_pointer: str) -> str:
         result = re.search(rf"({left_pointer})+\s?\w+\s?({right_pointer})+", additional_line)
         if result:
-            return result.group(0).lstrip(left_pointer).rstrip(right_pointer).strip()
+            return result.group(0).removeprefix(left_pointer).removesuffix(right_pointer).strip()
         raise AdditionalInfoParsingError("Could not parse additional info from '%s'!", additional_line)
 
     def _get_task_info(self, task_line: str) -> List[str]:
-        tasks = task_line.lstrip(self._task_prefix).split(",")
+        tasks = []
+        if self._task_prefix is not None:
+            tasks.extend(task_line.removeprefix(self._task_prefix).split(","))
         return [x.strip() for x in tasks]
 
     def _get_time_info(self, line: str, left_pointer: str, right_pointer: str) -> datetime:
         result = re.search(rf"({left_pointer})+[\w\-:\s]+({right_pointer})+", line)
         if result:
-            datetime_str = result.group(0).lstrip(left_pointer).rstrip(right_pointer).strip()
+            datetime_str = result.group(0).removeprefix(left_pointer).removesuffix(right_pointer).strip()
             return datetime.strptime(datetime_str, self._compilation_settings.time_format)
         raise DatetimeParsingError("Could not parse datetime from '%s'!", line)
 
