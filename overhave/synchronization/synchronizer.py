@@ -175,6 +175,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         for feature_file in all_features:
             logger.info("Synchronize feature from file %s...", feature_file.as_posix())
             feature_info = self._scenario_parser.parse(feature_file.read_text())
+            logger.debug("Parsed feature info: %s", feature_info)
             if feature_info.id is None:
                 if not create_db_features:
                     logger.warning("Feature doesn't have Overhave ID or ID format is incorrect. Skip.")

@@ -4,6 +4,7 @@ from typing import Optional, cast
 
 from overhave import db
 from overhave.entities import FeatureModel
+from overhave.storage.feature_tag_storage import IFeatureTagStorage
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,9 @@ class IFeatureStorage(abc.ABC):
 class FeatureStorage(IFeatureStorage):
     """ Class for feature storage. """
 
+    def __init__(self, tag_storage: IFeatureTagStorage):
+        self._tag_storage = tag_storage
+
     @staticmethod
     def get_feature(feature_id: int) -> Optional[FeatureModel]:
         with db.create_session() as session:
@@ -60,6 +64,8 @@ class FeatureStorage(IFeatureStorage):
                 file_path=model.file_path,
                 task=model.task,
             )
+            feature.last_edited_at = model.last_edited_at
+            feature.released = model.released
             session.add(feature)
             session.flush()
             return cast(int, feature.id)

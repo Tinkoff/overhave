@@ -4,7 +4,6 @@ from functools import cached_property
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.context import OverhaveSynchronizerContext
 from overhave.scenario import ScenarioParser
-from overhave.storage import FeatureTagStorage
 from overhave.synchronization import IOverhaveSynchronizer, OverhaveSynchronizer
 
 
@@ -21,10 +20,6 @@ class SynchronizerFactory(BaseOverhaveFactory[OverhaveSynchronizerContext], ISyn
     """ Factory for Overhave feature synchronization application. """
 
     context_cls = OverhaveSynchronizerContext
-
-    @cached_property
-    def _feature_tag_storage(self) -> FeatureTagStorage:
-        return FeatureTagStorage()
 
     @cached_property
     def _scenario_parser(self) -> ScenarioParser:
