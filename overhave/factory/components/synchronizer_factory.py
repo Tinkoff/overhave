@@ -46,6 +46,7 @@ class SynchronizerFactory(BaseOverhaveFactory[OverhaveSynchronizerContext], ISyn
             tag_storage=self._feature_tag_storage,
             scenario_parser=self._scenario_parser,
             feature_extractor=self._feature_extractor,
+            system_user_storage=self._system_user_storage,
         )
 
     @property

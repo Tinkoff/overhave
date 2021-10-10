@@ -15,7 +15,7 @@ from overhave.entities import ReportManager
 from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveAdminContext
-from overhave.storage import IFeatureTypeStorage, ISystemUserStorage, SystemUserGroupStorage, SystemUserStorage
+from overhave.storage import IFeatureTypeStorage, SystemUserGroupStorage
 from overhave.transport import EmulationTask, PublicationTask, RedisProducer, RedisStream, TestRunTask
 
 
@@ -25,11 +25,6 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
     @property
     @abc.abstractmethod
     def feature_type_storage(self) -> IFeatureTypeStorage:
-        pass
-
-    @property
-    @abc.abstractmethod
-    def system_user_storage(self) -> ISystemUserStorage:
         pass
 
     @property
@@ -57,14 +52,6 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
     """ Factory for Overhave admin application. """
 
     context_cls = OverhaveAdminContext
-
-    @cached_property
-    def _system_user_storage(self) -> ISystemUserStorage:
-        return SystemUserStorage()
-
-    @property
-    def system_user_storage(self) -> ISystemUserStorage:
-        return self._system_user_storage
 
     @cached_property
     def _simple_auth_manager(self) -> SimpleAdminAuthorizationManager:

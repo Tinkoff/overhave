@@ -13,7 +13,14 @@ from overhave.entities import (
 )
 from overhave.scenario import ScenarioParser
 from overhave.scenario.parser import FeatureInfo
-from overhave.storage import IDraftStorage, IFeatureStorage, IFeatureTagStorage, IFeatureTypeStorage, IScenarioStorage
+from overhave.storage import (
+    IDraftStorage,
+    IFeatureStorage,
+    IFeatureTagStorage,
+    IFeatureTypeStorage,
+    IScenarioStorage,
+    ISystemUserStorage,
+)
 from overhave.synchronization.abstract import IOverhaveSynchronizer
 
 logger = logging.getLogger(__name__)
@@ -47,6 +54,10 @@ class NullableInfoFeatureTypeError(BaseOverhaveSynchronizerException):
     """ Exception for situation without feature info type. """
 
 
+class FeatureInfoUserNotFoundError(BaseOverhaveSynchronizerException):
+    """ Exception for situation without specified user in database. """
+
+
 class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
     """ Class for synchronization between git and database. """
 
@@ -60,6 +71,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         tag_storage: IFeatureTagStorage,
         scenario_parser: ScenarioParser,
         feature_extractor: FeatureExtractor,
+        system_user_storage: ISystemUserStorage,
     ):
         super().__init__(extenstion=file_settings.feature_suffix)
         self._file_settings = file_settings
@@ -70,6 +82,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self._tag_storage = tag_storage
         self._scenario_parser = scenario_parser
         self._feature_extractor = feature_extractor
+        self._system_user_storage = system_user_storage
 
     @staticmethod
     def _update_feature_model_with_info(
@@ -128,6 +141,10 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             raise NullableInfoFeatureTypeError("Could not create feature without feature type!")
         if info.author is None:
             raise NullableInfoAuthorError("Could not create feature without author!")
+        for user in (info.author, info.last_edited_by):
+            if self._system_user_storage.get_user_by_credits(login=info.author) is not None:
+                continue
+            raise FeatureInfoUserNotFoundError(f"Could not find user with login={user}!")
         feature_tags = self._get_feature_tags(info=info)
         feature_type = self._feature_type_storage.get_feature_type_by_name(info.type)
         if info.last_edited_by is None:
