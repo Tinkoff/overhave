@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+import pytz
+
 from overhave.entities import (
     BaseFileExtractor,
     FeatureExtractor,
@@ -188,7 +190,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
                 logger.warning("Feature doesn't exist in Overhave database.")
                 continue  # TODO: unlink file and create MR with deletions at the end
 
-            feature_file_ts = datetime.fromtimestamp(feature_file.stat().st_mtime)
+            feature_file_ts = datetime.fromtimestamp(feature_file.stat().st_mtime, tz=pytz.UTC)
             if feature_model.last_edited_at is None:
                 raise NullableLastEditedAtError("last_edited_at value should not be None!")
             if feature_model.last_edited_at == feature_file_ts and feature_model.released:

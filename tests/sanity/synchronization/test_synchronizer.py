@@ -75,3 +75,14 @@ class TestOverhaveSynchronizer:
         test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
         with pytest.raises(sqlalchemy.exc.IntegrityError):
             test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+
+    @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
+    @pytest.mark.parametrize("test_system_user_login", ["admin"], indirect=True)
+    def test_synchronize_create_and_sync_without_update(
+        self,
+        test_resolved_synchronizer: OverhaveSynchronizer,
+        test_db_user: SystemUserModel,
+        test_db_feature_types: List[FeatureTypeModel],
+    ) -> None:
+        test_resolved_synchronizer.synchronize(create_db_features=True)
+        test_resolved_synchronizer.synchronize(create_db_features=False)

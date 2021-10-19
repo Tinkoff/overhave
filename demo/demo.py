@@ -6,12 +6,13 @@ from overhave import (
     OverhavePublicationContext,
     OverhaveRedisStream,
     OverhaveTestExecutionContext,
+    db,
     overhave_admin_factory,
     overhave_publication_factory,
     overhave_synchronizer_factory,
     overhave_test_execution_factory,
 )
-from overhave.cli.admin import _run_admin
+from overhave.cli.admin import _get_admin_app
 from overhave.cli.consumers import _run_consumer
 from overhave.cli.synchronization import _create_synchronizer
 from overhave.factory import OverhaveSynchronizerContext
@@ -47,13 +48,22 @@ def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenera
     overhave_synchronizer_factory().set_context(synchronizer_context)
 
 
+def _ensure_demo_app_has_features() -> None:
+    with db.create_session() as session:
+        create_db_features = not bool(session.query(db.Feature).all())
+    _create_synchronizer().synchronize(create_db_features=create_db_features)
+
+
 def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
     context = OverhaveAdminContext(**settings_generator.admin_context_settings)  # type: ignore
     overhave_admin_factory().set_context(context)
     if not context.admin_settings.consumer_based:
         _prepare_test_execution_factory(settings_generator)
         _prepare_publication_factory(settings_generator)
-    _run_admin(port=8076, debug=True)
+    _prepare_synchronizer_factory(settings_generator)
+    demo_admin_app = _get_admin_app()
+    _ensure_demo_app_has_features()
+    demo_admin_app.run(host="localhost", port=8076, debug=True)
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")

@@ -12,7 +12,7 @@ from demo.demo import _run_demo_admin
 from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import OverhaveDBSettings, db
 from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
-from overhave.entities import ScenarioModel, SystemUserModel
+from overhave.entities import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
 from overhave.factory import IAdminFactory
 from overhave.pytest_plugin import IProxyManager
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
@@ -50,22 +50,31 @@ def test_db_user(database: None, test_system_user_login: str) -> SystemUserModel
 
 
 @pytest.fixture()
-def test_db_scenario(test_feature_container: FeatureTestContainer, test_db_user: SystemUserModel) -> ScenarioModel:
+def test_db_feature(test_feature_container: FeatureTestContainer, test_db_user: SystemUserModel) -> FeatureModel:
     with db.create_session() as session:
-        db_feature_type = session.query(db.FeatureType).filter(db.FeatureType.name == test_feature_container.type).one()
-        db_feature = db.Feature(
-            name=test_feature_container.name,
-            author=test_db_user.login,
-            type_id=db_feature_type.id,
-            task=["PRJ-123"],
-            file_path=test_feature_container.file_path,
-        )
-        session.add(db_feature)
-        session.flush()
-        db_scenario = db.Scenario(feature_id=db_feature.id, text=test_feature_container.scenario)
-        session.add(db_scenario)
-        session.flush()
+        db_feature = session.query(db.Feature).filter(db.Feature.file_path == test_feature_container.file_path).one()
+        return FeatureModel.from_orm(db_feature)
+
+
+@pytest.fixture()
+def test_db_scenario(test_db_feature: FeatureModel, test_db_user: SystemUserModel) -> ScenarioModel:
+    with db.create_session() as session:
+        db_scenario = session.query(db.Scenario).filter(db.Scenario.feature_id == test_db_feature.id).one()
         return ScenarioModel.from_orm(db_scenario)
+
+
+@pytest.fixture()
+def test_db_test_run(test_db_scenario: ScenarioModel) -> TestRunModel:
+    with db.create_session() as session:
+        db_test_run: Optional[db.TestRun] = (  # noqa: ECE001
+            session.query(db.TestRun)
+            .filter(db.TestRun.scenario_id == test_db_scenario.id)
+            .order_by(db.TestRun.id.desc())
+            .first()
+        )
+        if db_test_run is None:
+            raise RuntimeError("TestRun should not be None!")
+        return TestRunModel.from_orm(db_test_run)
 
 
 @pytest.fixture()
