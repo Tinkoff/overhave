@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 import werkzeug
 from _pytest.fixtures import FixtureRequest
+from faker import Faker
 from flask import Flask
 
 from demo.demo import _run_demo_admin
@@ -33,9 +34,16 @@ def test_proxy_manager(clean_proxy_manager: Callable[[], IProxyManager]) -> IPro
 
 
 @pytest.fixture()
-def test_db_user(database: None) -> SystemUserModel:
+def test_system_user_login(request: FixtureRequest, faker: Faker) -> str:
+    if hasattr(request, "param"):
+        return cast(str, request.param)
+    return faker.word()
+
+
+@pytest.fixture()
+def test_db_user(database: None, test_system_user_login: str) -> SystemUserModel:
     with db.create_session() as session:
-        db_user = db.UserRole(login="test_user", password="test_password", role=db.Role.user)
+        db_user = db.UserRole(login=test_system_user_login, password="test_password", role=db.Role.user)
         session.add(db_user)
         session.flush()
         return SystemUserModel.from_orm(db_user)
