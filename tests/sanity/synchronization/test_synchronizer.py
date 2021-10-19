@@ -1,6 +1,7 @@
 from typing import List
 
 import pytest
+import sqlalchemy.exc
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
@@ -57,3 +58,20 @@ class TestOverhaveSynchronizer:
         create_db_features: bool,
     ) -> None:
         test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+        with db.create_session() as session:
+            features = session.query(db.Feature).all()
+            assert len(features) == 3
+
+    @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
+    @pytest.mark.parametrize("create_db_features", [True])
+    @pytest.mark.parametrize("test_system_user_login", ["admin"], indirect=True)
+    def test_synchronize_create_ru_double(
+        self,
+        test_resolved_synchronizer: OverhaveSynchronizer,
+        test_db_user: SystemUserModel,
+        test_db_feature_types: List[FeatureTypeModel],
+        create_db_features: bool,
+    ) -> None:
+        test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+        with pytest.raises(sqlalchemy.exc.IntegrityError):
+            test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
