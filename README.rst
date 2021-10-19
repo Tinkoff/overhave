@@ -42,6 +42,7 @@ Features
 * Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_ or `GitLab`_
+* Synchronization between `git`_ repository and database with features
 * Built-in configurable management of users and groups permissions
 * Configurable strategy for user authorization, LDAP also provided
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
@@ -375,6 +376,36 @@ has special `TokenizerClient` with it's own
 the token from a remote custom GitLab tokenizer service.
 
 
+Git-to-DataBase synchronization
+-------------------------------
+
+**Overhave** gives an ability to synchronize your current `git`_
+repository's state with database. It means that your features,
+which are located on the database, could be updated - and the source
+of updates is your repository.
+
+**For example**: you had to do bulk data replacement in `git`_
+repository, and now you want to deliver changes to remote database.
+This not so easy matter could be solved with **Overhave** special
+tooling:
+
+You are able to set necessary settings for your project:
+
+.. code-block:: bash
+
+    overhave synchronize  # only update existing features
+    overhave synchronize --create-db-features  # update + create new features
+
+You are able to test this tool with **Overhave** demo mode.
+By default, 3 features are created in demo database. Just try
+to change them or create new features and run synchronization
+command - you will get the result.
+
+.. code-block:: bash
+
+    overhave-demo synchronize  # or with '--create-db-features'
+
+
 Custom index
 ------------
 
@@ -528,5 +559,6 @@ with a detailed description.
 .. _`Click`: https://github.com/pallets/click
 .. _`Sphinx`: https://github.com/sphinx-doc/sphinx
 .. _`boto3`: https://github.com/boto/boto3
+.. _`git`: https://git-scm.com/
 .. _`context_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/context_example.rst
 .. _`feature_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/features_structure_example/feature_type_1/full_feature_example_en.feature
