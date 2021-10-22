@@ -20,8 +20,8 @@ class NullablePasswordError(Exception):
 class SimpleAdminAuthorizationManager(AdminSecretMixin):
     """ Class for user registration.
 
-    Manager does not provide real authorization. Every user could use preferred name.
-    This name will be used for user authority. Every user is unique. Passwords not required.
+    Manager does not provide real authorization. Each user could use preferred name.
+    This name will be used for user authority. Each user is unique. Passwords not required.
     """
 
     def authorize_user(self, username: str, password: SecretStr) -> Optional[SystemUserModel]:

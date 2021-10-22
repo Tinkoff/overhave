@@ -20,6 +20,6 @@ class TokenizerClientSettings(BaseHttpClientSettings):
 
     @validator("url", "remote_key", "remote_key_name")
     def validate_remote_key_and_initiator(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
-        if values.get("enabled") is True and not isinstance(v, str):
+        if values.get("enabled") and not isinstance(v, str):
             raise ValueError("Please verify that url, remote_key and remote_key_name variables are not nullable!")
         return v

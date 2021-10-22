@@ -21,7 +21,7 @@ class LDAPEmptyAdminGroupError(ValueError):
 class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
     """ Class for user authorization via LDAP.
 
-    Manager authorize users using remote LDAP server. Every user should use his LDAP credentials.
+    Manager authorize users using remote LDAP server. Each user should use his LDAP credentials.
     LDAP server returns user groups. If user in default 'admin' group or his groups list contains admin group - user
     will be authorized. If user already placed in database - user will be authorized too. No one password stores.
     """
