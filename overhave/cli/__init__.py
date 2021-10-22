@@ -4,3 +4,4 @@ from .consumers import consumer
 from .db import db, set_config_to_context
 from .group import overhave
 from .s3 import s3
+from .synchronization import synchronize

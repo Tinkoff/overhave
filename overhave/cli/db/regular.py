@@ -9,9 +9,9 @@ from overhave.base_settings import DataBaseSettings
 
 
 def _create_all(config: Config) -> None:
-    click.echo("creating")
+    click.echo("Creating...")
     config.attributes["metadata"].create_all()
-    click.echo("complete!")
+    click.secho("Completed.", fg="green")
 
 
 @click.command(short_help="Create all metadata tables")
@@ -22,7 +22,7 @@ def create_all(config: Config) -> None:
 
 
 def _drop_all(config: Config) -> None:
-    click.echo("dropping")
+    click.echo("Dropping...")
     meta = config.attributes["metadata"]
     engine = config.attributes["engine"]
     for table in meta.tables:
@@ -30,14 +30,14 @@ def _drop_all(config: Config) -> None:
     engine.execute("DROP TABLE IF EXISTS alembic_version")
     engine.execute("DROP SCHEMA IF EXISTS huey")
     meta.drop_all()
-    click.echo("complete!")
+    click.secho("Completed.", fg="green")
 
 
 @click.command(short_help="Drop all metadata tables, attributes, schema")
 @click.pass_obj
 def drop_all(config: Config) -> None:
     """ Drop all metadata tables, attributes, schema. """
-    click.confirm("it really need?", abort=True)
+    click.confirm("Does it really need?", abort=True)
     _drop_all(config)
 
 

@@ -7,6 +7,7 @@ from uuid import uuid1
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
+from pydantic import SecretStr
 
 from overhave import db
 from overhave.db import DraftStatus
@@ -17,11 +18,20 @@ from overhave.entities.converters import (
     FeatureTypeModel,
     ScenarioModel,
     SystemUserModel,
+    TagModel,
     TestUserModel,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import DraftStorage, FeatureTypeStorage, TestRunStorage
-from overhave.storage.emulation_storage import EmulationStorage
+from overhave.storage import (
+    DraftStorage,
+    EmulationStorage,
+    FeatureStorage,
+    FeatureTagStorage,
+    FeatureTypeStorage,
+    ScenarioStorage,
+    SystemUserStorage,
+    TestRunStorage,
+)
 
 
 @pytest.fixture(scope="module")
@@ -59,16 +69,16 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_system_user(database: None, faker: Faker, test_user_role: db.Role) -> SystemUserModel:
-    with db.create_session() as session:
-        app_user = db.UserRole(login=faker.word(), password=faker.word(), role=test_user_role)
-        session.add(app_user)
-        session.flush()
-        return cast(SystemUserModel, SystemUserModel.from_orm(app_user))
+def test_system_user(
+    test_system_user_storage: SystemUserStorage, database: None, faker: Faker, test_user_role: db.Role
+) -> SystemUserModel:
+    return test_system_user_storage.create_user(
+        login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
+    )
 
 
 @pytest.fixture()
-def test_user(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
+def test_testuser(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
             feature_type_id=test_feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
@@ -79,12 +89,12 @@ def test_user(test_system_user: SystemUserModel, faker: Faker, test_feature_type
 
 
 @pytest.fixture()
-def test_emulation(test_system_user: SystemUserModel, test_user: TestUserModel, faker: Faker) -> EmulationModel:
+def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
     with db.create_session() as session:
         emulation = db.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
-            test_user_id=test_user.id,
+            test_user_id=test_testuser.id,
             created_by=test_system_user.login,
         )
         session.add(emulation)
@@ -98,24 +108,57 @@ def test_test_run_storage() -> TestRunStorage:
 
 
 @pytest.fixture(scope="class")
+def test_tag_storage() -> FeatureTagStorage:
+    return FeatureTagStorage()
+
+
+@pytest.fixture(scope="class")
+def test_feature_storage(test_tag_storage: FeatureTagStorage) -> FeatureStorage:
+    return FeatureStorage(tag_storage=test_tag_storage)
+
+
+@pytest.fixture(scope="class")
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 
 
 @pytest.fixture()
-def test_feature(faker: Faker, test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel) -> FeatureModel:
+def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
+    with db.create_session() as session:
+        tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
+        session.add(tag)
+        session.flush()
+        return cast(TagModel, TagModel.from_orm(tag))
+
+
+@pytest.fixture()
+def test_feature(test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
             name=faker.word(),
             author=test_system_user.login,
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
-            last_edited_by=test_system_user.login,
-            file_path="my_folder/my_feature",
+            file_path=f"{faker.word()}/{faker.word()}",
         )
         session.add(feature)
         session.flush()
         return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> FeatureModel:
+    with db.create_session() as session:
+        tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
+        feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
+        feature.feature_tags.append(tag)
+        session.flush()
+        return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture(scope="class")
+def test_scenario_storage() -> ScenarioStorage:
+    return ScenarioStorage()
 
 
 @pytest.fixture()
@@ -153,11 +196,11 @@ def test_draft(
             feature_id=test_feature.id,
             test_run_id=test_created_test_run_id,
             text=faker.word(),
-            pr_url=faker.word(),
             published_by=test_system_user.login,
-            published_at=datetime.datetime.now(),
             status=DraftStatus.REQUESTED,
         )
+        draft.pr_url = faker.word()
+        draft.published_at = datetime.datetime.now()
         session.add(draft)
         session.flush()
         return cast(DraftModel, DraftModel.from_orm(draft))

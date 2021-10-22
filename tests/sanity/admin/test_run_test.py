@@ -4,14 +4,15 @@ from unittest import mock
 import pytest
 import werkzeug
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
 from overhave.admin.views.feature import _SCENARIO_PREFIX
-from overhave.entities import ScenarioModel, SystemUserModel, TestRunModel
+from overhave.entities import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
 from overhave.transport import TestRunData, TestRunTask
-from tests.objects import FeatureTestContainer
 
 
 @pytest.mark.usefixtures("database")
+@pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
 class TestOverhaveAdminRunTest:
     """ Sanity tests for application test run. """
 
@@ -64,11 +65,12 @@ class TestOverhaveAdminRunTest:
         flask_urlfor_handler_mock: mock.MagicMock,
         redisproducer_addtask_mock: mock.MagicMock,
         test_db_scenario: ScenarioModel,
+        test_db_test_run: TestRunModel,
     ) -> None:
         flask_flash_handler_mock.assert_not_called()
-        flask_urlfor_handler_mock.assert_called_with("testrun.details_view", id=test_db_scenario.id)
+        flask_urlfor_handler_mock.assert_called_with("testrun.details_view", id=test_db_test_run.id)
         redisproducer_addtask_mock.assert_called_once_with(
-            TestRunTask(data=TestRunData(test_run_id=test_db_scenario.id))
+            TestRunTask(data=TestRunData(test_run_id=test_db_test_run.id))
         )
         assert test_featureview_runtest_result != test_rendered_featureview
 
@@ -76,19 +78,15 @@ class TestOverhaveAdminRunTest:
         self,
         test_featureview_runtest_result: werkzeug.Response,
         test_db_user: SystemUserModel,
-        test_feature_container: FeatureTestContainer,
+        test_db_feature: FeatureModel,
         test_db_scenario: ScenarioModel,
+        test_db_test_run: TestRunModel,
     ) -> None:
-        with db.create_session() as session:
-            db_test_run = session.query(db.TestRun).get(test_db_scenario.id)
-            assert db_test_run is not None
-            test_run: TestRunModel = TestRunModel.from_orm(db_test_run)
-        assert test_run.id == test_db_scenario.id
-        assert isinstance(test_run.created_at, datetime)
-        assert test_run.name == test_feature_container.name
-        assert test_run.executed_by == test_db_user.login
-        assert test_run.status is db.TestRunStatus.STARTED
-        assert test_run.start is None
-        assert test_run.end is None
-        assert test_run.report_status is db.TestReportStatus.EMPTY
-        assert test_run.traceback is None
+        assert isinstance(test_db_test_run.created_at, datetime)
+        assert test_db_test_run.name == test_db_feature.name
+        assert test_db_test_run.executed_by == test_db_user.login
+        assert test_db_test_run.status is db.TestRunStatus.STARTED
+        assert test_db_test_run.start is None
+        assert test_db_test_run.end is None
+        assert test_db_test_run.report_status is db.TestReportStatus.EMPTY
+        assert test_db_test_run.traceback is None

@@ -1,6 +1,5 @@
 # flake8: noqa
 from .archiver import ArchiveManager
-from .authorization import IAdminAuthorizationManager
 from .converters import (
     DraftModel,
     EmulationRunModel,
@@ -9,6 +8,7 @@ from .converters import (
     PublisherContext,
     ScenarioModel,
     SystemUserModel,
+    TagModel,
     TestExecutorContext,
     TestRunModel,
 )
@@ -20,6 +20,7 @@ from .feature import (
     IFeatureExtractor,
     ScenariosTestFileNotFound,
 )
+from .file_extractor import BaseFileExtractor
 from .language import StepPrefixesModel
 from .report_manager import ReportManager, ReportPresenceResolution
 from .settings import (

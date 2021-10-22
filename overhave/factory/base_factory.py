@@ -9,14 +9,16 @@ from overhave.storage import (
     DraftStorage,
     EmulationStorage,
     FeatureStorage,
+    FeatureTagStorage,
     FeatureTypeStorage,
     IDraftStorage,
     IEmulationStorage,
-    IFeatureStorage,
     IFeatureTypeStorage,
     IScenarioStorage,
+    ISystemUserStorage,
     ITestRunStorage,
     ScenarioStorage,
+    SystemUserStorage,
     TestRunStorage,
 )
 from overhave.test_execution import PytestRunner, StepCollector
@@ -70,6 +72,11 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
     def test_runner(self) -> PytestRunner:
         pass
 
+    @property
+    @abc.abstractmethod
+    def system_user_storage(self) -> ISystemUserStorage:
+        pass
+
 
 class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     """ Base factory for application entities resolution and usage. """
@@ -117,8 +124,12 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
         return self._feature_extractor
 
     @cached_property
-    def _feature_storage(self) -> IFeatureStorage:
-        return FeatureStorage()
+    def _feature_tag_storage(self) -> FeatureTagStorage:
+        return FeatureTagStorage()
+
+    @cached_property
+    def _feature_storage(self) -> FeatureStorage:
+        return FeatureStorage(tag_storage=self._feature_tag_storage)
 
     @cached_property
     def _feature_type_storage(self) -> IFeatureTypeStorage:
@@ -196,3 +207,11 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     @property
     def test_runner(self) -> PytestRunner:
         return self._test_runner
+
+    @cached_property
+    def _system_user_storage(self) -> ISystemUserStorage:
+        return SystemUserStorage()
+
+    @property
+    def system_user_storage(self) -> ISystemUserStorage:
+        return self._system_user_storage

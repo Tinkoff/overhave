@@ -6,6 +6,7 @@ from .components import (
     IAdminFactory,
     IEmulationFactory,
     IPublicationFactory,
+    ISynchronizerFactory,
     ITaskConsumerFactory,
     ITestExecutionFactory,
     PublicationFactory,
@@ -16,7 +17,14 @@ from .context import (
     OverhaveAdminContext,
     OverhaveEmulationContext,
     OverhavePublicationContext,
+    OverhaveSynchronizerContext,
     OverhaveTestExecutionContext,
     TApplicationContext,
 )
-from .getters import get_admin_factory, get_emulation_factory, get_publication_factory, get_test_execution_factory
+from .getters import (
+    get_admin_factory,
+    get_emulation_factory,
+    get_publication_factory,
+    get_synchronizer_factory,
+    get_test_execution_factory,
+)

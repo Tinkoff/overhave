@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 83.85
+MIN_COVERAGE ?= 83.8
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -57,7 +57,7 @@ build-docs:
 check-package:
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
 
-check: test lint check-package build-docs
+check: lint test check-package build-docs
 
 clear:
 	rm -rf ./.mypy_cache

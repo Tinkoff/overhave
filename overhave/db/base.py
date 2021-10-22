@@ -13,8 +13,6 @@ from sqlalchemy.orm import Session as SessionClass
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.query import Query
 
-from overhave.db.types import INT_TYPE
-
 logger = logging.getLogger(__name__)
 
 convention = {
@@ -41,7 +39,7 @@ class PrimaryKeyWithoutDateMixin:
 
     @declared_attr
     def id(cls) -> sa.Column[int]:
-        return sa.Column(f"{cls.__tablename__}_id", INT_TYPE, primary_key=True)  # type: ignore
+        return sa.Column(f"{cls.__tablename__}_id", sa.Integer(), primary_key=True)  # type: ignore
 
 
 class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):

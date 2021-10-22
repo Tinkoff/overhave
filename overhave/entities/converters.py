@@ -27,21 +27,43 @@ from overhave.entities.feature import FeatureTypeName
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
     """ Model for :class:`UserRole`. """
 
+    id: int
     login: str
-    password: SecretStr
+    password: Optional[SecretStr]
     role: Role
+
+    @property
+    def is_authenticated(self) -> bool:
+        return True
+
+    @property
+    def is_active(self) -> bool:
+        return True
+
+    @property
+    def is_anonymous(self) -> bool:
+        return False
+
+    def get_id(self) -> int:
+        return self.id
+
+    def __unicode__(self) -> str:
+        return self.login
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
     """ Model for :class:`FeatureType` row. """
 
+    id: int
     name: FeatureTypeName
 
 
-class TagsTypeModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
+class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
     """ Model for :class:`Tags` row. """
 
+    id: int
     value: str
+    created_by: str
 
 
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
@@ -50,11 +72,15 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     id: int
     name: str
     author: str
-    feature_type: FeatureTypeModel
+    type_id: int
     last_edited_by: str
+    last_edited_at: datetime
     task: List[str]
-    feature_tags: List[TagsTypeModel]
     file_path: str
+    released: bool
+
+    feature_type: FeatureTypeModel
+    feature_tags: List[TagModel]
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore

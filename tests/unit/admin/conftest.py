@@ -89,13 +89,61 @@ def test_feature_name(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_feature_row(faker: Faker, test_feature_model_task: List[str]) -> db.Feature:
-    return db.Feature(name=faker.word(), author=faker.word(), task=test_feature_model_task)
+def test_feature_model_task() -> List[str]:
+    return ["KEK-1111"]
 
 
 @pytest.fixture()
-def test_draft_row(faker: Faker, test_feature_row: db.Feature, test_testrun_id: int) -> db.Draft:
-    return db.Draft(feature_id=test_feature_row.id, test_run_id=test_testrun_id, published_by=faker.word())
+def test_feature_type_id(faker: Faker) -> int:
+    return faker.random_int()
+
+
+@pytest.fixture()
+def test_system_user_login(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
+def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
+    if hasattr(request, "param") and isinstance(request.param, str):
+        return request.param
+    return faker.word()
+
+
+@pytest.fixture()
+def test_feature_row(
+    faker: Faker,
+    test_feature_id: int,
+    test_feature_name: str,
+    test_system_user_login: str,
+    test_feature_type_id: int,
+    test_feature_filepath: str,
+    test_feature_model_task: List[str],
+) -> db.Feature:
+    row = db.Feature(
+        name=test_feature_name,
+        author=test_system_user_login,
+        type_id=test_feature_type_id,
+        file_path=test_feature_filepath,
+        task=test_feature_model_task,
+    )
+    row.id = test_feature_id
+    return row
+
+
+@pytest.fixture()
+def test_draft_row(
+    faker: Faker, test_feature_id: int, test_testrun_id: int, test_feature_row: db.Feature, test_system_user_login: str
+) -> db.Draft:
+    row = db.Draft(
+        feature_id=test_feature_id,
+        test_run_id=test_testrun_id,
+        text=faker.word(),
+        published_by=test_system_user_login,
+        status=db.DraftStatus.REQUESTED,
+    )
+    row.feature = test_feature_row
+    return row
 
 
 @pytest.fixture(scope="session")
@@ -128,8 +176,8 @@ def test_tags_view() -> views.TagsView:
 
 
 @pytest.fixture()
-def test_tags_row() -> db.Tags:
-    return db.Tags()
+def test_tags_row(faker: Faker, test_system_user_login: str) -> db.Tags:
+    return db.Tags(value=faker.word(), created_by=test_system_user_login)
 
 
 @pytest.fixture()
@@ -162,13 +210,6 @@ def current_user_mock(user_role: db.Role, faker: Faker, test_mock_patch_user_dir
         mocked.login = faker.word()
         mocked.role = user_role
         yield mocked
-
-
-@pytest.fixture()
-def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
-    if hasattr(request, "param") and isinstance(request.param, str):
-        return request.param
-    return faker.word()
 
 
 @pytest.fixture()

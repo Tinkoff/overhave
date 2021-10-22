@@ -1,5 +1,4 @@
-import enum
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Dict, List, NamedTuple, NewType, Sequence
 from unittest import mock
@@ -9,6 +8,7 @@ from pydantic.main import BaseModel
 from sqlalchemy import MetaData
 from sqlalchemy.engine import Engine
 
+from demo.settings import OverhaveDemoAppLanguage
 from overhave.entities import FeatureExtractor, FeatureTypeName, OverhaveFileSettings
 
 _BLOCKS_DELIMITER = "\n\n"
@@ -26,7 +26,7 @@ class DataBaseContext(NamedTuple):
     engine: Engine
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_file_settings() -> OverhaveFileSettings:
     """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
     work_dir = Path(__file__).parent.parent
@@ -34,7 +34,7 @@ def get_test_file_settings() -> OverhaveFileSettings:
     return OverhaveFileSettings(work_dir=work_dir, root_dir=root_dir)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_feature_extractor() -> FeatureExtractor:
     """ Method for getting :class:`FeatureExtractor` with OverhaveFileSettings, based on docs files and examples.
 
@@ -42,13 +42,6 @@ def get_test_feature_extractor() -> FeatureExtractor:
     """
     with mock.patch.object(FeatureExtractor, "_check_pytest_bdd_scenarios_test_files", return_value=None):
         return FeatureExtractor(file_settings=get_test_file_settings())
-
-
-class TestLanguageName(str, enum.Enum):
-    """ Enum that declares languages for using in tests. """
-
-    ENG = "en"
-    RUS = "ru"
 
 
 class FeatureTestContainer(BaseModel):
@@ -59,7 +52,7 @@ class FeatureTestContainer(BaseModel):
     project_path: Path
     content: str
     scenario: str
-    language: TestLanguageName
+    language: OverhaveDemoAppLanguage
 
     @root_validator(pre=True)
     def make_scenario(cls, values: Dict[str, str]) -> Dict[str, str]:
@@ -71,10 +64,10 @@ class FeatureTestContainer(BaseModel):
         blocks = content.split(_BLOCKS_DELIMITER)
         values["scenario"] = _BLOCKS_DELIMITER.join(blocks[1:])
 
-        if TestLanguageName.RUS in name:
-            lang = TestLanguageName.RUS
+        if OverhaveDemoAppLanguage.RU in name:
+            lang = OverhaveDemoAppLanguage.RU
         else:
-            lang = TestLanguageName.ENG
+            lang = OverhaveDemoAppLanguage.EN
         values["language"] = lang
         return values
 
@@ -86,7 +79,7 @@ class FeatureTestContainer(BaseModel):
         return self.project_path.relative_to(feature_type_dir).as_posix()
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
     feature_containers: List[FeatureTestContainer] = []
     for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():

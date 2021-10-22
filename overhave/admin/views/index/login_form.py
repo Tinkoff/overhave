@@ -2,11 +2,12 @@ import logging
 
 import flask
 from flask_wtf import FlaskForm as Form
+from pydantic import SecretStr
 from werkzeug import Response
 from wtforms import PasswordField, StringField, validators
 
-from overhave import db
-from overhave.entities.authorization.manager import IAdminAuthorizationManager
+from overhave.authorization import IAdminAuthorizationManager
+from overhave.entities import SystemUserModel
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,10 @@ class LoginForm(Form):
         super().__init__()
         self._auth_manager = auth_manager
 
-    def get_user(self) -> db.BaseUser:
-        authorized_user = self._auth_manager.authorize_user(username_field=self.username, password_field=self.password)
+    def get_user(self) -> SystemUserModel:
+        authorized_user = self._auth_manager.authorize_user(
+            username=self.username.data, password=SecretStr(self.password.data)
+        )
         if authorized_user is None:
             raise validators.ValidationError(_INVALID_AUTH_MSG.format(username=self.username.data))
         return authorized_user

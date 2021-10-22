@@ -11,17 +11,15 @@ class TokenizerClientSettings(BaseHttpClientSettings):
 
     enabled: bool = False
     url: Optional[URL] = None  # type: ignore
-    initiator: Optional[str] = None
+    initiator: str = "Overhave"
     remote_key: Optional[str] = None
     remote_key_name: Optional[str] = None
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_TOKENIZER_"
 
-    @validator("remote_key", "initiator", "remote_key_name")
+    @validator("url", "remote_key", "remote_key_name")
     def validate_remote_key_and_initiator(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
-        if values["enabled"] and not isinstance(v, str):
-            raise ValueError(
-                "Please verify REMOTE_KEY, REMOTE_KEY_NAME and INITIATOR! Maybe you've forgotten about this env!"
-            )
+        if values.get("enabled") and not isinstance(v, str):
+            raise ValueError("Please verify that url, remote_key and remote_key_name variables are not nullable!")
         return v

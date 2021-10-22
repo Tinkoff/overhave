@@ -2,16 +2,17 @@ from typing import List, cast
 
 import pytest
 from faker import Faker
+from pydantic import SecretStr
 from pytest_mock import MockFixture
-from wtforms import PasswordField, StringField
 
 from overhave import OverhaveAuthorizationSettings
-from overhave.entities.authorization.manager import (
+from overhave.authorization import (
     DefaultAdminAuthorizationManager,
     LDAPAdminAuthorizationManager,
     LDAPAuthenticator,
     SimpleAdminAuthorizationManager,
 )
+from overhave.storage import SystemUserGroupStorage, SystemUserStorage
 
 
 @pytest.fixture()
@@ -40,30 +41,38 @@ def test_auth_settings(test_admin_group: str) -> OverhaveAuthorizationSettings:
 
 @pytest.fixture()
 def test_ldap_auth_manager(
-    mocked_ldap_authenticator: LDAPAuthenticator, test_auth_settings: OverhaveAuthorizationSettings
+    test_system_user_storage: SystemUserStorage,
+    test_system_user_group_storage: SystemUserGroupStorage,
+    mocked_ldap_authenticator: LDAPAuthenticator,
+    test_auth_settings: OverhaveAuthorizationSettings,
 ) -> LDAPAdminAuthorizationManager:
-    return LDAPAdminAuthorizationManager(settings=test_auth_settings, ldap_authenticator=mocked_ldap_authenticator)
+    return LDAPAdminAuthorizationManager(
+        settings=test_auth_settings,
+        system_user_storage=test_system_user_storage,
+        system_user_group_storage=test_system_user_group_storage,
+        ldap_authenticator=mocked_ldap_authenticator,
+    )
 
 
 @pytest.fixture()
-def test_default_auth_manager(test_auth_settings: OverhaveAuthorizationSettings) -> DefaultAdminAuthorizationManager:
-    return DefaultAdminAuthorizationManager(settings=test_auth_settings)
+def test_default_auth_manager(
+    test_system_user_storage: SystemUserStorage, test_auth_settings: OverhaveAuthorizationSettings
+) -> DefaultAdminAuthorizationManager:
+    return DefaultAdminAuthorizationManager(settings=test_auth_settings, system_user_storage=test_system_user_storage)
 
 
 @pytest.fixture()
-def test_simple_auth_manager(test_auth_settings: OverhaveAuthorizationSettings) -> SimpleAdminAuthorizationManager:
-    return SimpleAdminAuthorizationManager(settings=test_auth_settings)
+def test_simple_auth_manager(
+    test_system_user_storage: SystemUserStorage, test_auth_settings: OverhaveAuthorizationSettings
+) -> SimpleAdminAuthorizationManager:
+    return SimpleAdminAuthorizationManager(settings=test_auth_settings, system_user_storage=test_system_user_storage)
 
 
 @pytest.fixture()
-def test_username(mocker: MockFixture, faker: Faker) -> StringField:
-    field = mocker.create_autospec(StringField)
-    field.data = faker.word()
-    return field
+def test_username(faker: Faker) -> str:
+    return faker.word()
 
 
 @pytest.fixture()
-def test_password(mocker: MockFixture, faker: Faker) -> PasswordField:
-    field = mocker.create_autospec(PasswordField)
-    field.data = faker.word()
-    return field
+def test_password(faker: Faker) -> SecretStr:
+    return SecretStr(faker.word())

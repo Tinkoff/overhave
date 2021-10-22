@@ -90,8 +90,8 @@ class ScenarioCompiler(PrefixMixin):
                     f"{self._compilation_settings.created_by_prefix} {context.feature.author}"
                     f"{blocks_delimiter}"
                     f"{self._compilation_settings.last_edited_by_prefix} {context.feature.last_edited_by}"
-                    f"{self._compilation_settings.last_edited_time_delimiter} "
-                    f"{context.test_run.start.strftime('%d-%m-%Y')}"
+                    f"{self._compilation_settings.time_delimiter} "
+                    f"{context.feature.last_edited_at.strftime(self._compilation_settings.time_format)}"
                     f"{blocks_delimiter}"
                     f"{self._compilation_settings.published_by_prefix} {context.test_run.executed_by}"
                 ),

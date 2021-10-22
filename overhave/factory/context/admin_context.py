@@ -1,17 +1,17 @@
 from typing import Optional
 
+from overhave.authorization import (
+    AuthorizationStrategy,
+    OverhaveAdminSettings,
+    OverhaveAuthorizationSettings,
+    OverhaveLdapClientSettings,
+)
 from overhave.entities import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
-)
-from overhave.entities.authorization import AuthorizationStrategy
-from overhave.entities.authorization.settings import (
-    OverhaveAdminSettings,
-    OverhaveAuthorizationSettings,
-    OverhaveLdapClientSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
@@ -33,8 +33,8 @@ class OverhaveAdminContext(BaseFactoryContext):
         language_settings: Optional[OverhaveLanguageSettings] = None,
         ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
         redis_settings: Optional[OverhaveRedisSettings] = None,
-        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
+        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
     ) -> None:

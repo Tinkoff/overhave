@@ -7,8 +7,7 @@ import flask
 import werkzeug
 
 from overhave import db
-from overhave.admin.flask import get_flask_admin, get_flask_app, get_flask_login_manager
-from overhave.db import DraftStatus
+from overhave.admin.flask import FlaskLoginManager, get_flask_admin, get_flask_app
 from overhave.factory import IAdminFactory, get_publication_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import UniqueDraftCreationError
@@ -63,7 +62,7 @@ def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
     )
     flask_app = get_flask_app(template_folder=template_dir.as_posix())
     flask_admin.init_app(app=flask_app)
-    login_manager = get_flask_login_manager()
+    login_manager = FlaskLoginManager(system_user_storage=factory.system_user_storage, login_view="login")
     login_manager.init_app(flask_app)
     db.ensure_feature_types_exist(factory.feature_extractor.feature_types)  # type: ignore
     return flask_app
@@ -79,7 +78,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     flask_app = _resolved_app(factory=factory, template_dir=template_dir)
     flask_app.config["FILES_DIR"] = files_dir
 
-    @flask_app.teardown_request  # type: ignore
+    @flask_app.teardown_request
     def remove_session(exception: typing.Optional[BaseException]) -> None:
         db.current_session.remove()
 
@@ -112,7 +111,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
         try:
             draft_id = factory.draft_storage.save_draft(
-                test_run_id=run_id, published_by=published_by, status=DraftStatus.REQUESTED
+                test_run_id=run_id, published_by=published_by, status=db.DraftStatus.REQUESTED
             )
         except UniqueDraftCreationError:
             logger.exception("Error while creation draft!")

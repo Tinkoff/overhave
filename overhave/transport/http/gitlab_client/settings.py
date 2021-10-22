@@ -8,7 +8,7 @@ class OverhaveGitlabClientSettings(BaseHttpClientSettings):
     """ Settings for :class:`GitlabHttpClient`. """
 
     auth_token: Optional[str] = None
-    token_type: TokenType
+    token_type: TokenType = TokenType.OAUTH
 
     class Config:
         env_prefix = "OVERHAVE_GITLAB_"

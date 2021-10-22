@@ -18,7 +18,8 @@ class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
     last_edited_by_prefix: str = "last edited by"
     published_by_prefix: str = "published by"
 
-    last_edited_time_delimiter: str = ","
+    time_delimiter: str = ","
+    time_format: str = "%d-%m-%Y %H:%M:%S"
     blocks_delimiter: str = "|"
 
 

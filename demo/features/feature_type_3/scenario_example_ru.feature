@@ -1,5 +1,6 @@
 @feature_type_3
 Функция: Что умеет ассистент
+# created by admin | last edited by admin, 10-10-2021 11:00:00 | published by admin
 
 Предыстория:
   Дано Я клиент банка
