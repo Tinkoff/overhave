@@ -83,7 +83,7 @@ class ScenarioParser(PrefixMixin):
 
     @staticmethod
     def _get_additional_info(additional_line: str, left_pointer: str, right_pointer: str) -> str:
-        result = re.search(rf"({left_pointer})+\s?\w+\s?({right_pointer})+", additional_line)
+        result = re.search(rf"({left_pointer})+\s?[\w.]+\s?({right_pointer})+", additional_line)
         if result:
             return result.group(0).removeprefix(left_pointer).removesuffix(right_pointer).strip()
         raise AdditionalInfoParsingError("Could not parse additional info from '%s'!", additional_line)
