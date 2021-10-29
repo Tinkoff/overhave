@@ -23,11 +23,13 @@ from overhave.factory import ConsumerFactory as OverhaveConsumerFactory
 from overhave.factory import IAdminFactory as OverhaveAdminFactory
 from overhave.factory import IEmulationFactory as OverhaveEmulationFactory
 from overhave.factory import IPublicationFactory as OverhavePublicationFactory
+from overhave.factory import ISynchronizerFactory as OverhaveSynchronizerFactory
 from overhave.factory import ITestExecutionFactory as OverhaveTestExecutionFactory
 from overhave.factory import (
     OverhaveAdminContext,
     OverhaveEmulationContext,
     OverhavePublicationContext,
+    OverhaveSynchronizerContext,
     OverhaveTestExecutionContext,
 )
 from overhave.factory import get_admin_factory as overhave_admin_factory
