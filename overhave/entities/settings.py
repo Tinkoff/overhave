@@ -1,6 +1,7 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
+from flask_admin.contrib.sqla import ModelView
 from pydantic import root_validator, validator
 from pydantic.datetime_parse import timedelta
 from yarl import URL
@@ -15,9 +16,11 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     # Path to custom index template. By default, contains Overhave project info.
     index_template_path: Optional[Path]
 
+    # Custom SQLAlchemy ModelViews for Overhave admin panel
+    custom_views: Optional[Sequence[ModelView]]
+
     # Enable testing with test execution consumer, based on Redis tasks. Enabled by default.
     # When disabled - all test runs will be executed with :class:`Threadpool`.
-    # TODO: realise all other consumer actions with Threadpool for better customization.
     consumer_based: bool = True
 
     # Threadpool size for admin service
