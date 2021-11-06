@@ -1,25 +1,9 @@
-from pathlib import Path
 from typing import Optional
 
 from pydantic.datetime_parse import timedelta
 
 from overhave.authorization.strategies import AuthorizationStrategy
 from overhave.base_settings import BaseOverhavePrefix
-
-
-class OverhaveAdminSettings(BaseOverhavePrefix):
-    """ Settings for Overhave Flask Admin customization. """
-
-    # Path to custom index template. By default, contains Overhave project info.
-    index_template_path: Optional[Path]
-
-    # Enable testing with test execution consumer, based on Redis tasks. Enabled by default.
-    # When disabled - all test runs will be executed with :class:`Threadpool`.
-    # TODO: realise all other consumer actions with Threadpool for better customization.
-    consumer_based: bool = True
-
-    # Threadpool size for admin service
-    threadpool_process_num: int = 5
 
 
 class OverhaveAuthorizationSettings(BaseOverhavePrefix):

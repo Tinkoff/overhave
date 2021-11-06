@@ -1,12 +1,8 @@
 from typing import Optional
 
-from overhave.authorization import (
-    AuthorizationStrategy,
-    OverhaveAdminSettings,
-    OverhaveAuthorizationSettings,
-    OverhaveLdapClientSettings,
-)
+from overhave.authorization import AuthorizationStrategy, OverhaveAuthorizationSettings, OverhaveLdapClientSettings
 from overhave.entities import (
+    OverhaveAdminSettings,
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,

@@ -29,39 +29,8 @@ def _prepare_factory(factory: IAdminFactory) -> None:
 
 def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
     """ Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`. """
-    from overhave.admin.views import (
-        DraftView,
-        EmulationRunView,
-        EmulationView,
-        FeatureView,
-        GroupView,
-        OverhaveIndexView,
-        TagsView,
-        TestRunView,
-        TestUserView,
-        UserView,
-    )
-
-    index_view = OverhaveIndexView(
-        name="Info",
-        url="/",
-        auth_manager=factory.auth_manager,
-        index_template_path=factory.context.admin_settings.index_template_path,
-    )
-    flask_admin = get_flask_admin(index_view=index_view)
-    flask_admin.add_views(
-        FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
-        TestRunView(db.TestRun, db.current_session, category="Scenarios", name="Test runs"),
-        DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
-        TagsView(db.Tags, db.current_session, category="Scenarios", name="Tags"),
-        EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),
-        TestUserView(db.TestUser, db.current_session, category="Emulation", name="Test users"),
-        EmulationRunView(db.EmulationRun, db.current_session, category="Emulation", name="Emulation runs"),
-        UserView(db.UserRole, db.current_session, category="Access", name="Users"),
-        GroupView(db.GroupRole, db.current_session, category="Access", name="Groups"),
-    )
     flask_app = get_flask_app(template_folder=template_dir.as_posix())
-    flask_admin.init_app(app=flask_app)
+    get_flask_admin(factory).init_app(app=flask_app)
     login_manager = FlaskLoginManager(system_user_storage=factory.system_user_storage, login_view="login")
     login_manager.init_app(flask_app)
     db.ensure_feature_types_exist(factory.feature_extractor.feature_types)  # type: ignore

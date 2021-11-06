@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "overhave"
-version = "2.6.1"
+version = "2.6.2"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
     "Vladislav Mukhamatnurov <livestreamepidemz@yandex.ru>",
-    "Tinkoff Dialog System Backend Team <bds-dev@tinkoff.ru>"
+    "Tinkoff Backend Dialog System Team <bds-dev@tinkoff.ru>"
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
