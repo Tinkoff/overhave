@@ -11,7 +11,7 @@ from overhave.storage.emulation_storage import EmulationStorage, NotFoundEmulati
 
 @pytest.mark.usefixtures("database")
 class TestEmulationStorage:
-    """ Integration tests for :class:`EmulationStorage`. """
+    """Integration tests for :class:`EmulationStorage`."""
 
     def test_raise_exception_for_not_existing_id(self, test_emulation_storage: EmulationStorage, faker: Faker) -> None:
         with pytest.raises(NotFoundEmulationError):

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class FlaskLoginManager(LoginManager):
-    """ Custom Flask LoginManager for user acknowledgement. """
+    """Custom Flask LoginManager for user acknowledgement."""
 
     def __init__(self, system_user_storage: ISystemUserStorage, login_view: str) -> None:
         super().__init__()

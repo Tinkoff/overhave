@@ -15,15 +15,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseStepCollectorException(Exception):
-    """ Base exception for :class:`StepCollector`. """
+    """Base exception for :class:`StepCollector`."""
 
 
 class BddStepWithoutDocsError(BaseStepCollectorException):
-    """ Error for situation when pytest_bdd steps declared without docstring. """
+    """Error for situation when pytest_bdd steps declared without docstring."""
 
 
 class StepCollector:
-    """ Class for `pytest-bdd` steps dynamic collection. """
+    """Class for `pytest-bdd` steps dynamic collection."""
 
     def __init__(self, step_prefixes: Optional[StepPrefixesModel]) -> None:
         self._step_prefixes = step_prefixes

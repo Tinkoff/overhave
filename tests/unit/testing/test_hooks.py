@@ -37,7 +37,7 @@ from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 @pytest.mark.usefixtures("clear_get_step_context_runner")
 class TestPytestBddHooks:
-    """ Unit tests for pytest-bdd wrapped hooks. """
+    """Unit tests for pytest-bdd wrapped hooks."""
 
     def test_pytest_bdd_before_step(
         self,
@@ -138,7 +138,7 @@ class TestPytestBddHooks:
 
 
 class TestPytestCommonHooks:
-    """ Unit tests for pytest wrapped hooks. """
+    """Unit tests for pytest wrapped hooks."""
 
     def test_pytest_addoption(self, test_pytest_parser: Parser) -> None:
         pytest_addoption(test_pytest_parser)
@@ -179,7 +179,9 @@ class TestPytestCommonHooks:
         assert patched_hook_test_execution_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize(
-        "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True,
+        "getoption_mapping",
+        [{_OptionName.ENABLE_INJECTION.as_variable: False}],
+        indirect=True,
     )
     def test_pytest_configure_disabled_injection(
         self,
@@ -215,8 +217,7 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
         assert (
-            test_pytest_bdd_item._obj.__allure_display_name__  # type: ignore
-            == get_scenario(test_pytest_bdd_item).name
+            test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name  # type: ignore
         )
 
         if links_keyword is None:

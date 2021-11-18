@@ -5,15 +5,15 @@ from overhave.entities.settings import OverhaveFileSettings
 
 
 class BaseArchiveManagerException(Exception):
-    """ Base exception for :class:`ArchiveManager`. """
+    """Base exception for :class:`ArchiveManager`."""
 
 
 class IncorrectExtensionError(BaseArchiveManagerException):
-    """ Exception for situation with specifing incorrect file extension for unpacking. """
+    """Exception for situation with specifing incorrect file extension for unpacking."""
 
 
 class ArchiveManager:
-    """ Class for files archiving management. """
+    """Class for files archiving management."""
 
     def __init__(self, file_settings: OverhaveFileSettings):
         self._file_settings = file_settings

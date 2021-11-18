@@ -6,7 +6,7 @@ from overhave.transport import GitlabMrCreationResponse
 
 
 class TestGitlabHttpClientModels:
-    """ Unit tests for :class:`GitlabHttpClient` models. """
+    """Unit tests for :class:`GitlabHttpClient` models."""
 
     def test_mr_creation_response(self) -> None:
         response: GitlabMrCreationResponse = GitlabMrCreationResponse.parse_obj(

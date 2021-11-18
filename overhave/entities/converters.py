@@ -25,7 +25,7 @@ from overhave.entities.feature import FeatureTypeName
 
 
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
-    """ Model for :class:`UserRole`. """
+    """Model for :class:`UserRole`."""
 
     id: int
     login: str
@@ -52,14 +52,14 @@ class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
 
 
 class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
-    """ Model for :class:`FeatureType` row. """
+    """Model for :class:`FeatureType` row."""
 
     id: int
     name: FeatureTypeName
 
 
 class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
-    """ Model for :class:`Tags` row. """
+    """Model for :class:`Tags` row."""
 
     id: int
     value: str
@@ -67,7 +67,7 @@ class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
 
 
 class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
-    """ Model for :class:`Feature` row. """
+    """Model for :class:`Feature` row."""
 
     id: int
     name: str
@@ -84,7 +84,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
 
 
 class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
-    """ Model for :class:`Scenario` row. """
+    """Model for :class:`Scenario` row."""
 
     id: int
     text: str
@@ -92,7 +92,7 @@ class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
 
 
 class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
-    """ Model for :class:`TestRun` row. """
+    """Model for :class:`TestRun` row."""
 
     __test__ = False
 
@@ -110,7 +110,7 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
 
 
 class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
-    """ Model for :class:`Draft` row. """
+    """Model for :class:`Draft` row."""
 
     id: int
     feature_id: int
@@ -123,7 +123,7 @@ class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
 
 
 class TestExecutorContext(BaseModel):
-    """ Context model for test execution. """
+    """Context model for test execution."""
 
     __test__ = False
 
@@ -133,25 +133,25 @@ class TestExecutorContext(BaseModel):
 
 
 class PublisherContext(TestExecutorContext):
-    """ Context model for version publishing. """
+    """Context model for version publishing."""
 
     draft: DraftModel
     target_branch: str
 
 
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
-    """ Model for :class:`TestUser` row. """
+    """Model for :class:`TestUser` row."""
 
     feature_type: FeatureTypeModel
 
 
 class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
-    """ Model for :class:`Emulation` row. """
+    """Model for :class:`Emulation` row."""
 
     test_user: TestUserModel
 
 
 class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
-    """ Model for :class:`EmulationRun` row. """
+    """Model for :class:`EmulationRun` row."""
 
     emulation: EmulationModel

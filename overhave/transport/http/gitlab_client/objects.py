@@ -2,7 +2,7 @@ import enum
 
 
 class TokenType(enum.Enum):
-    """ Enum for token types you want. """
+    """Enum for token types you want."""
 
     OAUTH = "oauth"
     PRIVATE = "private"

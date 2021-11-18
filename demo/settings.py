@@ -21,14 +21,14 @@ from overhave.transport import OverhaveGitlabClientSettings
 
 
 class OverhaveDemoAppLanguage(str, enum.Enum):
-    """ Enum for choice of Overhave demo application language. """
+    """Enum for choice of Overhave demo application language."""
 
     RU = "ru"
     EN = "en"
 
 
 class OverhaveDemoSettingsGenerator:
-    """ Settings for application demo mode configuration. """
+    """Settings for application demo mode configuration."""
 
     def __init__(self, language: OverhaveDemoAppLanguage, threadpool: bool):
         self._root_dir: Path = Path(__file__).parent
@@ -42,7 +42,8 @@ class OverhaveDemoSettingsGenerator:
         else:
             language_settings = OverhaveLanguageSettings()
         return dict(
-            language_settings=language_settings, file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
+            language_settings=language_settings,
+            file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
         )
 
     @cached_property

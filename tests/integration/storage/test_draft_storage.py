@@ -12,7 +12,7 @@ from overhave.storage.draft_storage import DraftStorage, NullableDraftsError, Un
 
 @pytest.mark.usefixtures("database")
 class TestDraftStorage:
-    """ Integration tests for :class:`DraftStorage`. """
+    """Integration tests for :class:`DraftStorage`."""
 
     def test_get_none_if_not_existing_id(self, test_draft_storage: DraftStorage, faker: Faker) -> None:
         assert test_draft_storage.get_draft(faker.random_int()) is None

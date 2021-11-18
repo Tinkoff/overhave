@@ -14,7 +14,7 @@ from tests.unit.feature.conftest import get_incorrect_test_file_settings
 
 
 class TestFeatureExtractor:
-    """ Unit tests for :class:`FeatureExtractor`. """
+    """Unit tests for :class:`FeatureExtractor`."""
 
     @pytest.mark.parametrize("test_file_settings", [get_incorrect_test_file_settings()], indirect=True)
     def test_feature_type_extraction_error(self, test_file_settings: OverhaveFileSettings) -> None:

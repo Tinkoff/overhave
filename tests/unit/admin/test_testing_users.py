@@ -12,7 +12,7 @@ from overhave.admin.views.testing_users import TestUserView
     "test_mock_patch_user_directory", ["overhave.admin.views.testing_users.current_user"], indirect=True
 )
 class TestTestingUsers:
-    """ Unit tests for View. """
+    """Unit tests for View."""
 
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_admin_delete_testing_users(

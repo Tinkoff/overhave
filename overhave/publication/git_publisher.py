@@ -12,23 +12,23 @@ logger = logging.getLogger(__name__)
 
 
 class BaseGitVersionPublisherError(BaseVersionPublisherException):
-    """ Base exception for git version publisher. """
+    """Base exception for git version publisher."""
 
 
 class CurrentBranchEqualToDefaultError(BaseGitVersionPublisherError):
-    """ Exception for situation when current branch is equal to default branch. """
+    """Exception for situation when current branch is equal to default branch."""
 
 
 class CurrentBranchNotEqualToTargetError(BaseGitVersionPublisherError):
-    """ Exception for situation when current branch is not equal to target branch. """
+    """Exception for situation when current branch is not equal to target branch."""
 
 
 class CommitNotCreatedError(BaseGitVersionPublisherError):
-    """ Exception for situation with not created commit. """
+    """Exception for situation with not created commit."""
 
 
 class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, abc.ABC):
-    """ Class for feature version's management, based on git. """
+    """Class for feature version's management, based on git."""
 
     @staticmethod
     def _create_head(name: str, repository: git.Repo) -> git.SymbolicReference:

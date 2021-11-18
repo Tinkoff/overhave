@@ -5,7 +5,7 @@ from overhave import db
 
 
 class ISystemUserGroupStorage(abc.ABC):
-    """ Abstract class for system user storage. """
+    """Abstract class for system user storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -14,7 +14,7 @@ class ISystemUserGroupStorage(abc.ABC):
 
 
 class SystemUserGroupStorage(ISystemUserGroupStorage):
-    """ Class for system user storage. """
+    """Class for system user storage."""
 
     @staticmethod
     def has_any_group(user_groups: List[str]) -> bool:

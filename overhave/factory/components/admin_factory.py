@@ -20,7 +20,7 @@ from overhave.transport import EmulationTask, PublicationTask, RedisProducer, Re
 
 
 class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
-    """ Factory interface for Overhave admin application. """
+    """Factory interface for Overhave admin application."""
 
     @property
     @abc.abstractmethod
@@ -49,7 +49,7 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
 
 
 class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory):
-    """ Factory for Overhave admin application. """
+    """Factory for Overhave admin application."""
 
     context_cls = OverhaveAdminContext
 

@@ -15,7 +15,7 @@ from overhave.transport import (
 
 
 class ConsumerFactory:
-    """ Factory for :class:`RedisConsumer`, :class:`RedisConsumerRunner` and tasks mapping. """
+    """Factory for :class:`RedisConsumer`, :class:`RedisConsumerRunner` and tasks mapping."""
 
     def __init__(self, stream: RedisStream):
         self._stream = stream
@@ -43,4 +43,6 @@ class ConsumerFactory:
         factory = get_test_execution_factory()
         proxy_manager = get_proxy_manager()
         proxy_manager.set_factory(factory)
-        return partial(factory.process_task,)
+        return partial(
+            factory.process_task,
+        )

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class FeatureExtractor(IFeatureExtractor):
-    """ Class for specified project's feature types resolution. """
+    """Class for specified project's feature types resolution."""
 
     def __init__(self, file_settings: OverhaveFileSettings):
         self._file_settings = file_settings

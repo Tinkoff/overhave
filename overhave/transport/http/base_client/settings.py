@@ -8,7 +8,7 @@ from overhave.utils import make_url
 
 
 class BaseHttpClientSettings(BaseSettings):
-    """ Base settings for :class:`BaseHttpClient`. """
+    """Base settings for :class:`BaseHttpClient`."""
 
     url: URL
 

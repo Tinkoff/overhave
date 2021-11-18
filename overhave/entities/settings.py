@@ -11,7 +11,7 @@ from overhave.entities.language import StepPrefixesModel
 
 
 class OverhaveAdminSettings(BaseOverhavePrefix):
-    """ Settings for Overhave Flask Admin customization. """
+    """Settings for Overhave Flask Admin customization."""
 
     # Path to custom index template. By default, contains Overhave project info.
     index_template_path: Optional[Path]
@@ -28,7 +28,7 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
 
 
 class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
-    """ Settings for scenario compiling and parsing. """
+    """Settings for scenario compiling and parsing."""
 
     tag_prefix: str = "@"
     id_prefix: str = "ID:"
@@ -42,13 +42,13 @@ class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
 
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
-    """ Settings for language definitions. """
+    """Settings for language definitions."""
 
     step_prefixes: Optional[StepPrefixesModel]
 
 
 class OverhaveFileSettings(BaseOverhavePrefix):
-    """ Settings for scenario file savings. """
+    """Settings for scenario file savings."""
 
     feature_suffix: str = ".feature"
     fixture_suffix: str = ".py"
@@ -108,7 +108,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
 
 
 class OverhaveReportManagerSettings(BaseOverhavePrefix):
-    """ Settings for :class:`ReportManager`. """
+    """Settings for :class:`ReportManager`."""
 
     report_creation_timeout: int = 120  # sec
     report_creation_error_msg: str = "not_created"
@@ -117,13 +117,13 @@ class OverhaveReportManagerSettings(BaseOverhavePrefix):
 
 
 class ProcessorSettings(BaseOverhavePrefix):
-    """ Settings for :class:`Processor`. """
+    """Settings for :class:`Processor`."""
 
     processes_num: int = 5
 
 
 class OverhaveRedisSettings(BaseOverhavePrefix):
-    """ Settings for Redis entities, which use for work with different framework tasks. """
+    """Settings for Redis entities, which use for work with different framework tasks."""
 
     redis_url: URL = URL("redis://localhost:6379")
     redis_db: int = 0
@@ -142,7 +142,7 @@ class OverhaveRedisSettings(BaseOverhavePrefix):
 
 
 class OverhaveEmulationSettings(BaseOverhavePrefix):
-    """ Settings for Overhave Emulator, which emulates session with test user. """
+    """Settings for Overhave Emulator, which emulates session with test user."""
 
     # Path for emulation core application, such as GoTTY
     emulation_core_path: str = "/gotty"
@@ -202,13 +202,13 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
 
 
 class OverhaveStepContextSettings(BaseOverhavePrefix):
-    """ Settings for :class:`StepContextRunner`. """
+    """Settings for :class:`StepContextRunner`."""
 
     step_context_logs: bool = False
 
 
 class OverhaveDescriptionManagerSettings(BaseOverhavePrefix):
-    """ Settings for DescriptionManager, which sets the description to Allure report dynamically after test. """
+    """Settings for DescriptionManager, which sets the description to Allure report dynamically after test."""
 
     blocks_delimiter: str = ""
     html: bool = True

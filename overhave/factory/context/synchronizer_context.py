@@ -6,7 +6,7 @@ from overhave.test_execution import OverhaveProjectSettings
 
 
 class OverhaveSynchronizerContext(BaseFactoryContext):
-    """ Overhave feature synchronizer context, based on application BaseSettings.
+    """Overhave feature synchronizer context, based on application BaseSettings.
 
     This context defines how Overhave admin will work.
     """

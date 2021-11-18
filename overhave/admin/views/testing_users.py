@@ -20,7 +20,7 @@ def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str
 
 
 class TestUserView(ModelViewConfigured):
-    """ View for :class:`TestUser` table. """
+    """View for :class:`TestUser` table."""
 
     __test__ = False
 

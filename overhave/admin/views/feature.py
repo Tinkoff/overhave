@@ -29,7 +29,7 @@ _SCENARIO_PREFIX = "scenario-0"
 
 
 class ScenarioTextWidget(HiddenInput):
-    """ Widget to override scenario view. """
+    """Widget to override scenario view."""
 
     def __call__(self, field: Field, **kwargs: Any) -> Any:
         widget_name = type(self).__name__
@@ -40,20 +40,20 @@ class ScenarioTextWidget(HiddenInput):
 
 
 class ScenarioTextAreaField(TextAreaField):
-    """ Field to override scenario view. """
+    """Field to override scenario view."""
 
     widget = ScenarioTextWidget()
 
 
 class ScenarioInlineModelForm(InlineFormAdmin):
-    """ Form to override scenario view. """
+    """Form to override scenario view."""
 
     form_overrides = dict(text=ScenarioTextAreaField)
     form_excluded_columns = ("created_at", "test_runs")
 
 
 class FactoryViewUtilsMixin:
-    """ Mixin for :class:`FeatureView`. Extra methods for working with cached instance of :class:`IAdminFactory`. """
+    """Mixin for :class:`FeatureView`. Extra methods for working with cached instance of :class:`IAdminFactory`."""
 
     _task_pattern = re.compile(r"\w+[-]\d+")
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
@@ -114,7 +114,7 @@ class FactoryViewUtilsMixin:
 
 
 class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
-    """ View for :class:`Feature` table. """
+    """View for :class:`Feature` table."""
 
     can_view_details = False
 

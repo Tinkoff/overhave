@@ -21,7 +21,7 @@ def _create_user_groups(db_groups: Sequence[str]) -> None:
 
 @pytest.mark.usefixtures("database")
 class TestLdapAuthManager:
-    """ Integration tests for :class:`LDAPAdminAuthorizationManager`. """
+    """Integration tests for :class:`LDAPAdminAuthorizationManager`."""
 
     def test_authorize_user_no_groups(
         self,
@@ -100,10 +100,13 @@ class TestLdapAuthManager:
 
 @pytest.mark.usefixtures("database")
 class TestDefaultAuthManager:
-    """ Integration tests for :class:`DefaultAdminAuthorizationManager`. """
+    """Integration tests for :class:`DefaultAdminAuthorizationManager`."""
 
     def test_authorize_user_no_user(
-        self, test_default_auth_manager: DefaultAdminAuthorizationManager, test_username: str, test_password: SecretStr,
+        self,
+        test_default_auth_manager: DefaultAdminAuthorizationManager,
+        test_username: str,
+        test_password: SecretStr,
     ) -> None:
         assert test_default_auth_manager.authorize_user(username=test_username, password=test_password) is None
 
@@ -127,10 +130,13 @@ class TestDefaultAuthManager:
 
 @pytest.mark.usefixtures("database")
 class TestSimpleAuthManager:
-    """ Integration tests for :class:`SimpleAdminAuthorizationManager`. """
+    """Integration tests for :class:`SimpleAdminAuthorizationManager`."""
 
     def test_authorize_user_no_user(
-        self, test_simple_auth_manager: SimpleAdminAuthorizationManager, test_username: str, test_password: SecretStr,
+        self,
+        test_simple_auth_manager: SimpleAdminAuthorizationManager,
+        test_username: str,
+        test_password: SecretStr,
     ) -> None:
         user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None

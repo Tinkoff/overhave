@@ -17,7 +17,7 @@ def _create_all(config: Config) -> None:
 @click.command(short_help="Create all metadata tables")
 @click.pass_obj
 def create_all(config: Config) -> None:
-    """ Create all metadata tables. """
+    """Create all metadata tables."""
     _create_all(config)
 
 
@@ -36,7 +36,7 @@ def _drop_all(config: Config) -> None:
 @click.command(short_help="Drop all metadata tables, attributes, schema")
 @click.pass_obj
 def drop_all(config: Config) -> None:
-    """ Drop all metadata tables, attributes, schema. """
+    """Drop all metadata tables, attributes, schema."""
     click.confirm("Does it really need?", abort=True)
     _drop_all(config)
 
@@ -51,7 +51,7 @@ def _ensure_database_exists(db_url: URL) -> None:
 
 
 def set_config_to_context(context: click.Context, settings: DataBaseSettings) -> None:
-    """ Set Alembic config to Click context for easy operations and migrations ability. """
+    """Set Alembic config to Click context for easy operations and migrations ability."""
     _ensure_database_exists(settings.db_url)
     settings.setup_db()
     config = Config()

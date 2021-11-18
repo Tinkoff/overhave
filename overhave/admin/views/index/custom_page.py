@@ -8,7 +8,7 @@ from wtforms import Field
 
 
 class CustomPageWidget(XEditableWidget):
-    """ Customising widget.
+    """Customising widget.
 
     Widget content is filled with content from specified
     ``self.template_path```.
@@ -34,13 +34,13 @@ class CustomPageWidget(XEditableWidget):
 
 
 class CustomPageField(Field):
-    """ Field for custom page widget. """
+    """Field for custom page widget."""
 
     widget = CustomPageWidget()
 
 
 class CustomPageForm(BaseForm):
-    """ Form for custom page. """
+    """Form for custom page."""
 
     type = CustomPageField()
 

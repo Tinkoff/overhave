@@ -2,7 +2,7 @@ import enum
 
 
 class TestRunStatus(str, enum.Enum):
-    """ Enum for test run statuses. """
+    """Enum for test run statuses."""
 
     __test__ = False
 
@@ -18,7 +18,7 @@ class TestRunStatus(str, enum.Enum):
 
 
 class TestReportStatus(str, enum.Enum):
-    """ Enum for test run statuses. """
+    """Enum for test run statuses."""
 
     __test__ = False
 
@@ -33,7 +33,7 @@ class TestReportStatus(str, enum.Enum):
 
 
 class EmulationStatus(str, enum.Enum):
-    """ Enum for emulation statuses. """
+    """Enum for emulation statuses."""
 
     CREATED = "CREATED"
     REQUESTED = "REQUESTED"
@@ -46,7 +46,7 @@ class EmulationStatus(str, enum.Enum):
 
 
 class DraftStatus(str, enum.Enum):
-    """ Enum for draft statuses. """
+    """Enum for draft statuses."""
 
     REQUESTED = "REQUESTED"
     CREATING = "CREATING"

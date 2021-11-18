@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings]):
-    """ Class for feature version's pull requests management relative to Atlassian Stash API. """
+    """Class for feature version's pull requests management relative to Atlassian Stash API."""
 
     def __init__(
         self,

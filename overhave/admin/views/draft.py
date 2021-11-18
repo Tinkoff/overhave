@@ -6,7 +6,7 @@ from overhave.db import Role
 
 
 class DraftView(ModelViewProtected):
-    """ View for :class:`Draft` table. """
+    """View for :class:`Draft` table."""
 
     details_template = "draft_detail.html"
     can_delete = True

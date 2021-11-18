@@ -8,7 +8,7 @@ from overhave.pytest_plugin import DescriptionManager
 
 @pytest.mark.parametrize("enable_html", [True, False])
 class TestDescriptionManager:
-    """ Unit tests for DescriptionManager. """
+    """Unit tests for DescriptionManager."""
 
     def test_add_description(self, test_description_manager: DescriptionManager, faker: Faker) -> None:
         assert not test_description_manager._description

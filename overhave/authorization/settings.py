@@ -7,7 +7,7 @@ from overhave.base_settings import BaseOverhavePrefix
 
 
 class OverhaveAuthorizationSettings(BaseOverhavePrefix):
-    """ Settings for Overhave authorization in components interface.
+    """Settings for Overhave authorization in components interface.
 
     Supports 3 strategies: SIMPLE, DEFAULT and LDAP.
     LDAP authorization uses group politics with administration group `admin_group`.
@@ -19,7 +19,7 @@ class OverhaveAuthorizationSettings(BaseOverhavePrefix):
 
 
 class OverhaveLdapClientSettings(BaseOverhavePrefix):
-    """ Settings for Overhave LDAP client for AuthorizationStrategy.LDAP strategy. """
+    """Settings for Overhave LDAP client for AuthorizationStrategy.LDAP strategy."""
 
     ldap_url: str  # for example: "ldap://mydomain.ru"
     ldap_domain: str  # for example: "domain\\"

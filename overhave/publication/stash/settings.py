@@ -6,11 +6,11 @@ from overhave.transport import StashBranch, StashProject, StashRepository, Stash
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
-    """ Exception for not specified reviewers relative to feature type. """
+    """Exception for not specified reviewers relative to feature type."""
 
 
 class OverhaveStashPublisherSettings(BaseGitPublisherSettings):
-    """ Settings for :class:`StashVersionPublisher`.
+    """Settings for :class:`StashVersionPublisher`.
 
     This is a representation of BitBucket project parameters.
     Some pull-request parameters are also could be defined through these settings.

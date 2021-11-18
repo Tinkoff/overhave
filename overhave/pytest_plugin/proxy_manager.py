@@ -10,7 +10,7 @@ AnyProxyFactory = Union[IAdminFactory, ITestExecutionFactory]
 
 
 class IProxyManager(abc.ABC):
-    """ Abstract class for proxy manager. """
+    """Abstract class for proxy manager."""
 
     @property
     @abc.abstractmethod
@@ -60,19 +60,19 @@ class IProxyManager(abc.ABC):
 
 
 class BaseProxyManagerException(Exception):
-    """ Base exception for :class:`ProxyManager`. """
+    """Base exception for :class:`ProxyManager`."""
 
 
 class FactoryAlreadyDefinedError(BaseProxyManagerException):
-    """ Exception for situation with already defined `factory`. """
+    """Exception for situation with already defined `factory`."""
 
 
 class FactoryNotDefinedError(BaseProxyManagerException):
-    """ Exception for situation with not defined `factory`. """
+    """Exception for situation with not defined `factory`."""
 
 
 class ProxyManager(IProxyManager):
-    """ Manager for application factory resolution and usage, based on proxy-object pattern. """
+    """Manager for application factory resolution and usage, based on proxy-object pattern."""
 
     def __init__(self) -> None:
         self._factory: Optional[AnyProxyFactory] = None

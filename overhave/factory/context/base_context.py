@@ -14,15 +14,15 @@ from overhave.transport import OverhaveS3ManagerSettings
 
 
 class BaseFactoryContextException(Exception):
-    """ Base exception for :class:`BaseFactoryContext`. """
+    """Base exception for :class:`BaseFactoryContext`."""
 
 
 class NotDefinedSettingsError(BaseFactoryContextException):
-    """ Exception for situation with not defined specific settings. """
+    """Exception for situation with not defined specific settings."""
 
 
 class BaseFactoryContext:
-    """ Base class for factory context. """
+    """Base class for factory context."""
 
     def __init__(
         self,

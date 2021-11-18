@@ -20,7 +20,7 @@ def generate_tags_list(context: TestExecutorContext) -> Optional[List[str]]:
 
 
 class ScenarioCompiler(PrefixMixin):
-    """ Class for scenario compilation from text view into pytest_bdd feature format. """
+    """Class for scenario compilation from text view into pytest_bdd feature format."""
 
     def __init__(
         self,

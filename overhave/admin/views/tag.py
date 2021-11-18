@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class TagsView(ModelViewConfigured):
-    """ View for :class:`Tags` table. """
+    """View for :class:`Tags` table."""
 
     can_view_details = False
 

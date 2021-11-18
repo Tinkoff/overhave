@@ -12,14 +12,14 @@ from sqlalchemy.pool import SingletonThreadPool
 
 
 class BaseOverhavePrefix(BaseSettings):
-    """ Possibility to change Overhave default settings from environment. """
+    """Possibility to change Overhave default settings from environment."""
 
     class Config:
         env_prefix = "OVERHAVE_"
 
 
 class SAUrl(URL):
-    """ Custom SQLAlchemy URL for Pydantic BaseSettings validation. """
+    """Custom SQLAlchemy URL for Pydantic BaseSettings validation."""
 
     @classmethod
     def __get_validators__(cls):  # type: ignore
@@ -34,7 +34,7 @@ class SAUrl(URL):
 
 
 class DataBaseSettings(BaseOverhavePrefix):
-    """ Overhave database settings. """
+    """Overhave database settings."""
 
     db_url: SAUrl = Field(SAUrl.validate("postgresql://postgres:postgres@localhost/overhave"))
     db_pool_recycle: int = 500
@@ -66,7 +66,7 @@ class DataBaseSettings(BaseOverhavePrefix):
 
 
 class LoggingSettings(BaseOverhavePrefix):
-    """ Overhave logging settings. """
+    """Overhave logging settings."""
 
     log_level: str = logging.getLevelName(logging.INFO)
     log_config: Dict[str, Any] = {}

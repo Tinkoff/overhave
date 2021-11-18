@@ -10,19 +10,19 @@ logger = logging.getLogger(__name__)
 
 
 class BaseFeatureStorageException(Exception):
-    """ Base exception for :class:`FeatureStorage`. """
+    """Base exception for :class:`FeatureStorage`."""
 
 
 class FeatureNotExistsError(BaseFeatureStorageException):
-    """ Error for situation when feature not found. """
+    """Error for situation when feature not found."""
 
 
 class FeatureTagNotExistsError(BaseFeatureStorageException):
-    """ Error for situation when tag not found. """
+    """Error for situation when tag not found."""
 
 
 class IFeatureStorage(abc.ABC):
-    """ Abstract class for feature storage. """
+    """Abstract class for feature storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -41,7 +41,7 @@ class IFeatureStorage(abc.ABC):
 
 
 class FeatureStorage(IFeatureStorage):
-    """ Class for feature storage. """
+    """Class for feature storage."""
 
     def __init__(self, tag_storage: IFeatureTagStorage):
         self._tag_storage = tag_storage

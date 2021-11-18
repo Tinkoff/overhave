@@ -8,7 +8,7 @@ StepTypeName = NewType("StepTypeName", str)
 
 
 class BddStepModel(BaseModel):
-    """ Model for pytest_bdd step in Overhave. """
+    """Model for pytest_bdd step in Overhave."""
 
     type: StepTypeName
     name: str

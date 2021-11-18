@@ -5,7 +5,7 @@ from overhave.transport import OverhaveS3ManagerSettings
 
 
 class TestS3ManagerSettings:
-    """ Unit tests for :class:`OverhaveS3ManagerSettings`. """
+    """Unit tests for :class:`OverhaveS3ManagerSettings`."""
 
     @pytest.mark.parametrize("test_s3_enabled", [False])
     def test_disabled(self, test_s3_enabled: bool) -> None:

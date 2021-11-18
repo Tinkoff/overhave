@@ -27,7 +27,7 @@ metadata = MetaData(naming_convention=convention)
 
 @as_declarative(metadata=metadata)
 class BaseTable:
-    """ Base table class with __tablename__. """
+    """Base table class with __tablename__."""
 
     @declared_attr
     def __tablename__(cls) -> str:
@@ -35,7 +35,7 @@ class BaseTable:
 
 
 class PrimaryKeyWithoutDateMixin:
-    """ Table mixin with declared attribute `id`. """
+    """Table mixin with declared attribute `id`."""
 
     @declared_attr
     def id(cls) -> sa.Column[int]:
@@ -43,7 +43,7 @@ class PrimaryKeyWithoutDateMixin:
 
 
 class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
-    """ Table mixin with `id` and `created_at` declared attributes. """
+    """Table mixin with `id` and `created_at` declared attributes."""
 
     @declared_attr
     def created_at(cls) -> sa.Column[datetime.datetime]:

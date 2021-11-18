@@ -18,7 +18,7 @@ from overhave.admin.views.formatters.formatters import (
 
 
 class ModelViewConfigured(ModelView):
-    """ Base model view. """
+    """Base model view."""
 
     column_default_sort = ("id", True)
     column_display_pk = True
@@ -84,7 +84,7 @@ class ModelViewConfigured(ModelView):
 
 
 class ModelViewProtected(ModelViewConfigured):
-    """ Protected view. """
+    """Protected view."""
 
     can_delete = False
     can_edit = False

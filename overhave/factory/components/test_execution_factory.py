@@ -10,7 +10,7 @@ from overhave.transport import TestRunTask
 
 
 class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext], ITaskConsumerFactory[TestRunTask], abc.ABC):
-    """ Abstract factory for Overhave test execution application. """
+    """Abstract factory for Overhave test execution application."""
 
     @property
     @abc.abstractmethod
@@ -19,7 +19,7 @@ class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext], ITas
 
 
 class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext], ITestExecutionFactory):
-    """ Factory for Overhave test execution application. """
+    """Factory for Overhave test execution application."""
 
     context_cls = OverhaveTestExecutionContext
 

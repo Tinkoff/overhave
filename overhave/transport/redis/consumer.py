@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class RedisConsumer(RedisTemplate):
-    """ Class for consuming tasks from Redis stream ```stream_name```. """
+    """Class for consuming tasks from Redis stream ```stream_name```."""
 
     def __init__(self, settings: OverhaveRedisSettings, stream_name: RedisStream):
         super().__init__(settings)

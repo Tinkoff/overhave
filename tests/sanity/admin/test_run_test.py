@@ -14,7 +14,7 @@ from overhave.transport import TestRunData, TestRunTask
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
 class TestOverhaveAdminRunTest:
-    """ Sanity tests for application test run. """
+    """Sanity tests for application test run."""
 
     @pytest.mark.parametrize(
         "runtest_data",
@@ -40,7 +40,8 @@ class TestOverhaveAdminRunTest:
         assert test_featureview_runtest_result == test_rendered_featureview
 
     @pytest.mark.parametrize(
-        "runtest_data", [{f"{_SCENARIO_PREFIX}-id": "8841", f"{_SCENARIO_PREFIX}-text": "smth"}],
+        "runtest_data",
+        [{f"{_SCENARIO_PREFIX}-id": "8841", f"{_SCENARIO_PREFIX}-text": "smth"}],
     )
     def test_incorrect_scenario_data(
         self,

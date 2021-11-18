@@ -160,7 +160,8 @@ def mocked_feature_extractor(test_file_settings: OverhaveFileSettings) -> Featur
 
 @pytest.fixture()
 def test_file_manager_with_mocked_extractor(
-    test_file_manager: FileManager, mocked_feature_extractor: FeatureExtractor,
+    test_file_manager: FileManager,
+    mocked_feature_extractor: FeatureExtractor,
 ) -> FileManager:
     test_file_manager._feature_extractor = mocked_feature_extractor
     return test_file_manager

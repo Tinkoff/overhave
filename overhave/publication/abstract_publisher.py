@@ -4,7 +4,7 @@ from overhave.transport import PublicationTask
 
 
 class IVersionPublisher(abc.ABC):
-    """ Abstract class for feature version's pull requests management. """
+    """Abstract class for feature version's pull requests management."""
 
     @abc.abstractmethod
     def publish_version(self, draft_id: int) -> None:

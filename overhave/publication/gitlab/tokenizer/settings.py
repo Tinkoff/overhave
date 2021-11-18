@@ -7,7 +7,7 @@ from overhave.transport.http import BaseHttpClientSettings
 
 
 class TokenizerClientSettings(BaseHttpClientSettings):
-    """ Important environments and settings for :class:`TokenizerClient`. """
+    """Important environments and settings for :class:`TokenizerClient`."""
 
     enabled: bool = False
     url: Optional[URL] = None  # type: ignore

@@ -12,7 +12,7 @@ from overhave.admin.views.formatters.helpers import get_report_index_link
 
 
 class TestAppCommon:
-    """ Integration tests for OverhaveApp. """
+    """Integration tests for OverhaveApp."""
 
     def test_app_root_get(self, test_client: FlaskClient) -> None:
         response = test_client.get("/")
@@ -40,13 +40,17 @@ class TestAppCommon:
         response = test_client.get(f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}")
         assert response.status_code == HTTPStatus.FOUND
 
-    def test_app_get_emulation_run(self, test_app: OverhaveAdminApp, test_client: FlaskClient,) -> None:
+    def test_app_get_emulation_run(
+        self,
+        test_app: OverhaveAdminApp,
+        test_client: FlaskClient,
+    ) -> None:
         response = test_client.get("http://localhost/emulations/kek:8000")
         assert response.status_code == HTTPStatus.FOUND
 
 
 class TestAppReport:
-    """ Integration tests for OverhaveApp::get_report. """
+    """Integration tests for OverhaveApp::get_report."""
 
     def test_app_get_report_notexists(self, test_client: FlaskClient) -> None:
         response = test_client.get(get_report_index_link(uuid1().hex))

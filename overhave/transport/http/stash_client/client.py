@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseStashHttpClientException(BaseHttpClientException):
-    """ Base exception for :class:`StashHttpClient`. """
+    """Base exception for :class:`StashHttpClient`."""
 
 
 class StashHttpClientConflictError(BaseStashHttpClientException):
-    """ Exception for situation with `HTTPStatus.CONFLICT` response.status_code. """
+    """Exception for situation with `HTTPStatus.CONFLICT` response.status_code."""
 
 
 class StashHttpClient(BaseHttpClient[OverhaveStashClientSettings]):
-    """ Client for communication with remote Bitbucket server. """
+    """Client for communication with remote Bitbucket server."""
 
     def send_pull_request(self, pull_request: StashPrRequest) -> AnyStashResponseModel:
         url = self._settings.get_pr_url(

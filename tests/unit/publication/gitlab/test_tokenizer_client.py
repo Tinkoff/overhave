@@ -7,7 +7,7 @@ from overhave.publication.gitlab import TokenizerClientSettings
 
 
 class TestTokenizerClient:
-    """ Tests for :class:`TokenizerClient`. """
+    """Tests for :class:`TokenizerClient`."""
 
     @pytest.mark.parametrize(
         ("initiator", "remote_key", "remote_key_name"),

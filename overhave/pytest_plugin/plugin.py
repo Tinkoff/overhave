@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class StepNotFoundError(RuntimeError):
-    """ Exception for situation with missing or incorrect step definition. """
+    """Exception for situation with missing or incorrect step definition."""
 
 
 class _OptionName(str, enum.Enum):
@@ -72,7 +72,7 @@ def pytest_addoption(parser: Parser) -> None:
 
 
 def pytest_configure(config: Config) -> None:
-    """ Patch pytest_bdd objects in current hook. """
+    """Patch pytest_bdd objects in current hook."""
     injection_enabled: bool = config.getoption(_OptionName.ENABLE_INJECTION.as_variable)
     tw = _pytest.config.create_terminal_writer(config)
     if injection_enabled:
@@ -145,7 +145,7 @@ def pytest_bdd_step_func_lookup_error(
 
 
 def pytest_collection_finish(session: Session) -> None:
-    """ Supplying of injector configs for steps collection. """
+    """Supplying of injector configs for steps collection."""
     proxy_manager = get_proxy_manager()
     if (
         session.config.getoption(_OptionName.ENABLE_INJECTION.as_variable)
@@ -165,12 +165,12 @@ def pytest_collection_finish(session: Session) -> None:
 
 
 def pytest_runtest_setup(item: Item) -> None:
-    """ Hook for purgation of get_description_manager. """
+    """Hook for purgation of get_description_manager."""
     get_description_manager.cache_clear()
 
 
 def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:
-    """ Hook for description and issue links attachment to Allure report. """
+    """Hook for description and issue links attachment to Allure report."""
     get_description_manager().apply_description()
     proxy_manager = get_proxy_manager()
     if all((proxy_manager.factory.context.project_settings.browse_url is not None, has_issue_links(item))):

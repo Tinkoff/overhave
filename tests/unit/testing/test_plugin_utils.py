@@ -16,7 +16,7 @@ from overhave.test_execution.settings import EmptyBrowseURLError, OverhaveProjec
 
 
 class TestPluginUtils:
-    """ Unit tests for plugin utils. """
+    """Unit tests for plugin utils."""
 
     def test_get_scenario(self, test_pytest_bdd_scenario: Scenario, test_pytest_bdd_item: Item) -> None:
         assert test_pytest_bdd_scenario == get_scenario(test_pytest_bdd_item)

@@ -9,11 +9,11 @@ from overhave.transport import EmulationTask
 
 
 class IEmulationFactory(IOverhaveFactory[OverhaveEmulationContext], ITaskConsumerFactory[EmulationTask], abc.ABC):
-    """ Abstract factory for Overhave emulation application. """
+    """Abstract factory for Overhave emulation application."""
 
 
 class EmulationFactory(BaseOverhaveFactory[OverhaveEmulationContext], IEmulationFactory):
-    """ Factory for Overhave emulation application. """
+    """Factory for Overhave emulation application."""
 
     context_cls = OverhaveEmulationContext
 

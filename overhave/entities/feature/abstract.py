@@ -6,7 +6,7 @@ from overhave.entities.feature.types import FeatureTypeName
 
 
 class IFeatureExtractor(abc.ABC):
-    """ Abstract class for specified project's feature types resolution. """
+    """Abstract class for specified project's feature types resolution."""
 
     @property
     @abc.abstractmethod

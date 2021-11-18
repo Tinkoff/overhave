@@ -15,19 +15,19 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationError(Exception):
-    """ Base exception for :class:`Emulator`. """
+    """Base exception for :class:`Emulator`."""
 
 
 class DangerousExternalCommandError(EmulationError):
-    """ Exception for dangerous command error. """
+    """Exception for dangerous command error."""
 
 
 class EmulationNotEnabledError(EmulationError):
-    """ Exception for not enabled emulation (```emulation_base_cmd``` not specified). """
+    """Exception for not enabled emulation (```emulation_base_cmd``` not specified)."""
 
 
 class ExternalCommandCheckMixin:
-    """ Mixin for simple command-line command checking. """
+    """Mixin for simple command-line command checking."""
 
     @cached_property
     def _dangerous_pattern(self) -> Pattern[str]:
@@ -39,7 +39,7 @@ class ExternalCommandCheckMixin:
 
 
 class Emulator(ExternalCommandCheckMixin):
-    """ Class for creation of emulation runs. """
+    """Class for creation of emulation runs."""
 
     def __init__(self, settings: OverhaveEmulationSettings, storage: IEmulationStorage):
         self._settings = settings

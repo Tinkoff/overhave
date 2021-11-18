@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseAdminAuthorizationManager(IAdminAuthorizationManager, abc.ABC):
-    """ Base class for user authorization. """
+    """Base class for user authorization."""
 
     def __init__(self, settings: OverhaveAuthorizationSettings, system_user_storage: ISystemUserStorage):
         self._settings = settings

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class RedisProducer(RedisTemplate):
-    """ Class for producing tasks.
+    """Class for producing tasks.
 
     Producer send tasks into Redis stream specified by ```mapping``.
     """

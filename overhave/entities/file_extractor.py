@@ -3,7 +3,7 @@ from typing import List
 
 
 class BaseFileExtractor:
-    """ Base class for file extraction. """
+    """Base class for file extraction."""
 
     def __init__(self, extenstion: str) -> None:
         self._extenstion = extenstion

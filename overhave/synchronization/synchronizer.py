@@ -29,39 +29,39 @@ logger = logging.getLogger(__name__)
 
 
 class BaseOverhaveSynchronizerException(Exception):
-    """ Base exception for :class:`OverhaveSynchronizer`. """
+    """Base exception for :class:`OverhaveSynchronizer`."""
 
 
 class NullableLastEditedAtError(BaseOverhaveSynchronizerException):
-    """ Exception for nullable last_edited_at. """
+    """Exception for nullable last_edited_at."""
 
 
 class NullableInfoLastEditedByError(BaseOverhaveSynchronizerException):
-    """ Exception for nullable feature info last_edited_at. """
+    """Exception for nullable feature info last_edited_at."""
 
 
 class NullableInfoNameError(BaseOverhaveSynchronizerException):
-    """ Exception for situation without feature info name. """
+    """Exception for situation without feature info name."""
 
 
 class NullableInfoScenariosError(BaseOverhaveSynchronizerException):
-    """ Exception for situation without feature info scenarios. """
+    """Exception for situation without feature info scenarios."""
 
 
 class NullableInfoAuthorError(BaseOverhaveSynchronizerException):
-    """ Exception for situation without feature info author. """
+    """Exception for situation without feature info author."""
 
 
 class NullableInfoFeatureTypeError(BaseOverhaveSynchronizerException):
-    """ Exception for situation without feature info type. """
+    """Exception for situation without feature info type."""
 
 
 class FeatureInfoUserNotFoundError(BaseOverhaveSynchronizerException):
-    """ Exception for situation without specified user in database. """
+    """Exception for situation without specified user in database."""
 
 
 class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
-    """ Class for synchronization between git and database. """
+    """Class for synchronization between git and database."""
 
     def __init__(
         self,

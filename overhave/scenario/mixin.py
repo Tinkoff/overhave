@@ -1,5 +1,5 @@
 class PrefixMixin:
-    """ Mixin for getting specified data in format of `pytest-bdd` prefix. """
+    """Mixin for getting specified data in format of `pytest-bdd` prefix."""
 
     @staticmethod
     def _as_prefix(key: str) -> str:
