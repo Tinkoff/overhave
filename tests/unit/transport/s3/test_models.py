@@ -14,7 +14,7 @@ from overhave.transport.s3.models import (
 
 
 class TestBoto3Models:
-    """ Unit tests for boto3 response models. """
+    """Unit tests for boto3 response models."""
 
     def test_bucket_model(self, test_bucket_name: str, test_bucket_creation_date: datetime) -> None:
         item = {"Name": test_bucket_name, "CreationDate": test_bucket_creation_date}

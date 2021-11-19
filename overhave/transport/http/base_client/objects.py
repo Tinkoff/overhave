@@ -2,7 +2,7 @@ import enum
 
 
 class HttpMethod(str, enum.Enum):
-    """ HTTP methods enum. """
+    """HTTP methods enum."""
 
     GET = "get"
     POST = "post"

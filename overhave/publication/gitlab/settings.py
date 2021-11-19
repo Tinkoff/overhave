@@ -6,11 +6,11 @@ from overhave.transport.http.gitlab_client import GitlabRepository
 
 
 class NotSpecifiedFeatureTypeError(RuntimeError):
-    """ Exception for not specified reviewers relative to feature type. """
+    """Exception for not specified reviewers relative to feature type."""
 
 
 class OverhaveGitlabPublisherSettings(BaseGitPublisherSettings):
-    """ Settings for :class:`GitlabVersionPublisher`.
+    """Settings for :class:`GitlabVersionPublisher`.
 
     This is a representation of Gitlab project parameters.
     Some merge-request parameters are also could be defined through these settings.

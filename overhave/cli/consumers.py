@@ -21,5 +21,5 @@ def _run_consumer(stream: RedisStream) -> None:
     help="Redis stream, which defines application",
 )
 def consumer(stream: RedisStream) -> None:
-    """ Run Overhave Redis consumer. """
+    """Run Overhave Redis consumer."""
     _run_consumer(stream)

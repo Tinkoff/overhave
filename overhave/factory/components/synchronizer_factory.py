@@ -8,7 +8,7 @@ from overhave.synchronization import IOverhaveSynchronizer, OverhaveSynchronizer
 
 
 class ISynchronizerFactory(IOverhaveFactory[OverhaveSynchronizerContext]):
-    """ Factory interface for Overhave feature synchronizer application. """
+    """Factory interface for Overhave feature synchronizer application."""
 
     @property
     @abc.abstractmethod
@@ -17,7 +17,7 @@ class ISynchronizerFactory(IOverhaveFactory[OverhaveSynchronizerContext]):
 
 
 class SynchronizerFactory(BaseOverhaveFactory[OverhaveSynchronizerContext], ISynchronizerFactory):
-    """ Factory for Overhave feature synchronization application. """
+    """Factory for Overhave feature synchronization application."""
 
     context_cls = OverhaveSynchronizerContext
 

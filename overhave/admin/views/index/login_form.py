@@ -15,7 +15,7 @@ _INVALID_AUTH_MSG = "Specified username '{username}' and password pair is invali
 
 
 class LoginForm(Form):
-    """ Form for user authorization. """
+    """Form for user authorization."""
 
     username: StringField = StringField(
         "Username",
@@ -23,7 +23,8 @@ class LoginForm(Form):
         render_kw={"placeholder": "Username", "icon": "glyphicon-user"},
     )
     password: PasswordField = PasswordField(
-        "Password", render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
+        "Password",
+        render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
     )
 
     def __init__(self, auth_manager: IAdminAuthorizationManager) -> None:

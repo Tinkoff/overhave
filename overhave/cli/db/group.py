@@ -7,7 +7,7 @@ from overhave.cli.group import overhave
 
 
 def _db_commands(group: click.Group) -> click.Group:
-    """ Add commands to group. """
+    """Add commands to group."""
     group.add_command(create_all)
     group.add_command(drop_all)
     group.add_command(git_sync)
@@ -18,5 +18,5 @@ def _db_commands(group: click.Group) -> click.Group:
 @overhave.group(short_help="Commands for simple database operations")
 @click.pass_context
 def db(ctx: click.Context) -> None:
-    """ Commands for simple database operations. """
+    """Commands for simple database operations."""
     set_config_to_context(context=ctx, settings=DataBaseSettings())

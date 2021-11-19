@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class ReportManager:
-    """ Class for Allure reports creation and management. """
+    """Class for Allure reports creation and management."""
 
     def __init__(
         self,

@@ -16,11 +16,11 @@ class _WrapperPosition(str, enum.Enum):
 
 
 class StepContextNotDefinedError(Exception):
-    """ Exception for situation with calling for self._step, when StepContext has not been defined. """
+    """Exception for situation with calling for self._step, when StepContext has not been defined."""
 
 
 class StepContextRunner:
-    """ Class for Allure StepContext wrapping during pytest-bdd step execution. """
+    """Class for Allure StepContext wrapping during pytest-bdd step execution."""
 
     def __init__(self, settings: OverhaveStepContextSettings) -> None:
         self._settings = settings

@@ -18,13 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 class OverhaveIndexView(AdminIndexView):
-    """ View for index. """
+    """View for index."""
 
     def __init__(
         self, name: str, url: str, auth_manager: IAdminAuthorizationManager, index_template_path: Optional[Path]
     ) -> None:
         super().__init__(
-            name=name, url=url,
+            name=name,
+            url=url,
         )
         self._auth_manager = auth_manager
         self._index_template_path = index_template_path

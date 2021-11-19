@@ -14,7 +14,7 @@ from overhave.transport import OverhaveS3ManagerSettings
 
 
 class OverhaveTestExecutionContext(BaseFactoryContext):
-    """ Overhave test run context, based on application BaseSettings.
+    """Overhave test run context, based on application BaseSettings.
 
     This context defines how Overhave test run will work.
     """

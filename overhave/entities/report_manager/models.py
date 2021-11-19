@@ -6,7 +6,7 @@ from overhave.db import TestReportStatus
 
 
 class ReportPresenceResolution(BaseModel):
-    """ Model for report presence resolution result. """
+    """Model for report presence resolution result."""
 
     exists: bool
     s3_enabled: bool = False

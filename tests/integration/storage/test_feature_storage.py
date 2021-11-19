@@ -29,7 +29,7 @@ def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_mode
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
 class TestFeatureStorage:
-    """ Integration tests for :class:`FeatureStorage`. """
+    """Integration tests for :class:`FeatureStorage`."""
 
     def test_get_feature(
         self, test_feature_storage: FeatureStorage, test_feature_type: FeatureTypeModel, test_feature: FeatureModel

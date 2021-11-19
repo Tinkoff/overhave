@@ -26,7 +26,7 @@ from overhave.transport import S3Manager
 
 
 class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
-    """ Factory interface for application entities resolution and usage. """
+    """Factory interface for application entities resolution and usage."""
 
     @abc.abstractmethod
     def set_context(self, context: TApplicationContext) -> None:
@@ -79,7 +79,7 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
 
 
 class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
-    """ Base factory for application entities resolution and usage. """
+    """Base factory for application entities resolution and usage."""
 
     context_cls: Type[TApplicationContext]
 

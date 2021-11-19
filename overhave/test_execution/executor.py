@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class ITestExecutor(abc.ABC):
-    """ Abstract class for test execution. """
+    """Abstract class for test execution."""
 
     @abc.abstractmethod
     def execute_test(self, test_run_id: int) -> None:
@@ -26,23 +26,23 @@ class ITestExecutor(abc.ABC):
 
 
 class BaseTestExecutionException(Exception):
-    """ Base exception for :class:`TestExecutionManager`. """
+    """Base exception for :class:`TestExecutionManager`."""
 
 
 class FeatureNotExistsError(BaseTestExecutionException):
-    """ Exception for situation with not existing Feature. """
+    """Exception for situation with not existing Feature."""
 
 
 class TestRunNotExistsError(BaseTestExecutionException):
-    """ Exception for situation with not existing TestRun. """
+    """Exception for situation with not existing TestRun."""
 
 
 class ScenarioNotExistsError(BaseTestExecutionException):
-    """ Exception for situation with not existing Scenario. """
+    """Exception for situation with not existing Scenario."""
 
 
 class TestExecutor(ITestExecutor):
-    """ Class for test execution. """
+    """Class for test execution."""
 
     def __init__(
         self,
@@ -77,7 +77,11 @@ class TestExecutor(ITestExecutor):
         feature = self._feature_storage.get_feature(scenario.feature_id)
         if feature is None:
             raise FeatureNotExistsError(f"Feature with id={scenario.feature_id} does not exist!")
-        return TestExecutorContext(feature=feature, scenario=scenario, test_run=test_run,)
+        return TestExecutorContext(
+            feature=feature,
+            scenario=scenario,
+            test_run=test_run,
+        )
 
     def execute_test(self, test_run_id: int) -> None:
         self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.RUNNING)

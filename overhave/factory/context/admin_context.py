@@ -15,7 +15,7 @@ from overhave.transport import OverhaveS3ManagerSettings
 
 
 class OverhaveAdminContext(BaseFactoryContext):
-    """ Overhave admin context, based on application BaseSettings.
+    """Overhave admin context, based on application BaseSettings.
 
     This context defines how Overhave admin will work.
     """

@@ -3,7 +3,7 @@ from overhave.factory.context import TApplicationContext
 
 
 class FactoryWithS3ManagerInit(BaseOverhaveFactory[TApplicationContext]):
-    """ Factory with :class:`S3Manager` initialization. """
+    """Factory with :class:`S3Manager` initialization."""
 
     def set_context(self, context: TApplicationContext) -> None:
         super().set_context(context)  # type: ignore

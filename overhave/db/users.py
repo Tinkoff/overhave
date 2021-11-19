@@ -8,7 +8,7 @@ from overhave.db.base import BaseTable, PrimaryKeyMixin
 
 
 class Role(str, enum.Enum):
-    """ Enum that declares user access roles. """
+    """Enum that declares user access roles."""
 
     user = "user"
     admin = "admin"
@@ -16,7 +16,7 @@ class Role(str, enum.Enum):
 
 @su.generic_repr("login", "role")
 class UserRole(BaseTable, PrimaryKeyMixin):
-    """ User access table. """
+    """User access table."""
 
     login = sa.Column(sa.String(), nullable=False, unique=True)
     password = sa.Column(sa.String(), nullable=True)
@@ -33,7 +33,7 @@ class UserRole(BaseTable, PrimaryKeyMixin):
 
 @su.generic_repr("group")
 class GroupRole(BaseTable, PrimaryKeyMixin):
-    """ Group access table. """
+    """Group access table."""
 
     group = sa.Column(sa.String(), nullable=False, unique=True)
 

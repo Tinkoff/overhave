@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileSavingMixin:
-    """ Mixin for files saving. """
+    """Mixin for files saving."""
 
     @staticmethod
     def _write_data(file: tempfile._TemporaryFileWrapper, data: str, entity_name: str) -> None:  # type: ignore
@@ -23,7 +23,7 @@ class FileSavingMixin:
 
 
 class FileManager(FileSavingMixin):
-    """ Class for feature files management. """
+    """Class for feature files management."""
 
     def __init__(
         self,

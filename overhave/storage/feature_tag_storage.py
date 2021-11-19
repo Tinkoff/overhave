@@ -6,7 +6,7 @@ from overhave.entities import TagModel
 
 
 class IFeatureTagStorage(abc.ABC):
-    """ Abstract class for feature tags storage. """
+    """Abstract class for feature tags storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -15,7 +15,7 @@ class IFeatureTagStorage(abc.ABC):
 
 
 class FeatureTagStorage(IFeatureTagStorage):
-    """ Class for feature tags storage. """
+    """Class for feature tags storage."""
 
     @staticmethod
     def get_or_create_tag(value: str, created_by: str) -> TagModel:

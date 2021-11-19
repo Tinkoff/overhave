@@ -20,7 +20,7 @@ PROJECT_WORKDIR = Path(__file__).parent.parent
 
 
 class DataBaseContext(NamedTuple):
-    """ Class for easy database entities management through `PyTest` fixtures. """
+    """Class for easy database entities management through `PyTest` fixtures."""
 
     metadata: MetaData
     engine: Engine
@@ -28,7 +28,7 @@ class DataBaseContext(NamedTuple):
 
 @cache
 def get_test_file_settings() -> OverhaveFileSettings:
-    """ Cached OverhaveFileSettings with parameters, corresponding to docs files and examples. """
+    """Cached OverhaveFileSettings with parameters, corresponding to docs files and examples."""
     work_dir = Path(__file__).parent.parent
     root_dir = work_dir / "demo"
     return OverhaveFileSettings(work_dir=work_dir, root_dir=root_dir)
@@ -36,7 +36,7 @@ def get_test_file_settings() -> OverhaveFileSettings:
 
 @cache
 def get_test_feature_extractor() -> FeatureExtractor:
-    """ Method for getting :class:`FeatureExtractor` with OverhaveFileSettings, based on docs files and examples.
+    """Method for getting :class:`FeatureExtractor` with OverhaveFileSettings, based on docs files and examples.
 
     One of class functions is mocked to prevent the creation of additional files in docs includes.
     """
@@ -45,7 +45,7 @@ def get_test_feature_extractor() -> FeatureExtractor:
 
 
 class FeatureTestContainer(BaseModel):
-    """ Class for simple test feature operating. """
+    """Class for simple test feature operating."""
 
     type: FeatureTypeName
     name: str

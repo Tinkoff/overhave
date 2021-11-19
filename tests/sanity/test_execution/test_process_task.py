@@ -11,7 +11,7 @@ from overhave.entities import TestRunModel
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
 class TestOverhaveTestExecution:
-    """ Sanity tests for application test run. """
+    """Sanity tests for application test run."""
 
     @pytest.mark.parametrize(
         ("run_test_process_result", "report_status"),

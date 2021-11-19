@@ -8,7 +8,7 @@ from overhave.utils import make_url
 
 
 class EmptyBrowseURLError(ValueError):
-    """ Exception for situation with empty ```browse_url``` while trying to ```get_link_url```. """
+    """Exception for situation with empty ```browse_url``` while trying to ```get_link_url```."""
 
 
 class OverhaveProjectSettings(BaseOverhavePrefix):
@@ -54,7 +54,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
 
 
 class OverhaveTestSettings(BaseOverhavePrefix):
-    """ Settings for PytestRunner, which runs scenario tests with specified addoptions. """
+    """Settings for PytestRunner, which runs scenario tests with specified addoptions."""
 
     default_pytest_addoptions: str = "--disable-warnings"
     extra_pytest_addoptions: Optional[str]

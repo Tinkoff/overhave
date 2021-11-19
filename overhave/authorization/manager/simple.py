@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseSimpleAdminAuthorizationManagerException(Exception):
-    """ Base exception for :class:`SimpleAdminAuthorizationManager`. """
+    """Base exception for :class:`SimpleAdminAuthorizationManager`."""
 
 
 class NullablePasswordError(Exception):
-    """ Exception for situation when row is without password. """
+    """Exception for situation when row is without password."""
 
 
 class SimpleAdminAuthorizationManager(AdminSecretMixin):
-    """ Class for user registration.
+    """Class for user registration.
 
     Manager does not provide real authorization. Each user could use preferred name.
     This name will be used for user authority. Each user is unique. Passwords not required.

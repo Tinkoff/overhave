@@ -6,15 +6,15 @@ from overhave.entities import ScenarioModel
 
 
 class BaseScenarioStorageException(Exception):
-    """ Base exception for :class:`ScenarioStorage`. """
+    """Base exception for :class:`ScenarioStorage`."""
 
 
 class ScenarioNotExistsError(BaseScenarioStorageException):
-    """ Exception for situation without scenario. """
+    """Exception for situation without scenario."""
 
 
 class IScenarioStorage(abc.ABC):
-    """ Abstract class for feature type storage. """
+    """Abstract class for feature type storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -38,7 +38,7 @@ class IScenarioStorage(abc.ABC):
 
 
 class ScenarioStorage(IScenarioStorage):
-    """ Class for feature type storage. """
+    """Class for feature type storage."""
 
     @staticmethod
     def get_scenario(scenario_id: int) -> Optional[ScenarioModel]:

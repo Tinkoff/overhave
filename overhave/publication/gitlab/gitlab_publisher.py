@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseGitlabVersionPublisherException(Exception):
-    """ Base exception for :class:`GitlabVersionPublisher`."""
+    """Base exception for :class:`GitlabVersionPublisher`."""
 
 
 class InvalidWebUrlException(BaseGitlabVersionPublisherException):
-    """ Exception for case when web url is None. """
+    """Exception for case when web url is None."""
 
 
 class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings]):
-    """ Class for feature version's merge requests management relative to Gitlab API. """
+    """Class for feature version's merge requests management relative to Gitlab API."""
 
     def __init__(
         self,

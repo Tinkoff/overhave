@@ -8,7 +8,7 @@ from overhave.entities.archiver import ArchiveManager
 
 @pytest.mark.parametrize("extension", ["zip"])
 class TestArchiverManager:
-    """ Unit tests for :class:`ArchiveManager`. """
+    """Unit tests for :class:`ArchiveManager`."""
 
     def test_archive_path(
         self,

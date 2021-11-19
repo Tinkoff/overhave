@@ -19,7 +19,7 @@ def _check_db_no_features() -> None:
 
 @pytest.mark.usefixtures("database")
 class TestOverhaveSynchronizer:
-    """ Sanity tests for application admin mode. """
+    """Sanity tests for application admin mode."""
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("create_db_features", [False])

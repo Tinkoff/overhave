@@ -10,7 +10,7 @@ from overhave.admin.views.base import ModelViewConfigured
 
 
 class AccessModelView(ModelViewConfigured):
-    """ Additional base_factory view for access views. """
+    """Additional base_factory view for access views."""
 
     can_view_details = False
 
@@ -28,13 +28,13 @@ class AccessModelView(ModelViewConfigured):
 
 
 class UserView(AccessModelView):
-    """ View for application user access management. """
+    """View for application user access management."""
 
     column_list = ["id", "login", "role", "created_at"]
     column_searchable_list = ["login"]
 
 
 class GroupView(AccessModelView):
-    """ View for application group access management. """
+    """View for application group access management."""
 
     column_searchable_list = ["group"]

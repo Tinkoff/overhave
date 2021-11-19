@@ -7,7 +7,7 @@ from overhave.entities import OverhaveDescriptionManagerSettings
 
 
 class DescriptionManager:
-    """ Class for test-suit custom description management and setting to Allure report. """
+    """Class for test-suit custom description management and setting to Allure report."""
 
     def __init__(self, settings: OverhaveDescriptionManagerSettings):
         self._settings = settings

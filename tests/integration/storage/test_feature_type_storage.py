@@ -11,7 +11,7 @@ def _check_base_feature_type_model(test_model: FeatureTypeModel, validation_mode
 
 @pytest.mark.usefixtures("database")
 class TestFeatureTypeStorage:
-    """ Integration tests for :class:`FeatureTypeStorage`. """
+    """Integration tests for :class:`FeatureTypeStorage`."""
 
     def test_get_default_feature_type(
         self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel

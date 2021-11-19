@@ -11,7 +11,7 @@ from overhave.pytest_plugin import StepContextNotDefinedError, StepContextRunner
 
 @pytest.mark.parametrize("step_context_logs", [False, True], indirect=True)
 class TestStepContextRunner:
-    """ Unit tests for StepContextRunner. """
+    """Unit tests for StepContextRunner."""
 
     def test_set_title(self, test_step_context_runner: StepContextRunner, faker: Faker) -> None:
         test_step_context_runner.set_title(faker.word())

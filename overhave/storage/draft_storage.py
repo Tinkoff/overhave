@@ -8,7 +8,7 @@ from overhave.entities import DraftModel
 
 
 class IDraftStorage(abc.ABC):
-    """ Abstract class for scenario versions storage. """
+    """Abstract class for scenario versions storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -43,19 +43,19 @@ class IDraftStorage(abc.ABC):
 
 
 class BaseDraftStorageException(Exception):
-    """ Base exception for :class:`DraftStorage`. """
+    """Base exception for :class:`DraftStorage`."""
 
 
 class UniqueDraftCreationError(BaseDraftStorageException):
-    """ Exception for draft creation error with `as_unique`. """
+    """Exception for draft creation error with `as_unique`."""
 
 
 class NullableDraftsError(BaseDraftStorageException):
-    """ Exception for situation with not existing drafts. """
+    """Exception for situation with not existing drafts."""
 
 
 class DraftStorage(IDraftStorage):
-    """ Class for scenario versions storage. """
+    """Class for scenario versions storage."""
 
     @staticmethod
     def get_draft(draft_id: int) -> Optional[DraftModel]:
@@ -105,9 +105,13 @@ class DraftStorage(IDraftStorage):
     def get_previous_feature_draft(feature_id: int) -> DraftModel:
         with db.create_session() as session:
             selection_num = 2
-            drafts: List[db.Draft] = session.query(db.Draft).filter(  # noqa: ECE001
-                db.Draft.feature_id == feature_id
-            ).order_by(db.Draft.id.asc()).limit(selection_num).all()
+            drafts: List[db.Draft] = (
+                session.query(db.Draft)
+                .filter(db.Draft.feature_id == feature_id)  # noqa: ECE001
+                .order_by(db.Draft.id.asc())
+                .limit(selection_num)
+                .all()
+            )
             if not drafts or len(drafts) != selection_num:
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))

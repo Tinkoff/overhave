@@ -5,20 +5,20 @@ from pydantic import BaseModel, Field, validator
 
 
 class StashProject(BaseModel):
-    """ Model for Stash pull-request project slug. """
+    """Model for Stash pull-request project slug."""
 
     key: str
 
 
 class StashRepository(BaseModel):
-    """ Model for Stash pull-request repository. """
+    """Model for Stash pull-request repository."""
 
     name: str = Field(..., alias="slug")
     project: StashProject
 
 
 class StashBranch(BaseModel):
-    """ Model for Stash pull-request branch. """
+    """Model for Stash pull-request branch."""
 
     branch: str = Field(..., alias="id")
     repository: StashRepository
@@ -29,26 +29,26 @@ class StashBranch(BaseModel):
 
 
 class StashReviewerInfo(BaseModel):
-    """ Model for Stash pull-request reviewer information. """
+    """Model for Stash pull-request reviewer information."""
 
     name: str
 
 
 class StashReviewer(BaseModel):
-    """ Model for Stash pull-request reviewer. """
+    """Model for Stash pull-request reviewer."""
 
     user: StashReviewerInfo
 
 
 class StashBasicPrInfo(BaseModel):
-    """ Model for Stash basic pull-request information. """
+    """Model for Stash basic pull-request information."""
 
     title: Optional[str]
     open: bool
 
 
 class StashPrRequest(StashBasicPrInfo):
-    """ Model for Stash pull-request request. """
+    """Model for Stash pull-request request."""
 
     description: str
     state: str = "OPEN"
@@ -64,7 +64,7 @@ StashLinksType = Dict[str, List[Dict[str, str]]]
 
 
 class StashPrCreationResponse(StashBasicPrInfo):
-    """ Model for Stash pull-request creation response. """
+    """Model for Stash pull-request creation response."""
 
     created_date: datetime = Field(..., alias="createdDate")
     updated_date: datetime = Field(..., alias="updatedDate")
@@ -84,7 +84,7 @@ class StashPrCreationResponse(StashBasicPrInfo):
 
 
 class StashRequestError(BaseModel):
-    """ Model for Stash request error. """
+    """Model for Stash request error."""
 
     context: Optional[str]
     message: str
@@ -92,7 +92,7 @@ class StashRequestError(BaseModel):
 
 
 class StashErrorResponse(BaseModel):
-    """ Model for Stash error response. """
+    """Model for Stash error response."""
 
     errors: List[StashRequestError]
 

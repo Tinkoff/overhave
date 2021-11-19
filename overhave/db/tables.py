@@ -21,7 +21,7 @@ tags_association_table = sa.Table(
 
 
 class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
-    """ Feature types table. """
+    """Feature types table."""
 
     name = sa.Column(sa.Text, unique=True, nullable=False, doc="Feature types choice")
 
@@ -30,7 +30,7 @@ class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
 
 
 class Tags(BaseTable, PrimaryKeyMixin):
-    """ Feature tags table. """
+    """Feature tags table."""
 
     value = sa.Column(sa.String(), nullable=False, doc="Feature tags choice", unique=True)
     created_by = sa.Column(sa.String(), sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
@@ -45,7 +45,7 @@ class Tags(BaseTable, PrimaryKeyMixin):
 
 @su.generic_repr("name", "last_edited_by")
 class Feature(BaseTable, PrimaryKeyMixin):
-    """ Features table. """
+    """Features table."""
 
     name = sa.Column(sa.String(), doc="Feature name", nullable=False, unique=True)
     author = sa.Column(
@@ -72,7 +72,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
 
 @su.generic_repr("feature_id")
 class Scenario(BaseTable, PrimaryKeyMixin):
-    """ Scenarios table. """
+    """Scenarios table."""
 
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey(Feature.id), nullable=False, unique=True)
     text = sa.Column(sa.Text(), doc="Text storage for scenarios in feature")
@@ -81,7 +81,7 @@ class Scenario(BaseTable, PrimaryKeyMixin):
 
 
 class TestRun(BaseTable, PrimaryKeyMixin):
-    """ Test runs table. """
+    """Test runs table."""
 
     __test__ = False
 
@@ -99,7 +99,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
 
 
 class DraftQuery(so.Query):
-    """ Scenario versions table. """
+    """Scenario versions table."""
 
     def as_unique(self, test_run_id: int, published_by: str, status: DraftStatus) -> Draft:
         with self.session.no_autoflush:
@@ -125,7 +125,7 @@ class DraftQuery(so.Query):
 
 
 class Draft(BaseTable, PrimaryKeyMixin):
-    """ Scenario versions table. """
+    """Scenario versions table."""
 
     __query_cls__ = DraftQuery
 
@@ -155,7 +155,7 @@ class Draft(BaseTable, PrimaryKeyMixin):
 
 @su.generic_repr("id", "name", "created_by")
 class TestUser(BaseTable, PrimaryKeyMixin):
-    """ Test users table. """
+    """Test users table."""
 
     __test__ = False
 
@@ -168,7 +168,7 @@ class TestUser(BaseTable, PrimaryKeyMixin):
 
 
 class Emulation(BaseTable, PrimaryKeyMixin):
-    """ Emulation templates table. """
+    """Emulation templates table."""
 
     name = sa.Column(sa.String(), nullable=False, unique=True)
     test_user_id = sa.Column(sa.Integer(), sa.ForeignKey(TestUser.id), nullable=False, doc="Test user ID")
@@ -178,7 +178,7 @@ class Emulation(BaseTable, PrimaryKeyMixin):
 
 
 class EmulationRun(BaseTable, PrimaryKeyMixin):
-    """ Emulation runs table. """
+    """Emulation runs table."""
 
     __tablename__ = "emulation_run"  # type: ignore
     emulation_id = sa.Column(sa.Integer(), sa.ForeignKey(Emulation.id), nullable=False, index=True)

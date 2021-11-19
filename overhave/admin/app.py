@@ -19,7 +19,7 @@ OverhaveAdminApp = typing.NewType("OverhaveAdminApp", flask.Flask)
 
 
 def _prepare_factory(factory: IAdminFactory) -> None:
-    """ Resolve necessary settings with :class:`IProxyManager` and prepare :class:`IOverhaveFactory` for usage. """
+    """Resolve necessary settings with :class:`IProxyManager` and prepare :class:`IOverhaveFactory` for usage."""
     proxy_manager = get_proxy_manager()
     proxy_manager.set_factory(factory)
     proxy_manager.patch_pytest()
@@ -28,7 +28,7 @@ def _prepare_factory(factory: IAdminFactory) -> None:
 
 
 def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
-    """ Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`. """
+    """Resolve Flask application with :class:`IOverhaveFactory` and templates directory `template_dir`."""
     flask_app = get_flask_app(template_folder=template_dir.as_posix())
     get_flask_admin(factory).init_app(app=flask_app)
     login_manager = FlaskLoginManager(system_user_storage=factory.system_user_storage, login_view="login")
@@ -38,7 +38,7 @@ def _resolved_app(factory: IAdminFactory, template_dir: Path) -> flask.Flask:
 
 
 def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
-    """ Overhave application, based on Flask. """
+    """Overhave application, based on Flask."""
     current_dir = Path(__file__).parent
     template_dir = current_dir / "templates"
     files_dir = current_dir / "files"

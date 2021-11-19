@@ -10,7 +10,7 @@ from overhave.admin.views.base import ModelViewConfigured
 
 
 class TestRunView(ModelViewConfigured):
-    """ View for :class:`TestRun` table. """
+    """View for :class:`TestRun` table."""
 
     __test__ = False
 

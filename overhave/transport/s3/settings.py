@@ -4,7 +4,7 @@ from pydantic import BaseSettings, root_validator
 
 
 class OverhaveS3ManagerSettings(BaseSettings):
-    """ Settings for S3Client. """
+    """Settings for S3Client."""
 
     enabled: bool = False
 

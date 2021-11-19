@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class EmulationStorageError(Exception):
-    """ Base Exception for :class:`EmulationStorage`. """
+    """Base Exception for :class:`EmulationStorage`."""
 
 
 class NotFoundEmulationError(EmulationStorageError):
-    """ Exception for situation without saved emulation.. """
+    """Exception for situation without saved emulation.."""
 
 
 class AllPortsAreBusyError(EmulationStorageError):
-    """ Exception for situation when all ports are busy. """
+    """Exception for situation when all ports are busy."""
 
 
 class IEmulationStorage(abc.ABC):
-    """ Abstract class for emulation runs storage. """
+    """Abstract class for emulation runs storage."""
 
     @abc.abstractmethod
     def create_emulation_run(self, emulation_id: int, initiated_by: str) -> EmulationRunModel:
@@ -46,7 +46,7 @@ class IEmulationStorage(abc.ABC):
 
 
 class EmulationStorage(IEmulationStorage):
-    """ Class for emulation runs storage. """
+    """Class for emulation runs storage."""
 
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
@@ -74,7 +74,8 @@ class EmulationStorage(IEmulationStorage):
             .all()
         )
         allocated_sorted_runs = sorted(
-            runs_with_allocated_ports, key=lambda t: t.changed_at,  # type: ignore
+            runs_with_allocated_ports,
+            key=lambda t: t.changed_at,  # type: ignore
         )
 
         allocated_ports = {run.port for run in allocated_sorted_runs}

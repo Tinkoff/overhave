@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseHttpClientException(Exception):
-    """ Base exception for BaseHttpClient. """
+    """Base exception for BaseHttpClient."""
 
 
 class HttpClientValidationError(BaseHttpClientException):
-    """ Model validation error for BaseHttpClient. """
+    """Model validation error for BaseHttpClient."""
 
 
 class BaseHttpClient(Generic[HttpSettingsType]):
-    """ Base client for HTTP communications. """
+    """Base client for HTTP communications."""
 
     def __init__(self, settings: HttpSettingsType) -> None:
         self._settings = settings

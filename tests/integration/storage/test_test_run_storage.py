@@ -9,7 +9,7 @@ from overhave.storage import TestRunStorage
 
 
 class TestTestRunStorage:
-    """ Integration tests for :class:`TestRunStorage`. """
+    """Integration tests for :class:`TestRunStorage`."""
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_create_test_run(

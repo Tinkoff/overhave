@@ -2,7 +2,7 @@ from typing import Any, Mapping
 
 
 class ConfigGetOptionMock:
-    """ The light-weight class for getoption with defined mapping. """
+    """The light-weight class for getoption with defined mapping."""
 
     def __init__(self, mapping: Mapping[str, Any]) -> None:
         self._mapping = mapping

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class IPluginResolver(abc.ABC):
-    """ Abstract class for custom pytest-bdd steps modules resolution. """
+    """Abstract class for custom pytest-bdd steps modules resolution."""
 
     @abc.abstractmethod
     def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:
@@ -17,7 +17,7 @@ class IPluginResolver(abc.ABC):
 
 
 class PluginResolver(BaseFileExtractor, IPluginResolver):
-    """ Class for custom pytest-bdd steps modules resolution. """
+    """Class for custom pytest-bdd steps modules resolution."""
 
     def __init__(self, file_settings: OverhaveFileSettings):
         super().__init__(extenstion=".py")

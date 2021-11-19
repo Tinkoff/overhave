@@ -10,7 +10,7 @@ from overhave.transport.http.base_client.settings import HttpSettingsType
 
 
 class OverhavePublicationContext(BaseFactoryContext):
-    """ Overhave publication context, based on application BaseSettings.
+    """Overhave publication context, based on application BaseSettings.
 
     This context defines how Overhave publication will work.
     """

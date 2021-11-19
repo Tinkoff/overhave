@@ -5,13 +5,13 @@ from pydantic import BaseModel, Field
 
 
 class GitlabRepository(BaseModel):
-    """ Model for Gitlab merge-request repository. """
+    """Model for Gitlab merge-request repository."""
 
     id: str = Field(..., alias="project_id")
 
 
 class GitlabMrRequest(BaseModel):
-    """ Model for Gitlab merge-request request. """
+    """Model for Gitlab merge-request request."""
 
     id: str = Field(..., alias="project_id")
     source_branch: str
@@ -22,7 +22,7 @@ class GitlabMrRequest(BaseModel):
 
 
 class GitlabMrCreationResponse(BaseModel):
-    """ Model for Gitlab merge-request creation response. """
+    """Model for Gitlab merge-request creation response."""
 
     created_at: datetime
     updated_at: datetime

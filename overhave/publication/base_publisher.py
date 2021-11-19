@@ -10,31 +10,31 @@ from overhave.transport import PublicationTask
 
 
 class BaseVersionPublisherException(Exception):
-    """ Base exception for :class:`BaseVersionPublisher`. """
+    """Base exception for :class:`BaseVersionPublisher`."""
 
 
 class FeatureNotExistsError(BaseVersionPublisherException):
-    """ Exception for situation with not existing Feature. """
+    """Exception for situation with not existing Feature."""
 
 
 class DraftNotExistsError(BaseVersionPublisherException):
-    """ Exception for situation with not existing Draft. """
+    """Exception for situation with not existing Draft."""
 
 
 class TestRunNotExistsError(BaseVersionPublisherException):
-    """ Exception for situation with not existing TestRun. """
+    """Exception for situation with not existing TestRun."""
 
 
 class ScenarioNotExistsError(BaseVersionPublisherException):
-    """ Exception for situation with not existing Scenario. """
+    """Exception for situation with not existing Scenario."""
 
 
 class NullablePullRequestUrlError(BaseVersionPublisherException):
-    """ Exception for nullable merge-request in selected Draft. """
+    """Exception for nullable merge-request in selected Draft."""
 
 
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
-    """ Class for feature version's pull requests management relative to Atlassian Stash API. """
+    """Class for feature version's pull requests management relative to Atlassian Stash API."""
 
     def __init__(
         self,

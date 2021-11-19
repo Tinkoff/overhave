@@ -9,7 +9,7 @@ from overhave.storage import FeatureTagStorage
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
 class TestFeatureTagStorage:
-    """ Integration tests for :class:`FeatureTagStorage`. """
+    """Integration tests for :class:`FeatureTagStorage`."""
 
     def test_create_tag(
         self, test_tag_storage: FeatureTagStorage, test_system_user: SystemUserModel, faker: Faker

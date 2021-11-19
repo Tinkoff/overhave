@@ -5,7 +5,7 @@ from overhave.factory.context.base_context import BaseFactoryContext
 
 
 class OverhaveEmulationContext(BaseFactoryContext):
-    """ Overhave emulation context, based on application BaseSettings.
+    """Overhave emulation context, based on application BaseSettings.
 
     This context defines how Overhave emulation will work.
     """

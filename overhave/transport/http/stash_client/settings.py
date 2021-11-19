@@ -4,7 +4,7 @@ from overhave.transport.http.base_client import BaseHttpClientSettings
 
 
 class OverhaveStashClientSettings(BaseHttpClientSettings):
-    """ Settings for :class:`StashHttpClient`. """
+    """Settings for :class:`StashHttpClient`."""
 
     pr_path: str = "rest/api/1.0/projects/{project_key}/repos/{repository_name}/pull-requests"
     auth_token: str

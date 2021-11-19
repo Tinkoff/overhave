@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class LDAPAuthenticator:
-    """ Class-client for LDAP authentication. """
+    """Class-client for LDAP authentication."""
 
     def __init__(self, settings: OverhaveLdapClientSettings) -> None:
         self._settings = settings

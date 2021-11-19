@@ -11,19 +11,19 @@ from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClien
 
 
 class BasePublicationFactoryException(Exception):
-    """ Base exception for :class:`PublicationFactory`. """
+    """Base exception for :class:`PublicationFactory`."""
 
 
 class AuthTokenNotSpecifiedError(BasePublicationFactoryException):
-    """ Exception for situation AuthToken env was not set. """
+    """Exception for situation AuthToken env was not set."""
 
 
 class UrlGitlabTokenizerNotScepifiedIfEnabled(BasePublicationFactoryException):
-    """ Exception for situation tokenizer is enabled and url env was not set. """
+    """Exception for situation tokenizer is enabled and url env was not set."""
 
 
 class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskConsumerFactory[PublicationTask], abc.ABC):
-    """ Abstract factory for Overhave publication application. """
+    """Abstract factory for Overhave publication application."""
 
     @property
     @abc.abstractmethod
@@ -32,7 +32,7 @@ class IPublicationFactory(IOverhaveFactory[OverhavePublicationContext], ITaskCon
 
 
 class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPublicationFactory):
-    """ Factory for Overhave publication application. """
+    """Factory for Overhave publication application."""
 
     context_cls = OverhavePublicationContext
 

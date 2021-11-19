@@ -8,15 +8,15 @@ from overhave.entities import SystemUserModel
 
 
 class BaseSystemStorageException(Exception):
-    """ Base exception for :class:`SystemUserStorage`. """
+    """Base exception for :class:`SystemUserStorage`."""
 
 
 class SystemUserNotFoundError(Exception):
-    """ Error for situation without user with given id. """
+    """Error for situation without user with given id."""
 
 
 class ISystemUserStorage(abc.ABC):
-    """ Abstract class for system user storage. """
+    """Abstract class for system user storage."""
 
     @staticmethod
     @abc.abstractmethod
@@ -40,7 +40,7 @@ class ISystemUserStorage(abc.ABC):
 
 
 class SystemUserStorage(ISystemUserStorage):
-    """ Class for system user storage. """
+    """Class for system user storage."""
 
     @staticmethod
     def get_user(user_id: int) -> Optional[SystemUserModel]:

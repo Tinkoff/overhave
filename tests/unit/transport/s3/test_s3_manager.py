@@ -18,7 +18,7 @@ from overhave.transport.s3.models import ObjectModel
 
 @pytest.mark.parametrize("test_s3_autocreate_buckets", [False, True], indirect=True)
 class TestS3Manager:
-    """ Unit tests for :class:`S3Manager` with non-bucket defs. """
+    """Unit tests for :class:`S3Manager` with non-bucket defs."""
 
     @pytest.mark.parametrize("test_s3_enabled", [False], indirect=True)
     def test_initialize_disabled(self, mocked_boto3_client_getter: mock.MagicMock, test_s3_manager: S3Manager) -> None:
@@ -66,7 +66,7 @@ class TestS3Manager:
 @pytest.mark.parametrize("test_s3_enabled", [True], indirect=True)
 @pytest.mark.parametrize("bucket", list(OverhaveS3Bucket))
 class TestInitializedS3Manager:
-    """ Unit tests for initialized :class:`S3Manager`. """
+    """Unit tests for initialized :class:`S3Manager`."""
 
     def test_create_bucket(
         self,

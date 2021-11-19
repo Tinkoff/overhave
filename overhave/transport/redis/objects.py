@@ -7,7 +7,7 @@ from pydantic.main import BaseModel
 
 
 class RedisStream(str, enum.Enum):
-    """ Enum that declares Redis streams. """
+    """Enum that declares Redis streams."""
 
     TEST = "test-stream"
     PUBLICATION = "publication-stream"
@@ -26,7 +26,7 @@ class _IRedisTask(BaseModel, abc.ABC):
 
 
 class BaseRedisTask(_IRedisTask):
-    """ Base task for Redis streams. """
+    """Base task for Redis streams."""
 
     data: Any
 
@@ -36,7 +36,7 @@ class BaseRedisTask(_IRedisTask):
 
 
 class TestRunData(BaseModel):
-    """ Specific data for test run. """
+    """Specific data for test run."""
 
     __test__ = False
 
@@ -44,7 +44,7 @@ class TestRunData(BaseModel):
 
 
 class TestRunTask(BaseRedisTask):
-    """ Redis stream task for test run. """
+    """Redis stream task for test run."""
 
     __test__ = False
 
@@ -52,25 +52,25 @@ class TestRunTask(BaseRedisTask):
 
 
 class PublicationData(BaseModel):
-    """ Specific data for test run. """
+    """Specific data for test run."""
 
     draft_id: int
 
 
 class PublicationTask(BaseRedisTask):
-    """ Redis stream task for test run. """
+    """Redis stream task for test run."""
 
     data: PublicationData
 
 
 class EmulationData(BaseModel):
-    """ Specific data for emulation run. """
+    """Specific data for emulation run."""
 
     emulation_run_id: int
 
 
 class EmulationTask(BaseRedisTask):
-    """ Redis stream task for emulation run. """
+    """Redis stream task for emulation run."""
 
     data: EmulationData
 
@@ -80,7 +80,7 @@ AnyRedisTask = Union[TestRunTask, PublicationTask, EmulationTask]
 
 
 class RedisPendingData(BaseModel):
-    """ Class that describes pending data from Redis stream. """
+    """Class that describes pending data from Redis stream."""
 
     message_id: str
     consumer: str
@@ -89,7 +89,7 @@ class RedisPendingData(BaseModel):
 
 
 class RedisUnreadData:
-    """ Class for unread data from Redis stream. """
+    """Class for unread data from Redis stream."""
 
     def __init__(self, message_id: bytes, message: Dict[bytes, bytes]) -> None:
         self.message_id = message_id.decode()
@@ -101,7 +101,7 @@ class RedisUnreadData:
 
 
 class RedisContainer(BaseModel):
-    """ Class for parsing instance of :class:`RedisUnreadData` from Redis stream.
+    """Class for parsing instance of :class:`RedisUnreadData` from Redis stream.
 
     ```task``` will be parsed to one of declared models.
     """

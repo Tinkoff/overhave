@@ -19,31 +19,31 @@ logger = logging.getLogger(__name__)
 
 
 class BaseS3ManagerException(Exception):
-    """ Base exception for :class:`S3Manager`. """
+    """Base exception for :class:`S3Manager`."""
 
 
 class UndefinedClientException(BaseS3ManagerException):
-    """ Exception for situation with not initialized client in :class:`S3Manager`. """
+    """Exception for situation with not initialized client in :class:`S3Manager`."""
 
 
 class InvalidEndpointError(BaseS3ManagerException):
-    """ Exception for ValueError with invalid endpoint from boto3. """
+    """Exception for ValueError with invalid endpoint from boto3."""
 
 
 class InvalidCredentialsError(BaseS3ManagerException):
-    """ Exception for situation with invalid credentials from boto3. """
+    """Exception for situation with invalid credentials from boto3."""
 
 
 class EndpointConnectionError(BaseS3ManagerException):
-    """ Exception for situation with endpoint connection error from boto3. """
+    """Exception for situation with endpoint connection error from boto3."""
 
 
 class ClientError(BaseS3ManagerException):
-    """ Exception for situation with client error from boto3. """
+    """Exception for situation with client error from boto3."""
 
 
 class EmptyObjectsListError(BaseS3ManagerException):
-    """ Exception for situation with empty object list. """
+    """Exception for situation with empty object list."""
 
 
 def _s3_error(msg: str):  # type: ignore
@@ -60,7 +60,7 @@ def _s3_error(msg: str):  # type: ignore
 
 
 class S3Manager:
-    """ Class for s3 management with boto3 client. """
+    """Class for s3 management with boto3 client."""
 
     def __init__(self, settings: OverhaveS3ManagerSettings):
         self._settings = settings
@@ -151,7 +151,8 @@ class S3Manager:
             raise EmptyObjectsListError("No one object specified for deletion!")
         logger.info("Deleting items %s...", [obj.name for obj in objects])
         response = self._ensured_client.delete_objects(
-            Bucket=bucket, Delete={"Objects": [{"Key": obj.name} for obj in objects]},
+            Bucket=bucket,
+            Delete={"Objects": [{"Key": obj.name} for obj in objects]},
         )
         logger.debug("Delete objects response:\n%s", response)
         return DeletionResultModel.parse_obj(response)

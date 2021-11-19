@@ -7,7 +7,7 @@ from overhave.utils import get_current_time
 
 
 class ITestRunStorage(abc.ABC):
-    """ Abstract class for test runs storage. """
+    """Abstract class for test runs storage."""
 
     @abc.abstractmethod
     def create_test_run(self, scenario_id: int, executed_by: str) -> int:
@@ -27,7 +27,7 @@ class ITestRunStorage(abc.ABC):
 
 
 class TestRunStorage(ITestRunStorage):
-    """ Class for test runs storage. """
+    """Class for test runs storage."""
 
     def create_test_run(self, scenario_id: int, executed_by: str) -> int:
         with db.create_session() as session:

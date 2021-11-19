@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class DefaultAdminAuthorizationManager(AdminSecretMixin):
-    """ Class for user authorization.
+    """Class for user authorization.
 
     Manager authorize users with registered credentials.
     """

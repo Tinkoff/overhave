@@ -11,7 +11,7 @@ from overhave.admin import views
 
 @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.tag.current_user"], indirect=True)
 class TestTagView:
-    """ Unit tests for TagsView. """
+    """Unit tests for TagsView."""
 
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)
     def test_get_tag_created_not_change(

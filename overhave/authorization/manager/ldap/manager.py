@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class LDAPEmptyAdminGroupError(ValueError):
-    """ Exception for situation with empty LDAP admin group. """
+    """Exception for situation with empty LDAP admin group."""
 
 
 class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
-    """ Class for user authorization via LDAP.
+    """Class for user authorization via LDAP.
 
     Manager authorize users using remote LDAP server. Each user should use his LDAP credentials.
     LDAP server returns user groups. If user in default 'admin' group or his groups list contains admin group - user

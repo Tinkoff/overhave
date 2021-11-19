@@ -12,7 +12,7 @@ from overhave.storage import SystemUserStorage
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
 class TestSystemUserStorage:
-    """ Integration tests for :class:`TestSystemUserStorage`. """
+    """Integration tests for :class:`TestSystemUserStorage`."""
 
     def test_get_existing_user(
         self, test_system_user_storage: SystemUserStorage, test_system_user: SystemUserModel
