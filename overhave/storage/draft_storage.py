@@ -105,9 +105,9 @@ class DraftStorage(IDraftStorage):
     def get_previous_feature_draft(feature_id: int) -> DraftModel:
         with db.create_session() as session:
             selection_num = 2
-            drafts: List[db.Draft] = (
+            drafts: List[db.Draft] = (  # noqa: ECE001
                 session.query(db.Draft)
-                .filter(db.Draft.feature_id == feature_id)  # noqa: ECE001
+                .filter(db.Draft.feature_id == feature_id)
                 .order_by(db.Draft.id.asc())
                 .limit(selection_num)
                 .all()
