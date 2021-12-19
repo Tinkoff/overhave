@@ -39,7 +39,7 @@ tz = ["python-dateutil"]
 name = "allure-pytest"
 version = "2.9.45"
 description = "Allure pytest integration"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -52,7 +52,7 @@ six = ">=1.9.0"
 name = "allure-python-commons"
 version = "2.9.45"
 description = "Common module for integrate allure with python-based frameworks"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 
@@ -313,7 +313,7 @@ python-versions = "*"
 name = "execnet"
 version = "1.9.0"
 description = "execnet: rapid multi-Python deployment"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -1171,7 +1171,7 @@ Faker = ">=0.7.3"
 name = "pytest-forked"
 version = "1.4.0"
 description = "run tests in isolated forked subprocesses"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1208,7 +1208,7 @@ pytest = ">=3.0.0"
 name = "pytest-xdist"
 version = "2.5.0"
 description = "pytest xdist plugin for distributed testing and loop-on-failing modes"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1845,7 +1845,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "8554b6dbbcd38c7c9b4fc2fc4a620be4bb6f59c491ad8a234eafbcd348a3b03f"
+content-hash = "c025446701dfbdc113acef4005886eb0008b2a385a40214b83e9d6879859bafa"
 
 [metadata.files]
 alabaster = [
