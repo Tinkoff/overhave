@@ -58,8 +58,9 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             test_run_storage=self._test_run_storage,
             draft_storage=self._draft_storage,
             file_manager=self._file_manager,
+            git_initializer=self._git_initializer,
             stash_publisher_settings=self.context.publisher_settings,  # type: ignore
-            client=self._stash_client,
+            stash_client=self._stash_client,
         )
 
     @cached_property
@@ -80,6 +81,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             test_run_storage=self._test_run_storage,
             draft_storage=self._draft_storage,
             file_manager=self._file_manager,
+            git_initializer=self._git_initializer,
             gitlab_publisher_settings=self.context.publisher_settings,  # type: ignore
             gitlab_client=self._gitlab_client,
             tokenizer_client=self._tokenizer_client,

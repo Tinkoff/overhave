@@ -2,7 +2,13 @@ import abc
 from functools import cached_property
 from typing import Generic, Optional, Type, cast
 
-from overhave.entities import ArchiveManager, FeatureExtractor, IFeatureExtractor, ReportManager
+from overhave.entities import (
+    ArchiveManager,
+    FeatureExtractor,
+    GitRepositoryInitializer,
+    IFeatureExtractor,
+    ReportManager,
+)
 from overhave.factory.context import TApplicationContext
 from overhave.scenario import FileManager, ScenarioCompiler
 from overhave.storage import (
@@ -215,3 +221,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     @property
     def system_user_storage(self) -> ISystemUserStorage:
         return self._system_user_storage
+
+    @cached_property
+    def _git_initializer(self) -> GitRepositoryInitializer:
+        return GitRepositoryInitializer(file_settings=self.context.file_settings)

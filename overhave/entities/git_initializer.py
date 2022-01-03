@@ -15,6 +15,10 @@ class GitRepositoryInitializationError(BaseGitRepositoryInitializerException):
     """Error for situation with `git.GitError` when repo initializing."""
 
 
+class GitPullError(BaseGitRepositoryInitializerException):
+    """Error for situation with `git.GitError` when origin pulling."""
+
+
 class GitRepositoryInitializer:
     """Class for git repository initializing and updating with pull command."""
 
@@ -30,10 +34,17 @@ class GitRepositoryInitializer:
             logger.info("Repository: %s", self._repository)
             logger.info("Working dir: %s", self._repository.working_dir)
             logger.info("Active head: %s", self._repository.active_branch)
-        except git.GitError:
-            raise GitRepositoryInitializationError("Error while trying to initialize git repository!")
+        except git.GitError as err:
+            raise GitRepositoryInitializationError("Error while trying to initialize git repository!") from err
+
+    @property
+    def repository(self) -> git.Repo:
+        return self._repository
 
     def pull(self) -> None:
-        origin = self._repository.remotes.origin
-        origin.pull()
-        logger.info("Origin successfully pulled")
+        try:
+            origin = self._repository.remotes.origin
+            origin.pull()
+            logger.info("Origin successfully pulled")
+        except git.GitError as err:
+            raise GitPullError("Error while trying to pull from remote repository!") from err

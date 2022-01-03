@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockFixture
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
-from overhave.entities import FeatureTypeName
+from overhave.entities import FeatureTypeName, GitRepositoryInitializer
 from overhave.publication import StashVersionPublisher
 from overhave.publication.stash import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
@@ -53,6 +53,7 @@ def test_stash_publisher_with_default_reviewers(
     test_project_settings: OverhaveProjectSettings,
     test_stash_publisher_settings_with_default_reviewers: OverhaveStashPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_git_initializer: GitRepositoryInitializer,
     mocked_stash_client: StashHttpClient,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
@@ -64,8 +65,9 @@ def test_stash_publisher_with_default_reviewers(
         test_run_storage=mocker.create_autospec(ITestRunStorage),
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
+        git_initializer=mocked_git_initializer,
         stash_publisher_settings=test_stash_publisher_settings_with_default_reviewers,
-        client=mocked_stash_client,
+        stash_client=mocked_stash_client,
     )
 
 
@@ -75,6 +77,7 @@ def test_stash_publisher_with_reviewers_mapping(
     test_project_settings: OverhaveProjectSettings,
     test_stash_project_settings_with_reviewers_mapping: OverhaveStashPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_git_initializer: GitRepositoryInitializer,
     mocked_stash_client: StashHttpClient,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
@@ -86,6 +89,7 @@ def test_stash_publisher_with_reviewers_mapping(
         test_run_storage=mocker.create_autospec(ITestRunStorage),
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
+        git_initializer=mocked_git_initializer,
         stash_publisher_settings=test_stash_project_settings_with_reviewers_mapping,
-        client=mocked_stash_client,
+        stash_client=mocked_stash_client,
     )

@@ -6,7 +6,7 @@ from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 from requests import HTTPError
 
 from overhave.db import DraftStatus
-from overhave.entities import OverhaveFileSettings, PublisherContext
+from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
@@ -38,6 +38,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         test_run_storage: ITestRunStorage,
         draft_storage: IDraftStorage,
         file_manager: FileManager,
+        git_initializer: GitRepositoryInitializer,
         gitlab_publisher_settings: OverhaveGitlabPublisherSettings,
         gitlab_client: GitlabHttpClient,
         tokenizer_client: TokenizerClient,
@@ -50,6 +51,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             test_run_storage=test_run_storage,
             draft_storage=draft_storage,
             file_manager=file_manager,
+            git_initializer=git_initializer,
         )
         self._gitlab_publisher_settings = gitlab_publisher_settings
         self._gitlab_client = gitlab_client

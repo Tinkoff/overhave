@@ -5,7 +5,7 @@ from _pytest.fixtures import FixtureRequest
 from pytest_mock import MockFixture
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
-from overhave.entities import FeatureExtractor, OverhaveScenarioCompilerSettings
+from overhave.entities import FeatureExtractor, GitRepositoryInitializer, OverhaveScenarioCompilerSettings
 from overhave.scenario import FileManager
 
 
@@ -24,6 +24,11 @@ def test_file_settings(request: FixtureRequest) -> OverhaveFileSettings:
 @pytest.fixture()
 def mocked_file_manager(mocker: MockFixture) -> FileManager:
     return cast(FileManager, mocker.create_autospec(FileManager))
+
+
+@pytest.fixture()
+def mocked_git_initializer(mocker: MockFixture) -> GitRepositoryInitializer:
+    return cast(GitRepositoryInitializer, mocker.create_autospec(GitRepositoryInitializer))
 
 
 @pytest.fixture()

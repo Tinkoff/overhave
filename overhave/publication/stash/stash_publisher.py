@@ -3,7 +3,7 @@ import logging
 from requests import HTTPError
 
 from overhave.db import DraftStatus
-from overhave.entities import OverhaveFileSettings, PublisherContext
+from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings, PublisherContext
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
@@ -33,8 +33,9 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         test_run_storage: ITestRunStorage,
         draft_storage: IDraftStorage,
         file_manager: FileManager,
+        git_initializer: GitRepositoryInitializer,
         stash_publisher_settings: OverhaveStashPublisherSettings,
-        client: StashHttpClient,
+        stash_client: StashHttpClient,
     ):
         super().__init__(
             file_settings=file_settings,
@@ -44,9 +45,10 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             test_run_storage=test_run_storage,
             draft_storage=draft_storage,
             file_manager=file_manager,
+            git_initializer=git_initializer,
         )
         self._stash_publisher_settings = stash_publisher_settings
-        self._client = client
+        self._client = stash_client
 
     def publish_version(self, draft_id: int) -> None:
         logger.info("Start processing draft_id=%s...", draft_id)
