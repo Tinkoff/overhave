@@ -105,9 +105,16 @@ def test_demo_settings_generator(test_demo_language: OverhaveDemoAppLanguage) ->
     return OverhaveDemoSettingsGenerator(language=test_demo_language, threadpool=False)
 
 
+@pytest.fixture(scope="module")
+def mocked_git_repo() -> mock.MagicMock:
+    with mock.patch("git.Repo", return_value=mock.MagicMock()) as git_repo:
+        yield git_repo
+
+
 @pytest.fixture()
 def test_resolved_admin_proxy_manager(
     flask_run_mock: mock.MagicMock,
+    mocked_git_repo: mock.MagicMock,
     test_admin_factory: IAdminFactory,
     test_proxy_manager: IProxyManager,
     mock_envs: None,
