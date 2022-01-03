@@ -21,6 +21,7 @@ from .feature import (
     ScenariosTestFileNotFound,
 )
 from .file_extractor import BaseFileExtractor
+from .git_initializer import GitRepositoryInitializer
 from .language import StepPrefixesModel
 from .report_manager import ReportManager, ReportPresenceResolution
 from .settings import (

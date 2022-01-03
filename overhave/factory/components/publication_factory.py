@@ -4,9 +4,13 @@ from functools import cached_property
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
-from overhave.publication import IVersionPublisher, StashVersionPublisher
-from overhave.publication.gitlab import GitlabVersionPublisher, TokenizerClient
-from overhave.publication.objects import PublicationManagerType
+from overhave.publication import (
+    GitlabVersionPublisher,
+    IVersionPublisher,
+    PublicationManagerType,
+    StashVersionPublisher,
+    TokenizerClient,
+)
 from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
 
