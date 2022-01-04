@@ -78,7 +78,7 @@ def delete(name: str, force: bool) -> None:
     help="Remove all files in bucket older then specified days value",
 )
 def remove_files(name: str, days: int) -> None:
-    """Remove s3 bucket files older ."""
+    """Remove s3 bucket files older than specified number of days."""
     _check_bucket_registered(name)
     manager = _get_s3_manager()
     target_date = get_current_time() - timedelta(days=days)
@@ -93,7 +93,7 @@ def remove_files(name: str, days: int) -> None:
         click.secho(f"No one object older than {days} days.")
         return
     click.secho(f"Objects older then {days} days: {[x.name for x in objects_to_delete]}")
-    manager.delete_bucket_objects(bucket=bucket, objects=objects_to_delete)
+    manager.delete_bucket_objects(bucket=name, objects=objects_to_delete)
 
 
 @s3.command(short_help="Download file from s3 bucket")
