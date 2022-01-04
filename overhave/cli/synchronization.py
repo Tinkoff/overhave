@@ -14,5 +14,6 @@ def _create_synchronizer() -> IOverhaveSynchronizer:
 
 @overhave.command(short_help="Run Overhave feature synchronization")
 @click.option("-c", "--create-db-features", is_flag=True, help="Create features in database if necessary")
-def synchronize(create_db_features: bool) -> None:
-    _create_synchronizer().synchronize(create_db_features)
+@click.option("-p", "--pull-repository", is_flag=True, help="Pull remote repository")
+def synchronize(create_db_features: bool, pull_repository: bool) -> None:
+    _create_synchronizer().synchronize(create_db_features, pull_repository)

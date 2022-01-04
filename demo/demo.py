@@ -1,3 +1,5 @@
+from unittest import mock
+
 import click
 
 from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
@@ -51,7 +53,8 @@ def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenera
 def _ensure_demo_app_has_features() -> None:
     with db.create_session() as session:
         create_db_features = not bool(session.query(db.Feature).all())
-    _create_synchronizer().synchronize(create_db_features=create_db_features)
+    with mock.patch("git.Repo", return_value=mock.MagicMock()):
+        _create_synchronizer().synchronize(create_db_features=create_db_features)
 
 
 def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:

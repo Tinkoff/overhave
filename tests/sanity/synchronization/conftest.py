@@ -1,4 +1,5 @@
 from typing import Callable, List
+from unittest import mock
 
 import pytest
 
@@ -26,6 +27,7 @@ def test_synchronizer_factory(clean_synchronizer_factory: Callable[[], ISynchron
 @pytest.fixture()
 def test_resolved_synchronizer(
     test_synchronizer_factory: ISynchronizerFactory,
+    mocked_git_repo: mock.MagicMock,
     mock_envs: None,
     database: None,
     test_demo_settings_generator: OverhaveDemoSettingsGenerator,

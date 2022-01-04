@@ -42,6 +42,7 @@ class SynchronizerFactory(BaseOverhaveFactory[OverhaveSynchronizerContext], ISyn
             scenario_parser=self._scenario_parser,
             feature_extractor=self._feature_extractor,
             system_user_storage=self._system_user_storage,
+            git_initializer=self._git_initializer,
         )
 
     @property

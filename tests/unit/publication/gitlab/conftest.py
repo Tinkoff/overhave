@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 from yarl import URL
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
-from overhave.entities import FeatureTypeName
+from overhave.entities import FeatureTypeName, GitRepositoryInitializer
 from overhave.publication.gitlab import GitlabVersionPublisher, OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer import TokenizerClient, TokenizerClientSettings
 from overhave.scenario import FileManager
@@ -73,9 +73,10 @@ def test_gitlab_publisher_with_default_reviewers(
     test_project_settings: OverhaveProjectSettings,
     test_gitlab_publisher_settings_with_default_reviewers: OverhaveGitlabPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_git_initializer: GitRepositoryInitializer,
     mocked_gitlab_client: GitlabHttpClient,
-    mocker: MockFixture,
     mocked_tokenizer_client: TokenizerClient,
+    mocker: MockFixture,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -85,6 +86,7 @@ def test_gitlab_publisher_with_default_reviewers(
         test_run_storage=mocker.create_autospec(ITestRunStorage),
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
+        git_initializer=mocked_git_initializer,
         gitlab_publisher_settings=test_gitlab_publisher_settings_with_default_reviewers,
         gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
@@ -97,9 +99,10 @@ def test_gitlab_publisher_with_reviewers_mapping(
     test_project_settings: OverhaveProjectSettings,
     test_gitlab_project_settings_with_reviewers_mapping: OverhaveGitlabPublisherSettings,
     mocked_file_manager: FileManager,
+    mocked_git_initializer: GitRepositoryInitializer,
     mocked_gitlab_client: GitlabHttpClient,
-    mocker: MockFixture,
     mocked_tokenizer_client: TokenizerClient,
+    mocker: MockFixture,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -109,6 +112,7 @@ def test_gitlab_publisher_with_reviewers_mapping(
         test_run_storage=mocker.create_autospec(ITestRunStorage),
         draft_storage=mocker.create_autospec(IDraftStorage),
         file_manager=mocked_file_manager,
+        git_initializer=mocked_git_initializer,
         gitlab_publisher_settings=test_gitlab_project_settings_with_reviewers_mapping,
         gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,

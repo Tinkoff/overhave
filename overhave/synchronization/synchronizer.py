@@ -9,6 +9,7 @@ from overhave.entities import (
     BaseFileExtractor,
     FeatureExtractor,
     FeatureModel,
+    GitRepositoryInitializer,
     OverhaveFileSettings,
     ScenarioModel,
     TagModel,
@@ -74,6 +75,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         scenario_parser: ScenarioParser,
         feature_extractor: FeatureExtractor,
         system_user_storage: ISystemUserStorage,
+        git_initializer: GitRepositoryInitializer,
     ):
         super().__init__(extenstion=file_settings.feature_suffix)
         self._file_settings = file_settings
@@ -85,6 +87,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self._scenario_parser = scenario_parser
         self._feature_extractor = feature_extractor
         self._system_user_storage = system_user_storage
+        self._git_initializer = git_initializer
 
     @staticmethod
     def _update_feature_model_with_info(
@@ -171,7 +174,9 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         self._scenario_storage.create_scenario(scenario_model)
         logger.info("Feature with ID=%s has been created successfully.", feature_model.id)
 
-    def synchronize(self, create_db_features: bool = False) -> None:  # noqa: C901
+    def synchronize(self, create_db_features: bool = False, pull_repository: bool = False) -> None:  # noqa: C901
+        if pull_repository:
+            self._git_initializer.pull()
         logger.info("Start synchronization...")
         all_features = self._extract_recursively(self._file_settings.features_dir)
         for feature_file in all_features:
