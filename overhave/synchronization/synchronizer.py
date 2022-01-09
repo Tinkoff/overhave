@@ -110,7 +110,8 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             last_published_draft = draft_models[-1]
             if last_published_draft.published_at is not None:
                 logger.info(
-                    "Last version has been published at %s.", last_published_draft.strftime("%d-%m-%Y %H:%M:%S")
+                    "Last version has been published at %s.",
+                    last_published_draft.published_at.strftime("%d-%m-%Y %H:%M:%S"),
                 )
                 return last_published_draft.published_at
         logger.info("Feature hasn't got any published version.")
