@@ -81,6 +81,7 @@ class FeatureStorage(IFeatureStorage):
             feature.task = model.task
             feature.last_edited_by = model.last_edited_by
             feature.released = True
+            session.flush()
 
             existing_tags = {tag.id for tag in feature.feature_tags}
             model_tags = {tag.id for tag in model.feature_tags}
