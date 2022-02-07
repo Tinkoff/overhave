@@ -16,7 +16,7 @@ def _run_consumer(stream: RedisStream) -> None:
 @click.option(
     "-s",
     "--stream",
-    type=click.Choice(RedisStream.__members__),
+    type=click.Choice(list(RedisStream.__members__)),
     callback=lambda c, p, v: getattr(RedisStream, v),
     help="Redis stream, which defines application",
 )

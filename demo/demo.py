@@ -104,7 +104,7 @@ def _run_demo_consumer(stream: OverhaveRedisStream, settings_generator: Overhave
 @click.option(
     "-s",
     "--stream",
-    type=click.Choice(OverhaveRedisStream.__members__),
+    type=click.Choice(list(OverhaveRedisStream.__members__)),
     callback=lambda c, p, v: getattr(OverhaveRedisStream, v),
     help="Redis stream, which defines application",
 )
