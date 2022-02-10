@@ -35,10 +35,7 @@ def mocked_ldap_connection(cls: Any, *args: Any, **kwargs: Any) -> None:
     ]
     cls._ldap_connection = mock.MagicMock()
     cls._ldap_connection.search_st.return_value = [
-        (
-            "CN=Very cool member,OU=dep1,DC=mydomain,DC=ru",
-            {"memberOf": member_groups},
-        )
+        ("CN=Very cool member,OU=dep1,DC=mydomain,DC=ru", {"memberOf": member_groups},)
     ]
 
 

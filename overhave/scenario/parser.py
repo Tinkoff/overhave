@@ -68,9 +68,7 @@ class ScenarioParser(PrefixMixin):
     def _get_name(self, name_line: str, feature_prefix: str) -> str:
         name_parts = name_line.split(feature_prefix)
         if not name_parts:
-            raise FeatureNameParsingError(
-                f"Could not parse feature name from '{name_line}'!",
-            )
+            raise FeatureNameParsingError(f"Could not parse feature name from '{name_line}'!",)
         return name_parts[-1].strip()
 
     def _get_tags(self, tags_line: str) -> List[str]:
@@ -81,9 +79,7 @@ class ScenarioParser(PrefixMixin):
             if tag not in self._feature_extractor.feature_types:
                 continue
             return tag
-        raise FeatureTypeParsingError(
-            f"Could not get feature type from tags {tags}!",
-        )
+        raise FeatureTypeParsingError(f"Could not get feature type from tags {tags}!",)
 
     @staticmethod
     def _get_additional_info(additional_line: str, left_pointer: str, right_pointer: str) -> str:

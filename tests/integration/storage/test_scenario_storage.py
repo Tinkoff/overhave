@@ -30,10 +30,7 @@ class TestScenarioStorage:
         _check_base_scenario_type_model(test_model=model, validation_model=test_scenario)
 
     def test_update_scenario(
-        self,
-        test_scenario_storage: ScenarioStorage,
-        test_scenario: ScenarioModel,
-        faker: Faker,
+        self, test_scenario_storage: ScenarioStorage, test_scenario: ScenarioModel, faker: Faker,
     ) -> None:
         new_model = ScenarioModel(id=test_scenario.feature_id, text=faker.word(), feature_id=test_scenario.feature_id)
         test_scenario_storage.update_scenario(new_model)
@@ -42,10 +39,7 @@ class TestScenarioStorage:
         _check_base_scenario_type_model(test_model=changed_model, validation_model=new_model)
 
     def test_create_scenario(
-        self,
-        test_scenario_storage: ScenarioStorage,
-        faker: Faker,
-        test_feature: FeatureModel,
+        self, test_scenario_storage: ScenarioStorage, faker: Faker, test_feature: FeatureModel,
     ) -> None:
         new_model = ScenarioModel(id=0, text=faker.word(), feature_id=test_feature.id)
         new_model.id = test_scenario_storage.create_scenario(new_model)

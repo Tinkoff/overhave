@@ -142,6 +142,11 @@ class PublisherContext(TestExecutorContext):
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     """Model for :class:`TestUser` row."""
 
+    id: int
+    name: str
+    created_by: str
+    specification: dict[str, str]
+    feature_type_id: int
     feature_type: FeatureTypeModel
 
 

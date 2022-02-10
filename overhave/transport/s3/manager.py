@@ -151,8 +151,7 @@ class S3Manager:
             raise EmptyObjectsListError("No one object specified for deletion!")
         logger.info("Deleting items %s...", [obj.name for obj in objects])
         response = self._ensured_client.delete_objects(
-            Bucket=bucket,
-            Delete={"Objects": [{"Key": obj.name} for obj in objects]},
+            Bucket=bucket, Delete={"Objects": [{"Key": obj.name} for obj in objects]},
         )
         logger.debug("Delete objects response:\n%s", response)
         return DeletionResultModel.parse_obj(response)

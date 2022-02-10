@@ -34,10 +34,7 @@ def _get_s3_manager() -> S3Manager:
 
 @bucket.command(short_help="Create s3 cloud bucket")
 @click.option(
-    "-n",
-    "--name",
-    type=str,
-    help="Declared s3 bucket",
+    "-n", "--name", type=str, help="Declared s3 bucket",
 )
 def create(name: str) -> None:
     """Create s3 bucket."""
@@ -47,16 +44,10 @@ def create(name: str) -> None:
 
 @bucket.command(short_help="Delete s3 cloud bucket")
 @click.option(
-    "-n",
-    "--name",
-    type=str,
-    help="Declared s3 bucket",
+    "-n", "--name", type=str, help="Declared s3 bucket",
 )
 @click.option(
-    "-f",
-    "--force",
-    is_flag=True,
-    help="Delete all files in bucket, then delete bucket",
+    "-f", "--force", is_flag=True, help="Delete all files in bucket, then delete bucket",
 )
 def delete(name: str, force: bool) -> None:
     """Delete s3 bucket."""
@@ -66,16 +57,10 @@ def delete(name: str, force: bool) -> None:
 
 @bucket.command(short_help="Remove old s3 cloud bucket files")
 @click.option(
-    "-n",
-    "--name",
-    type=str,
-    help="Declared s3 bucket",
+    "-n", "--name", type=str, help="Declared s3 bucket",
 )
 @click.option(
-    "-d",
-    "--days",
-    type=int,
-    help="Remove all files in bucket older then specified days value",
+    "-d", "--days", type=int, help="Remove all files in bucket older then specified days value",
 )
 def remove_files(name: str, days: int) -> None:
     """Remove s3 bucket files older than specified number of days."""
@@ -98,16 +83,10 @@ def remove_files(name: str, days: int) -> None:
 
 @s3.command(short_help="Download file from s3 bucket")
 @click.option(
-    "-b",
-    "--bucket",
-    type=str,
-    help="Declared s3 bucket",
+    "-b", "--bucket", type=str, help="Declared s3 bucket",
 )
 @click.option(
-    "-f",
-    "--filename",
-    type=str,
-    help="Filename for downloading",
+    "-f", "--filename", type=str, help="Filename for downloading",
 )
 @click.option("-d", "--dir-to-save", type=str, help="Directory for saving file", default=".")
 def download_file(bucket: str, filename: str, dir_to_save: str) -> None:

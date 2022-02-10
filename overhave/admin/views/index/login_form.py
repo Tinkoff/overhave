@@ -23,8 +23,7 @@ class LoginForm(Form):
         render_kw={"placeholder": "Username", "icon": "glyphicon-user"},
     )
     password: PasswordField = PasswordField(
-        "Password",
-        render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
+        "Password", render_kw={"placeholder": "Password", "icon": "glyphicon-certificate"},
     )
 
     def __init__(self, auth_manager: IAdminAuthorizationManager) -> None:

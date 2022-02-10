@@ -52,8 +52,6 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
         if self._settings.remote_key_name is None:
             raise InvalidRemoteKeyNameException("Please check remote key name! Value is invalid!")
         response = self._make_request(
-            HttpMethod.POST,
-            self._settings.url,
-            params=params_model.get_request_params(self._settings.remote_key_name),
+            HttpMethod.POST, self._settings.url, params=params_model.get_request_params(self._settings.remote_key_name),
         )
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))

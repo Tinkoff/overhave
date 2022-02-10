@@ -40,11 +40,7 @@ class TestAppCommon:
         response = test_client.get(f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}")
         assert response.status_code == HTTPStatus.FOUND
 
-    def test_app_get_emulation_run(
-        self,
-        test_app: OverhaveAdminApp,
-        test_client: FlaskClient,
-    ) -> None:
+    def test_app_get_emulation_run(self, test_app: OverhaveAdminApp, test_client: FlaskClient,) -> None:
         response = test_client.get("http://localhost/emulations/kek:8000")
         assert response.status_code == HTTPStatus.FOUND
 

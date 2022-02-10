@@ -43,6 +43,4 @@ class ConsumerFactory:
         factory = get_test_execution_factory()
         proxy_manager = get_proxy_manager()
         proxy_manager.set_factory(factory)
-        return partial(
-            factory.process_task,
-        )
+        return partial(factory.process_task,)

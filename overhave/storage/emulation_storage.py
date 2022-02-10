@@ -74,8 +74,7 @@ class EmulationStorage(IEmulationStorage):
             .all()
         )
         allocated_sorted_runs = sorted(
-            runs_with_allocated_ports,
-            key=lambda t: t.changed_at,  # type: ignore
+            runs_with_allocated_ports, key=lambda t: t.changed_at,  # type: ignore
         )
 
         allocated_ports = {run.port for run in allocated_sorted_runs}

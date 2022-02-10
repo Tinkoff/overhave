@@ -31,9 +31,7 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
         self, repository_id: str, merge_request: GitlabMrRequest, token: str
     ) -> GitlabMrCreationResponse:
         gitlab_python_client = get_gitlab_python_client(
-            url=self._settings.url.human_repr(),
-            token_type=self._settings.token_type,
-            token=token,
+            url=self._settings.url.human_repr(), token_type=self._settings.token_type, token=token,
         )
         project = gitlab_python_client.projects.get(repository_id, lazy=True)
         try:

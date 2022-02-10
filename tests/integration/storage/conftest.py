@@ -32,6 +32,7 @@ from overhave.storage import (
     SystemUserStorage,
     TestRunStorage,
 )
+from overhave.storage.test_user_storage import TestUserStorage
 
 
 @pytest.fixture(scope="module")
@@ -53,7 +54,7 @@ def test_emulation_storage(
 
 
 @pytest.fixture()
-def test_feature_type(database: None, faker: Faker) -> db.FeatureType:
+def test_feature_type(database: None, faker: Faker) -> FeatureTypeModel:
     with db.create_session() as session:
         feature_type = db.FeatureType(name=cast(str, faker.word()))
         session.add(feature_type)
@@ -77,11 +78,31 @@ def test_system_user(
     )
 
 
+@pytest.fixture(scope="class")
+def test_user_storage() -> TestUserStorage:
+    return TestUserStorage()
+
+
 @pytest.fixture()
-def test_testuser(test_system_user: SystemUserModel, faker: Faker, test_feature_type) -> TestUserModel:
+def test_user_name(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
+def test_specification() -> dict[str, str]:
+    return {"test": "value"}
+
+
+@pytest.fixture()
+def test_testuser(
+    test_system_user: SystemUserModel, faker: Faker, test_feature_type, test_specification
+) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
-            feature_type_id=test_feature_type.id, name=cast(str, faker.word()), created_by=test_system_user.login
+            feature_type_id=test_feature_type.id,
+            name=cast(str, faker.word()),
+            created_by=test_system_user.login,
+            specification=test_specification,
         )
         session.add(test_user)
         session.flush()
