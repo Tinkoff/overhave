@@ -2,8 +2,8 @@ import pytest
 
 from overhave import db
 from overhave.entities import FeatureTypeModel, SystemUserModel
-from overhave.entities.converters import TestUserModel
-from overhave.storage.test_user_storage import TestUserDoesNotExistError, TestUserSpecification, TestUserStorage
+from overhave.entities.converters import TestUserModel, TestUserSpecification
+from overhave.storage.test_user_storage import TestUserDoesNotExistError, TestUserStorage
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)

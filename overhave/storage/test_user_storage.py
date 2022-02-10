@@ -1,12 +1,11 @@
 import abc
-from typing import Any, NewType, Optional, cast
+from typing import Optional, cast
 
 from overhave import db
 from overhave.db import create_session
-from overhave.entities.converters import TestUserModel
+from overhave.entities import FeatureTypeName
+from overhave.entities.converters import TestUserModel, TestUserSpecification
 from overhave.storage import FeatureTypeStorage
-
-TestUserSpecification = NewType("TestUserSpecification", dict[str, Any])
 
 
 class BaseTestUserStorageException(Exception):
@@ -27,7 +26,9 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def create_test_user(name: str, specification: TestUserSpecification, created_by: str, feature_type: str) -> int:
+    def create_test_user(
+        name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
+    ) -> TestUserModel:
         pass
 
     @staticmethod
@@ -48,7 +49,9 @@ class TestUserStorage(ITestUserStorage):
             raise TestUserDoesNotExistError(f"Not found test user with name {name}!")
 
     @staticmethod
-    def create_test_user(name: str, specification: TestUserSpecification, created_by: str, feature_type: str) -> int:
+    def create_test_user(
+        name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
+    ) -> TestUserModel:
         feature_type = FeatureTypeStorage.get_feature_type_by_name(name=feature_type)
         with db.create_session() as session:
             test_user = db.TestUser(  # type: ignore
@@ -59,7 +62,7 @@ class TestUserStorage(ITestUserStorage):
             )
             session.add(test_user)
             session.flush()
-            return cast(int, test_user.id)
+            return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
     @staticmethod
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:

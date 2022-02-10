@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, NewType, Optional
 
 from pydantic.main import BaseModel
 from pydantic.types import SecretStr
@@ -22,6 +22,8 @@ from overhave.db import (
     UserRole,
 )
 from overhave.entities.feature import FeatureTypeName
+
+TestUserSpecification = NewType("TestUserSpecification", dict[str, str])
 
 
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore

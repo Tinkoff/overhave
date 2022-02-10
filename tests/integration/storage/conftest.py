@@ -20,6 +20,7 @@ from overhave.entities.converters import (
     SystemUserModel,
     TagModel,
     TestUserModel,
+    TestUserSpecification,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage import (
@@ -32,7 +33,7 @@ from overhave.storage import (
     SystemUserStorage,
     TestRunStorage,
 )
-from overhave.storage.test_user_storage import TestUserSpecification, TestUserStorage
+from overhave.storage.test_user_storage import TestUserStorage
 
 
 @pytest.fixture(scope="module")
