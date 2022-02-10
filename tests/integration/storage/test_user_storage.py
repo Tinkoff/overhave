@@ -3,7 +3,7 @@ import pytest
 from overhave import db
 from overhave.entities import FeatureTypeModel, SystemUserModel
 from overhave.entities.converters import TestUserModel, TestUserSpecification
-from overhave.storage.test_user_storage import TestUserDoesNotExistError, TestUserStorage
+from overhave.storage.test_user_storage import TestUserStorage
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
@@ -18,8 +18,7 @@ class TestTestUserStorage:
         test_feature_type: FeatureTypeModel,
         test_system_user: SystemUserModel,
     ) -> None:
-        with pytest.raises(TestUserDoesNotExistError):
-            test_user_storage.get_test_user_by_name(test_user_name)
+        assert test_user_storage.get_test_user_by_name(test_user_name) is None
         test_user_storage.create_test_user(
             name=test_user_name,
             specification=test_specification,
@@ -42,4 +41,5 @@ class TestTestUserStorage:
         assert test_testuser.specification == test_specification
         test_user_storage.update_test_user_specification(test_testuser.id, new_specification)
         test_user = test_user_storage.get_test_user_by_name(test_testuser.name)
+        assert test_user is not None
         assert test_user.specification == new_specification
