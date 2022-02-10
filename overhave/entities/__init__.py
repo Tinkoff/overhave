@@ -11,6 +11,7 @@ from .converters import (
     TagModel,
     TestExecutorContext,
     TestRunModel,
+    TestUserSpecification,
 )
 from .emulator import Emulator
 from .feature import (

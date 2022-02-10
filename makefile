@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 83.8
+MIN_COVERAGE ?= 83.9
 BUILD_DIR ?= dist
 
 DOCS_DIR ?= docs
@@ -40,6 +40,8 @@ lint:
 pretty:
 	$(VENV)/bin/poetry run isort $(ALL)
 	$(VENV)/bin/poetry run black $(ALL)
+
+plint: pretty lint
 
 tag:
 	git tag $(TAG)

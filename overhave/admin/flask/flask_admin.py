@@ -32,7 +32,7 @@ def get_flask_admin(factory: IAdminFactory) -> Admin:
         DraftView(db.Draft, db.current_session, category="Scenarios", name="Versions"),
         TagsView(db.Tags, db.current_session, category="Scenarios", name="Tags"),
         EmulationView(db.Emulation, db.current_session, category="Emulation", name="Templates"),
-        TestUserView(db.TestUser, db.current_session, category="Emulation", name="Test users"),
+        TestUserView(db.TestUser, db.current_session, category="Test users", name="Test users"),
         EmulationRunView(db.EmulationRun, db.current_session, category="Emulation", name="Emulation runs"),
         UserView(db.UserRole, db.current_session, category="Access", name="Users"),
         GroupView(db.GroupRole, db.current_session, category="Access", name="Groups"),
