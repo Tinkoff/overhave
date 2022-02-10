@@ -40,7 +40,8 @@ class TestOverhaveAdminRunTest:
         assert test_featureview_runtest_result == test_rendered_featureview
 
     @pytest.mark.parametrize(
-        "runtest_data", [{f"{_SCENARIO_PREFIX}-id": "8841", f"{_SCENARIO_PREFIX}-text": "smth"}],
+        "runtest_data",
+        [{f"{_SCENARIO_PREFIX}-id": "8841", f"{_SCENARIO_PREFIX}-text": "smth"}],
     )
     def test_incorrect_scenario_data(
         self,

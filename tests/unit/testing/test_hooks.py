@@ -179,7 +179,9 @@ class TestPytestCommonHooks:
         assert patched_hook_test_execution_proxy_manager.pytest_patched
 
     @pytest.mark.parametrize(
-        "getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True,
+        "getoption_mapping",
+        [{_OptionName.ENABLE_INJECTION.as_variable: False}],
+        indirect=True,
     )
     def test_pytest_configure_disabled_injection(
         self,

@@ -42,7 +42,8 @@ class OverhaveDemoSettingsGenerator:
         else:
             language_settings = OverhaveLanguageSettings()
         return dict(
-            language_settings=language_settings, file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
+            language_settings=language_settings,
+            file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
         )
 
     @cached_property

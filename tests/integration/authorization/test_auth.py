@@ -103,7 +103,10 @@ class TestDefaultAuthManager:
     """Integration tests for :class:`DefaultAdminAuthorizationManager`."""
 
     def test_authorize_user_no_user(
-        self, test_default_auth_manager: DefaultAdminAuthorizationManager, test_username: str, test_password: SecretStr,
+        self,
+        test_default_auth_manager: DefaultAdminAuthorizationManager,
+        test_username: str,
+        test_password: SecretStr,
     ) -> None:
         assert test_default_auth_manager.authorize_user(username=test_username, password=test_password) is None
 
@@ -130,7 +133,10 @@ class TestSimpleAuthManager:
     """Integration tests for :class:`SimpleAdminAuthorizationManager`."""
 
     def test_authorize_user_no_user(
-        self, test_simple_auth_manager: SimpleAdminAuthorizationManager, test_username: str, test_password: SecretStr,
+        self,
+        test_simple_auth_manager: SimpleAdminAuthorizationManager,
+        test_username: str,
+        test_password: SecretStr,
     ) -> None:
         user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None

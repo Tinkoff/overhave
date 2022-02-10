@@ -28,14 +28,18 @@ class TestGenerateTaskInfo:
 
 @pytest.mark.parametrize("task_links_keyword", [None, "Tasks"])
 @pytest.mark.parametrize(
-    "language_settings", [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
+    "language_settings",
+    [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
 )
 class TestScenarioCompiler:
     """Unit tests for :class:`ScenarioCompiler`."""
 
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
-        self, test_scenario_compiler: ScenarioCompiler, test_scenario_text: str, test_executor_ctx: TestExecutorContext,
+        self,
+        test_scenario_compiler: ScenarioCompiler,
+        test_scenario_text: str,
+        test_executor_ctx: TestExecutorContext,
     ) -> None:
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_executor_ctx)

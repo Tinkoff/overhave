@@ -70,7 +70,8 @@ class TestDatetimeFormatter:
     """Unit tests for datetime_formatter."""
 
     @pytest.mark.parametrize(
-        ("column_name", "value"), [("created_at", get_current_time())],
+        ("column_name", "value"),
+        [("created_at", get_current_time())],
     )
     def test_created_at(
         self,
@@ -82,7 +83,12 @@ class TestDatetimeFormatter:
         value: datetime,
     ) -> None:
         setattr(test_table, column_name, value)
-        result = datetime_formatter(view=test_view, context=mocker.MagicMock(), model=test_table, name=column_name,)
+        result = datetime_formatter(
+            view=test_view,
+            context=mocker.MagicMock(),
+            model=test_table,
+            name=column_name,
+        )
         assert result == Markup(value.strftime("%d-%m-%Y %H:%M:%S"))
 
     @pytest.mark.parametrize(
@@ -122,9 +128,15 @@ class TestTaskFormatter:
         test_feature_row: db.Feature,
     ) -> None:
         setattr(test_feature_row, column_name, value)
-        assert task_formatter(
-            view=test_feature_view_mocked, context=mocker.MagicMock(), model=test_feature_row, name=column_name,
-        ) == Markup(", ".join(value))
+        assert (
+            task_formatter(
+                view=test_feature_view_mocked,
+                context=mocker.MagicMock(),
+                model=test_feature_row,
+                name=column_name,
+            )
+            == Markup(", ".join(value))
+        )
 
     @pytest.mark.parametrize("test_browse_url", ["https://overhave.readthedocs.io"], indirect=True)
     def test_task_with_url(
@@ -140,9 +152,15 @@ class TestTaskFormatter:
         task_links = []
         for task in value:
             task_links.append(f"<a href='{test_browse_url}/{task}' target='blank'>{task}</a>")
-        assert task_formatter(
-            view=test_feature_view_mocked, context=mocker.MagicMock(), model=test_feature_row, name=column_name,
-        ) == Markup(", ".join(task_links))
+        assert (
+            task_formatter(
+                view=test_feature_view_mocked,
+                context=mocker.MagicMock(),
+                model=test_feature_row,
+                name=column_name,
+            )
+            == Markup(", ".join(task_links))
+        )
 
 
 @pytest.mark.parametrize("column_name", ["status"])
@@ -214,7 +232,11 @@ class TestJsonFormatter:
 
     @pytest.mark.parametrize("value", [{"kek": "lol"}, {"a": "lot", "of": "items"}])
     def test_dict_with_data(
-        self, test_testuser_view: TestUserView, mocker: MockerFixture, column_name: str, value: Dict[str, str],
+        self,
+        test_testuser_view: TestUserView,
+        mocker: MockerFixture,
+        column_name: str,
+        value: Dict[str, str],
     ) -> None:
         info = ""
         for k, v in list(filter(lambda x: x, value.items())):
@@ -244,9 +266,15 @@ class TestFeatureLinkFormatter:
         test_feature_name: str,
         test_feature_row: db.Feature,
     ) -> None:
-        assert feature_link_formatter(
-            view=test_feature_view_mocked, context=mocker.MagicMock(), model=test_feature_row, name=column_name,
-        ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        assert (
+            feature_link_formatter(
+                view=test_feature_view_mocked,
+                context=mocker.MagicMock(),
+                model=test_feature_row,
+                name=column_name,
+            )
+            == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        )
 
     def test_with_testrun(
         self,
@@ -257,17 +285,20 @@ class TestFeatureLinkFormatter:
         test_feature_name: str,
         faker: Faker,
     ) -> None:
-        assert feature_link_formatter(
-            view=test_testrun_view,
-            context=mocker.MagicMock(),
-            model=db.TestRun(  # type: ignore
-                **{
-                    column_name: test_feature_name,
-                    "scenario": db.Scenario(feature_id=test_feature_id, text=faker.word()),  # type: ignore
-                }
-            ),
-            name=column_name,
-        ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        assert (
+            feature_link_formatter(
+                view=test_testrun_view,
+                context=mocker.MagicMock(),
+                model=db.TestRun(  # type: ignore
+                    **{
+                        column_name: test_feature_name,
+                        "scenario": db.Scenario(feature_id=test_feature_id, text=faker.word()),  # type: ignore
+                    }
+                ),
+                name=column_name,
+            )
+            == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        )
 
 
 @pytest.mark.parametrize("column_name", ["feature_id"])
@@ -283,9 +314,15 @@ class TestDraftFeatureFormatter:
         test_feature_name: str,
         test_draft_row: db.Draft,
     ) -> None:
-        assert draft_feature_formatter(
-            view=test_draft_view, context=mocker.MagicMock(), model=test_draft_row, name=column_name,
-        ) == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        assert (
+            draft_feature_formatter(
+                view=test_draft_view,
+                context=mocker.MagicMock(),
+                model=test_draft_row,
+                name=column_name,
+            )
+            == get_feature_link_markup(feature_id=test_feature_id, feature_name=test_feature_name)
+        )
 
 
 @pytest.mark.parametrize("column_name", ["test_run_id"])
@@ -300,9 +337,15 @@ class TestDraftTestRunFormatter:
         test_testrun_id: int,
         test_draft_row: db.Draft,
     ) -> None:
-        assert draft_testrun_formatter(
-            view=test_draft_view, context=mocker.MagicMock(), model=test_draft_row, name=column_name,
-        ) == Markup(f"<a {get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
+        assert (
+            draft_testrun_formatter(
+                view=test_draft_view,
+                context=mocker.MagicMock(),
+                model=test_draft_row,
+                name=column_name,
+            )
+            == Markup(f"<a {get_testrun_details_link(test_testrun_id)}>{test_testrun_id}</a>")
+        )
 
 
 @pytest.mark.parametrize("column_name", ["pr_url"])
@@ -319,9 +362,15 @@ class TestDraftPrUrlFormatter:
         test_draft_row: db.Draft,
     ) -> None:
         setattr(test_draft_row, column_name, test_prurl)
-        assert draft_prurl_formatter(
-            view=test_draft_view, context=mocker.MagicMock(), model=test_draft_row, name=column_name,
-        ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")
+        assert (
+            draft_prurl_formatter(
+                view=test_draft_view,
+                context=mocker.MagicMock(),
+                model=test_draft_row,
+                name=column_name,
+            )
+            == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")
+        )
 
 
 @pytest.mark.parametrize("column_name", ["file_path"])
@@ -347,6 +396,12 @@ class TestFilePathFormatter:
         test_feature_row: db.Feature,
     ) -> None:
         setattr(test_feature_row, column_name, value)
-        assert file_path_formatter(
-            view=test_feature_view_mocked, context=mocker.MagicMock(), model=test_feature_row, name=column_name,
-        ) == Markup(f"<i>{correct_value}</i>")
+        assert (
+            file_path_formatter(
+                view=test_feature_view_mocked,
+                context=mocker.MagicMock(),
+                model=test_feature_row,
+                name=column_name,
+            )
+            == Markup(f"<i>{correct_value}</i>")
+        )

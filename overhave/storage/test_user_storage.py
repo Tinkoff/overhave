@@ -40,7 +40,7 @@ class TestUserStorage(ITestUserStorage):
     @staticmethod
     def get_test_user_by_name(name: str) -> TestUserModel:
         with create_session() as session:
-            user: Optional[db.TestUser] = (session.query(db.TestUser).filter(db.TestUser.name == name).one_or_none())
+            user: Optional[db.TestUser] = session.query(db.TestUser).filter(db.TestUser.name == name).one_or_none()
             if user is not None:
                 return cast(TestUserModel, TestUserModel.from_orm(user))
             raise TestUserDoesNotExistError(f"Not found test user with name {name}!")
@@ -49,8 +49,11 @@ class TestUserStorage(ITestUserStorage):
     def create_test_user(name: str, specification: dict[str, str], created_by: str, feature_type: str) -> int:
         feature_type = FeatureTypeStorage.get_feature_type_by_name(name=feature_type)
         with db.create_session() as session:
-            test_user = db.TestUser(
-                name=name, specification=specification, feature_type_id=feature_type.id, created_by=created_by,
+            test_user = db.TestUser(  # type: ignore
+                name=name,
+                specification=specification,
+                feature_type_id=feature_type.id,
+                created_by=created_by,
             )
             session.add(test_user)
             session.flush()
