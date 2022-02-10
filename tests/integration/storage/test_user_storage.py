@@ -3,7 +3,7 @@ import pytest
 from overhave import db
 from overhave.entities import FeatureTypeModel, SystemUserModel
 from overhave.entities.converters import TestUserModel
-from overhave.storage.test_user_storage import TestUserDoesNotExistError, TestUserStorage
+from overhave.storage.test_user_storage import TestUserDoesNotExistError, TestUserSpecification, TestUserStorage
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
@@ -14,7 +14,7 @@ class TestTestUserStorage:
         self,
         test_user_storage: TestUserStorage,
         test_user_name: str,
-        test_specification: dict[str, str],
+        test_specification: TestUserSpecification,
         test_feature_type: FeatureTypeModel,
         test_system_user: SystemUserModel,
     ) -> None:
@@ -36,8 +36,8 @@ class TestTestUserStorage:
         self,
         test_user_storage: TestUserStorage,
         test_testuser: TestUserModel,
-        test_specification: dict[str, str],
-        new_specification: dict[str, str],
+        test_specification: TestUserSpecification,
+        new_specification: TestUserSpecification,
     ) -> None:
         assert test_testuser.specification == test_specification
         test_user_storage.update_test_user_specification(test_testuser.id, new_specification)

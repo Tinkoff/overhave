@@ -32,7 +32,7 @@ from overhave.storage import (
     SystemUserStorage,
     TestRunStorage,
 )
-from overhave.storage.test_user_storage import TestUserStorage
+from overhave.storage.test_user_storage import TestUserSpecification, TestUserStorage
 
 
 @pytest.fixture(scope="module")
@@ -89,7 +89,7 @@ def test_user_name(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_specification() -> dict[str, str]:
+def test_specification() -> TestUserSpecification:
     return {"test": "value"}
 
 
