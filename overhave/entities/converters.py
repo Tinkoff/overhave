@@ -147,7 +147,7 @@ class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     id: int
     name: str
     created_by: str
-    specification: dict[str, str]
+    specification: TestUserSpecification
     feature_type_id: int
     feature_type: FeatureTypeModel
 
