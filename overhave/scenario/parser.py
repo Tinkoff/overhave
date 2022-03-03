@@ -54,6 +54,7 @@ class ScenarioParser(PrefixMixin):
         prefixes = [self._as_prefix(default_types.FEATURE)]
         if self._language_settings.step_prefixes is not None:
             prefixes.append(self._as_prefix(self._language_settings.step_prefixes.FEATURE))
+        logger.debug("Cached ScenarioParser feature prefixes: %s", prefixes)
         return prefixes
 
     @cached_property

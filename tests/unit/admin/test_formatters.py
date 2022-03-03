@@ -106,7 +106,7 @@ class TestDatetimeFormatter:
         result = datetime_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(**{"id": test_testrun_id, column_name: value}),  # type: ignore
+            model=TestRun(**{"id": test_testrun_id, column_name: value}),
             name=column_name,
         )
         assert result == Markup(value.strftime("%d-%m-%Y %H:%M:%S"))
@@ -246,7 +246,7 @@ class TestJsonFormatter:
         result = json_formatter(
             view=test_testuser_view,
             context=mocker.MagicMock(),
-            model=TestUser(**{column_name: value}),  # type: ignore
+            model=TestUser(**{column_name: value}),
             name=column_name,
         )
         assert result == expected
@@ -289,7 +289,7 @@ class TestFeatureLinkFormatter:
             feature_link_formatter(
                 view=test_testrun_view,
                 context=mocker.MagicMock(),
-                model=db.TestRun(  # type: ignore
+                model=db.TestRun(
                     **{
                         column_name: test_feature_name,
                         "scenario": db.Scenario(feature_id=test_feature_id, text=faker.word()),  # type: ignore

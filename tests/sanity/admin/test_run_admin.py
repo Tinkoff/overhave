@@ -24,7 +24,7 @@ class TestOverhaveRunAdminClean:
         assert not test_proxy_manager.pytest_patched
 
 
-@pytest.mark.parametrize("test_demo_language", list(OverhaveDemoAppLanguage), indirect=True)
+@pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
 class TestOverhaveRunAdmin:
     """Sanity tests for application admin mode."""
 
@@ -69,12 +69,7 @@ class TestOverhaveRunAdmin:
                 "demo.steps.parser",
             }
 
-
-class TestOverhaveRunAdminCollectedSteps:
-    """Sanity tests for application admin mode: steps collection."""
-
-    @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
-    def test_injector_collect_steps_ru(
+    def test_injector_collect_steps(
         self,
         test_feature_types: Tuple[str, ...],
         test_resolved_admin_proxy_manager: IProxyManager,
