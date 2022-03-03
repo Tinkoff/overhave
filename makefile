@@ -3,7 +3,7 @@ VENV ?= .venv
 WORK_DIR ?= .
 MIN_COVERAGE ?= 83.8
 BUILD_DIR ?= dist
-PYTHON_VERSION := 3.10
+PYTHON_VERSION ?= 3.10
 
 DOCS_DIR ?= docs
 DOCS_BUILD_DIR ?= _build
