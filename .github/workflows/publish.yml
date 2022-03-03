@@ -29,7 +29,7 @@ jobs:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         # set `export PYTHON_VERSION=` since python3.10 cause not working with ver
         run: |
-          export PYTHON_VERSION=
+          export PYTHON_VERSION=3
           sudo apt-get update
           make pre-init
           make init
