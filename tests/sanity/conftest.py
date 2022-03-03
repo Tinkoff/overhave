@@ -1,3 +1,4 @@
+import logging
 from os import chdir
 from typing import Any, Callable, Dict, Optional, Tuple, cast
 from unittest import mock
@@ -13,9 +14,11 @@ from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import OverhaveDBSettings, db
 from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
 from overhave.entities import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
-from overhave.factory import IAdminFactory
+from overhave.factory import IAdminFactory, ISynchronizerFactory
 from overhave.pytest_plugin import IProxyManager
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
@@ -94,6 +97,11 @@ def test_admin_factory(clean_admin_factory: Callable[[], IAdminFactory]) -> IAdm
 
 
 @pytest.fixture()
+def test_synchronizer_factory(clean_synchronizer_factory: Callable[[], ISynchronizerFactory]) -> ISynchronizerFactory:
+    return clean_synchronizer_factory()
+
+
+@pytest.fixture()
 def test_demo_language(request: FixtureRequest) -> Optional[str]:
     if hasattr(request, "param"):
         return cast(OverhaveDemoAppLanguage, request.param)
@@ -102,6 +110,7 @@ def test_demo_language(request: FixtureRequest) -> Optional[str]:
 
 @pytest.fixture()
 def test_demo_settings_generator(test_demo_language: OverhaveDemoAppLanguage) -> OverhaveDemoSettingsGenerator:
+    logger.debug("Test demo language: %s", test_demo_language)
     return OverhaveDemoSettingsGenerator(language=test_demo_language, threadpool=False)
 
 
@@ -115,6 +124,7 @@ def mocked_git_repo() -> mock.MagicMock:
 def test_resolved_admin_proxy_manager(
     flask_run_mock: mock.MagicMock,
     mocked_git_repo: mock.MagicMock,
+    test_synchronizer_factory: ISynchronizerFactory,
     test_admin_factory: IAdminFactory,
     test_proxy_manager: IProxyManager,
     mock_envs: None,

@@ -1,8 +1,9 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 83.9
+MIN_COVERAGE ?= 83.8
 BUILD_DIR ?= dist
+PYTHON_VERSION := 3.10
 
 DOCS_DIR ?= docs
 DOCS_BUILD_DIR ?= _build
@@ -14,11 +15,11 @@ SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
 ALL = $(CODE) $(DOCS_DIR) tests demo
 
 pre-init:
-	sudo apt install python3.9 python3.9-venv python3.9-dev python3.9-distutils gcc\
+	sudo apt install python$(PYTHON_VERSION) python$(PYTHON_VERSION)-venv python$(PYTHON_VERSION)-dev python$(PYTHON_VERSION)-distutils gcc\
         libsasl2-dev libldap2-dev libssl-dev libpq-dev g++ libgnutls28-dev
 
 init:
-	python3.9 -m venv $(VENV)
+	python$(PYTHON_VERSION) -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
 	$(VENV)/bin/python -m pip install poetry
 	$(VENV)/bin/poetry install
@@ -34,7 +35,7 @@ test:
 lint:
 	$(VENV)/bin/poetry run black --check $(ALL)
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
-	$(VENV)/bin/poetry run mypy $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
+	$(VENV)/bin/poetry run mypy --install-types --non-interactive $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
 
 pretty:

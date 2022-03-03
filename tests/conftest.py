@@ -18,9 +18,10 @@ from overhave import (
     OverhaveLoggingSettings,
     overhave_admin_factory,
     overhave_proxy_manager,
+    overhave_synchronizer_factory,
     overhave_test_execution_factory,
 )
-from overhave.factory import IAdminFactory, ITestExecutionFactory
+from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
 from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
@@ -76,19 +77,29 @@ def mock_envs(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) 
 @pytest.fixture()
 def clean_admin_factory() -> Callable[[], IAdminFactory]:
     overhave_admin_factory.cache_clear()
-    return overhave_admin_factory
+    yield overhave_admin_factory
+    overhave_admin_factory.cache_clear()
 
 
 @pytest.fixture()
 def clean_test_execution_factory() -> Callable[[], ITestExecutionFactory]:
     overhave_test_execution_factory.cache_clear()
-    return overhave_test_execution_factory
+    yield overhave_test_execution_factory
+    overhave_test_execution_factory.cache_clear()
 
 
 @pytest.fixture()
 def clean_proxy_manager() -> Callable[[], IProxyManager]:
     overhave_proxy_manager.cache_clear()
-    return overhave_proxy_manager
+    yield overhave_proxy_manager
+    overhave_proxy_manager.cache_clear()
+
+
+@pytest.fixture()
+def clean_synchronizer_factory() -> Callable[[], ISynchronizerFactory]:
+    overhave_synchronizer_factory.cache_clear()
+    yield overhave_synchronizer_factory
+    overhave_synchronizer_factory.cache_clear()
 
 
 @pytest.fixture()

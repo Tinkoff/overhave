@@ -144,6 +144,8 @@ class PublisherContext(TestExecutorContext):
 class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     """Model for :class:`TestUser` row."""
 
+    __test__ = False
+
     id: int
     name: str
     created_by: str
