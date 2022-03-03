@@ -27,7 +27,9 @@ jobs:
       - name: Run a multi-line script
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        # set `export PYTHON_VERSION=` since python3.10 cause not working with ver
         run: |
+          export PYTHON_VERSION=
           sudo apt-get update
           make pre-init
           make init
