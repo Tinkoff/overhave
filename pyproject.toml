@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "2.7.2.1"
+version = "2.8.0"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -87,6 +87,7 @@ pytest-bdd = "^5.0.0"
 pytest = "^6.2.5"
 allure-pytest = "^2.9.45"
 pytest-xdist = "^2.5.0"
+uvicorn = "^0.17.5"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
