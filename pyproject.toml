@@ -62,6 +62,7 @@ GitPython = "^3.1.15"
 Flask = "^2.0.1"
 python-gitlab = "^2.9.0"
 pydantic-sqlalchemy = "^0.0.9"
+fastapi = "^0.75.0"
 
 
 [tool.poetry.dev-dependencies]
