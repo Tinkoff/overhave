@@ -50,7 +50,7 @@ Features
 * Distributed `producer-consumer` architecture based on Redis streams
   through `Walrus`_
 * Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
-* Simple command-line interface, provided with `Click`_
+* Simple command-line interface, provided with `Typer`_
 * Integrated interaction for files storage with s3-cloud based on `boto3`_
 
 ------------
@@ -160,7 +160,7 @@ provides a CLI entrypoints for easy server run in debug mode:
     make up  # start PostgreSQL database and Redis
     overhave db create-all  # create Overhave database schema
     overhave-demo admin  # start Overhave admin on port 8076 in debug mode
-    overhave-demo consumer -s TEST  # start Overhave test execution consumer
+    overhave-demo consumer -s test  # start Overhave test execution consumer
 
 **Note**: you could run admin in special mode, which does not require
 consumers. This mode uses *threadpool* for running testing and publication
@@ -183,7 +183,7 @@ run consumer and execute basic database operations. Examples are below:
 
     overhave db create-all
     overhave admin --port 8080
-    overhave consumer -s PUBLICATION
+    overhave consumer -s publication
 
 **Note**: service start-up takes a set of settings, so you can set them through
 virtual environment with prefix ```OVERHAVE_```, for example ```OVERHAVE_DB_URL```.
@@ -556,7 +556,7 @@ with a detailed description.
 .. _`Tox`: https://github.com/tox-dev/tox
 .. _`Poetry`: https://github.com/python-poetry/poetry
 .. _`Docker-compose`: https://docs.docker.com/compose
-.. _`Click`: https://github.com/pallets/click
+.. _`Typer`: https://github.com/tiangolo/typer
 .. _`Sphinx`: https://github.com/sphinx-doc/sphinx
 .. _`boto3`: https://github.com/boto/boto3
 .. _`git`: https://git-scm.com/

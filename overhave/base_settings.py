@@ -10,12 +10,14 @@ from sqlalchemy.engine.url import URL, make_url
 from sqlalchemy.exc import ArgumentError
 from sqlalchemy.pool import SingletonThreadPool
 
+OVERHAVE_ENV_PREFIX = "OVERHAVE_"
+
 
 class BaseOverhavePrefix(BaseSettings):
     """Possibility to change Overhave default settings from environment."""
 
     class Config:
-        env_prefix = "OVERHAVE_"
+        env_prefix = OVERHAVE_ENV_PREFIX
 
 
 class SAUrl(URL):

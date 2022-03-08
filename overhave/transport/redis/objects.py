@@ -9,9 +9,9 @@ from pydantic.main import BaseModel
 class RedisStream(str, enum.Enum):
     """Enum that declares Redis streams."""
 
-    TEST = "test-stream"
-    PUBLICATION = "publication-stream"
-    EMULATION = "emulation-stream"
+    TEST = "test"
+    PUBLICATION = "publication"
+    EMULATION = "emulation"
 
     @property
     def with_dunder(self) -> str:
