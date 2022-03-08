@@ -1,5 +1,3 @@
-import click
-
 from overhave import OverhaveAdminApp, overhave_app
 from overhave.base_settings import DataBaseSettings, LoggingSettings
 from overhave.cli.group import overhave
@@ -12,8 +10,6 @@ def _get_admin_app() -> OverhaveAdminApp:
     return overhave_app(get_admin_factory())
 
 
-@overhave.command(short_help="Run Overhave web-service")
-@click.option("--port", default=8076)
-@click.option("--debug", default=False)
-def admin(port: int, debug: bool) -> None:
+@overhave.command(short_help="Run Overhave Admin panel")
+def admin(port: int = 8076, debug: bool = False) -> None:
     _get_admin_app().run(host="localhost", port=port, debug=debug)

@@ -1,5 +1,5 @@
-import click
 import sqlalchemy_utils as sau
+import typer
 from alembic.config import Config
 from sqlalchemy.engine.url import URL
 from sqlalchemy.exc import OperationalError
@@ -8,21 +8,14 @@ from overhave import db as database
 from overhave.base_settings import DataBaseSettings
 
 
-def _create_all(config: Config) -> None:
-    click.echo("Creating...")
+def create_schema(config: Config) -> None:
+    typer.echo("Creating...")
     config.attributes["metadata"].create_all()
-    click.secho("Completed.", fg="green")
+    typer.secho("Completed.", fg="green")
 
 
-@click.command(short_help="Create all metadata tables")
-@click.pass_obj
-def create_all(config: Config) -> None:
-    """Create all metadata tables."""
-    _create_all(config)
-
-
-def _drop_all(config: Config) -> None:
-    click.echo("Dropping...")
+def drop_schema(config: Config) -> None:
+    typer.echo("Dropping...")
     meta = config.attributes["metadata"]
     engine = config.attributes["engine"]
     for table in meta.tables:
@@ -30,15 +23,7 @@ def _drop_all(config: Config) -> None:
     engine.execute("DROP TABLE IF EXISTS alembic_version")
     engine.execute("DROP SCHEMA IF EXISTS huey")
     meta.drop_all()
-    click.secho("Completed.", fg="green")
-
-
-@click.command(short_help="Drop all metadata tables, attributes, schema")
-@click.pass_obj
-def drop_all(config: Config) -> None:
-    """Drop all metadata tables, attributes, schema."""
-    click.confirm("Does it really need?", abort=True)
-    _drop_all(config)
+    typer.secho("Completed.", fg="green")
 
 
 def _ensure_database_exists(db_url: URL) -> None:
@@ -46,12 +31,12 @@ def _ensure_database_exists(db_url: URL) -> None:
         if not sau.database_exists(db_url):
             sau.create_database(db_url)
     except OperationalError as e:
-        click.echo(e)
-        click.echo("Catched error when trying to check database existence!")
+        typer.echo(e)
+        typer.echo("Catched error when trying to check database existence!")
 
 
-def set_config_to_context(context: click.Context, settings: DataBaseSettings) -> None:
-    """Set Alembic config to Click context for easy operations and migrations ability."""
+def set_config_to_context(context: typer.Context, settings: DataBaseSettings) -> None:
+    """Set Alembic config to Typer context for easy operations and migrations ability."""
     _ensure_database_exists(settings.db_url)
     settings.setup_db()
     config = Config()

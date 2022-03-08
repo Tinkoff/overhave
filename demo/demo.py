@@ -1,6 +1,6 @@
 from unittest import mock
 
-import click
+import typer
 
 from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import (
@@ -19,14 +19,13 @@ from overhave.cli.consumers import _run_consumer
 from overhave.cli.synchronization import _create_synchronizer
 from overhave.factory import OverhaveSynchronizerContext
 
-
-@click.group(context_settings={"help_option_names": ["-h", "--help"]})
-def overhave_demo() -> None:
-    pass
+overhave_demo = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
 
 
-def _get_overhave_settings_generator(language: str, threadpool: bool = False) -> OverhaveDemoSettingsGenerator:
-    return OverhaveDemoSettingsGenerator(language=OverhaveDemoAppLanguage(language), threadpool=threadpool)
+def _get_overhave_settings_generator(
+    language: OverhaveDemoAppLanguage, threadpool: bool = False
+) -> OverhaveDemoSettingsGenerator:
+    return OverhaveDemoSettingsGenerator(language=language, threadpool=threadpool)
 
 
 def _prepare_test_execution_factory(settings_generator: OverhaveDemoSettingsGenerator) -> None:
@@ -70,19 +69,21 @@ def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")
-@click.option(
-    "-l",
-    "--language",
-    default=OverhaveDemoAppLanguage.RU.value,
-    help="Overhave application language (defines step prefixes only right now)",
-)
-@click.option(
-    "-t",
-    "--threadpool",
-    is_flag=True,
-    help="Run Overhave admin without consumers, which produces tasks into Threadpool",
-)
-def admin(threadpool: bool, language: str) -> None:
+def admin(
+    threadpool: bool = typer.Option(
+        False,
+        "-t",
+        "--threadpool",
+        is_flag=True,
+        help="Run Overhave admin without consumers, which produces tasks into Threadpool",
+    ),
+    language: OverhaveDemoAppLanguage = typer.Option(
+        OverhaveDemoAppLanguage.RU,
+        "-l",
+        "--language",
+        help="Overhave application language (defines step prefixes only right now)",
+    ),
+) -> None:
     _run_demo_admin(settings_generator=_get_overhave_settings_generator(language=language, threadpool=threadpool))
 
 
@@ -95,31 +96,29 @@ def _run_demo_consumer(stream: OverhaveRedisStream, settings_generator: Overhave
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")
-@click.option(
-    "-l",
-    "--language",
-    default=OverhaveDemoAppLanguage.RU.value,
-    help="Overhave application language (defines step prefixes only right now)",
-)
-@click.option(
-    "-s",
-    "--stream",
-    type=click.Choice(list(OverhaveRedisStream.__members__)),
-    callback=lambda c, p, v: getattr(OverhaveRedisStream, v),
-    help="Redis stream, which defines application",
-)
-def consumer(stream: OverhaveRedisStream, language: str) -> None:
+def consumer(
+    stream: OverhaveRedisStream = typer.Option(..., "-s", "--stream", help="Redis stream, which defines application"),
+    language: OverhaveDemoAppLanguage = typer.Option(
+        OverhaveDemoAppLanguage.RU,
+        "-l",
+        "--language",
+        help="Overhave application language (defines step prefixes only right now)",
+    ),
+) -> None:
     _run_demo_consumer(stream=stream, settings_generator=_get_overhave_settings_generator(language=language))
 
 
 @overhave_demo.command(short_help="Run Overhave feature synchronization")
-@click.option("-c", "--create-db-features", is_flag=True, help="Create features in database if necessary")
-@click.option(
-    "-l",
-    "--language",
-    default=OverhaveDemoAppLanguage.RU.value,
-    help="Overhave application language (defines step prefixes only right now)",
-)
-def synchronize(create_db_features: bool, language: str) -> None:
+def synchronize(
+    create_db_features: bool = typer.Option(
+        False, "-c", "--create-db-features", is_flag=True, help="Create features in database if necessary"
+    ),
+    language: OverhaveDemoAppLanguage = typer.Option(
+        OverhaveDemoAppLanguage.RU,
+        "-l",
+        "--language",
+        help="Overhave application language (defines step prefixes only right now)",
+    ),
+) -> None:
     _prepare_synchronizer_factory(settings_generator=_get_overhave_settings_generator(language=language))
     _create_synchronizer().synchronize(create_db_features)
