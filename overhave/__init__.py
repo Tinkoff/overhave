@@ -1,5 +1,6 @@
 # flake8: noqa
 from overhave.admin import OverhaveAdminApp, overhave_app
+from overhave.api import create_overhave_api as overhave_api
 from overhave.authorization import AuthorizationStrategy, OverhaveAuthorizationSettings, OverhaveLdapClientSettings
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import LoggingSettings as OverhaveLoggingSettings

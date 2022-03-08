@@ -10,6 +10,16 @@ from overhave.storage.test_user_storage import TestUserStorage
 class TestTestUserStorage:
     """Integration tests for :class:`TestUserStorage`."""
 
+    def test_get_test_user_by_id(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
+        test_user = test_user_storage.get_test_user_by_id(test_testuser.id)
+        assert test_user is not None
+        assert test_user == test_testuser
+
+    def test_get_user_by_name(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
+        test_user = test_user_storage.get_test_user_by_name(test_testuser.name)
+        assert test_user is not None
+        assert test_user == test_testuser
+
     def test_create_test_user(
         self,
         test_user_storage: TestUserStorage,

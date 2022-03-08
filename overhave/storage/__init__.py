@@ -8,3 +8,4 @@ from .scenario_storage import IScenarioStorage, ScenarioStorage
 from .system_user_group_storage import ISystemUserGroupStorage, SystemUserGroupStorage
 from .system_user_storage import ISystemUserStorage, SystemUserStorage
 from .test_run_storage import ITestRunStorage, TestRunStorage
+from .test_user_storage import ITestUserStorage, TestUserStorage
