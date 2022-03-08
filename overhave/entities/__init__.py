@@ -13,7 +13,6 @@ from .converters import (
     TestRunModel,
     TestUserSpecification,
 )
-from .emulator import Emulator
 from .feature import (
     FeatureExtractor,
     FeatureTypeExtractionError,

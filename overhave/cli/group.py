@@ -1,6 +1,6 @@
 import typer as typer
 
-from overhave.cli.db import db_app
+from overhave.cli.db_cmds import db_app
 from overhave.cli.s3 import s3_app
 
 overhave = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})

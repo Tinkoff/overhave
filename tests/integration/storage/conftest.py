@@ -5,9 +5,7 @@ from unittest import mock
 from uuid import uuid1
 
 import pytest
-from _pytest.fixtures import FixtureRequest
 from faker import Faker
-from pydantic import SecretStr
 
 from overhave import db
 from overhave.db import DraftStatus
@@ -19,8 +17,6 @@ from overhave.entities.converters import (
     ScenarioModel,
     SystemUserModel,
     TagModel,
-    TestUserModel,
-    TestUserSpecification,
 )
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage import (
@@ -30,10 +26,8 @@ from overhave.storage import (
     FeatureTagStorage,
     FeatureTypeStorage,
     ScenarioStorage,
-    SystemUserStorage,
     TestRunStorage,
 )
-from overhave.storage.test_user_storage import TestUserStorage
 
 
 @pytest.fixture(scope="module")
@@ -52,62 +46,6 @@ def test_emulation_storage(
     socket_mock: mock.MagicMock, test_emulation_settings: OverhaveEmulationSettings
 ) -> EmulationStorage:
     return EmulationStorage(test_emulation_settings)
-
-
-@pytest.fixture()
-def test_feature_type(database: None, faker: Faker) -> FeatureTypeModel:
-    with db.create_session() as session:
-        feature_type = db.FeatureType(name=cast(str, faker.word()))
-        session.add(feature_type)
-        session.flush()
-        return cast(FeatureTypeModel, FeatureTypeModel.from_orm(feature_type))
-
-
-@pytest.fixture()
-def test_user_role(request: FixtureRequest) -> db.Role:
-    if hasattr(request, "param"):
-        return request.param
-    raise NotImplementedError
-
-
-@pytest.fixture()
-def test_system_user(
-    test_system_user_storage: SystemUserStorage, database: None, faker: Faker, test_user_role: db.Role
-) -> SystemUserModel:
-    return test_system_user_storage.create_user(
-        login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
-    )
-
-
-@pytest.fixture(scope="class")
-def test_user_storage() -> TestUserStorage:
-    return TestUserStorage()
-
-
-@pytest.fixture()
-def test_user_name(faker: Faker) -> str:
-    return faker.word()
-
-
-@pytest.fixture()
-def test_specification() -> TestUserSpecification:
-    return {"test": "value"}
-
-
-@pytest.fixture()
-def test_testuser(
-    test_system_user: SystemUserModel, faker: Faker, test_feature_type, test_specification
-) -> TestUserModel:
-    with db.create_session() as session:
-        test_user = db.TestUser(
-            feature_type_id=test_feature_type.id,
-            name=cast(str, faker.word()),
-            created_by=test_system_user.login,
-            specification=test_specification,
-        )
-        session.add(test_user)
-        session.flush()
-        return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
 
 @pytest.fixture()
@@ -226,3 +164,8 @@ def test_draft(
         session.add(draft)
         session.flush()
         return cast(DraftModel, DraftModel.from_orm(draft))
+
+
+@pytest.fixture()
+def test_user_name(faker: Faker) -> str:
+    return faker.word()

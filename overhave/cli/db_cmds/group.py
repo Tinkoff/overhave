@@ -1,7 +1,7 @@
 import typer
 
 from overhave.base_settings import DataBaseSettings
-from overhave.cli.db.regular import create_schema, drop_schema, set_config_to_context
+from overhave.cli.db_cmds.regular import create_schema, drop_schema, set_config_to_context
 
 
 def _config_callback(ctx: typer.Context) -> None:

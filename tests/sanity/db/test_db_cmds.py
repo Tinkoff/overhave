@@ -1,6 +1,6 @@
 import typer
 
-from overhave.cli.db.regular import create_schema, drop_schema
+from overhave.cli.db_cmds.regular import create_schema, drop_schema
 
 
 class TestOverhaveDatabaseCmds:

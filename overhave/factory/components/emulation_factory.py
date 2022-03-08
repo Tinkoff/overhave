@@ -1,7 +1,7 @@
 import abc
 from functools import cached_property
 
-from overhave.entities import Emulator
+from overhave.emulation import Emulator
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhaveEmulationContext

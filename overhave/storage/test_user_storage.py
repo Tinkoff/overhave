@@ -21,6 +21,11 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def get_test_user_by_id(user_id: int) -> Optional[TestUserModel]:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
         pass
 
@@ -39,6 +44,14 @@ class ITestUserStorage(abc.ABC):
 
 class TestUserStorage(ITestUserStorage):
     """Class for Test User storage."""
+
+    @staticmethod
+    def get_test_user_by_id(user_id: int) -> Optional[TestUserModel]:
+        with create_session() as session:
+            user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
+            if user is not None:
+                return cast(TestUserModel, TestUserModel.from_orm(user))
+            return None
 
     @staticmethod
     def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
