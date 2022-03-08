@@ -4,7 +4,7 @@ import pathlib
 from overhave.base_settings import OVERHAVE_ENV_PREFIX
 
 worker_class = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_WORKER_CLASS", "uvicorn.workers.UvicornWorker")
-workers = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_WORKERS", 4)
+workers = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_WORKERS", 1)
 threads = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_THREADS", 1)
 worker_connections = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_CONNECTIONS", 1000)
 timeout = os.environ.get(OVERHAVE_ENV_PREFIX + "GUNICORN_TIMEOUT", 10)
