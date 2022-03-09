@@ -61,12 +61,11 @@ GitPython = "^3.1.15"
 Flask = "^2.0.1"
 python-gitlab = "^2.9.0"
 pydantic-sqlalchemy = "^0.0.9"
-fastapi = "^0.75.0"
+fastapi = ">=0.57.0"
 typer = "^0.4.0"
 
 
 [tool.poetry.dev-dependencies]
-black = "^21.10b0"
 flake8-awesome = "<1.3"
 requests_mock = "*"
 flake8-docstrings = "^1.5"
@@ -88,6 +87,7 @@ pytest = "^6.2.5"
 allure-pytest = "^2.9.45"
 pytest-xdist = "^2.5.0"
 uvicorn = "^0.17.5"
+black = "^22.1.0"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -117,7 +117,7 @@ line_length = 120
 multi_line_output = 3
 
 [tool.black]
-target-version = ['py38']
+target-version = ['py310']
 line-length = 120
 
 [build-system]
