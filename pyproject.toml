@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "2.8.4"
+version = "2.8.5"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -39,8 +39,7 @@ requests = ">=2.0.0"
 tenacity = "*"
 yarl = ">=1.1.1"
 pytz = "*"
-gunicorn = "^20.0.4"
-flask-admin = "^1.5"
+flask-admin = ">=1.5"
 flask-login = "^0.4.1"
 WTForms = ">=2.2"
 Flask-WTF = ">=0.14.2"
