@@ -7,7 +7,7 @@ from pydantic import SecretStr
 
 from overhave import db
 from overhave.entities import FeatureTypeModel, SystemUserModel, TestUserSpecification
-from overhave.entities.converters import TestUserModel
+from overhave.entities.converters import TagModel, TestUserModel
 from overhave.storage import SystemUserGroupStorage, SystemUserStorage, TestUserStorage
 
 
@@ -70,3 +70,12 @@ def test_testuser(
         session.add(test_user)
         session.flush()
         return cast(TestUserModel, TestUserModel.from_orm(test_user))
+
+
+@pytest.fixture()
+def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
+    with db.create_session() as session:
+        tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
+        session.add(tag)
+        session.flush()
+        return cast(TagModel, TagModel.from_orm(tag))

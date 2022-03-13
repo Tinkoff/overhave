@@ -83,15 +83,6 @@ def test_feature_type_storage() -> FeatureTypeStorage:
 
 
 @pytest.fixture()
-def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
-    with db.create_session() as session:
-        tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
-        session.add(tag)
-        session.flush()
-        return cast(TagModel, TagModel.from_orm(tag))
-
-
-@pytest.fixture()
 def test_feature(test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
