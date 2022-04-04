@@ -84,4 +84,3 @@ class TestUserStorage(ITestUserStorage):
             if test_user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
             test_user.specification = specification
-            session.flush()
