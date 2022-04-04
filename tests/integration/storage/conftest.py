@@ -63,7 +63,7 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 
 
 @pytest.fixture(scope="class")
-def test_test_run_storage() -> TestRunStorage:
+def test_run_storage() -> TestRunStorage:
     return TestRunStorage()
 
 
@@ -121,15 +121,6 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
 
 
-@pytest.fixture()
-def test_second_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
-    with db.create_session() as session:
-        db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
-        session.add(db_scenario)
-        session.flush()
-        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
-
-
 @pytest.fixture(scope="class")
 def test_report() -> str:
     return uuid1().hex
@@ -137,16 +128,16 @@ def test_report() -> str:
 
 @pytest.fixture()
 def test_created_test_run_id(
-    test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
+    test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
-    return test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+    return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture()
 def test_second_created_test_run_id(
-    test_test_run_storage: TestRunStorage, test_second_scenario: ScenarioModel, test_feature: FeatureModel
+    test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
-    return test_test_run_storage.create_test_run(test_second_scenario.id, test_feature.author)
+    return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture(scope="class")
