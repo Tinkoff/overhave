@@ -74,7 +74,6 @@ class TestUserStorage(ITestUserStorage):
                 created_by=created_by,
             )
             session.add(test_user)
-            session.flush()
             return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
     @staticmethod
@@ -84,4 +83,3 @@ class TestUserStorage(ITestUserStorage):
             if test_user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
             test_user.specification = specification
-            session.flush()

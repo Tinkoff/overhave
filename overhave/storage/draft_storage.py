@@ -108,7 +108,7 @@ class DraftStorage(IDraftStorage):
             drafts: List[db.Draft] = (  # noqa: ECE001
                 session.query(db.Draft)
                 .filter(db.Draft.feature_id == feature_id)
-                .order_by(db.Draft.id.asc())
+                .order_by(db.Draft.id.desc())
                 .limit(selection_num)
                 .all()
             )
