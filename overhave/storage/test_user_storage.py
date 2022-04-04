@@ -74,6 +74,7 @@ class TestUserStorage(ITestUserStorage):
                 created_by=created_by,
             )
             session.add(test_user)
+            session.flush()
             return cast(TestUserModel, TestUserModel.from_orm(test_user))
 
     @staticmethod
