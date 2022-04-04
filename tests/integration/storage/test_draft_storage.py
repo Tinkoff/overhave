@@ -6,7 +6,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import DraftStatus
-from overhave.entities import DraftModel
+from overhave.entities import DraftModel, FeatureModel, SystemUserModel
 from overhave.storage.draft_storage import DraftStorage, NullableDraftsError, UniqueDraftCreationError
 
 
@@ -75,3 +75,19 @@ class TestDraftStorage:
     ) -> None:
         with pytest.raises(NullableDraftsError):
             test_draft_storage.get_previous_feature_draft(test_draft.feature_id)
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_get_previous_draft(
+        self,
+        test_draft_storage: DraftStorage,
+        test_created_test_run_id: int,
+        test_second_created_test_run_id: int,
+        test_system_user: SystemUserModel,
+        test_feature: FeatureModel,
+    ) -> None:
+        test_draft_storage.save_draft(test_created_test_run_id, test_system_user.login, DraftStatus.REQUESTED)
+        test_draft_storage.save_draft(test_second_created_test_run_id, test_system_user.login, DraftStatus.DUPLICATE)
+        draft = test_draft_storage.get_previous_feature_draft(feature_id=test_feature.id)
+        assert draft.status == DraftStatus.DUPLICATE
+        assert draft.feature_id == test_feature.id
+        assert draft.test_run_id == test_second_created_test_run_id

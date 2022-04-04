@@ -13,9 +13,9 @@ class TestTestRunStorage:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_create_test_run(
-        self, test_test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
+        self, test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
     ) -> None:
-        test_run = test_test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+        test_run = test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         assert isinstance(test_run, int)
 
     @pytest.mark.parametrize(
@@ -30,10 +30,10 @@ class TestTestRunStorage:
     )
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_set_run_status(
-        self, test_test_run_storage: TestRunStorage, run_status: TestRunStatus, test_created_test_run_id: int
+        self, test_run_storage: TestRunStorage, run_status: TestRunStatus, test_created_test_run_id: int
     ) -> None:
-        test_test_run_storage.set_run_status(test_created_test_run_id, run_status)
-        test_run = test_test_run_storage.get_test_run(test_created_test_run_id)
+        test_run_storage.set_run_status(test_created_test_run_id, run_status)
+        test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
         assert test_run.status == run_status
 
@@ -49,24 +49,24 @@ class TestTestRunStorage:
     )
     def test_set_report(
         self,
-        test_test_run_storage: TestRunStorage,
+        test_run_storage: TestRunStorage,
         report_status: TestReportStatus,
         test_report: Optional[str],
         test_created_test_run_id: int,
     ) -> None:
-        test_run = test_test_run_storage.get_test_run(test_created_test_run_id)
+        test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
-        test_test_run_storage.set_report(run_id=test_created_test_run_id, status=report_status, report=test_report)
-        updated_test_run = test_test_run_storage.get_test_run(test_created_test_run_id)
+        test_run_storage.set_report(run_id=test_created_test_run_id, status=report_status, report=test_report)
+        updated_test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(updated_test_run, TestRunModel)
         assert updated_test_run.report_status == report_status
         assert updated_test_run.report == test_report
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(
-        self, test_test_run_storage: TestRunStorage, test_feature: FeatureModel, test_created_test_run_id: int
+        self, test_run_storage: TestRunStorage, test_feature: FeatureModel, test_created_test_run_id: int
     ) -> None:
-        test_run = test_test_run_storage.get_test_run(test_created_test_run_id)
+        test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
         assert test_run.id == test_created_test_run_id
         assert test_run.status == TestRunStatus.STARTED
