@@ -6,5 +6,4 @@ from .manager import (
     LDAPAuthenticator,
     SimpleAdminAuthorizationManager,
 )
-from .settings import AuthorizationStrategy, OverhaveAuthorizationSettings, OverhaveLdapClientSettings
-from .strategies import AuthorizationStrategy
+from .settings import OverhaveLdapClientSettings, OverhaveLdapManagerSettings

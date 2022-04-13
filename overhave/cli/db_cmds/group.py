@@ -8,7 +8,7 @@ def _config_callback(ctx: typer.Context) -> None:
     set_config_to_context(context=ctx, settings=DataBaseSettings())
 
 
-db_app = typer.Typer(short_help="Commands for simple database operations", callback=_config_callback)
+db_app: typer.Typer = typer.Typer(short_help="Commands for simple database operations", callback=_config_callback)
 
 
 @db_app.command(short_help="Create all metadata tables")

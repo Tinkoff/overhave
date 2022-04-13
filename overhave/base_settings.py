@@ -1,3 +1,4 @@
+import enum
 import logging
 import socket
 from logging.config import DictConfigurator  # type: ignore
@@ -84,3 +85,31 @@ class LoggingSettings(BaseOverhavePrefix):
             self.log_config.configure()
         else:
             logging.basicConfig(level=self.log_level)
+
+
+class AuthorizationStrategy(str, enum.Enum):
+    """
+    Authorization strategies Enum.
+
+    Simple - strategy without real authorization. Each user could use preferred name. This name will be used for user
+    authority. Each user is unique. Password not required.
+    Default - strategy with real authorization. Each user could use only registered credentials.
+    LDAP - strategy with authorization using remote LDAP server. Each user should use his LDAP credentials. LDAP
+    server returns user groups. If user in default 'admin' group or his groups list contains admin group - user
+    will be authorized. If user already placed in database - user will be authorized too. No one password stores.
+    """
+
+    SIMPLE = "simple"
+    DEFAULT = "default"
+    LDAP = "ldap"
+
+
+class OverhaveAuthorizationSettings(BaseOverhavePrefix):
+    """Settings for Overhave authorization in components interface.
+
+    Supports 3 strategies: SIMPLE, DEFAULT and LDAP.
+    LDAP authorization uses group politics with administration group `admin_group`.
+    SIMPLE and DEFAULT strategies use admin user that would be dynamically created at startup.
+    """
+
+    auth_strategy: AuthorizationStrategy = AuthorizationStrategy.SIMPLE

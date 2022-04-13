@@ -6,7 +6,7 @@ from pydantic import SecretStr
 
 from overhave.authorization.manager.base import BaseAdminAuthorizationManager
 from overhave.authorization.manager.ldap.authenticator import LDAPAuthenticator
-from overhave.authorization.settings import OverhaveAuthorizationSettings
+from overhave.authorization.settings import OverhaveLdapManagerSettings
 from overhave.db import Role
 from overhave.entities import SystemUserModel
 from overhave.storage import ISystemUserGroupStorage, ISystemUserStorage
@@ -28,19 +28,18 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
 
     def __init__(
         self,
-        settings: OverhaveAuthorizationSettings,
+        settings: OverhaveLdapManagerSettings,
         system_user_storage: ISystemUserStorage,
         system_user_group_storage: ISystemUserGroupStorage,
         ldap_authenticator: LDAPAuthenticator,
     ):
-        if settings.admin_group is None:
-            raise LDAPEmptyAdminGroupError("Admin group could not be empty!")
-        super().__init__(settings, system_user_storage)
+        super().__init__(system_user_storage)
+        self._settings = settings
         self._system_user_group_storage = system_user_group_storage
         self._ldap_authenticator = ldap_authenticator
 
     def _reassign_role_if_neccessary(self, user: SystemUserModel, user_groups: List[str]) -> None:
-        if self._settings.admin_group is None or self._settings.admin_group not in user_groups:
+        if self._settings.ldap_admin_group not in user_groups:
             return
         user.role = Role.admin
         self._system_user_storage.update_user_role(user_model=user)
@@ -57,7 +56,7 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
             self._reassign_role_if_neccessary(user=user, user_groups=user_groups)
             return user
         logger.debug("Have not found user with username '%s'!", username)
-        if self._system_user_group_storage.has_any_group(user_groups) or self._settings.admin_group in user_groups:
+        if self._system_user_group_storage.has_any_group(user_groups) or self._settings.ldap_admin_group in user_groups:
             user = self._system_user_storage.create_user(login=username)
             self._reassign_role_if_neccessary(user=user, user_groups=user_groups)
             return user

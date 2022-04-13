@@ -6,7 +6,6 @@ from pydantic import SecretStr
 
 from overhave import db
 from overhave.authorization.manager.base import BaseAdminAuthorizationManager
-from overhave.authorization.settings import OverhaveAuthorizationSettings
 from overhave.storage import ISystemUserStorage
 
 logger = logging.getLogger(__name__)
@@ -22,8 +21,8 @@ class AdminSecretMixin(BaseAdminAuthorizationManager, abc.ABC):
     Note: real service administrator should bring this key and change password or delete this user!
     """
 
-    def __init__(self, settings: OverhaveAuthorizationSettings, system_user_storage: ISystemUserStorage):
-        super().__init__(settings, system_user_storage)
+    def __init__(self, system_user_storage: ISystemUserStorage):
+        super().__init__(system_user_storage)
         self._make_secret()
 
     @staticmethod

@@ -13,7 +13,7 @@ from sqlalchemy.engine import create_engine, make_url
 from sqlalchemy.orm import close_all_sessions
 
 from overhave import (
-    AuthorizationStrategy,
+    OverhaveAuthorizationStrategy,
     OverhaveDBSettings,
     OverhaveLoggingSettings,
     overhave_admin_factory,
@@ -105,7 +105,7 @@ def clean_synchronizer_factory() -> Callable[[], ISynchronizerFactory]:
 @pytest.fixture()
 def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> BaseFactoryContext:
     context_mock = session_mocker.MagicMock()
-    context_mock.auth_settings.auth_strategy = AuthorizationStrategy.LDAP
+    context_mock.auth_settings.auth_strategy = OverhaveAuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False
 
     root_dir = Path(tmpdir)

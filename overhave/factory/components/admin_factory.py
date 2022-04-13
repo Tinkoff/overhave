@@ -4,13 +4,13 @@ from multiprocessing.pool import ThreadPool
 from typing import Callable, Mapping
 
 from overhave.authorization import (
-    AuthorizationStrategy,
     DefaultAdminAuthorizationManager,
     IAdminAuthorizationManager,
     LDAPAdminAuthorizationManager,
     LDAPAuthenticator,
     SimpleAdminAuthorizationManager,
 )
+from overhave.base_settings import AuthorizationStrategy
 from overhave.entities import ReportManager
 from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
@@ -55,20 +55,16 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
 
     @cached_property
     def _simple_auth_manager(self) -> SimpleAdminAuthorizationManager:
-        return SimpleAdminAuthorizationManager(
-            settings=self.context.auth_settings, system_user_storage=self._system_user_storage
-        )
+        return SimpleAdminAuthorizationManager(system_user_storage=self._system_user_storage)
 
     @cached_property
     def _default_auth_manager(self) -> DefaultAdminAuthorizationManager:
-        return DefaultAdminAuthorizationManager(
-            settings=self.context.auth_settings, system_user_storage=self._system_user_storage
-        )
+        return DefaultAdminAuthorizationManager(system_user_storage=self._system_user_storage)
 
     @cached_property
     def _ldap_auth_manager(self) -> LDAPAdminAuthorizationManager:
         return LDAPAdminAuthorizationManager(
-            settings=self.context.auth_settings,
+            settings=self.context.ldap_manager_settings,
             system_user_storage=self._system_user_storage,
             system_user_group_storage=SystemUserGroupStorage(),
             ldap_authenticator=LDAPAuthenticator(settings=self.context.ldap_client_settings),
