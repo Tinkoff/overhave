@@ -11,7 +11,7 @@ def api(
 ) -> None:
     """Run Overhave API."""
     from overhave.api.asgi import app
-    from overhave.api.settings import OverhaveApiSettings
+    from overhave.api.settings import OverhaveUvicornApiSettings
 
-    settings = OverhaveApiSettings(port=port, workers=workers)
+    settings = OverhaveUvicornApiSettings(port=port, workers=workers)
     uvicorn.run(app, **settings.dict())

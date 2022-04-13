@@ -989,20 +989,6 @@ develop = ["coverage (>=4.4)", "pytest-html (>=1.19.0)", "pytest-cov", "tox (>=2
 docs = ["sphinx (>=1.2)"]
 
 [[package]]
-name = "passlib"
-version = "1.7.4"
-description = "comprehensive password hashing framework supporting over 30 schemes"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.extras]
-argon2 = ["argon2-cffi (>=18.2.0)"]
-bcrypt = ["bcrypt (>=3.1.0)"]
-build_docs = ["sphinx (>=1.6)", "sphinxcontrib-fulltoc (>=1.2.0)", "cloud-sptheme (>=1.10.1)"]
-totp = ["cryptography"]
-
-[[package]]
 name = "pathspec"
 version = "0.9.0"
 description = "Utility library for gitignore style pattern matching of file paths."
@@ -1369,6 +1355,17 @@ python-versions = ">=3.6"
 [package.dependencies]
 pyasn1 = ">=0.3.7"
 pyasn1_modules = ">=0.1.5"
+
+[[package]]
+name = "python-multipart"
+version = "0.0.5"
+description = "A streaming multipart parser for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = ">=1.4.0"
 
 [[package]]
 name = "pytz"
@@ -2032,7 +2029,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "6ab84abc6289ede54fcd8b23b5ba8393ec6cde419cc7ebc18d4153dc06d54528"
+content-hash = "8c72509aa6e2f00e0718126f9c6ce40c96815dcea504df436eb8e015f62ad43f"
 
 [metadata.files]
 alabaster = [
@@ -2653,10 +2650,6 @@ parse-type = [
     {file = "parse_type-0.6.0-py2.py3-none-any.whl", hash = "sha256:c148e88436bd54dab16484108e882be3367f44952c649c9cd6b82a7370b650cb"},
     {file = "parse_type-0.6.0.tar.gz", hash = "sha256:20b43c660e48ed47f433bce5873a2a3d4b9b6a7ba47bd7f7d2a7cec4bec5551f"},
 ]
-passlib = [
-    {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
-    {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
-]
 pathspec = [
     {file = "pathspec-0.9.0-py2.py3-none-any.whl", hash = "sha256:7d15c4ddb0b5c802d161efc417ec1a2558ea2653c2e8ad9c19098201dc1c993a"},
     {file = "pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
@@ -2883,6 +2876,9 @@ python-jose = [
 ]
 python-ldap = [
     {file = "python-ldap-3.4.0.tar.gz", hash = "sha256:60464c8fc25e71e0fd40449a24eae482dcd0fb7fcf823e7de627a6525b3e0d12"},
+]
+python-multipart = [
+    {file = "python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
 ]
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
