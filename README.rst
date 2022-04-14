@@ -47,6 +47,7 @@ Features
 * Configurable strategy for user authorization, LDAP also provided
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
 * Still configurable as `Flask Admin`_, supports plug-ins and extensions
+* Has built-in API application with Swagger docs, based on `FastAPI`_
 * Distributed `producer-consumer` architecture based on Redis streams
   through `Walrus`_
 * Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
@@ -444,9 +445,9 @@ configured like this:
 
 .. code-block:: python
 
-    auth_settings=OverhaveAuthorizationSettings(
-        auth_strategy=AuthorizationStrategy.LDAP, admin_group="admin"
-    )
+    auth_settings = OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP)
+    ldap_manager_settings = OverhaveLdapManagerSettings(ldap_admin_group="admin")
+
 
 S3 cloud
 --------
@@ -560,5 +561,6 @@ with a detailed description.
 .. _`Sphinx`: https://github.com/sphinx-doc/sphinx
 .. _`boto3`: https://github.com/boto/boto3
 .. _`git`: https://git-scm.com/
+.. _`FastAPI`: https://github.com/tiangolo/fastapi
 .. _`context_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/context_example.rst
 .. _`feature_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/features_structure_example/feature_type_1/full_feature_example_en.feature
