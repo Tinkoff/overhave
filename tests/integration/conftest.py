@@ -6,9 +6,16 @@ from faker import Faker
 from pydantic import SecretStr
 
 from overhave import db
-from overhave.entities import FeatureTypeModel, SystemUserModel, TestUserSpecification
-from overhave.entities.converters import TagModel, TestUserModel
-from overhave.storage import SystemUserGroupStorage, SystemUserStorage, TestUserStorage
+from overhave.storage import (
+    FeatureTypeModel,
+    SystemUserGroupStorage,
+    SystemUserModel,
+    SystemUserStorage,
+    TagModel,
+    TestUserModel,
+    TestUserSpecification,
+    TestUserStorage,
+)
 
 
 @pytest.fixture(scope="package")

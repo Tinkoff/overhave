@@ -6,8 +6,8 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import DraftStatus
-from overhave.entities import DraftModel, FeatureModel, SystemUserModel
-from overhave.storage.draft_storage import DraftStorage, NullableDraftsError, UniqueDraftCreationError
+from overhave.storage import DraftModel, DraftStorage, FeatureModel, SystemUserModel, UniqueDraftCreationError
+from overhave.storage.draft_storage import NullableDraftsError
 
 
 @pytest.mark.usefixtures("database")

@@ -4,8 +4,9 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from overhave.entities import IFeatureExtractor, OverhaveFileSettings, TestExecutorContext
+from overhave.entities import IFeatureExtractor, OverhaveFileSettings
 from overhave.scenario.compiler import ScenarioCompiler
+from overhave.storage import TestExecutorContext
 from overhave.test_execution.settings import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)

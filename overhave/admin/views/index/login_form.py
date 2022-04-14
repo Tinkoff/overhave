@@ -6,8 +6,8 @@ from pydantic import SecretStr
 from werkzeug import Response
 from wtforms import PasswordField, StringField, validators
 
-from overhave.authorization import IAdminAuthorizationManager
-from overhave.entities import SystemUserModel
+from overhave.entities import IAdminAuthorizationManager
+from overhave.storage import SystemUserModel
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ _INVALID_AUTH_MSG = "Specified username '{username}' and password pair is invali
 
 
 class LoginForm(Form):
-    """Form for user authorization."""
+    """Form for user auth_managers."""
 
     username: StringField = StringField(
         "Username",

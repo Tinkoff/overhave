@@ -5,8 +5,8 @@ import sqlalchemy.exc
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
-from overhave.entities import FeatureTypeModel, SystemUserModel
 from overhave.scenario.errors import FeatureNameParsingError
+from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import OverhaveSynchronizer
 from overhave.synchronization.synchronizer import FeatureInfoUserNotFoundError
 

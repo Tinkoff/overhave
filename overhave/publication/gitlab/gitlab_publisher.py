@@ -6,12 +6,12 @@ from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 from requests import HTTPError
 
 from overhave.db import DraftStatus
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings, PublisherContext
+from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
 

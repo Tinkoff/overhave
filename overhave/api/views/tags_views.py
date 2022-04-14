@@ -5,8 +5,7 @@ from typing import List
 import fastapi
 
 from overhave.api.deps import get_feature_tag_storage
-from overhave.entities.converters import TagModel
-from overhave.storage import IFeatureTagStorage
+from overhave.storage import IFeatureTagStorage, TagModel
 
 logger = logging.getLogger(__name__)
 

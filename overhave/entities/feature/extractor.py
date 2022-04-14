@@ -4,8 +4,8 @@ from typing import Dict, List
 
 from overhave.entities.feature.abstract import IFeatureExtractor
 from overhave.entities.feature.errors import FeatureTypeExtractionError, ScenariosTestFileNotFound
-from overhave.entities.feature.types import FeatureTypeName
 from overhave.entities.settings import OverhaveFileSettings
+from overhave.storage import FeatureTypeName
 
 logger = logging.getLogger(__name__)
 

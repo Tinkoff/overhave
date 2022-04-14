@@ -4,7 +4,7 @@ from typing import List, Optional, cast
 import sqlalchemy as sa
 
 from overhave import db
-from overhave.entities import TagModel
+from overhave.storage.converters import TagModel
 
 
 class IFeatureTagStorage(abc.ABC):

@@ -4,7 +4,7 @@ import requests
 
 
 class BearerAuth(requests.auth.AuthBase):
-    """Class for Bearer authorization pattern."""
+    """Class for Bearer auth_managers pattern."""
 
     def __init__(self, token: str) -> None:
         super().__init__()

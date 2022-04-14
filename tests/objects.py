@@ -9,7 +9,8 @@ from sqlalchemy import MetaData
 from sqlalchemy.engine import Engine
 
 from demo.settings import OverhaveDemoAppLanguage
-from overhave.entities import FeatureExtractor, FeatureTypeName, OverhaveFileSettings
+from overhave.entities import FeatureExtractor, OverhaveFileSettings
+from overhave.storage import FeatureTypeName
 
 _BLOCKS_DELIMITER = "\n\n"
 

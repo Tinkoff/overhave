@@ -5,8 +5,7 @@ from faker import Faker
 from pydantic import SecretStr
 
 from overhave import db
-from overhave.entities import SystemUserModel
-from overhave.storage import SystemUserStorage
+from overhave.storage import SystemUserModel, SystemUserStorage
 
 
 @pytest.mark.usefixtures("database")

@@ -3,14 +3,14 @@ from typing import Optional
 
 from pydantic import SecretStr
 
-from overhave.authorization.manager.secret_mixin import AdminSecretMixin
-from overhave.entities import SystemUserModel
+from overhave.entities.auth_managers.secret_mixin import AdminSecretMixin
+from overhave.storage import SystemUserModel
 
 logger = logging.getLogger(__name__)
 
 
 class DefaultAdminAuthorizationManager(AdminSecretMixin):
-    """Class for user authorization.
+    """Class for user auth_managers.
 
     Manager authorize users with registered credentials.
     """

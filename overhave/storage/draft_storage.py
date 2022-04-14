@@ -3,8 +3,7 @@ from datetime import datetime
 from typing import List, Optional, cast
 
 from overhave import db
-from overhave.db import DraftStatus
-from overhave.entities import DraftModel
+from overhave.storage import DraftModel
 
 
 class IDraftStorage(abc.ABC):
@@ -22,13 +21,13 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def save_draft(test_run_id: int, published_by: str, status: DraftStatus) -> int:
+    def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
         pass
 
     @staticmethod
     @abc.abstractmethod
     def save_response(
-        draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
+        draft_id: int, pr_url: str, published_at: datetime, status: db.DraftStatus, traceback: Optional[str] = None
     ) -> None:
         pass
 
@@ -38,7 +37,7 @@ class IDraftStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+    def set_draft_status(self, draft_id: int, status: db.DraftStatus, traceback: Optional[str] = None) -> None:
         pass
 
 
@@ -75,7 +74,7 @@ class DraftStorage(IDraftStorage):
         return draft_model_list
 
     @staticmethod
-    def save_draft(test_run_id: int, published_by: str, status: DraftStatus) -> int:
+    def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
         with db.create_session() as session:
             try:
                 draft = session.query(db.Draft).as_unique(
@@ -89,7 +88,7 @@ class DraftStorage(IDraftStorage):
 
     @staticmethod
     def save_response(
-        draft_id: int, pr_url: str, published_at: datetime, status: DraftStatus, traceback: Optional[str] = None
+        draft_id: int, pr_url: str, published_at: datetime, status: db.DraftStatus, traceback: Optional[str] = None
     ) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
@@ -116,7 +115,7 @@ class DraftStorage(IDraftStorage):
                 raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
             return cast(DraftModel, DraftModel.from_orm(drafts[0]))
 
-    def set_draft_status(self, draft_id: int, status: DraftStatus, traceback: Optional[str] = None) -> None:
+    def set_draft_status(self, draft_id: int, status: db.DraftStatus, traceback: Optional[str] = None) -> None:
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.status = status

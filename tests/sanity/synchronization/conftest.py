@@ -7,8 +7,8 @@ from demo.demo import _prepare_synchronizer_factory
 from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import db, overhave_synchronizer_factory
 from overhave.cli.synchronization import _create_synchronizer
-from overhave.entities import FeatureTypeModel
 from overhave.factory import ISynchronizerFactory
+from overhave.storage import FeatureTypeModel
 from overhave.synchronization import IOverhaveSynchronizer
 from tests.objects import get_test_feature_containers
 

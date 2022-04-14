@@ -1,7 +1,7 @@
 # flake8: noqa
 from overhave.admin import OverhaveAdminApp, overhave_app
 from overhave.api import create_overhave_api as overhave_api
-from overhave.authorization import AuthorizationStrategy, OverhaveAuthorizationSettings, OverhaveLdapClientSettings
+from overhave.base_settings import AuthorizationStrategy as OverhaveAuthorizationStrategy
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import LoggingSettings as OverhaveLoggingSettings
 from overhave.cli import group, set_config_to_context
@@ -11,6 +11,7 @@ from overhave.entities import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
+    OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
     OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
@@ -39,5 +40,5 @@ from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
 from overhave.pytest_plugin import get_description_manager
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveS3ManagerSettings, OverhaveStashClientSettings
+from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings, OverhaveStashClientSettings
 from overhave.transport import RedisStream as OverhaveRedisStream

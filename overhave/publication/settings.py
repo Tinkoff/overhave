@@ -1,8 +1,8 @@
 from typing import List, Mapping, TypeVar
 
 from overhave.base_settings import BaseOverhavePrefix
-from overhave.entities import FeatureTypeName
 from overhave.publication.objects import PublicationManagerType
+from overhave.storage import FeatureTypeName
 
 
 class BaseGitPublisherSettings(BaseOverhavePrefix):

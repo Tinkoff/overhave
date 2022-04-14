@@ -4,7 +4,7 @@ from typing import Optional, cast
 from pydantic import SecretStr
 
 from overhave import db
-from overhave.entities import SystemUserModel
+from overhave.storage.converters import SystemUserModel
 
 
 class BaseSystemStorageException(Exception):

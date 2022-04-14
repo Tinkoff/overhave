@@ -1,10 +1,10 @@
 import abc
 
 from overhave.db import DraftStatus
-from overhave.entities import OverhaveFileSettings, PublisherContext
+from overhave.entities import OverhaveFileSettings
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.scenario import FileManager, generate_task_info
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport import PublicationTask
 

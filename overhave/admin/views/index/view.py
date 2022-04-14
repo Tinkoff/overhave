@@ -12,7 +12,7 @@ from wtforms.validators import ValidationError
 
 from overhave.admin.views.index.custom_page import CustomPageForm
 from overhave.admin.views.index.login_form import LoginForm
-from overhave.authorization import IAdminAuthorizationManager
+from overhave.entities import IAdminAuthorizationManager
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class OverhaveIndexView(AdminIndexView):
         except ValidationError:
             return form.flash_and_redirect("Incorrect username/password pair!")
         except ldap.SERVER_DOWN:
-            return form.flash_and_redirect("LDAP authorization service is unreachable!")
+            return form.flash_and_redirect("LDAP auth_managers service is unreachable!")
         except OperationalError:
             logger.exception("DataBase is unreachable!")
             return form.flash_and_redirect("DataBase is unreachable!")

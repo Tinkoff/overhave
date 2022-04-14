@@ -13,16 +13,9 @@ from overhave import (
     OverhaveProjectSettings,
     OverhaveScenarioCompilerSettings,
 )
-from overhave.entities import (
-    FeatureExtractor,
-    FeatureModel,
-    FeatureTypeModel,
-    ScenarioModel,
-    TestExecutorContext,
-    TestRunModel,
-)
-from overhave.entities.converters import TagModel
+from overhave.entities import FeatureExtractor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
+from overhave.storage import FeatureModel, FeatureTypeModel, ScenarioModel, TagModel, TestExecutorContext, TestRunModel
 from overhave.utils import get_current_time
 from tests.objects import get_test_feature_containers, get_test_feature_extractor
 

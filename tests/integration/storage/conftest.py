@@ -9,23 +9,21 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import DraftStatus
-from overhave.entities.converters import (
-    DraftModel,
-    EmulationModel,
-    FeatureModel,
-    FeatureTypeModel,
-    ScenarioModel,
-    SystemUserModel,
-    TagModel,
-)
 from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage import (
+    DraftModel,
     DraftStorage,
+    EmulationModel,
     EmulationStorage,
+    FeatureModel,
     FeatureStorage,
     FeatureTagStorage,
+    FeatureTypeModel,
     FeatureTypeStorage,
+    ScenarioModel,
     ScenarioStorage,
+    SystemUserModel,
+    TagModel,
     TestRunStorage,
 )
 

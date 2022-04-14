@@ -1,17 +1,18 @@
 from typing import Optional
 
-from overhave.authorization import AuthorizationStrategy, OverhaveAuthorizationSettings, OverhaveLdapClientSettings
+from overhave.base_settings import AuthorizationStrategy, OverhaveAuthorizationSettings
 from overhave.entities import (
     OverhaveAdminSettings,
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
+    OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveS3ManagerSettings
+from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings
 
 
 class OverhaveAdminContext(BaseFactoryContext):
@@ -27,6 +28,7 @@ class OverhaveAdminContext(BaseFactoryContext):
         emulation_settings: Optional[OverhaveEmulationSettings] = None,
         file_settings: Optional[OverhaveFileSettings] = None,
         language_settings: Optional[OverhaveLanguageSettings] = None,
+        ldap_manager_settings: Optional[OverhaveLdapManagerSettings] = None,
         ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
         redis_settings: Optional[OverhaveRedisSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
@@ -46,5 +48,7 @@ class OverhaveAdminContext(BaseFactoryContext):
         self.admin_settings = admin_settings or OverhaveAdminSettings()
         self.auth_settings = auth_settings or OverhaveAuthorizationSettings()
         self.redis_settings = redis_settings or OverhaveRedisSettings()
+
         if self.auth_settings.auth_strategy is AuthorizationStrategy.LDAP:
+            self.ldap_manager_settings = ldap_manager_settings or OverhaveLdapManagerSettings()
             self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()

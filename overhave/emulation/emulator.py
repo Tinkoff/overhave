@@ -6,9 +6,8 @@ from functools import cached_property
 from typing import Pattern
 
 from overhave import db
-from overhave.entities.converters import EmulationRunModel
 from overhave.entities.settings import OverhaveEmulationSettings
-from overhave.storage import EmulationStorageError, IEmulationStorage
+from overhave.storage import EmulationRunModel, EmulationStorageError, IEmulationStorage
 from overhave.transport import EmulationTask
 
 logger = logging.getLogger(__name__)

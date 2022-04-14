@@ -17,8 +17,8 @@ from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.entities import FeatureTypeName
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
+from overhave.storage import FeatureTypeName
 from overhave.test_execution import BddStepModel, StepTypeName
 from overhave.transport import TestRunData, TestRunTask
 from overhave.utils import get_current_time

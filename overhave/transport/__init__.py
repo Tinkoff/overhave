@@ -18,6 +18,7 @@ from .http import (
     StashReviewer,
     StashReviewerInfo,
 )
+from .ldap import LDAPAuthenticator, OverhaveLdapClientSettings
 from .redis import (
     AnyRedisTask,
     BaseRedisTask,

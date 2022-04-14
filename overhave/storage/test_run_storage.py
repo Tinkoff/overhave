@@ -2,7 +2,7 @@ import abc
 from typing import Optional, cast
 
 from overhave import db
-from overhave.entities import TestRunModel
+from overhave.storage.converters import TestRunModel
 from overhave.utils import get_current_time
 
 

@@ -5,24 +5,19 @@ from typing import List
 
 import pytz
 
-from overhave.entities import (
-    BaseFileExtractor,
-    FeatureExtractor,
-    FeatureModel,
-    GitRepositoryInitializer,
-    OverhaveFileSettings,
-    ScenarioModel,
-    TagModel,
-)
+from overhave.entities import BaseFileExtractor, FeatureExtractor, GitRepositoryInitializer, OverhaveFileSettings
 from overhave.scenario import ScenarioParser
 from overhave.scenario.parser import FeatureInfo
 from overhave.storage import (
+    FeatureModel,
     IDraftStorage,
     IFeatureStorage,
     IFeatureTagStorage,
     IFeatureTypeStorage,
     IScenarioStorage,
     ISystemUserStorage,
+    ScenarioModel,
+    TagModel,
 )
 from overhave.synchronization.abstract import IOverhaveSynchronizer
 

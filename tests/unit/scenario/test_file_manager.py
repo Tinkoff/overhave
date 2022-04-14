@@ -4,8 +4,9 @@ from unittest import mock
 import pytest
 
 from overhave import OverhaveFileSettings, OverhaveLanguageSettings
-from overhave.entities import FeatureExtractor, TestExecutorContext
+from overhave.entities import FeatureExtractor
 from overhave.scenario import FileManager, ScenarioCompiler
+from overhave.storage import TestExecutorContext
 from overhave.test_execution import OverhaveProjectSettings
 
 

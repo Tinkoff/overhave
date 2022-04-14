@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import SecretStr
 
-from overhave.authorization.manager.secret_mixin import AdminSecretMixin
-from overhave.entities import SystemUserModel
+from overhave.entities.auth_managers.secret_mixin import AdminSecretMixin
+from overhave.storage import SystemUserModel
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class NullablePasswordError(Exception):
 class SimpleAdminAuthorizationManager(AdminSecretMixin):
     """Class for user registration.
 
-    Manager does not provide real authorization. Each user could use preferred name.
+    Manager does not provide real auth_managers. Each user could use preferred name.
     This name will be used for user authority. Each user is unique. Passwords not required.
     """
 

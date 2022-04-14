@@ -3,11 +3,11 @@ import logging
 from requests import HTTPError
 
 from overhave.db import DraftStatus
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings, PublisherContext
+from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport import (
     StashBranch,

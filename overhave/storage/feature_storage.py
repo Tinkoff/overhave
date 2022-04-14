@@ -3,7 +3,7 @@ import logging
 from typing import Optional, cast
 
 from overhave import db
-from overhave.entities import FeatureModel
+from overhave.storage.converters import FeatureModel
 from overhave.storage.feature_tag_storage import IFeatureTagStorage
 
 logger = logging.getLogger(__name__)

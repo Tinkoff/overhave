@@ -3,7 +3,7 @@ from typing import List, Mapping, Sequence, cast
 import pytest
 from faker import Faker
 
-from overhave.entities import FeatureTypeName
+from overhave.storage import FeatureTypeName
 from tests.objects import get_test_feature_extractor
 
 

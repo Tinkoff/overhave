@@ -9,9 +9,9 @@ from demo.demo import _run_demo_consumer
 from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import OverhaveRedisStream
 from overhave.db import TestReportStatus
-from overhave.entities import TestRunModel
 from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, ProxyManager
+from overhave.storage import TestRunModel
 from overhave.transport import RedisConsumerRunner, TestRunData, TestRunTask
 
 

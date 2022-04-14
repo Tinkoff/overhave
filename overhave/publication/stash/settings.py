@@ -1,7 +1,7 @@
 from typing import List
 
-from overhave.entities.feature import FeatureTypeName
 from overhave.publication.settings import BaseGitPublisherSettings
+from overhave.storage import FeatureTypeName
 from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 
 

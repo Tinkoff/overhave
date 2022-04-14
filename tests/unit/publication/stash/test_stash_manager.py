@@ -3,8 +3,8 @@ from typing import List, Mapping, Sequence
 import pytest
 from faker import Faker
 
-from overhave.entities import FeatureTypeName
 from overhave.publication import StashVersionPublisher
+from overhave.storage import FeatureTypeName
 from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
 from tests.objects import get_test_file_settings
 

@@ -21,8 +21,8 @@ from overhave.db import (
     TestUser,
     UserRole,
 )
-from overhave.entities.feature import FeatureTypeName
 
+FeatureTypeName = NewType("FeatureTypeName", str)
 TestUserSpecification = NewType("TestUserSpecification", dict[str, str])
 
 

@@ -6,8 +6,8 @@ from typing import cast
 import sqlalchemy.orm as so
 
 from overhave import db
-from overhave.entities.converters import EmulationRunModel
 from overhave.entities.settings import OverhaveEmulationSettings
+from overhave.storage import EmulationRunModel
 from overhave.utils import get_current_time
 
 logger = logging.getLogger(__name__)
