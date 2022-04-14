@@ -5,8 +5,7 @@ from flask import redirect
 from flask_login import LoginManager
 from werkzeug import Response
 
-from overhave.entities import SystemUserModel
-from overhave.storage import ISystemUserStorage
+from overhave.storage import ISystemUserStorage, SystemUserModel
 
 logger = logging.getLogger(__name__)
 

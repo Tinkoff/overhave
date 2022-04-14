@@ -2,7 +2,7 @@ import abc
 from typing import Optional, cast
 
 from overhave import db
-from overhave.entities import ScenarioModel
+from overhave.storage.converters import ScenarioModel
 
 
 class BaseScenarioStorageException(Exception):

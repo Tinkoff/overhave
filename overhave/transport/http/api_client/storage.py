@@ -6,7 +6,7 @@ from overhave.utils import get_current_time
 
 
 class IAuthStorage(abc.ABC):
-    """Abstract storage for authorization tokens."""
+    """Abstract storage for auth_managers tokens."""
 
     @abc.abstractmethod
     def get_auth_token(self, username: str) -> Optional[AuthToken]:
@@ -18,7 +18,7 @@ class IAuthStorage(abc.ABC):
 
 
 class AuthStorage(IAuthStorage):
-    """In-memory storage for authorization tokens."""
+    """In-memory storage for auth_managers tokens."""
 
     def __init__(self) -> None:
         self._storage: dict[str, AuthToken] = {}

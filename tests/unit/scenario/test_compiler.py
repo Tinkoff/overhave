@@ -2,9 +2,10 @@ from typing import List, Optional
 
 import pytest
 
-from overhave.entities import FeatureModel, OverhaveLanguageSettings, ScenarioModel, TestExecutorContext
+from overhave.entities import OverhaveLanguageSettings
 from overhave.extra import RUSSIAN_PREFIXES
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
+from overhave.storage import FeatureModel, ScenarioModel, TestExecutorContext
 
 
 class TestGenerateTaskInfo:

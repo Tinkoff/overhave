@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from overhave.authorization import LDAPAuthenticator, OverhaveLdapClientSettings
+from overhave.transport import LDAPAuthenticator, OverhaveLdapClientSettings
 
 
 @pytest.fixture(scope="module")

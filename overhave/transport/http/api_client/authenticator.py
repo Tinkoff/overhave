@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class OverhaveApiAuthenticator(BaseHttpClient[OverhaveApiAuthenticatorSettings]):
-    """Client for authorization in Overhave API."""
+    """Client for auth_managers in Overhave API."""
 
     def __init__(
         self,
@@ -24,7 +24,7 @@ class OverhaveApiAuthenticator(BaseHttpClient[OverhaveApiAuthenticatorSettings])
         self._auth_storage = auth_storage
 
     def _auth_by_credentials(self, username: str, password: SecretStr) -> AuthToken:
-        logger.info("Get authorization token by username and password")
+        logger.info("Get auth_managers token by username and password")
         data = TokenRequestData(username=username, password=password.get_secret_value())
         response = self._make_request(
             method=HttpMethod.POST,

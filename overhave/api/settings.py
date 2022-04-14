@@ -18,7 +18,7 @@ class OverhaveUvicornApiSettings(BaseSettings):
 
 
 class OverhaveApiAuthSettings(BaseSettings):
-    """Settings for Overhave API service authorization."""
+    """Settings for Overhave API service auth_managers."""
 
     secret_key: SecretStr
     algorithm: str = "HS256"

@@ -5,7 +5,7 @@ import pytest
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
-from overhave.entities import TestRunModel
+from overhave.storage import TestRunModel
 
 
 @pytest.mark.usefixtures("database")

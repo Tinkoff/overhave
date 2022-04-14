@@ -7,7 +7,7 @@ import werkzeug
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
 from overhave.admin.views.feature import _SCENARIO_PREFIX
-from overhave.entities import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
+from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
 from overhave.transport import TestRunData, TestRunTask
 
 

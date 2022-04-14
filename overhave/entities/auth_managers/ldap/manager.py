@@ -4,12 +4,11 @@ from typing import List, Optional
 
 from pydantic import SecretStr
 
-from overhave.authorization.manager.base import BaseAdminAuthorizationManager
-from overhave.authorization.manager.ldap.authenticator import LDAPAuthenticator
-from overhave.authorization.settings import OverhaveLdapManagerSettings
 from overhave.db import Role
-from overhave.entities import SystemUserModel
-from overhave.storage import ISystemUserGroupStorage, ISystemUserStorage
+from overhave.entities.auth_managers.base import BaseAdminAuthorizationManager
+from overhave.entities.auth_managers.ldap.settings import OverhaveLdapManagerSettings
+from overhave.storage import ISystemUserGroupStorage, ISystemUserStorage, SystemUserModel
+from overhave.transport.ldap.authenticator import LDAPAuthenticator
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ class LDAPEmptyAdminGroupError(ValueError):
 
 
 class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
-    """Class for user authorization via LDAP.
+    """Class for user auth_managers via LDAP.
 
     Manager authorize users using remote LDAP server. Each user should use his LDAP credentials.
     LDAP server returns user groups. If user in default 'admin' group or his groups list contains admin group - user

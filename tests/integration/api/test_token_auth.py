@@ -4,7 +4,7 @@ from pydantic.types import SecretStr
 
 from overhave.api import AuthToken
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.entities.converters import SystemUserModel
+from overhave.storage import SystemUserModel
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.models import TokenRequestData
 from overhave.transport.http.base_client import BearerAuth
@@ -13,7 +13,7 @@ from tests.integration.api.conftest import validate_content_null
 
 
 class TestAuthAPI:
-    """Integration tests for Overhave API authorization."""
+    """Integration tests for Overhave API auth_managers."""
 
     def test_unathorized(self, test_api_client: TestClient) -> None:
         response = test_api_client.get("/test_user/")

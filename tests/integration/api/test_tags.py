@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
 from overhave import db
-from overhave.entities.converters import TagModel
+from overhave.storage import TagModel
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 

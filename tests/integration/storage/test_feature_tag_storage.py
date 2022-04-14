@@ -4,8 +4,7 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.entities import SystemUserModel, TagModel
-from overhave.storage import FeatureTagStorage
+from overhave.storage import FeatureTagStorage, SystemUserModel, TagModel
 
 
 def _validate_tag_model(tag: Optional[TagModel], validation_tag: TagModel) -> None:

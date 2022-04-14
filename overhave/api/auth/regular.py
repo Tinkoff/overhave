@@ -8,8 +8,7 @@ from overhave.api.auth.models import AUTH_HEADERS
 from overhave.api.auth.token import get_token_data
 from overhave.api.deps import get_api_auth_settings, get_system_user_storage
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.entities import SystemUserModel
-from overhave.storage import ISystemUserStorage
+from overhave.storage import ISystemUserStorage, SystemUserModel
 
 oauth2_scheme = fastapi_security.OAuth2PasswordBearer(tokenUrl="token")
 

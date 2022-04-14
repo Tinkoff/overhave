@@ -2,10 +2,7 @@ import abc
 from typing import Optional, cast
 
 from overhave import db
-from overhave.db import create_session
-from overhave.entities import FeatureTypeName
-from overhave.entities.converters import TestUserModel, TestUserSpecification
-from overhave.storage import FeatureTypeStorage
+from overhave.storage import FeatureTypeName, FeatureTypeStorage, TestUserModel, TestUserSpecification
 
 
 class BaseTestUserStorageException(Exception):
@@ -47,7 +44,7 @@ class TestUserStorage(ITestUserStorage):
 
     @staticmethod
     def get_test_user_by_id(user_id: int) -> Optional[TestUserModel]:
-        with create_session() as session:
+        with db.create_session() as session:
             user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
             if user is not None:
                 return cast(TestUserModel, TestUserModel.from_orm(user))
@@ -55,7 +52,7 @@ class TestUserStorage(ITestUserStorage):
 
     @staticmethod
     def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
-        with create_session() as session:
+        with db.create_session() as session:
             user: Optional[db.TestUser] = session.query(db.TestUser).filter(db.TestUser.name == name).one_or_none()
             if user is not None:
                 return cast(TestUserModel, TestUserModel.from_orm(user))

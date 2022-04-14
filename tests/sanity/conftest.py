@@ -13,9 +13,9 @@ from demo.demo import _run_demo_admin
 from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import OverhaveDBSettings, db
 from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
-from overhave.entities import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
 from overhave.factory import IAdminFactory, ISynchronizerFactory
 from overhave.pytest_plugin import IProxyManager
+from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
 
 logger = logging.getLogger(__name__)

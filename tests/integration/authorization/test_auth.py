@@ -5,7 +5,7 @@ import pytest
 from pydantic import SecretStr
 
 from overhave import db
-from overhave.authorization import (
+from overhave.entities import (
     DefaultAdminAuthorizationManager,
     LDAPAdminAuthorizationManager,
     SimpleAdminAuthorizationManager,

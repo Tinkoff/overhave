@@ -5,7 +5,7 @@ from pydantic.main import BaseModel
 
 
 class AuthToken(BaseModel):
-    """Model for OAuth2 authorization token."""
+    """Model for OAuth2 auth_managers token."""
 
     access_token: str
     expires_at: datetime
@@ -13,13 +13,13 @@ class AuthToken(BaseModel):
 
 
 class AuthTokenData(BaseModel):
-    """Model for OAuth2 authorization token data."""
+    """Model for OAuth2 auth_managers token data."""
 
     username: str
 
 
 class AuthHeaders(BaseModel):
-    """Model for OAuth2 authorization HTTP headers."""
+    """Model for OAuth2 auth_managers HTTP headers."""
 
     Authorization: str = Field("Bearer", const=True)
 

@@ -5,7 +5,7 @@ from faker import Faker
 from fastapi.testclient import TestClient
 
 from overhave import db
-from overhave.entities.converters import TestUserModel, TestUserSpecification
+from overhave.storage import TestUserModel, TestUserSpecification
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 

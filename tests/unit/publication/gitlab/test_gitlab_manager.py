@@ -3,8 +3,8 @@ from typing import List, Mapping, Sequence
 import pytest
 from faker import Faker
 
-from overhave.entities import FeatureTypeName
 from overhave.publication.gitlab import GitlabVersionPublisher
+from overhave.storage import FeatureTypeName
 from overhave.transport import GitlabRepository
 from tests.objects import get_test_file_settings
 

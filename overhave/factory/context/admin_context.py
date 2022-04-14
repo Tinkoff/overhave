@@ -1,18 +1,18 @@
 from typing import Optional
 
-from overhave.authorization import OverhaveLdapClientSettings, OverhaveLdapManagerSettings
 from overhave.base_settings import AuthorizationStrategy, OverhaveAuthorizationSettings
 from overhave.entities import (
     OverhaveAdminSettings,
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
+    OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveS3ManagerSettings
+from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings
 
 
 class OverhaveAdminContext(BaseFactoryContext):

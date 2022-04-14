@@ -4,8 +4,7 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.entities import FeatureModel, FeatureTypeModel
-from overhave.storage import FeatureStorage, FeatureTagStorage, SystemUserStorage
+from overhave.storage import FeatureModel, FeatureStorage, FeatureTagStorage, FeatureTypeModel, SystemUserStorage
 from overhave.utils import get_current_time
 
 

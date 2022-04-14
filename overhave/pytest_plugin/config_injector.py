@@ -3,7 +3,7 @@ from typing import Optional
 
 from _pytest.main import Session
 
-from overhave.entities import FeatureTypeName, IFeatureExtractor, OverhaveFileSettings, StepPrefixesModel
+from overhave.entities import IFeatureExtractor, OverhaveFileSettings, StepPrefixesModel
 from overhave.test_execution import PytestRunner, StepCollector
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class ConfigInjector:
         self._test_runner: Optional[PytestRunner] = None
         self._feature_extractor: Optional[IFeatureExtractor] = None
 
-        self._current_type: Optional[FeatureTypeName] = None
+        self._current_type: Optional[str] = None
         self._initialized = False
 
     @staticmethod

@@ -1,6 +1,6 @@
 from pydantic import SecretStr
 
-from overhave.authorization import LDAPAuthenticator
+from overhave.transport import LDAPAuthenticator
 from tests.unit.authorization.conftest import TEST_LDAP_GROUPS
 
 

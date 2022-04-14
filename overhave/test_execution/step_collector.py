@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 from _pytest.fixtures import FixtureDef
 from _pytest.main import Session
 
-from overhave.entities import FeatureTypeName, StepPrefixesModel
+from overhave.entities import StepPrefixesModel
+from overhave.storage import FeatureTypeName
 from overhave.test_execution.objects import BddStepModel
 
 _PYTESTBDD_FIXTURE_MARK = "pytestbdd_"

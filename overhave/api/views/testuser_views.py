@@ -5,8 +5,7 @@ from typing import Optional
 import fastapi
 
 from overhave.api.deps import get_test_user_storage
-from overhave.entities.converters import TestUserModel, TestUserSpecification
-from overhave.storage import ITestUserStorage, TestUserDoesNotExistError
+from overhave.storage import ITestUserStorage, TestUserDoesNotExistError, TestUserModel, TestUserSpecification
 
 logger = logging.getLogger(__name__)
 

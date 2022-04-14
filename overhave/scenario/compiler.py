@@ -2,9 +2,10 @@ from typing import List, Optional, cast
 
 from pytest_bdd import types as default_types
 
-from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings, TestExecutorContext
+from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
 from overhave.scenario.errors import IncorrectScenarioTextError
 from overhave.scenario.mixin import PrefixMixin
+from overhave.storage import TestExecutorContext
 
 
 def generate_task_info(tasks: List[str], header: Optional[str]) -> str:

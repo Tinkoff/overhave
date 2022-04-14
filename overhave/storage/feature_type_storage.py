@@ -2,7 +2,7 @@ import abc
 from typing import cast
 
 from overhave import db
-from overhave.entities import FeatureTypeModel
+from overhave.storage.converters import FeatureTypeModel
 
 
 class BaseFeatureTypeStorageException(Exception):

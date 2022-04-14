@@ -5,9 +5,9 @@ import pytest
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
-from overhave.entities import FeatureTypeModel, FeatureTypeName
 from overhave.factory import AdminFactory
 from overhave.pytest_plugin import IProxyManager
+from overhave.storage import FeatureTypeModel, FeatureTypeName
 
 
 class TestOverhaveRunAdminClean:

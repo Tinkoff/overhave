@@ -5,14 +5,14 @@ from faker import Faker
 from pydantic import SecretStr
 from pytest_mock import MockFixture
 
-from overhave.authorization import (
+from overhave.entities import (
     DefaultAdminAuthorizationManager,
     LDAPAdminAuthorizationManager,
-    LDAPAuthenticator,
     OverhaveLdapManagerSettings,
     SimpleAdminAuthorizationManager,
 )
 from overhave.storage import SystemUserGroupStorage, SystemUserStorage
+from overhave.transport import LDAPAuthenticator
 
 
 @pytest.fixture()

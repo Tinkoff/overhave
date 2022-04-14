@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import SecretStr
 
 from overhave import db
-from overhave.authorization.manager.base import BaseAdminAuthorizationManager
+from overhave.entities.auth_managers.base import BaseAdminAuthorizationManager
 from overhave.storage import ISystemUserStorage
 
 logger = logging.getLogger(__name__)

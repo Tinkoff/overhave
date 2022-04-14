@@ -2,8 +2,7 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.entities import FeatureModel, ScenarioModel
-from overhave.storage import ScenarioStorage
+from overhave.storage import FeatureModel, ScenarioModel, ScenarioStorage
 
 
 def _check_base_scenario_type_model(test_model: ScenarioModel, validation_model: ScenarioModel) -> None:

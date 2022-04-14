@@ -13,8 +13,7 @@ from overhave.api.views import (
     test_user_handler,
     test_user_put_spec_handler,
 )
-from overhave.entities import TagModel
-from overhave.entities.converters import TestUserModel, TestUserSpecification
+from overhave.storage import TagModel, TestUserModel, TestUserSpecification
 
 
 def _get_tags_router() -> fastapi.APIRouter:

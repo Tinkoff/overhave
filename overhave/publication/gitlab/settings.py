@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from overhave.entities import FeatureTypeName
 from overhave.publication.settings import BaseGitPublisherSettings
+from overhave.storage import FeatureTypeName
 from overhave.transport.http.gitlab_client import GitlabRepository
 
 

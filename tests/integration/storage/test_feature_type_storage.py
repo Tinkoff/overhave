@@ -1,7 +1,6 @@
 import pytest
 
-from overhave.entities import FeatureTypeModel
-from overhave.storage import FeatureTypeStorage
+from overhave.storage import FeatureTypeModel, FeatureTypeStorage
 
 
 def _check_base_feature_type_model(test_model: FeatureTypeModel, validation_model: FeatureTypeModel) -> None:

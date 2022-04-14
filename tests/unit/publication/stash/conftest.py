@@ -4,11 +4,11 @@ import pytest
 from pytest_mock import MockFixture
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
-from overhave.entities import FeatureTypeName, GitRepositoryInitializer
+from overhave.entities import GitRepositoryInitializer
 from overhave.publication import StashVersionPublisher
 from overhave.publication.stash import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
+from overhave.storage import FeatureTypeName, IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import StashHttpClient
 
 

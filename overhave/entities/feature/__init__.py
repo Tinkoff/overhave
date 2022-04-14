@@ -2,4 +2,3 @@
 from .abstract import IFeatureExtractor
 from .errors import FeatureTypeExtractionError, ScenariosTestFileNotFound
 from .extractor import FeatureExtractor
-from .types import FeatureTypeName
