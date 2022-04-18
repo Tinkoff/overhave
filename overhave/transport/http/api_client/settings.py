@@ -1,7 +1,7 @@
 from yarl import URL
 
 from overhave.base_settings import OVERHAVE_ENV_PREFIX
-from overhave.transport.http import BaseHttpClientSettings
+from overhave.transport.http.base_client import BaseHttpClientSettings
 
 
 class OverhaveApiAuthenticatorSettings(BaseHttpClientSettings):

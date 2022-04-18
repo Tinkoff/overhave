@@ -4,6 +4,7 @@ from overhave.api import create_overhave_api as overhave_api
 from overhave.base_settings import AuthorizationStrategy as OverhaveAuthorizationStrategy
 from overhave.base_settings import DataBaseSettings as OverhaveDBSettings
 from overhave.base_settings import LoggingSettings as OverhaveLoggingSettings
+from overhave.base_settings import OverhaveAuthorizationSettings
 from overhave.cli import group, set_config_to_context
 from overhave.entities import (
     OverhaveAdminSettings,
@@ -39,6 +40,14 @@ from overhave.publication import OverhaveStashPublisherSettings
 from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
 from overhave.pytest_plugin import get_description_manager
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
+from overhave.storage import FeatureTypeName as OverhaveFeatureName
+from overhave.storage import TestUserSpecification
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
-from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings, OverhaveStashClientSettings
+from overhave.transport import (
+    OverhaveApiAuthenticator,
+    OverhaveApiAuthenticatorSettings,
+    OverhaveLdapClientSettings,
+    OverhaveS3ManagerSettings,
+    OverhaveStashClientSettings,
+)
 from overhave.transport import RedisStream as OverhaveRedisStream
