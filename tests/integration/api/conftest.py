@@ -16,9 +16,9 @@ from overhave.transport.http.base_client import BearerAuth
 
 
 @pytest.fixture(scope="module")
-def envs_for_mock(faker: Faker) -> Dict[str, Optional[str]]:
+def envs_for_mock() -> Dict[str, Optional[str]]:
     return {
-        "OVERHAVE_API_AUTH_SECRET_KEY": faker.word(),
+        "OVERHAVE_API_AUTH_SECRET_KEY": "123",
     }
 
 

@@ -6,12 +6,12 @@ from .tables import (
     Emulation,
     EmulationRun,
     Feature,
+    FeatureTagsAssociationTable,
     FeatureType,
     Scenario,
     Tags,
     TestRun,
     TestUser,
-    tags_association_table,
 )
 from .users import GroupRole, Role, UserRole
 from .utils import create_session, ensure_feature_types_exist

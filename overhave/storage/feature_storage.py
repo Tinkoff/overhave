@@ -1,10 +1,11 @@
 import abc
 import logging
-from typing import Optional, cast
+from typing import List, Optional, cast
+
+from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.storage.converters import FeatureModel
-from overhave.storage.feature_tag_storage import IFeatureTagStorage
 
 logger = logging.getLogger(__name__)
 
@@ -39,12 +40,14 @@ class IFeatureStorage(abc.ABC):
     def update_feature(model: FeatureModel) -> None:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def get_features_by_tag(tag_id: int) -> List[FeatureModel]:
+        pass
+
 
 class FeatureStorage(IFeatureStorage):
     """Class for feature storage."""
-
-    def __init__(self, tag_storage: IFeatureTagStorage):
-        self._tag_storage = tag_storage
 
     @staticmethod
     def get_feature(feature_id: int) -> Optional[FeatureModel]:
@@ -97,3 +100,14 @@ class FeatureStorage(IFeatureStorage):
                     raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
                 logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
                 feature.feature_tags.append(db_tag)
+
+    @staticmethod
+    def get_features_by_tag(tag_id: int) -> List[FeatureModel]:
+        with db.create_session() as session:
+            feature_ids_query = (
+                session.query(db.FeatureTagsAssociationTable)
+                .with_entities(db.FeatureTagsAssociationTable.feature_id)
+                .filter(db.FeatureTagsAssociationTable.tags_id == tag_id)
+            )
+            features = session.query(db.Feature).filter(db.Feature.id == feature_ids_query).all()
+            return parse_obj_as(List[FeatureModel], features)
