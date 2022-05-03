@@ -34,7 +34,12 @@ class TestRunStorage(ITestRunStorage):
             scenario_id_query = (
                 session.query(db.Scenario).with_entities(db.Scenario.feature_id).filter(db.Scenario.id == scenario_id)
             )
-            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario_id_query).one()
+            feature: db.Feature = (
+                session.query(db.Feature)
+                .with_entities(db.Feature.name)
+                .filter(db.Feature.id == scenario_id_query)
+                .one()
+            )
             run = db.TestRun(  # type: ignore
                 scenario_id=scenario_id,
                 name=feature.name,
