@@ -117,10 +117,8 @@ class DraftQuery(so.Query):
                 .filter(Draft.test_run_id == run.id, Draft.text == run.scenario.text)
                 .one_or_none()
             )
-
         if draft:
             return draft
-
         return Draft(
             feature_id=run.scenario.feature_id,
             test_run_id=test_run_id,

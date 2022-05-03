@@ -118,6 +118,5 @@ class DraftStorage(IDraftStorage):
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.status = status
-            if not isinstance(traceback, str):
-                return
-            draft.traceback = traceback
+            if isinstance(traceback, str):
+                draft.traceback = traceback

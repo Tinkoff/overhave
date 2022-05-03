@@ -31,8 +31,10 @@ class TestRunStorage(ITestRunStorage):
 
     def create_test_run(self, scenario_id: int, executed_by: str) -> int:
         with db.create_session() as session:
-            scenario: db.Scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
-            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario.feature_id).one()
+            scenario_id_query = (
+                session.query(db.Scenario).with_entities(db.Scenario.feature_id).filter(db.Scenario.id == scenario_id)
+            )
+            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario_id_query).one()
             run = db.TestRun(  # type: ignore
                 scenario_id=scenario_id,
                 name=feature.name,
