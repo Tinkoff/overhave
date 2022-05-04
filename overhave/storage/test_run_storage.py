@@ -34,12 +34,7 @@ class TestRunStorage(ITestRunStorage):
             scenario_id_query = (
                 session.query(db.Scenario).with_entities(db.Scenario.feature_id).filter(db.Scenario.id == scenario_id)
             )
-            feature: db.Feature = (
-                session.query(db.Feature)
-                .with_entities(db.Feature.name)
-                .filter(db.Feature.id == scenario_id_query)
-                .one()
-            )
+            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario_id_query).one()
             run = db.TestRun(  # type: ignore
                 scenario_id=scenario_id,
                 name=feature.name,
@@ -55,7 +50,7 @@ class TestRunStorage(ITestRunStorage):
         with db.create_session() as session:
             run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
             run.status = status
-            if status is db.TestRunStatus.RUNNING:
+            if status == db.TestRunStatus.RUNNING:
                 run.start = get_current_time()
             if status.finished:
                 run.end = get_current_time()
