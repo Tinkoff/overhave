@@ -4,7 +4,14 @@ import pytest
 from faker import Faker
 
 from overhave import db
-from overhave.storage import FeatureModel, FeatureStorage, FeatureTagStorage, FeatureTypeModel, SystemUserStorage
+from overhave.storage import (
+    FeatureModel,
+    FeatureStorage,
+    FeatureTagStorage,
+    FeatureTypeModel,
+    SystemUserStorage,
+    TagModel,
+)
 from overhave.utils import get_current_time
 
 
@@ -83,3 +90,15 @@ class TestFeatureStorage:
         _check_base_feature_type_attrs(
             test_model=updated_feature_model.feature_type, validation_model=test_feature_type
         )
+        test_feature_storage.get_features_by_tag(new_tag_model.id)
+
+    def test_get_feature_by_tag(
+        self,
+        test_feature_storage: FeatureStorage,
+        test_tag: TagModel,
+        test_feature_with_tag: FeatureModel,
+        faker: Faker,
+    ) -> None:
+        found_features = test_feature_storage.get_features_by_tag(test_tag.id)
+        assert len(found_features) == 1
+        assert found_features[0] == test_feature_with_tag

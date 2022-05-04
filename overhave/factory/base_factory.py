@@ -135,7 +135,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
 
     @cached_property
     def _feature_storage(self) -> FeatureStorage:
-        return FeatureStorage(tag_storage=self._feature_tag_storage)
+        return FeatureStorage()
 
     @cached_property
     def _feature_type_storage(self) -> IFeatureTypeStorage:

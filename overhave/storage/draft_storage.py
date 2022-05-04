@@ -2,6 +2,8 @@ import abc
 from datetime import datetime
 from typing import List, Optional, cast
 
+from pydantic import parse_obj_as
+
 from overhave import db
 from overhave.storage import DraftModel
 
@@ -66,12 +68,9 @@ class DraftStorage(IDraftStorage):
 
     @staticmethod
     def get_drafts_by_feature_id(feature_id: int) -> List[DraftModel]:
-        draft_model_list: List[DraftModel] = []
         with db.create_session() as session:
             drafts: List[db.Draft] = session.query(db.Draft).filter(db.Draft.feature_id == feature_id).all()
-            for draft in drafts:
-                draft_model_list.append(cast(DraftModel, DraftModel.from_orm(draft)))
-        return draft_model_list
+            return parse_obj_as(List[DraftModel], drafts)
 
     @staticmethod
     def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
@@ -119,6 +118,5 @@ class DraftStorage(IDraftStorage):
         with db.create_session() as session:
             draft: db.Draft = session.query(db.Draft).get(draft_id)
             draft.status = status
-            if not isinstance(traceback, str):
-                return
-            draft.traceback = traceback
+            if isinstance(traceback, str):
+                draft.traceback = traceback

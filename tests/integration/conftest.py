@@ -7,6 +7,7 @@ from pydantic import SecretStr
 
 from overhave import db
 from overhave.storage import (
+    FeatureModel,
     FeatureTypeModel,
     SystemUserGroupStorage,
     SystemUserModel,
@@ -86,3 +87,28 @@ def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
         session.add(tag)
         session.flush()
         return cast(TagModel, TagModel.from_orm(tag))
+
+
+@pytest.fixture()
+def test_feature(test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker) -> FeatureModel:
+    with db.create_session() as session:
+        feature = db.Feature(
+            name=faker.word(),
+            author=test_system_user.login,
+            type_id=test_feature_type.id,
+            task=[faker.word()[:11]],
+            file_path=f"{faker.word()}/{faker.word()}",
+        )
+        session.add(feature)
+        session.flush()
+        return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> FeatureModel:
+    with db.create_session() as session:
+        tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
+        feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
+        feature.feature_tags.append(tag)
+        session.flush()
+        return cast(FeatureModel, FeatureModel.from_orm(feature))

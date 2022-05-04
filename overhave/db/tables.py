@@ -6,18 +6,11 @@ import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
+from sqlalchemy.ext.declarative import declared_attr
 
-from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin, metadata
+from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
 from overhave.db.users import UserRole
-
-tags_association_table = sa.Table(
-    "feature_tags",
-    metadata,
-    sa.Column("tags_id", sa.Integer(), sa.ForeignKey("tags.tags_id")),
-    sa.Column("feature_id", sa.Integer(), sa.ForeignKey("feature.feature_id")),
-    extend_existing=True,
-)
 
 
 class FeatureType(BaseTable, PrimaryKeyWithoutDateMixin):
@@ -59,7 +52,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary=tags_association_table)
+    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags")
 
     def __init__(self, name: str, author: str, type_id: int, file_path: str, task: List[str]) -> None:
         self.name = name
@@ -68,6 +61,19 @@ class Feature(BaseTable, PrimaryKeyMixin):
         self.file_path = file_path
         self.task = task
         self.last_edited_by = author
+
+
+class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
+    """Association table between features and tags."""
+
+    extend_existing = True
+
+    tags_id = sa.Column(sa.Integer(), sa.ForeignKey(Tags.id))
+    feature_id = sa.Column(sa.Integer(), sa.ForeignKey(Feature.id))
+
+    @declared_attr
+    def __tablename__(cls) -> str:
+        return "feature_tags"
 
 
 @su.generic_repr("feature_id")
@@ -111,10 +117,8 @@ class DraftQuery(so.Query):
                 .filter(Draft.test_run_id == run.id, Draft.text == run.scenario.text)
                 .one_or_none()
             )
-
         if draft:
             return draft
-
         return Draft(
             feature_id=run.scenario.feature_id,
             test_run_id=test_run_id,
