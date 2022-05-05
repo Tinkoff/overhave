@@ -6,7 +6,6 @@ import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
-from sqlalchemy.ext.declarative import declared_attr
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
@@ -52,7 +51,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags")
+    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")
 
     def __init__(self, name: str, author: str, type_id: int, file_path: str, task: List[str]) -> None:
         self.name = name
@@ -70,10 +69,6 @@ class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
 
     tags_id = sa.Column(sa.Integer(), sa.ForeignKey(Tags.id))
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey(Feature.id))
-
-    @declared_attr
-    def __tablename__(cls) -> str:
-        return "feature_tags"
 
 
 @su.generic_repr("feature_id")
