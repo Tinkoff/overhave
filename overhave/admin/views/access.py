@@ -30,7 +30,7 @@ class AccessModelView(ModelViewConfigured):
 class UserView(AccessModelView):
     """View for application user access management."""
 
-    column_list = ["id", "login", "role", "created_at"]
+    column_list = ["login", "role", "created_at"]
     column_searchable_list = ["login"]
     form_excluded_columns = ["created_at"]
 
@@ -38,5 +38,6 @@ class UserView(AccessModelView):
 class GroupView(AccessModelView):
     """View for application group access management."""
 
+    column_list = ["group", "created_at"]
     column_searchable_list = ["group"]
     form_excluded_columns = ["created_at"]

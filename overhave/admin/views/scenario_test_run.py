@@ -47,6 +47,11 @@ class TestRunView(ModelViewConfigured):
         "executed_by",
         "status",
     )
+    column_descriptions = {
+        "name": "Feature name",
+        "executed_by": "Initiator of scenarios set test run",
+        "status": "Test run result",
+    }
 
     def on_model_change(self, form: Form, model: db.TestRun, is_created: bool) -> None:
         if not is_created and current_user.role != db.Role.admin:

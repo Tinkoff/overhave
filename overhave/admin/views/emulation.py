@@ -24,13 +24,14 @@ class EmulationView(ModelViewConfigured):
     edit_template = "emulation_edit.html"
 
     can_view_details = False
-    column_list = ["id", "name", "test_user.feature_type", "test_user", "created_by"]
-    column_searchable_list = ["name", "created_by"]
+    column_list = ("name", "test_user.feature_type", "test_user", "created_by")
+    column_searchable_list = ("name", "created_by")
+    column_filters = ("name", "created_by")
     form_excluded_columns = ("created_at", "emulation_runs")
 
-    column_labels = {"test_user.feature_type": "Template type"}
+    column_labels = {"name": "Template name", "test_user.feature_type": "Template type"}
     column_descriptions = {
-        "name": "Emulation name",
+        "name": "Emulation template name",
         "test_user.feature_type": "Type of template supported by specified test user",
         "test_user": "Related Test User used for specified emulation",
         "command": "Flags and values for emulation execution",

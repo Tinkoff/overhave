@@ -28,20 +28,25 @@ class TestUserView(ModelViewConfigured):
     edit_template = "test_user_edit.html"
 
     can_view_details = False
-    column_list = ["id", "name", "feature_type", "specification", "created_by"]
-    column_searchable_list = ["name", "created_by"]
+    column_list = ("name", "feature_type", "specification", "created_by")
+    column_searchable_list = ("name", "created_by")
+    column_filters = ("name", "created_by")
     form_excluded_columns = ("created_at", "emulations")
     form_overrides = dict(specification=JSONField)
 
     form_extra_fields = {"template": JSONField("Specification format")}
     form_widget_args = {"template": {"readonly": True}}
 
-    column_descriptions = dict(
-        name="Test user name",
-        feature_type="Type of scenarios set, where test user will be used",
-        specification="Test user specification in JSON format placed below",
-        created_by="Author of test user set",
-    )
+    column_labels = {
+        "name": "Test user name",
+        "feature_type": "Feature type",
+    }
+    column_descriptions = {
+        "name": "Custom name for test user",
+        "feature_type": "Type of scenarios set, where test user will be used",
+        "specification": "Test user specification in JSON format placed below",
+        "created_by": "Author of test user set",
+    }
 
     _feature_type: Optional[str] = None
 
