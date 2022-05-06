@@ -3,6 +3,7 @@ from unittest import mock
 from unittest.mock import patch
 from uuid import uuid1
 
+import allure_commons.types as allure_types
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.python import Metafunc
@@ -110,6 +111,12 @@ def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
     return faker.word()
 
 
+@pytest.fixture(scope="class")
+def test_severity(faker: Faker) -> allure_types.Severity:
+    lst = list(allure_types.Severity)
+    return lst[faker.random_int(0, len(lst) - 1)]
+
+
 @pytest.fixture()
 def test_feature_row(
     faker: Faker,
@@ -118,6 +125,7 @@ def test_feature_row(
     test_system_user_login: str,
     test_feature_type_id: int,
     test_feature_filepath: str,
+    test_severity: allure_types.Severity,
     test_feature_model_task: List[str],
 ) -> db.Feature:
     row = db.Feature(
@@ -126,6 +134,7 @@ def test_feature_row(
         type_id=test_feature_type_id,
         file_path=test_feature_filepath,
         task=test_feature_model_task,
+        severity=test_severity,
     )
     row.id = test_feature_id
     return row

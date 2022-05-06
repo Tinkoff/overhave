@@ -165,7 +165,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             released=True,
             feature_type=feature_type,
             feature_tags=feature_tags,
-            severity=allure_types.Severity.NORMAL,
+            severity=info.severity or allure_types.Severity.NORMAL,
         )
         feature_model.id = self._feature_storage.create_feature(feature_model)
         scenario_model = ScenarioModel(id=0, feature_id=feature_model.id, text=info.scenarios)

@@ -66,6 +66,7 @@ class FeatureStorage(IFeatureStorage):
                 type_id=model.feature_type.id,
                 file_path=model.file_path,
                 task=model.task,
+                severity=model.severity,
             )
             feature.last_edited_at = model.last_edited_at
             feature.released = model.released
@@ -82,6 +83,7 @@ class FeatureStorage(IFeatureStorage):
             feature.name = model.name
             feature.file_path = model.file_path
             feature.task = model.task
+            feature.severity = model.severity
             feature.last_edited_by = model.last_edited_by
             feature.released = True
             session.flush()

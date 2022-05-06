@@ -41,6 +41,10 @@ class OverhaveScenarioCompilerSettings(BaseOverhavePrefix):
     time_format: str = "%d-%m-%Y %H:%M:%S"
     blocks_delimiter: str = "|"
 
+    @property
+    def severity_keyword(self) -> str:
+        return self.severity_prefix.removeprefix(self.tag_prefix)
+
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""

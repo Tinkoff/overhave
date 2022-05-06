@@ -2,8 +2,9 @@ import logging
 import re
 from datetime import datetime
 from functools import cached_property
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
+import allure_commons.types as allure_types
 from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
@@ -27,6 +28,7 @@ class FeatureInfo(BaseModel):
     name: Optional[str]
     type: Optional[str]
     tags: Optional[List[str]]
+    severity: Optional[allure_types.Severity]
     author: Optional[str]
     last_edited_by: Optional[str]
     last_edited_at: Optional[datetime]
@@ -77,7 +79,7 @@ class ScenarioParser(PrefixMixin):
     def _get_tags(self, tags_line: str) -> List[str]:
         return [tag.strip() for tag in tags_line.split(self._compilation_settings.tag_prefix) if tag]
 
-    def _get_feature_type(self, tags: List[str]) -> str:
+    def _get_feature_type(self, tags: Sequence[str]) -> str:
         for tag in tags:
             if tag not in self._feature_extractor.feature_types:
                 continue
@@ -85,6 +87,13 @@ class ScenarioParser(PrefixMixin):
         raise FeatureTypeParsingError(
             f"Could not get feature type from tags {tags}!",
         )
+
+    def _get_severity_tag(self, tags: Sequence[str]) -> Optional[str]:
+        for tag in reversed(tags):
+            if self._compilation_settings.severity_keyword not in tag:
+                continue
+            return tag
+        return None
 
     @staticmethod
     def _get_additional_info(additional_line: str, left_pointer: str, right_pointer: str) -> str:
@@ -116,6 +125,14 @@ class ScenarioParser(PrefixMixin):
                 tags = self._get_tags(line)
                 feature_info.type = self._get_feature_type(tags)
                 tags.remove(feature_info.type)
+
+                severity_tag = self._get_severity_tag(tags)
+                if severity_tag is not None:
+                    tags.remove(severity_tag)
+                    feature_info.severity = allure_types.Severity(
+                        severity_tag.removeprefix(self._compilation_settings.severity_keyword)
+                    )
+
                 feature_info.tags = tags
                 continue
             for prefix in self._feature_prefixes:

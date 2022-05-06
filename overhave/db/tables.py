@@ -60,13 +60,16 @@ class Feature(BaseTable, PrimaryKeyMixin):
     feature_type = so.relationship(FeatureType)
     feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")
 
-    def __init__(self, name: str, author: str, type_id: int, file_path: str, task: List[str]) -> None:
+    def __init__(
+        self, name: str, author: str, type_id: int, file_path: str, task: List[str], severity: allure_types.Severity
+    ) -> None:
         self.name = name
         self.author = author
         self.type_id = type_id
         self.file_path = file_path
         self.task = task
         self.last_edited_by = author
+        self.severity = severity
 
 
 class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):

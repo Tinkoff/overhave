@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pytest
 
-from overhave import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave import OverhaveLanguageSettings
 from overhave.extra import RUSSIAN_PREFIXES
 from overhave.scenario import IncorrectScenarioTextError, ScenarioCompiler, ScenarioParser, generate_task_info
 from overhave.storage import FeatureModel, ScenarioModel, TestExecutorContext
@@ -47,7 +47,6 @@ class TestScenarioCompiler:
 
     def test_compile_scenario_from_correct_text(
         self,
-        test_compilation_settings: OverhaveScenarioCompilerSettings,
         task_links_keyword: Optional[str],
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_parser: ScenarioParser,
@@ -60,15 +59,10 @@ class TestScenarioCompiler:
         assert parsed_info.id == test_feature.id
         assert parsed_info.name == test_feature.name
         assert parsed_info.type == test_feature.feature_type.name
-
         assert parsed_info.tags is not None
-        validation_tags_set = {model.value for model in test_feature.feature_tags}
-        validation_parsed_severity_tag = test_scenario_compiler._get_severity_tag(
-            severity=test_feature.severity
-        ).removeprefix(test_compilation_settings.tag_prefix)
-        validation_tags_set.add(validation_parsed_severity_tag)
-        assert set(parsed_info.tags) == validation_tags_set
-
+        assert set(parsed_info.tags) == {model.value for model in test_feature.feature_tags}
+        assert parsed_info.severity is not None
+        assert parsed_info.severity == test_feature.severity
         assert parsed_info.author == test_feature.author
         assert parsed_info.last_edited_by == test_feature.last_edited_by
         assert parsed_info.last_edited_at is not None
