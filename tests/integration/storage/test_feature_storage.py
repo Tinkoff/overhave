@@ -1,5 +1,6 @@
 from uuid import uuid1
 
+import allure_commons.types as allure_types
 import pytest
 from faker import Faker
 
@@ -58,6 +59,7 @@ class TestFeatureStorage:
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
         _check_base_feature_type_attrs(test_model=feature_model.feature_type, validation_model=test_feature_type)
 
+    @pytest.mark.parametrize("severity", list(allure_types.Severity))
     def test_update_feature(
         self,
         test_feature_storage: FeatureStorage,
@@ -65,6 +67,7 @@ class TestFeatureStorage:
         test_tag_storage: FeatureTagStorage,
         test_feature_type: FeatureTypeModel,
         test_feature_with_tag: FeatureModel,
+        severity: allure_types.Severity,
         faker: Faker,
     ) -> None:
         new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
@@ -81,6 +84,7 @@ class TestFeatureStorage:
             released=True,
             feature_type=test_feature_type,
             feature_tags=[new_tag_model],
+            severity=severity,
         )
         test_feature_storage.update_feature(model=new_feature_model)
         updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import allure
+import allure_commons.types
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
 
@@ -32,4 +33,6 @@ def has_issue_links(item: Item) -> bool:
 
 def add_issue_links_to_report(project_settings: OverhaveProjectSettings, scenario: Scenario) -> None:
     for link in scenario.feature.links:
-        allure.dynamic.link(url=project_settings.get_link_url(link), link_type="issue", name=link)
+        allure.dynamic.link(
+            url=project_settings.get_link_url(link), link_type=allure_commons.types.LinkType.LINK, name=link
+        )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, cast
 
+import allure_commons.types as allure_types
 import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
@@ -49,6 +50,12 @@ class Feature(BaseTable, PrimaryKeyMixin):
     last_edited_by = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
     last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
+    severity = sa.Column(
+        sa.Enum(allure_types.Severity),
+        nullable=False,
+        default=allure_types.Severity.NORMAL,
+        doc="Feature severity choice",
+    )
 
     feature_type = so.relationship(FeatureType)
     feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")

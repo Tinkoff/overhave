@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, NewType, Optional
 
+import allure_commons.types as allure_types
 from pydantic.main import BaseModel
 from pydantic.types import SecretStr
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
@@ -80,6 +81,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     task: List[str]
     file_path: str
     released: bool
+    severity: allure_types.Severity
 
     feature_type: FeatureTypeModel
     feature_tags: List[TagModel]
