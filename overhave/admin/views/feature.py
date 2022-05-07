@@ -128,10 +128,10 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "name",
         "feature_type",
         "file_path",
+        "severity",
         "feature_tags",
         "task",
-        "author",
-        "created_at",
+        "last_edited_at",
         "last_edited_by",
         "released",
     )
@@ -153,8 +153,17 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "last_edited_by",
         "feature_tags.value",
     ]
-    column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
-    column_sortable_list = ("id", "name", "author", "last_edited_by")
+    column_filters = (
+        "name",
+        "feature_type",
+        "last_edited_by",
+        "author",
+        "created_at",
+        "last_edited_at",
+        "feature_tags.value",
+        "severity",
+    )
+    column_sortable_list = ("id", "name", "author", "last_edited_by", "severity")
     column_labels = {
         "file_path": "File",
         "feature_tags": "Tags",

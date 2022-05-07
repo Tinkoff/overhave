@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+import allure
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
 from yarl import URL
@@ -52,7 +53,7 @@ def file_path_formatter(view: ModelView, context: Any, model: db.Feature, value:
         value_without_suffix = re.sub(rf"({view.feature_suffix})", "", value)
         value_to_visualize = value_without_suffix.split("/")[-1]
         return Markup(f"<i>{value_to_visualize}</i>")
-    raise NotImplementedError
+    raise NotImplementedError()
 
 
 @safe_formatter(type=str, supported_models=(db.TestRun,))
@@ -94,7 +95,26 @@ def feature_link_formatter(view: ModelView, context: Any, model: db.BaseTable, v
         return get_feature_link_markup(feature_id=model.id, feature_name=value)
     if isinstance(model, db.TestRun):
         return get_feature_link_markup(feature_id=model.scenario.feature_id, feature_name=value)
-    raise NotImplementedError
+    raise NotImplementedError()
+
+
+def _get_severity_color(severity: str) -> str:
+    match severity:
+        case allure.severity_level.BLOCKER:
+            return "brown"
+        case allure.severity_level.CRITICAL:
+            return "maroon"
+        case allure.severity_level.MINOR:
+            return "gray"
+        case allure.severity_level.TRIVIAL:
+            return "silver"
+    return "black"
+
+
+@safe_formatter(type=str, supported_models=(db.Feature,))
+def feature_severity_formatter(view: ModelView, context: Any, model: db.BaseTable, value: str) -> Markup:
+    color = _get_severity_color(severity=value)
+    return Markup(f"<font color='{color}'>{value.upper()}</font>")
 
 
 @safe_formatter(type=int, supported_models=(db.Draft,))

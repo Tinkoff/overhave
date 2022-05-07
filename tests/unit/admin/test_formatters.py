@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from types import FunctionType
 from typing import Dict, Optional, Sequence
 
+import allure
 import pytest
 from faker import Faker
 from markupsafe import Markup
@@ -20,10 +21,12 @@ from overhave.admin.views import (
 )
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.admin.views.formatters.formatters import (
+    _get_severity_color,
     draft_feature_formatter,
     draft_prurl_formatter,
     draft_testrun_formatter,
     feature_link_formatter,
+    feature_severity_formatter,
     file_path_formatter,
     json_formatter,
 )
@@ -381,3 +384,30 @@ class TestFilePathFormatter:
             model=test_feature_row,
             name=column_name,
         ) == Markup(f"<i>{correct_value}</i>")
+
+
+@pytest.mark.parametrize("column_name", ["severity"])
+@pytest.mark.parametrize(
+    ("value", "correct_value"),
+    [(severity, _get_severity_color(severity)) for severity in list(allure.severity_level)],
+)
+@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+class TestSeverityFormatter:
+    """Unit tests for feature_severity_formatter."""
+
+    def test_severity(
+        self,
+        test_feature_view_mocked: FeatureView,
+        column_name: str,
+        value: allure.severity_level,
+        correct_value: str,
+        mocker: MockerFixture,
+        test_feature_row: db.Feature,
+    ) -> None:
+        setattr(test_feature_row, column_name, value)
+        assert feature_severity_formatter(
+            view=test_feature_view_mocked,
+            context=mocker.MagicMock(),
+            model=test_feature_row,
+            name=column_name,
+        ) == Markup(f"<font color='{correct_value}'>{value.name.upper()}</font>")

@@ -9,6 +9,7 @@ from overhave.entities import (
     OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
+    OverhaveScenarioCompilerSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
@@ -32,6 +33,7 @@ class OverhaveAdminContext(BaseFactoryContext):
         ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
         redis_settings: Optional[OverhaveRedisSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
+        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
         report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
@@ -41,6 +43,7 @@ class OverhaveAdminContext(BaseFactoryContext):
             file_settings=file_settings or OverhaveFileSettings(),
             language_settings=language_settings or OverhaveLanguageSettings(),
             project_settings=project_settings or OverhaveProjectSettings(),
+            compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),
             report_manager_settings=report_manager_settings or OverhaveReportManagerSettings(),
             s3_manager_settings=s3_manager_settings or OverhaveS3ManagerSettings(),
             test_settings=test_settings or OverhaveTestSettings(),

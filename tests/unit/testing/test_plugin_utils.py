@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 import pytest
@@ -30,7 +31,8 @@ class TestPluginUtils:
     @pytest.mark.parametrize("keyword", ["Tasks"])
     def test_issue_links_with_correct_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
         scenario = get_scenario(test_pytest_bdd_item)
-        set_issue_links(scenario=scenario, keyword=keyword)
+        with Path(scenario.feature.filename).open() as feature_file:
+            set_issue_links(file_wrapper=feature_file, scenario=scenario, keyword=keyword)
         assert hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
         assert set(getattr(get_scenario(test_pytest_bdd_item).feature, "links")) == {"PRJ-1234", "PRJ-1235"}
         assert has_issue_links(test_pytest_bdd_item)
@@ -38,7 +40,8 @@ class TestPluginUtils:
     @pytest.mark.parametrize("keyword", ["Trash"])
     def test_issue_links_with_incorrect_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
         scenario = get_scenario(test_pytest_bdd_item)
-        set_issue_links(scenario=scenario, keyword=keyword)
+        with Path(scenario.feature.filename).open() as feature_file:
+            set_issue_links(file_wrapper=feature_file, scenario=scenario, keyword=keyword)
         assert not hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
         assert not has_issue_links(test_pytest_bdd_item)
 
@@ -52,7 +55,8 @@ class TestPluginUtils:
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
         scenario = get_scenario(test_pytest_bdd_item)
-        set_issue_links(scenario=scenario, keyword=keyword)
+        with Path(scenario.feature.filename).open() as feature_file:
+            set_issue_links(file_wrapper=feature_file, scenario=scenario, keyword=keyword)
         add_issue_links_to_report(project_settings=test_project_settings, scenario=scenario)
 
     @pytest.mark.parametrize("keyword", ["Tasks"])
@@ -65,7 +69,8 @@ class TestPluginUtils:
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
         scenario = get_scenario(test_pytest_bdd_item)
-        set_issue_links(scenario=scenario, keyword=keyword)
+        with Path(scenario.feature.filename).open() as feature_file:
+            set_issue_links(file_wrapper=feature_file, scenario=scenario, keyword=keyword)
         with pytest.raises(EmptyBrowseURLError):
             add_issue_links_to_report(project_settings=test_project_settings, scenario=scenario)
 

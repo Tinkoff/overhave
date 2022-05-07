@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, TextIO
 
 import allure
 import allure_commons.types
@@ -10,19 +9,18 @@ from overhave.pytest_plugin.helpers.basic import get_scenario, is_pytest_bdd_ite
 from overhave.test_execution import OverhaveProjectSettings
 
 
-def _get_issue_links(scenario: Scenario, keyword: str) -> Optional[List[str]]:
+def _get_issue_links(file_wrapper: TextIO, keyword: str) -> Optional[List[str]]:
     keyword_with_colon = keyword.title() + ":"
-    with Path(scenario.feature.filename).open() as file:
-        for line in file:
-            if keyword not in line:
-                continue
-            links_part = line.split(keyword_with_colon)[-1]
-            return [x.strip() for x in links_part.split(",")]
+    for line in file_wrapper:
+        if keyword not in line:
+            continue
+        links_part = line.split(keyword_with_colon)[-1]
+        return [x.strip() for x in links_part.split(",")]
     return None
 
 
-def set_issue_links(scenario: Scenario, keyword: str) -> None:
-    links = _get_issue_links(scenario, keyword)
+def set_issue_links(file_wrapper: TextIO, scenario: Scenario, keyword: str) -> None:
+    links = _get_issue_links(file_wrapper, keyword)
     if links:
         setattr(scenario.feature, "links", links)
 
