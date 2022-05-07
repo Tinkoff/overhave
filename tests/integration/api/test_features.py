@@ -1,6 +1,6 @@
 from typing import List
 
-import allure_commons.types as allure_types
+import allure
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
@@ -42,7 +42,7 @@ class TestFeatureAPI:
         validate_content_null(response, False)
         assert response.json() == []
 
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_feature_by_tag_id(
         self,
         test_api_client: TestClient,
@@ -72,7 +72,7 @@ class TestFeatureAPI:
         validate_content_null(response, False)
         assert response.json() == []
 
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_feature_by_tag_value(
         self,
         test_api_client: TestClient,

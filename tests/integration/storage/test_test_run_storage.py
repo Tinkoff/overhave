@@ -1,6 +1,6 @@
 from typing import Optional
 
-import allure_commons.types as allure_types
+import allure
 import pytest
 
 from overhave import db
@@ -9,7 +9,7 @@ from overhave.storage import FeatureModel, ScenarioModel, TestRunModel, TestRunS
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
-@pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+@pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
 class TestTestRunStorage:
     """Integration tests for :class:`TestRunStorage`."""
 

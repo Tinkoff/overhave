@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-import allure_commons.types as allure_types
+import allure
 import pytz
 
 from overhave.entities import BaseFileExtractor, FeatureExtractor, GitRepositoryInitializer, OverhaveFileSettings
@@ -165,7 +165,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             released=True,
             feature_type=feature_type,
             feature_tags=feature_tags,
-            severity=info.severity or allure_types.Severity.NORMAL,
+            severity=info.severity or allure.severity_level.NORMAL,
         )
         feature_model.id = self._feature_storage.create_feature(feature_model)
         scenario_model = ScenarioModel(id=0, feature_id=feature_model.id, text=info.scenarios)

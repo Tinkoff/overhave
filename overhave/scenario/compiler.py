@@ -1,6 +1,6 @@
 from typing import List, Optional, cast
 
-import allure_commons.types as allure_types
+import allure
 from pytest_bdd import types as default_types
 
 from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
@@ -47,7 +47,7 @@ class ScenarioCompiler(PrefixMixin):
             return f"{' '.join(tags_with_prefix)}"
         return ""
 
-    def _get_severity_tag(self, severity: allure_types.Severity) -> str:
+    def _get_severity_tag(self, severity: allure.severity_level) -> str:
         return f"{self._compilation_settings.severity_prefix}{severity.value}"
 
     def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:

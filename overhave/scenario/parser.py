@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import cached_property
 from typing import List, Optional, Sequence
 
-import allure_commons.types as allure_types
+import allure
 from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
@@ -28,7 +28,7 @@ class FeatureInfo(BaseModel):
     name: Optional[str]
     type: Optional[str]
     tags: Optional[List[str]]
-    severity: Optional[allure_types.Severity]
+    severity: Optional[allure.severity_level]
     author: Optional[str]
     last_edited_by: Optional[str]
     last_edited_at: Optional[datetime]
@@ -129,7 +129,7 @@ class ScenarioParser(PrefixMixin):
                 severity_tag = self._get_severity_tag(tags)
                 if severity_tag is not None:
                     tags.remove(severity_tag)
-                    feature_info.severity = allure_types.Severity(
+                    feature_info.severity = allure.severity_level(
                         severity_tag.removeprefix(self._compilation_settings.severity_keyword)
                     )
 

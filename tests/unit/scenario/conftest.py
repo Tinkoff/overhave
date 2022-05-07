@@ -1,7 +1,7 @@
 from typing import Optional
 from unittest import mock
 
-import allure_commons.types as allure_types
+import allure
 import py
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -54,7 +54,7 @@ def test_feature() -> FeatureModel:
             TagModel(id=2, value="tag2", created_by="qqq", created_at=get_current_time()),
         ],
         file_path="my_folder/my_feature",
-        severity=allure_types.Severity.NORMAL,
+        severity=allure.severity_level.NORMAL,
     )
 
 

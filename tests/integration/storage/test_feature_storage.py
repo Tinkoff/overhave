@@ -1,6 +1,6 @@
 from uuid import uuid1
 
-import allure_commons.types as allure_types
+import allure
 import pytest
 from faker import Faker
 
@@ -35,7 +35,7 @@ def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_mode
 
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-@pytest.mark.parametrize("test_severity", list(allure_types.Severity), indirect=True)
+@pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
 class TestFeatureStorage:
     """Integration tests for :class:`FeatureStorage`."""
 
@@ -60,7 +60,7 @@ class TestFeatureStorage:
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
         _check_base_feature_type_attrs(test_model=feature_model.feature_type, validation_model=test_feature_type)
 
-    @pytest.mark.parametrize("updated_severity", list(allure_types.Severity))
+    @pytest.mark.parametrize("updated_severity", list(allure.severity_level))
     def test_update_feature(
         self,
         test_feature_storage: FeatureStorage,
@@ -68,7 +68,7 @@ class TestFeatureStorage:
         test_tag_storage: FeatureTagStorage,
         test_feature_type: FeatureTypeModel,
         test_feature_with_tag: FeatureModel,
-        updated_severity: allure_types.Severity,
+        updated_severity: allure.severity_level,
         faker: Faker,
     ) -> None:
         new_system_user = test_system_user_storage.create_user(login=uuid1().hex)

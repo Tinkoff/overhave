@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, cast
 
-import allure_commons.types as allure_types
+import allure
 import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
@@ -51,9 +51,9 @@ class Feature(BaseTable, PrimaryKeyMixin):
     last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
     severity = sa.Column(
-        sa.Enum(allure_types.Severity),
+        sa.Enum(allure.severity_level),
         nullable=False,
-        default=allure_types.Severity.NORMAL,
+        default=allure.severity_level.NORMAL,
         doc="Feature severity choice",
     )
 
@@ -61,7 +61,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")
 
     def __init__(
-        self, name: str, author: str, type_id: int, file_path: str, task: List[str], severity: allure_types.Severity
+        self, name: str, author: str, type_id: int, file_path: str, task: List[str], severity: allure.severity_level
     ) -> None:
         self.name = name
         self.author = author

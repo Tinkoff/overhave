@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-import allure_commons.types as allure_types
+import allure
 import pytest
 from faker import Faker
 
@@ -19,7 +19,7 @@ class TestDraftStorage:
         assert test_draft_storage.get_draft(faker.random_int()) is None
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
         draft_model: Optional[DraftModel] = test_draft_storage.get_draft(test_draft.id)
         assert draft_model is not None
@@ -30,13 +30,13 @@ class TestDraftStorage:
         assert draft_model.test_run_id == test_draft.test_run_id
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_save_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
         with pytest.raises(UniqueDraftCreationError):
             test_draft_storage.save_draft(faker.random_int(), test_draft.published_by, DraftStatus.REQUESTED)
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_save_response(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
         pr_url: str = faker.word()
         published_at: datetime.datetime = datetime.datetime.now()
@@ -55,7 +55,7 @@ class TestDraftStorage:
         assert new_test_draft.traceback == traceback
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize(
         "draft_status",
         [
@@ -75,7 +75,7 @@ class TestDraftStorage:
         assert draft.status is draft_status
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_previous_feature_draft_with_error(
         self, test_draft_storage: DraftStorage, test_draft: DraftModel
     ) -> None:
@@ -83,7 +83,7 @@ class TestDraftStorage:
             test_draft_storage.get_previous_feature_draft(test_draft.feature_id)
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure_types.Severity.NORMAL], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_previous_draft(
         self,
         test_draft_storage: DraftStorage,
