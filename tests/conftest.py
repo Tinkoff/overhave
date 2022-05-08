@@ -16,6 +16,7 @@ from overhave import (
     OverhaveAuthorizationStrategy,
     OverhaveDBSettings,
     OverhaveLoggingSettings,
+    OverhaveScenarioCompilerSettings,
     overhave_admin_factory,
     overhave_proxy_manager,
     overhave_synchronizer_factory,
@@ -107,6 +108,7 @@ def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> Base
     context_mock = session_mocker.MagicMock()
     context_mock.auth_settings.auth_strategy = OverhaveAuthorizationStrategy.LDAP
     context_mock.s3_manager_settings.enabled = False
+    context_mock.compilation_settings = OverhaveScenarioCompilerSettings()
 
     root_dir = Path(tmpdir)
     features_dir = root_dir / "features"

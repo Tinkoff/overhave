@@ -1,7 +1,6 @@
 from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
-import allure
 import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
@@ -222,21 +221,6 @@ def patched_hook_test_execution_proxy_manager(
     proxy_manager = clean_proxy_manager()
     proxy_manager.set_factory(patched_hook_test_execution_factory)
     return proxy_manager
-
-
-@pytest.fixture()
-def test_severity(request: FixtureRequest) -> allure.severity_level:
-    if hasattr(request, "param"):
-        return request.param
-    raise NotImplementedError
-
-
-@pytest.fixture()
-def patched_get_severity_level(test_severity: allure.severity_level) -> mock.MagicMock:
-    with mock.patch(
-        "overhave.pytest_plugin.helpers.allure_utils.severity._get_severity_level", return_value=test_severity
-    ) as mocked_severity:
-        yield mocked_severity
 
 
 @pytest.fixture()

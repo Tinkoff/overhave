@@ -36,23 +36,22 @@ Features
 
 * Ready web-interface for easy BDD features management with `Ace`_ editor
 * Traditional Gherkin format for scenarios provided by `pytest-bdd`_
-* Execution and reporting of BDD features based on `PyTest`_  and `Allure`_
-* Auto-collection of `pytest-bdd`_ steps and display on the web-interface
-* Simple business-alike scenarios structure, easy horizontal scaling
+* Execution and reporting of BDD features based on `Allure`_
+* Auto-collection of `pytest-bdd`_ steps and display on web-interface
+* Simple scenarios structure, easy horizontal scaling
 * Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_ or `GitLab`_
 * Synchronization between `git`_ repository and database with features
-* Built-in configurable management of users and groups permissions
-* Configurable strategy for user authorization, LDAP also provided
+* Built-in configurable access management of users and groups
+* Configurable strategy for user authorization (LDAP also provided)
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
 * Still configurable as `Flask Admin`_, supports plug-ins and extensions
 * Has built-in API application with Swagger docs, based on `FastAPI`_
-* Distributed `producer-consumer` architecture based on Redis streams
-  through `Walrus`_
-* Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
-* Simple command-line interface, provided with `Typer`_
+* Distributed `producer-consumer` architecture based on `Walrus`_ Redis streams
+* Command-line interface, provided with `Typer`_
 * Integrated interaction for files storage with s3-cloud based on `boto3`_
+* Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
 
 ------------
 Installation
