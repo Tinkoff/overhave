@@ -1,6 +1,6 @@
 import re
 from functools import cache
-from typing import TextIO, Pattern
+from typing import Pattern, TextIO
 
 import allure
 
