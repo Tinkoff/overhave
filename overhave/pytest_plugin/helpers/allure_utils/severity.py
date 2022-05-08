@@ -1,25 +1,16 @@
-import re
-from functools import cache
-from typing import Pattern, TextIO
-
 import allure
+from _pytest.nodes import Item
 
 
-@cache
-def _get_severity_pattern(keyword: str) -> Pattern[str]:
-    return re.compile(rf"({keyword})(?P<severity>\w+)\b")
-
-
-def _get_severity_level(file_wrapper: TextIO, keyword: str) -> allure.severity_level:
-    for line in file_wrapper:
-        if keyword not in line:
+def _get_severity_level(item: Item, keyword: str) -> allure.severity_level:
+    for marker in item.own_markers:
+        if not marker.name.startswith(keyword):
             continue
-        parsed_severity = _get_severity_pattern(keyword).search(line)
-        if parsed_severity is not None:
-            return allure.severity_level(parsed_severity.group("severity"))
+        severity = marker.name.removeprefix(keyword)
+        return allure.severity_level(severity)
     return allure.severity_level.NORMAL
 
 
-def set_severity_level(file_wrapper: TextIO, keyword: str) -> None:
-    parsed_severity = _get_severity_level(file_wrapper, keyword)
+def set_severity_level(item: Item, keyword: str) -> None:
+    parsed_severity = _get_severity_level(item, keyword)
     allure.dynamic.severity(parsed_severity)

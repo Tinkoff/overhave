@@ -1,12 +1,13 @@
 from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
+import allure
 import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
-from _pytest.nodes import Item
+from _pytest.nodes import Item, Mark
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
@@ -45,10 +46,24 @@ def test_pytest_bdd_scenario(test_scenario_name: str) -> Scenario:
 
 
 @pytest.fixture()
-def test_pytest_bdd_item(test_pytest_bdd_scenario: Scenario) -> Item:
+def test_severity(request: FixtureRequest) -> allure.severity_level:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_pytest_bdd_item(
+    mocked_context: BaseFactoryContext, test_pytest_bdd_scenario: Scenario, test_severity: allure.severity_level
+) -> Item:
     item = mock.create_autospec(Item)
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
+    item.own_markers = [
+        Mark(
+            name=f"{mocked_context.compilation_settings.severity_keyword}{test_severity.value}", args=tuple(), kwargs={}
+        )
+    ]
     return item
 
 

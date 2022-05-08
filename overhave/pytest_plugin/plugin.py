@@ -1,6 +1,5 @@
 import enum
 import logging
-from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
 import _pytest
@@ -90,15 +89,13 @@ def pytest_configure(config: Config) -> None:
 
 def pytest_collection_modifyitems(session: Session) -> None:
     links_keyword = get_proxy_manager().factory.context.project_settings.links_keyword
-    severity_prefix = get_proxy_manager().factory.context.compilation_settings.severity_prefix
+    severity_keyword = get_proxy_manager().factory.context.compilation_settings.severity_keyword
     pytest_bdd_scenario_items = (item for item in session.items if is_pytest_bdd_item(item))
     for item in pytest_bdd_scenario_items:
         add_scenario_title_to_report(item)
-        item_scenario = get_scenario(item)
-        with Path(item_scenario.feature.filename).open() as feature_file:
-            set_severity_level(file_wrapper=feature_file, keyword=severity_prefix)
-            if isinstance(links_keyword, str):
-                set_issue_links(file_wrapper=feature_file, scenario=item_scenario, keyword=links_keyword)
+        set_severity_level(item=item, keyword=severity_keyword)
+        if isinstance(links_keyword, str):
+            set_issue_links(item=item, keyword=links_keyword)
 
 
 def pytest_bdd_before_step(

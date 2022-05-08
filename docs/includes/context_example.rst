@@ -12,6 +12,7 @@
         OverhaveFileSettings,
         OverhaveLanguageSettings,
         OverhaveLdapClientSettings,
+        OverhaveLdapManagerSettings,
         OverhaveProjectSettings,
         OverhaveStashClientSettings,
         OverhaveStashPublisherSettings,

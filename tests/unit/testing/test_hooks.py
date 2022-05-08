@@ -211,15 +211,15 @@ class TestPytestCommonHooks:
             mocked_title_func.assert_not_called()
 
     @pytest.mark.parametrize("links_keyword", [None, "Tasks"])
-    @pytest.mark.parametrize("severity", [allure.severity_level.NORMAL])
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_modifyitems_bdd(
         self,
         severity_handler_mock: mock.MagicMock,
+        test_severity: allure.severity_level,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
         patched_hook_test_execution_proxy_manager: IProxyManager,
         links_keyword: Optional[str],
-        severity: allure.severity_level,
     ) -> None:
         patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
@@ -230,9 +230,10 @@ class TestPytestCommonHooks:
             assert not has_issue_links(test_pytest_bdd_item)
         else:
             assert has_issue_links(test_pytest_bdd_item)
-        assert severity_handler_mock.called_once(severity)
+        assert severity_handler_mock.called_once(test_severity)
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_injection_disabled(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -243,6 +244,7 @@ class TestPytestCommonHooks:
         terminal_writer_mock.assert_not_called()
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_admin_factory_injection_enabled_with_not_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -255,6 +257,7 @@ class TestPytestCommonHooks:
         assert not patched_hook_admin_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_not_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -267,6 +270,7 @@ class TestPytestCommonHooks:
         assert not patched_hook_test_execution_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_admin_factory_finish_injection_enabled_with_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -280,6 +284,7 @@ class TestPytestCommonHooks:
         assert patched_hook_admin_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -319,7 +324,7 @@ class TestPytestCommonHooks:
         ("browse_url", "links_keyword", "enable_html"),
         [(None, None, True), ("https://overhave.readthedocs.io/browse", "Tasks", True)],
     )
-    @pytest.mark.parametrize("severity", [allure.severity_level.NORMAL])
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_runtest_makereport_bdd(
         self,
         clear_get_description_manager: None,
@@ -331,7 +336,6 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager: IProxyManager,
         browse_url: Optional[str],
         links_keyword: Optional[str],
-        severity: allure.severity_level,
     ) -> None:
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
