@@ -51,6 +51,7 @@ class ModelViewConfigured(ModelView):
     }
     column_formatters = {
         "created_at": datetime_formatter,
+        "last_edited_at": datetime_formatter,
         "start": datetime_formatter,
         "end": datetime_formatter,
         "task": task_formatter,
