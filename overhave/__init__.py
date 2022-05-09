@@ -37,6 +37,8 @@ from overhave.factory import get_publication_factory as overhave_publication_fac
 from overhave.factory import get_synchronizer_factory as overhave_synchronizer_factory
 from overhave.factory import get_test_execution_factory as overhave_test_execution_factory
 from overhave.publication import OverhaveGitlabPublisherSettings, OverhaveStashPublisherSettings
+from overhave.publication import PublicationManagerType as OverhavePublicationManagerType
+from overhave.publication import PublicationSettings as OverhavePublicationSettings
 from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
 from overhave.pytest_plugin import get_description_manager
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
