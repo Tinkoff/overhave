@@ -51,7 +51,7 @@ def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenera
 
 def _ensure_demo_app_has_features() -> None:
     with db.create_session() as session:
-        create_db_features = not bool(session.query(db.Feature).all())
+        create_db_features = session.query(db.Feature).first() is None
     with mock.patch("git.Repo", return_value=mock.MagicMock()):
         _create_synchronizer().synchronize(create_db_features=create_db_features)
 

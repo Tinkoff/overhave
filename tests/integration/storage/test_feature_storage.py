@@ -25,6 +25,7 @@ def _check_base_feature_attrs(test_model: FeatureModel, validation_model: Featur
     assert test_model.last_edited_by == validation_model.last_edited_by
     assert test_model.released == validation_model.released
     assert test_model.feature_tags == validation_model.feature_tags
+    assert test_model.severity == validation_model.severity
 
 
 def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_model: FeatureTypeModel) -> None:

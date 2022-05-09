@@ -237,7 +237,7 @@ class TestPytestCommonHooks:
             assert not has_issue_links(test_pytest_bdd_item)
         else:
             assert has_issue_links(test_pytest_bdd_item)
-        assert severity_handler_mock.called_once(test_severity)
+        severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)

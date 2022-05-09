@@ -74,7 +74,7 @@ The web-interface is a basic tool for BDD features management. It consists of:
 
 * `Info` - index page with optional information about your tool or project;
 * `Scenarios` - section for features management, contains subsections
-    `Features`, `Test runs` and `Versions`:
+    `Features`, `Test runs`, `Versions` and `Tags`:
 
     * `Features`
         gives an interface for features records management and provides info
