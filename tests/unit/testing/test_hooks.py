@@ -13,6 +13,7 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
+from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
@@ -20,6 +21,7 @@ from overhave.pytest_plugin.plugin import (
     StepNotFoundError,
     _OptionName,
     _Options,
+    get_step_context_runner,
     pytest_addoption,
     pytest_bdd_after_step,
     pytest_bdd_apply_tag,
@@ -53,7 +55,12 @@ class TestPytestBddHooks:
             step=test_pytest_bdd_step,
             step_func=mock.MagicMock(),
         )
-        assert cast(mock.MagicMock, patched_hook_test_execution_proxy_manager.factory.context).called_once()
+        assert (
+            get_step_context_runner()._settings
+            is cast(
+                ITestExecutionFactory, patched_hook_test_execution_proxy_manager.factory
+            ).context.step_context_settings
+        )
 
     def test_pytest_bdd_after_step_failed(
         self,

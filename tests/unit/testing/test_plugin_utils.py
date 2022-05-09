@@ -100,10 +100,10 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=severity_keyword)
-        assert severity_handler_mock.called_once(allure.severity_level.NORMAL)
+        severity_handler_mock.assert_called_once_with(allure.severity_level.NORMAL)
 
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
-    def test_set_severity_with_match_keyword(
+    def test_set_severity_with_match_keyword_by_tag(
         self,
         mocked_context: BaseFactoryContext,
         test_pytest_bdd_item: Item,
@@ -111,4 +111,15 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
-        assert severity_handler_mock.called_once(allure.severity_level)
+        severity_handler_mock.assert_called_once_with(test_severity)
+
+    @pytest.mark.parametrize("test_severity", [None], indirect=True)
+    def test_set_severity_with_match_keyword_by_feature(
+        self,
+        mocked_context: BaseFactoryContext,
+        test_pytest_bdd_item: Item,
+        test_severity: Optional[allure.severity_level],
+        severity_handler_mock: mock.MagicMock,
+    ) -> None:
+        set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
+        severity_handler_mock.assert_called_once_with(allure.severity_level.CRITICAL)

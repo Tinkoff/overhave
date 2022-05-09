@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, cast
+from typing import Any, Callable, Mapping, Optional, cast
 from unittest import mock
 
 import allure
@@ -54,16 +54,23 @@ def test_severity(request: FixtureRequest) -> allure.severity_level:
 
 @pytest.fixture()
 def test_pytest_bdd_item(
-    mocked_context: BaseFactoryContext, test_pytest_bdd_scenario: Scenario, test_severity: allure.severity_level
+    mocked_context: BaseFactoryContext,
+    test_pytest_bdd_scenario: Scenario,
+    test_severity: Optional[allure.severity_level],
 ) -> Item:
     item = mock.create_autospec(Item)
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
-    item.own_markers = [
-        Mark(
-            name=f"{mocked_context.compilation_settings.severity_keyword}{test_severity.value}", args=tuple(), kwargs={}
-        )
-    ]
+    if test_severity is not None:
+        item.own_markers = [
+            Mark(
+                name=f"{mocked_context.compilation_settings.severity_keyword}{test_severity.value}",
+                args=tuple(),
+                kwargs={},
+            )
+        ]
+    else:
+        item.own_markers = []
     return item
 
 
@@ -231,7 +238,8 @@ def patched_hook_admin_proxy_manager(
 
 @pytest.fixture()
 def patched_hook_test_execution_proxy_manager(
-    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_test_execution_factory
+    clean_proxy_manager: Callable[[], IProxyManager],
+    patched_hook_test_execution_factory: ITestExecutionFactory,
 ) -> IProxyManager:
     proxy_manager = clean_proxy_manager()
     proxy_manager.set_factory(patched_hook_test_execution_factory)
