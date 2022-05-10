@@ -9,15 +9,17 @@ from pydantic import BaseSettings
 from overhave import (
     OverhaveAdminSettings,
     OverhaveFileSettings,
+    OverhaveGitlabClientSettings,
+    OverhaveGitlabPublisherSettings,
     OverhaveLanguageSettings,
+    OverhaveProjectSettings,
+    OverhavePublicationManagerType,
+    OverhavePublicationSettings,
     OverhaveStashClientSettings,
     OverhaveStashPublisherSettings,
 )
 from overhave.extra import RUSSIAN_PREFIXES
-from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
-from overhave.publication.objects import PublicationManagerType
-from overhave.publication.settings import PublicationSettings
-from overhave.transport import OverhaveGitlabClientSettings
+from overhave.publication.gitlab import TokenizerClientSettings
 
 
 class OverhaveDemoAppLanguage(str, enum.Enum):
@@ -30,10 +32,15 @@ class OverhaveDemoAppLanguage(str, enum.Enum):
 class OverhaveDemoSettingsGenerator:
     """Settings for application demo mode configuration."""
 
-    def __init__(self, language: OverhaveDemoAppLanguage, threadpool: bool):
+    def __init__(self, language: OverhaveDemoAppLanguage, threadpool: bool, default_feature_user: str = "user"):
         self._root_dir: Path = Path(__file__).parent
         self._language = language
         self._threadpool = threadpool
+        self._default_feature_user = default_feature_user  # default user login from demo feature files
+
+    @property
+    def default_feature_user(self) -> str:
+        return self._default_feature_user
 
     @cached_property
     def default_context_settings(self) -> Dict[str, BaseSettings]:
@@ -44,6 +51,9 @@ class OverhaveDemoSettingsGenerator:
         return dict(
             language_settings=language_settings,
             file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
+            project_settings=OverhaveProjectSettings(
+                browse_url="https://tracker.myorg.com/browse", links_keyword="Tasks"
+            ),
         )
 
     @cached_property
@@ -57,7 +67,7 @@ class OverhaveDemoSettingsGenerator:
     @cached_property
     def publication_context_settings(self) -> Dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
-        if PublicationSettings().publication_manager_type is PublicationManagerType.GITLAB:
+        if OverhavePublicationSettings().publication_manager_type is OverhavePublicationManagerType.GITLAB:
             publication_manager_settings = dict(
                 publisher_settings=OverhaveGitlabPublisherSettings(repository_id="4687"),
                 client_settings=OverhaveGitlabClientSettings(  # noqa: S106

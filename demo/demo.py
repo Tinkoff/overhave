@@ -7,6 +7,7 @@ from overhave import (
     OverhaveAdminContext,
     OverhavePublicationContext,
     OverhaveRedisStream,
+    OverhaveSynchronizerContext,
     OverhaveTestExecutionContext,
     db,
     overhave_admin_factory,
@@ -17,7 +18,6 @@ from overhave import (
 from overhave.cli.admin import _get_admin_app
 from overhave.cli.consumers import _run_consumer
 from overhave.cli.synchronization import _create_synchronizer
-from overhave.factory import OverhaveSynchronizerContext
 
 overhave_demo = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
 
@@ -49,11 +49,15 @@ def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenera
     overhave_synchronizer_factory().set_context(synchronizer_context)
 
 
-def _ensure_demo_app_has_features() -> None:
+def _ensure_demo_app_has_features(settings_generator: OverhaveDemoSettingsGenerator) -> None:
+    synchronizer = _create_synchronizer()
     with db.create_session() as session:
-        create_db_features = not bool(session.query(db.Feature).all())
-    with mock.patch("git.Repo", return_value=mock.MagicMock()):
-        _create_synchronizer().synchronize(create_db_features=create_db_features)
+        create_db_features = session.query(db.Feature).first() is None
+    if not overhave_synchronizer_factory().system_user_storage.get_user_by_credits(
+        login=settings_generator.default_feature_user
+    ):
+        overhave_synchronizer_factory().system_user_storage.create_user(login=settings_generator.default_feature_user)
+    synchronizer.synchronize(create_db_features=create_db_features)
 
 
 def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
@@ -64,8 +68,9 @@ def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
         _prepare_publication_factory(settings_generator)
     _prepare_synchronizer_factory(settings_generator)
     demo_admin_app = _get_admin_app()
-    _ensure_demo_app_has_features()
-    demo_admin_app.run(host="localhost", port=8076, debug=True)
+    with mock.patch("git.Repo", return_value=mock.MagicMock()):
+        _ensure_demo_app_has_features(settings_generator)
+        demo_admin_app.run(host="localhost", port=8076, debug=True)
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")

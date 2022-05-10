@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+import allure
 import pytz
 
 from overhave.entities import BaseFileExtractor, FeatureExtractor, GitRepositoryInitializer, OverhaveFileSettings
@@ -122,10 +123,17 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
                 tags.append(tag_model)
         return tags
 
+    def _ensure_users_exist(self, info: FeatureInfo) -> None:
+        for user in (x for x in {info.author, info.last_edited_by} if x):
+            if self._system_user_storage.get_user_by_credits(login=user) is not None:
+                continue
+            raise FeatureInfoUserNotFoundError(f"Could not find user with login={user}!")
+
     def _update_db_feature(self, model: FeatureModel, info: FeatureInfo, file_ts: datetime) -> None:
         logger.info("Feature is gonna be updated...")
         if info.scenarios is None:
             raise NullableInfoScenariosError("Some troubles with parsing feature - could not get scenarios!")
+        self._ensure_users_exist(info)
         feature_tags = self._get_feature_tags(info=info)
         self._update_feature_model_with_info(model=model, info=info, file_ts=file_ts, tags=feature_tags)
         scenario_model = self._scenario_storage.get_scenario_by_feature_id(model.id)
@@ -142,10 +150,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             raise NullableInfoFeatureTypeError("Could not create feature without feature type!")
         if info.author is None:
             raise NullableInfoAuthorError("Could not create feature without author!")
-        for user in (info.author, info.last_edited_by):
-            if self._system_user_storage.get_user_by_credits(login=info.author) is not None:
-                continue
-            raise FeatureInfoUserNotFoundError(f"Could not find user with login={user}!")
+        self._ensure_users_exist(info)
         feature_tags = self._get_feature_tags(info=info)
         feature_type = self._feature_type_storage.get_feature_type_by_name(info.type)
         if info.last_edited_by is None:
@@ -164,6 +169,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             released=True,
             feature_type=feature_type,
             feature_tags=feature_tags,
+            severity=info.severity or allure.severity_level.NORMAL,
         )
         feature_model.id = self._feature_storage.create_feature(feature_model)
         scenario_model = ScenarioModel(id=0, feature_id=feature_model.id, text=info.scenarios)

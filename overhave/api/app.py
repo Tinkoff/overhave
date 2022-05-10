@@ -25,7 +25,7 @@ def _get_tags_router() -> fastapi.APIRouter:
         methods=["GET"],
         response_model=TagModel,
         summary="Get FeatureTag",
-        description="Get FeatureTag by `value`",
+        description="Get feature tag by `value`",
     )
     tags_router.add_api_route(
         "/list",
@@ -33,7 +33,7 @@ def _get_tags_router() -> fastapi.APIRouter:
         response_model=List[TagModel],
         methods=["GET"],
         summary="Get FeatureTags",
-        description="Get FeatureTags list like `value`",
+        description="Get list of feature tags like `value`",
     )
     return tags_router
 
@@ -45,8 +45,8 @@ def _get_feature_router() -> fastapi.APIRouter:
         get_features_handler,
         methods=["GET"],
         response_model=List[FeatureModel],
-        summary="Get Feature info",
-        description="Get FeatureModel by `tag_id` or `tag_model`",
+        summary="Get list of Feature info",
+        description="Get list of feature info by `tag_id` or `tag_value`",
     )
     return feature_router
 
@@ -59,7 +59,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
         methods=["GET"],
         response_model=TestUserModel,
         summary="Get TestUser",
-        description="Get TestUserModel by `user_id` or `user_name`",
+        description="Get test user full info by `user_id` or `user_name`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",
@@ -67,14 +67,14 @@ def _get_testuser_router() -> fastapi.APIRouter:
         methods=["GET"],
         response_model=TestUserSpecification,
         summary="Get TestUser specification",
-        description="Get TestUserModel.specification by `user_id`",
+        description="Get test user specification by `user_id`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",
         test_user_put_spec_handler,
         methods=["PUT"],
-        summary="Put TestUser specification",
-        description="Update TestUser.specification by `user_id` and given payload",
+        summary="Put test user specification",
+        description="Update test user specification by `user_id` and given payload",
     )
     return test_user_router
 

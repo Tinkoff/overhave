@@ -1,5 +1,6 @@
 from uuid import uuid1
 
+import allure
 import pytest
 from faker import Faker
 
@@ -24,6 +25,7 @@ def _check_base_feature_attrs(test_model: FeatureModel, validation_model: Featur
     assert test_model.last_edited_by == validation_model.last_edited_by
     assert test_model.released == validation_model.released
     assert test_model.feature_tags == validation_model.feature_tags
+    assert test_model.severity == validation_model.severity
 
 
 def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_model: FeatureTypeModel) -> None:
@@ -34,6 +36,7 @@ def _check_base_feature_type_attrs(test_model: FeatureTypeModel, validation_mode
 
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
+@pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
 class TestFeatureStorage:
     """Integration tests for :class:`FeatureStorage`."""
 
@@ -58,6 +61,7 @@ class TestFeatureStorage:
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
         _check_base_feature_type_attrs(test_model=feature_model.feature_type, validation_model=test_feature_type)
 
+    @pytest.mark.parametrize("updated_severity", list(allure.severity_level))
     def test_update_feature(
         self,
         test_feature_storage: FeatureStorage,
@@ -65,6 +69,7 @@ class TestFeatureStorage:
         test_tag_storage: FeatureTagStorage,
         test_feature_type: FeatureTypeModel,
         test_feature_with_tag: FeatureModel,
+        updated_severity: allure.severity_level,
         faker: Faker,
     ) -> None:
         new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
@@ -81,6 +86,7 @@ class TestFeatureStorage:
             released=True,
             feature_type=test_feature_type,
             feature_tags=[new_tag_model],
+            severity=updated_severity,
         )
         test_feature_storage.update_feature(model=new_feature_model)
         updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)

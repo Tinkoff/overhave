@@ -1,3 +1,4 @@
+import allure
 import pytest
 from faker import Faker
 
@@ -13,6 +14,7 @@ def _check_base_scenario_type_model(test_model: ScenarioModel, validation_model:
 
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
+@pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
 class TestScenarioStorage:
     """Integration tests for :class:`ScenarioStorage`."""
 

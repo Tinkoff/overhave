@@ -39,7 +39,7 @@ def service_system_user(
     faker: Faker,
 ) -> SystemUserModel:
     return test_system_user_storage.create_user(
-        login=faker.word(), password=SecretStr(faker.word()), role=db.Role.admin
+        login=f"{faker.word()}.{faker.word()}", password=SecretStr(faker.word()), role=db.Role.admin
     )
 
 

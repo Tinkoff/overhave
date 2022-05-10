@@ -4,12 +4,13 @@ from flask import redirect, request, url_for
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 
-from overhave.admin.views.formatters.formatters import (
+from overhave.admin.views.formatters import (
     datetime_formatter,
     draft_feature_formatter,
     draft_prurl_formatter,
     draft_testrun_formatter,
     feature_link_formatter,
+    feature_severity_formatter,
     file_path_formatter,
     json_formatter,
     result_report_formatter,
@@ -50,6 +51,7 @@ class ModelViewConfigured(ModelView):
     }
     column_formatters = {
         "created_at": datetime_formatter,
+        "last_edited_at": datetime_formatter,
         "start": datetime_formatter,
         "end": datetime_formatter,
         "task": task_formatter,
@@ -60,6 +62,7 @@ class ModelViewConfigured(ModelView):
         "test_run_id": draft_testrun_formatter,
         "pr_url": draft_prurl_formatter,
         "file_path": file_path_formatter,
+        "severity": feature_severity_formatter,
     }
     column_descriptions = dict(
         name="Feature header for business scenarios",

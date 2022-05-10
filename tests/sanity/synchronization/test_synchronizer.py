@@ -19,7 +19,7 @@ def _check_db_no_features() -> None:
 
 @pytest.mark.usefixtures("database")
 class TestOverhaveSynchronizer:
-    """Sanity tests for application admin mode."""
+    """Sanity tests for :class:`OverhaveSynchronizer`."""
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("create_db_features", [False])
@@ -49,7 +49,7 @@ class TestOverhaveSynchronizer:
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("create_db_features", [True])
-    @pytest.mark.parametrize("test_system_user_login", ["admin"], indirect=True)
+    @pytest.mark.parametrize("test_system_user_login", ["user"], indirect=True)
     def test_synchronize_create_ru(
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
@@ -64,7 +64,7 @@ class TestOverhaveSynchronizer:
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("create_db_features", [True])
-    @pytest.mark.parametrize("test_system_user_login", ["admin"], indirect=True)
+    @pytest.mark.parametrize("test_system_user_login", ["user"], indirect=True)
     def test_synchronize_create_ru_double(
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
@@ -77,7 +77,7 @@ class TestOverhaveSynchronizer:
             test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
-    @pytest.mark.parametrize("test_system_user_login", ["admin"], indirect=True)
+    @pytest.mark.parametrize("test_system_user_login", ["user"], indirect=True)
     def test_synchronize_create_and_sync_without_update(
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,

@@ -18,10 +18,6 @@ class BasePublicationFactoryException(Exception):
     """Base exception for :class:`PublicationFactory`."""
 
 
-class AuthTokenNotSpecifiedError(BasePublicationFactoryException):
-    """Exception for situation AuthToken env was not set."""
-
-
 class UrlGitlabTokenizerNotScepifiedIfEnabled(BasePublicationFactoryException):
     """Exception for situation tokenizer is enabled and url env was not set."""
 
@@ -69,8 +65,6 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
 
     @cached_property
     def _gitlab_publisher(self) -> GitlabVersionPublisher:
-        if not self._tokenizer_client._settings.enabled and self._gitlab_client._settings.auth_token is None:
-            raise AuthTokenNotSpecifiedError("Please set correct auth_token!")
         if self._tokenizer_client._settings.enabled and self._tokenizer_client._settings.url is None:
             raise UrlGitlabTokenizerNotScepifiedIfEnabled("Please set correct url for gitlab_tokenizer!")
         return GitlabVersionPublisher(

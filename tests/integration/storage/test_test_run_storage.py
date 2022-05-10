@@ -1,5 +1,6 @@
 from typing import Optional
 
+import allure
 import pytest
 
 from overhave import db
@@ -7,10 +8,11 @@ from overhave.db import TestReportStatus, TestRunStatus
 from overhave.storage import FeatureModel, ScenarioModel, TestRunModel, TestRunStorage
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+@pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
 class TestTestRunStorage:
     """Integration tests for :class:`TestRunStorage`."""
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_create_test_run(
         self, test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
     ) -> None:
@@ -27,7 +29,6 @@ class TestTestRunStorage:
             TestRunStatus.INTERNAL_ERROR,
         ],
     )
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_set_run_status(
         self, test_run_storage: TestRunStorage, run_status: TestRunStatus, test_created_test_run_id: int
     ) -> None:
@@ -36,7 +37,6 @@ class TestTestRunStorage:
         assert isinstance(test_run, TestRunModel)
         assert test_run.status == run_status
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize(
         "report_status",
         [
@@ -61,7 +61,6 @@ class TestTestRunStorage:
         assert updated_test_run.report_status == report_status
         assert updated_test_run.report == test_report
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_run(
         self, test_run_storage: TestRunStorage, test_feature: FeatureModel, test_created_test_run_id: int
     ) -> None:

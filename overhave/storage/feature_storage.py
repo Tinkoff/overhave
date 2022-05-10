@@ -1,7 +1,8 @@
 import abc
 import logging
-from typing import List, Optional, cast
+from typing import Iterable, List, Optional, cast
 
+import sqlalchemy.orm as so
 from pydantic.tools import parse_obj_as
 
 from overhave import db
@@ -46,6 +47,17 @@ class IFeatureStorage(abc.ABC):
         pass
 
 
+def _append_tags_to_feature(session: so.Session, feature: db.Feature, tag_ids: Iterable[int]) -> None:
+    db_tags: List[db.Tags] = []
+    for tag_id in tag_ids:
+        db_tag = session.query(db.Tags).get(tag_id)
+        if db_tag is None:
+            raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
+        logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
+        db_tags.append(db_tag)
+    feature.feature_tags.extend(db_tags)
+
+
 class FeatureStorage(IFeatureStorage):
     """Class for feature storage."""
 
@@ -66,9 +78,11 @@ class FeatureStorage(IFeatureStorage):
                 type_id=model.feature_type.id,
                 file_path=model.file_path,
                 task=model.task,
+                severity=model.severity,
             )
             feature.last_edited_at = model.last_edited_at
             feature.released = model.released
+            _append_tags_to_feature(session=session, feature=feature, tag_ids=(tag.id for tag in model.feature_tags))
             session.add(feature)
             session.flush()
             return cast(int, feature.id)
@@ -82,6 +96,7 @@ class FeatureStorage(IFeatureStorage):
             feature.name = model.name
             feature.file_path = model.file_path
             feature.task = model.task
+            feature.severity = model.severity
             feature.last_edited_by = model.last_edited_by
             feature.released = True
             session.flush()
@@ -94,12 +109,7 @@ class FeatureStorage(IFeatureStorage):
                 logger.info("Remove tag with id=%s and value=%s", tag_id, db_tag.value)
                 feature.feature_tags.remove(db_tag)
             tags_to_append = model_tags.difference(existing_tags)
-            for tag_id in tags_to_append:
-                db_tag = session.query(db.Tags).get(tag_id)
-                if db_tag is None:
-                    raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
-                logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
-                feature.feature_tags.append(db_tag)
+            _append_tags_to_feature(session=session, feature=feature, tag_ids=tags_to_append)
 
     @staticmethod
     def get_features_by_tag(tag_id: int) -> List[FeatureModel]:
@@ -108,6 +118,7 @@ class FeatureStorage(IFeatureStorage):
                 session.query(db.FeatureTagsAssociationTable)
                 .with_entities(db.FeatureTagsAssociationTable.feature_id)
                 .filter(db.FeatureTagsAssociationTable.tags_id == tag_id)
+                .scalar_subquery()
             )
             features = session.query(db.Feature).filter(db.Feature.id == feature_ids_query).all()
             return parse_obj_as(List[FeatureModel], features)

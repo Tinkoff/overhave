@@ -36,23 +36,22 @@ Features
 
 * Ready web-interface for easy BDD features management with `Ace`_ editor
 * Traditional Gherkin format for scenarios provided by `pytest-bdd`_
-* Execution and reporting of BDD features based on `PyTest`_  and `Allure`_
-* Auto-collection of `pytest-bdd`_ steps and display on the web-interface
-* Simple business-alike scenarios structure, easy horizontal scaling
+* Execution and reporting of BDD features based on `Allure`_
+* Auto-collection of `pytest-bdd`_ steps and display on web-interface
+* Simple scenarios structure, easy horizontal scaling
 * Built-in wrappers for `pytest-bdd`_ hooks to supplement `Allure`_ report
 * Ability to create and use several BDD keywords dictionary with different languages
 * Versioning and deployment of scenario drafts to `Bitbucket`_ or `GitLab`_
 * Synchronization between `git`_ repository and database with features
-* Built-in configurable management of users and groups permissions
-* Configurable strategy for user authorization, LDAP also provided
+* Built-in configurable access management of users and groups
+* Configurable strategy for user authorization (LDAP also provided)
 * Database schema based on `SQLAlchemy`_ models and works with PostgreSQL
 * Still configurable as `Flask Admin`_, supports plug-ins and extensions
 * Has built-in API application with Swagger docs, based on `FastAPI`_
-* Distributed `producer-consumer` architecture based on Redis streams
-  through `Walrus`_
-* Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
-* Simple command-line interface, provided with `Typer`_
+* Distributed `producer-consumer` architecture based on `Walrus`_ Redis streams
+* Command-line interface, provided with `Typer`_
 * Integrated interaction for files storage with s3-cloud based on `boto3`_
+* Web-browser emulation ability with custom toolkit (`GoTTY`_, for example)
 
 ------------
 Installation
@@ -75,7 +74,7 @@ The web-interface is a basic tool for BDD features management. It consists of:
 
 * `Info` - index page with optional information about your tool or project;
 * `Scenarios` - section for features management, contains subsections
-    `Features`, `Test runs` and `Versions`:
+    `Features`, `Test runs`, `Versions` and `Tags`:
 
     * `Features`
         gives an interface for features records management and provides info
@@ -97,7 +96,7 @@ The web-interface is a basic tool for BDD features management. It consists of:
 
     * Versions
         contains feature versions in corresponding to test runs; versions contains PR-links to
-        the remote Git repository (only Stash is supported now).
+        the remote Git repository.
 
         .. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/versions_img.png
           :width: 500
@@ -112,6 +111,7 @@ The web-interface is a basic tool for BDD features management. It consists of:
           :align: center
           :alt: Feature published versions list
 
+* `Test users` - section for viewing and configuring test users;
 * `Access` - section for access management, contains `Users` and
     `Groups` subsections;
 * `Emulation` - experimental section for alternative tools implementation
@@ -185,6 +185,7 @@ run consumer and execute basic database operations. Examples are below:
     overhave db create-all
     overhave admin --port 8080
     overhave consumer -s publication
+    overhave api -p 8000 -w 4
 
 **Note**: service start-up takes a set of settings, so you can set them through
 virtual environment with prefix ```OVERHAVE_```, for example ```OVERHAVE_DB_URL```.
@@ -237,7 +238,6 @@ The `PyTest` usage should be similar to:
 
     pytest --enable-injection
 
-
 Consumers
 ---------
 
@@ -255,7 +255,6 @@ and supported 3 consumer's types:
 
 **Note**: the ```overhave_test_execution_factory``` has ability for context injection
 and could be enriched with the custom context as the ```overhave_admin_factory```.
-
 
 Project structure
 -----------------
@@ -293,12 +292,15 @@ Feature format
 --------------
 
 **Overhave** has it's own special feature's text format, which inherits
-Gherkin from `pytest-bdd`_ with small updates:
+Gherkin from `pytest-bdd`_ with unique updates:
 
 * required tag that is related to existing feature type directory, where
     current feature is located;
+* any amount of arbitrary tags;
+* severity tag - implements `Allure`_ severity to feature or just tagged
+    scenario (for example: ```@severity.blocker```);
 * info about feature - who is creator, last editor and publisher;
-* task tracker's tickets with traditional format ```PRJ-NUMBER```.
+* task tracker's tickets with format ```PRJ-1234```.
 
 An example of filled feature content is located in
 `feature_example.rst`_.
@@ -340,7 +342,6 @@ in framework and available for usage:
         BUT="Aber ",
     )
 
-
 Git integration
 ---------------
 
@@ -376,7 +377,6 @@ has special `TokenizerClient` with it's own
 `TokenizerClientSettings` - this simple client could take
 the token from a remote custom GitLab tokenizer service.
 
-
 Git-to-DataBase synchronization
 -------------------------------
 
@@ -406,7 +406,6 @@ command - you will get the result.
 
     overhave-demo synchronize  # or with '--create-db-features'
 
-
 Custom index
 ------------
 
@@ -418,7 +417,6 @@ to file could be set through environment as well as set with context:
     admin_settings = OverhaveAdminSettings(
         index_template_path="/path/to/index.html"
     )
-
 
 Authorization strategy
 ----------------------
@@ -448,7 +446,6 @@ configured like this:
     auth_settings = OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP)
     ldap_manager_settings = OverhaveLdapManagerSettings(ldap_admin_group="admin")
 
-
 S3 cloud
 --------
 
@@ -474,6 +471,38 @@ Optionally, you could change default settings also:
 
 The framework with enabled ```OVERHAVE_S3_AUTOCREATE_BUCKETS``` flag will create
 application buckets in remote storage if buckets don't exist.
+
+API
+---
+**Overhave** has it's own application programming interface, based on
+`FastAPI`_.
+
+.. figure:: https://raw.githubusercontent.com/TinkoffCreditSystems/overhave/master/docs/includes/images/api_img.png
+  :width: 600
+  :align: center
+  :alt: Allure test-case report
+
+  **Overhave** openapi.json through `Swagger`_
+
+Current possibilities could be displayed through built-in
+`Swagger`_ - just run the API and open http://localhost:8000 in your
+browser.
+
+.. code-block:: bash
+
+    overhave api -p 8000
+
+Interface has authorization through `oauth2`_ scheme, so you should setup
+```OVERHAVE_API_AUTH_SECRET_KEY``` for usage.
+
+Right now, API implements types of resources:
+
+* `feature_tags`
+    get feature tag or get list of feature tags;
+* `features`
+    get features info by tag ID or tag value;
+* `test_users`
+    get test user info, specification or put new test user specification.
 
 ------------
 Contributing
@@ -562,5 +591,7 @@ with a detailed description.
 .. _`boto3`: https://github.com/boto/boto3
 .. _`git`: https://git-scm.com/
 .. _`FastAPI`: https://github.com/tiangolo/fastapi
+.. _`Swagger`: https://swagger.io
+.. _`oauth2`: https://oauth.net/2/
 .. _`context_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/context_example.rst
 .. _`feature_example.rst`: https://github.com/TinkoffCreditSystems/overhave/blob/master/docs/includes/features_structure_example/feature_type_1/full_feature_example_en.feature

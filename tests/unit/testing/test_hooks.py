@@ -1,6 +1,7 @@
 from typing import Any, Mapping, Optional, Type, cast
 from unittest import mock
 
+import allure
 import pytest
 from _pytest.config import Config
 from _pytest.config.argparsing import OptionGroup, Parser
@@ -12,6 +13,7 @@ from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
+from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
@@ -19,6 +21,7 @@ from overhave.pytest_plugin.plugin import (
     StepNotFoundError,
     _OptionName,
     _Options,
+    get_step_context_runner,
     pytest_addoption,
     pytest_bdd_after_step,
     pytest_bdd_apply_tag,
@@ -52,7 +55,12 @@ class TestPytestBddHooks:
             step=test_pytest_bdd_step,
             step_func=mock.MagicMock(),
         )
-        assert cast(mock.MagicMock, patched_hook_test_execution_proxy_manager.factory.context).called_once()
+        assert (
+            get_step_context_runner()._settings
+            is cast(
+                ITestExecutionFactory, patched_hook_test_execution_proxy_manager.factory
+            ).context.step_context_settings
+        )
 
     def test_pytest_bdd_after_step_failed(
         self,
@@ -197,7 +205,10 @@ class TestPytestCommonHooks:
         assert not patched_hook_test_execution_proxy_manager.pytest_patched
 
     def test_pytest_collection_modifyitems_clean(
-        self, test_clean_item: Item, test_pytest_clean_session: Session
+        self,
+        test_clean_item: Item,
+        test_pytest_clean_session: Session,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
         with mock.patch(
             "overhave.pytest_plugin.helpers.allure_utils.common.add_scenario_title_to_report",
@@ -207,8 +218,11 @@ class TestPytestCommonHooks:
             mocked_title_func.assert_not_called()
 
     @pytest.mark.parametrize("links_keyword", [None, "Tasks"])
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_modifyitems_bdd(
         self,
+        severity_handler_mock: mock.MagicMock,
+        test_severity: allure.severity_level,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
         patched_hook_test_execution_proxy_manager: IProxyManager,
@@ -219,13 +233,14 @@ class TestPytestCommonHooks:
         assert (
             test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name  # type: ignore
         )
-
         if links_keyword is None:
             assert not has_issue_links(test_pytest_bdd_item)
         else:
             assert has_issue_links(test_pytest_bdd_item)
+        severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_injection_disabled(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -236,6 +251,7 @@ class TestPytestCommonHooks:
         terminal_writer_mock.assert_not_called()
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_admin_factory_injection_enabled_with_not_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -248,6 +264,7 @@ class TestPytestCommonHooks:
         assert not patched_hook_admin_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_not_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -260,6 +277,7 @@ class TestPytestCommonHooks:
         assert not patched_hook_test_execution_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_admin_factory_finish_injection_enabled_with_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -273,6 +291,7 @@ class TestPytestCommonHooks:
         assert patched_hook_admin_proxy_manager.collection_prepared
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_patched_pytest(
         self,
         terminal_writer_mock: mock.MagicMock,
@@ -312,6 +331,7 @@ class TestPytestCommonHooks:
         ("browse_url", "links_keyword", "enable_html"),
         [(None, None, True), ("https://overhave.readthedocs.io/browse", "Tasks", True)],
     )
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_pytest_runtest_makereport_bdd(
         self,
         clear_get_description_manager: None,

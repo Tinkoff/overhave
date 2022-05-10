@@ -128,10 +128,10 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "name",
         "feature_type",
         "file_path",
+        "severity",
         "feature_tags",
         "task",
-        "author",
-        "created_at",
+        "last_edited_at",
         "last_edited_by",
         "released",
     )
@@ -153,8 +153,17 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "last_edited_by",
         "feature_tags.value",
     ]
-    column_filters = ("name", "feature_type", "last_edited_by", "author", "created_at", "feature_tags.value")
-    column_sortable_list = ("id", "name", "author", "last_edited_by")
+    column_filters = (
+        "name",
+        "feature_type",
+        "last_edited_by",
+        "author",
+        "created_at",
+        "last_edited_at",
+        "feature_tags.value",
+        "severity",
+    )
+    column_sortable_list = ("id", "name", "author", "last_edited_by", "severity")
     column_labels = {
         "file_path": "File",
         "feature_tags": "Tags",
@@ -162,6 +171,26 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "name": "Name",
         "task": "Tasks",
     }
+    column_descriptions = {
+        "feature_type": "Feature type / root directory",
+        "name": "Feature header for business scenarios",
+        "file_path": "Path for saving current file",
+        "severity": "Feature severity level",
+        "feature_tags": "Special tags for custom marking",
+        "task": "Tracker tasks converted to web links",
+        "last_edited_by": "Last editor of scenarios set",
+        "author": "Author of scenarios set",
+        "released": "Last version publishing status",
+    }
+    form_columns = (
+        "feature_type",
+        "name",
+        "file_path",
+        "severity",
+        "feature_tags",
+        "task",
+        "scenario",
+    )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

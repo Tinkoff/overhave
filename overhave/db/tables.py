@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import List, Optional, cast
 
+import allure
 import sqlalchemy as sa
 import sqlalchemy_utils as su
 from flask import url_for
 from sqlalchemy import orm as so
-from sqlalchemy.ext.declarative import declared_attr
 
 from overhave.db.base import BaseTable, PrimaryKeyMixin, PrimaryKeyWithoutDateMixin
 from overhave.db.statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
@@ -36,7 +36,7 @@ class Tags(BaseTable, PrimaryKeyMixin):
         self.created_by = created_by
 
 
-@su.generic_repr("name", "last_edited_by")
+@su.generic_repr("id", "name", "last_edited_by")
 class Feature(BaseTable, PrimaryKeyMixin):
     """Features table."""
 
@@ -50,17 +50,26 @@ class Feature(BaseTable, PrimaryKeyMixin):
     last_edited_by = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
     last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
+    severity = sa.Column(
+        sa.Enum(allure.severity_level),
+        nullable=False,
+        default=allure.severity_level.NORMAL,
+        doc="Feature severity choice",
+    )
 
     feature_type = so.relationship(FeatureType)
-    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags")
+    feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")
 
-    def __init__(self, name: str, author: str, type_id: int, file_path: str, task: List[str]) -> None:
+    def __init__(
+        self, name: str, author: str, type_id: int, file_path: str, task: List[str], severity: allure.severity_level
+    ) -> None:
         self.name = name
         self.author = author
         self.type_id = type_id
         self.file_path = file_path
         self.task = task
         self.last_edited_by = author
+        self.severity = severity
 
 
 class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
@@ -70,10 +79,6 @@ class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
 
     tags_id = sa.Column(sa.Integer(), sa.ForeignKey(Tags.id))
     feature_id = sa.Column(sa.Integer(), sa.ForeignKey(Feature.id))
-
-    @declared_attr
-    def __tablename__(cls) -> str:
-        return "feature_tags"
 
 
 @su.generic_repr("feature_id")

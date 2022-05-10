@@ -1,12 +1,13 @@
-from typing import Any, Callable, Mapping, cast
+from typing import Any, Callable, Mapping, Optional, cast
 from unittest import mock
 
+import allure
 import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
-from _pytest.nodes import Item
+from _pytest.nodes import Item, Mark
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
@@ -45,10 +46,31 @@ def test_pytest_bdd_scenario(test_scenario_name: str) -> Scenario:
 
 
 @pytest.fixture()
-def test_pytest_bdd_item(test_pytest_bdd_scenario: Scenario) -> Item:
+def test_severity(request: FixtureRequest) -> allure.severity_level:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_pytest_bdd_item(
+    mocked_context: BaseFactoryContext,
+    test_pytest_bdd_scenario: Scenario,
+    test_severity: Optional[allure.severity_level],
+) -> Item:
     item = mock.create_autospec(Item)
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
+    if test_severity is not None:
+        item.own_markers = [
+            Mark(
+                name=f"{mocked_context.compilation_settings.severity_keyword}{test_severity.value}",
+                args=tuple(),
+                kwargs={},
+            )
+        ]
+    else:
+        item.own_markers = []
     return item
 
 
@@ -216,8 +238,15 @@ def patched_hook_admin_proxy_manager(
 
 @pytest.fixture()
 def patched_hook_test_execution_proxy_manager(
-    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_test_execution_factory
+    clean_proxy_manager: Callable[[], IProxyManager],
+    patched_hook_test_execution_factory: ITestExecutionFactory,
 ) -> IProxyManager:
     proxy_manager = clean_proxy_manager()
     proxy_manager.set_factory(patched_hook_test_execution_factory)
     return proxy_manager
+
+
+@pytest.fixture()
+def severity_handler_mock() -> mock.MagicMock:
+    with mock.patch("allure.dynamic.severity", return_value=mock.MagicMock()) as mocked_severity_handler:
+        yield mocked_severity_handler

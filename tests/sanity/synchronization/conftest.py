@@ -8,7 +8,7 @@ from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import db, overhave_synchronizer_factory
 from overhave.cli.synchronization import _create_synchronizer
 from overhave.factory import ISynchronizerFactory
-from overhave.storage import FeatureTypeModel
+from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import IOverhaveSynchronizer
 from tests.objects import get_test_feature_containers
 
@@ -20,7 +20,18 @@ def clean_synchronizer_factory() -> Callable[[], ISynchronizerFactory]:
 
 
 @pytest.fixture()
-def test_synchronizer_factory(clean_synchronizer_factory: Callable[[], ISynchronizerFactory]) -> ISynchronizerFactory:
+def prepared_admin_user(database: None) -> SystemUserModel:
+    with db.create_session() as session:
+        db_user = db.UserRole(login="admin", password="admin", role=db.Role.admin)
+        session.add(db_user)
+        session.flush()
+        return SystemUserModel.from_orm(db_user)
+
+
+@pytest.fixture()
+def test_synchronizer_factory(
+    clean_synchronizer_factory: Callable[[], ISynchronizerFactory], prepared_admin_user: SystemUserModel
+) -> ISynchronizerFactory:
     return clean_synchronizer_factory()
 
 

@@ -1,5 +1,6 @@
 from typing import cast
 
+import allure
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
@@ -90,7 +91,19 @@ def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
 
 
 @pytest.fixture()
-def test_feature(test_system_user: SystemUserModel, test_feature_type: FeatureTypeModel, faker: Faker) -> FeatureModel:
+def test_severity(request: FixtureRequest) -> allure.severity_level:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_feature(
+    test_system_user: SystemUserModel,
+    test_feature_type: FeatureTypeModel,
+    test_severity: allure.severity_level,
+    faker: Faker,
+) -> FeatureModel:
     with db.create_session() as session:
         feature = db.Feature(
             name=faker.word(),
@@ -98,6 +111,7 @@ def test_feature(test_system_user: SystemUserModel, test_feature_type: FeatureTy
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
             file_path=f"{faker.word()}/{faker.word()}",
+            severity=test_severity,
         )
         session.add(feature)
         session.flush()

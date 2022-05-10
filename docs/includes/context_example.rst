@@ -5,13 +5,14 @@
 .. code-block:: python
 
     from overhave import (
-        AuthorizationStrategy,
-        OverhaveLdapClientSettings,
+        OverhaveAdminContext,
         OverhaveAdminSettings,
         OverhaveAuthorizationSettings,
-        OverhaveAdminContext,
+        OverhaveAuthorizationStrategy,
         OverhaveFileSettings,
         OverhaveLanguageSettings,
+        OverhaveLdapClientSettings,
+        OverhaveLdapManagerSettings,
         OverhaveProjectSettings,
         OverhaveStashClientSettings,
         OverhaveStashPublisherSettings,
@@ -34,10 +35,11 @@
             links_keyword="Tasks",
         ),
         admin_settings=OverhaveAdminSettings(index_template_path=path_settings.index_template_path),
-        auth_settings=OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP, admin_group="admin"),
+        auth_settings=OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP),
         ldap_client_settings=OverhaveLdapClientSettings(
             ldap_url="ldap://company.com", ldap_domain="company\\", ldap_dn="dc=company,dc=com"
         ),
+        ldap_manager_settings=OverhaveLdapManagerSettings(ldap_admin_group="admin"),
         stash_project_settings=OverhaveStashPublisherSettings(
             repository_name='bdd-features',
             key='PRJ',

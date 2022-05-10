@@ -4,10 +4,10 @@
 
 .. code-block:: gherkin
 
-    @feature_type_1 @my_custom_tag
+    @feature_type_1 @my_custom_tag @severity.critical
     Feature: Tinkoff Mobile answering machine
     ID: 123
-    # created by livestreamx | last edited by other_user, 09-01-2021 | published by other_user
+    # created by livestreamx | last edited by other_user, 09-01-2021 09:00:00 | published by other_user
     Tasks: PRJ-1234, PRJ-1235
 
     Background:

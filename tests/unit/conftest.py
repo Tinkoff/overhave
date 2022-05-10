@@ -4,8 +4,8 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from pytest_mock import MockFixture
 
-from overhave import OverhaveFileSettings, OverhaveProjectSettings
-from overhave.entities import FeatureExtractor, GitRepositoryInitializer, OverhaveScenarioCompilerSettings
+from overhave import OverhaveFileSettings, OverhaveProjectSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import FeatureExtractor, GitRepositoryInitializer
 from overhave.scenario import FileManager
 
 

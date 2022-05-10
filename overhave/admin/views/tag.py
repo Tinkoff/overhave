@@ -15,14 +15,10 @@ class TagsView(ModelViewConfigured):
 
     can_view_details = False
 
-    column_list = (
-        "id",
-        "value",
-        "created_at",
-        "created_by",
-    )
-
+    column_list = ("value", "created_at", "created_by")
     form_excluded_columns = ("created_at",)
+    column_searchable_list = ("value", "created_by")
+    column_filters = ("value", "created_by")
 
     _tag_name_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_]+$")
 
