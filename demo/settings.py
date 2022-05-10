@@ -32,10 +32,15 @@ class OverhaveDemoAppLanguage(str, enum.Enum):
 class OverhaveDemoSettingsGenerator:
     """Settings for application demo mode configuration."""
 
-    def __init__(self, language: OverhaveDemoAppLanguage, threadpool: bool):
+    def __init__(self, language: OverhaveDemoAppLanguage, threadpool: bool, default_feature_user: str = "user"):
         self._root_dir: Path = Path(__file__).parent
         self._language = language
         self._threadpool = threadpool
+        self._default_feature_user = default_feature_user  # default user login from demo feature files
+
+    @property
+    def default_feature_user(self) -> str:
+        return self._default_feature_user
 
     @cached_property
     def default_context_settings(self) -> Dict[str, BaseSettings]:

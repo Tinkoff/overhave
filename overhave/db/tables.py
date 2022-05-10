@@ -36,7 +36,7 @@ class Tags(BaseTable, PrimaryKeyMixin):
         self.created_by = created_by
 
 
-@su.generic_repr("name", "last_edited_by")
+@su.generic_repr("id", "name", "last_edited_by")
 class Feature(BaseTable, PrimaryKeyMixin):
     """Features table."""
 

@@ -1,6 +1,6 @@
 @feature_type_1 @oleg @talkbot @severity.critical
 Feature: Tinkoff Mobile answering machine
-# created by admin | last edited by admin, 09-01-2021 09:00:00 | published by admin
+# created by admin | last edited by user, 09-05-2022 18:40:22 | published by user
 Tasks: PRJ-1234, PRJ-1235
 
 Background:
