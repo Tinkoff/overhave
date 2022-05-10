@@ -89,11 +89,9 @@ def pytest_configure(config: Config) -> None:
 
 def pytest_collection_modifyitems(session: Session) -> None:
     links_keyword = get_proxy_manager().factory.context.project_settings.links_keyword
-    severity_keyword = get_proxy_manager().factory.context.compilation_settings.severity_keyword
     pytest_bdd_scenario_items = (item for item in session.items if is_pytest_bdd_item(item))
     for item in pytest_bdd_scenario_items:
         add_scenario_title_to_report(item)
-        set_severity_level(item=item, keyword=severity_keyword)
         if isinstance(links_keyword, str):
             set_issue_links(item=item, keyword=links_keyword)
 
@@ -169,6 +167,8 @@ def pytest_collection_finish(session: Session) -> None:
 def pytest_runtest_setup(item: Item) -> None:
     """Hook for purgation of get_description_manager."""
     get_description_manager.cache_clear()
+    if is_pytest_bdd_item(item):
+        set_severity_level(item=item, keyword=get_proxy_manager().factory.context.compilation_settings.severity_keyword)
 
 
 def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:
