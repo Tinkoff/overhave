@@ -178,14 +178,14 @@ dev = ["pip-tools (==6.5.1)", "pytest (==7.1.1)", "flake8 (==4.0.1)", "tox (==3.
 
 [[package]]
 name = "boto3"
-version = "1.22.9"
+version = "1.22.10"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.25.9,<1.26.0"
+botocore = ">=1.25.10,<1.26.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -202,7 +202,7 @@ python-versions = "*"
 
 [[package]]
 name = "botocore"
-version = "1.25.9"
+version = "1.25.10"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -382,7 +382,7 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "faker"
-version = "13.7.0"
+version = "13.11.0"
 description = "Faker is a Python package that generates fake data for you."
 category = "dev"
 optional = false
@@ -394,7 +394,7 @@ typing-extensions = {version = ">=3.10.0.2", markers = "python_version < \"3.8\"
 
 [[package]]
 name = "fastapi"
-version = "0.76.0"
+version = "0.77.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
 optional = false
@@ -402,7 +402,7 @@ python-versions = ">=3.6.1"
 
 [package.dependencies]
 pydantic = ">=1.6.2,<1.7 || >1.7,<1.7.1 || >1.7.1,<1.7.2 || >1.7.2,<1.7.3 || >1.7.3,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0"
-starlette = "0.18.0"
+starlette = "0.19.1"
 
 [package.extras]
 all = ["requests (>=2.24.0,<3.0.0)", "jinja2 (>=2.11.2,<4.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "itsdangerous (>=1.1.0,<3.0.0)", "pyyaml (>=5.3.1,<7.0.0)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0,<6.0.0)", "orjson (>=3.2.1,<4.0.0)", "email_validator (>=1.1.1,<2.0.0)", "uvicorn[standard] (>=0.12.0,<0.18.0)"]
@@ -1412,7 +1412,7 @@ md = ["cmarkgfm (>=0.8.0)"]
 
 [[package]]
 name = "redis"
-version = "4.2.2"
+version = "4.3.1"
 description = "Python client for Redis database and key-value store"
 category = "main"
 optional = false
@@ -1729,15 +1729,15 @@ url = ["furl (>=0.4.1)"]
 
 [[package]]
 name = "starlette"
-version = "0.18.0"
+version = "0.19.1"
 description = "The little ASGI library that shines."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-anyio = ">=3.0.0,<4"
-typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
+anyio = ">=3.4.0,<5"
+typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
@@ -2109,16 +2109,16 @@ bleach = [
     {file = "bleach-5.0.0.tar.gz", hash = "sha256:c6d6cc054bdc9c83b48b8083e236e5f00f238428666d2ce2e083eaa5fd568565"},
 ]
 boto3 = [
-    {file = "boto3-1.22.9-py3-none-any.whl", hash = "sha256:65e45029d234ff94ba8aa3bacb9df00fbbb2f1d9ee7fd1c2e40f4815d12ec3f5"},
-    {file = "boto3-1.22.9.tar.gz", hash = "sha256:441b619067cb205bfcd0e66fe085c16989ab65bd348823013e11bef991c00a5c"},
+    {file = "boto3-1.22.10-py3-none-any.whl", hash = "sha256:f32f35ea86b0d9ff408279f8e9903e4d0711475bbbd07003ccdf01fac7788e0a"},
+    {file = "boto3-1.22.10.tar.gz", hash = "sha256:3edf68bdd1b95576c04cb7f69b9759a75b169fa13bb567271cb4d742f60accad"},
 ]
 boto3-type-annotations = [
     {file = "boto3_type_annotations-0.3.1-py3-none-any.whl", hash = "sha256:52e007ac2ab792abee42aaac3019c2acc9781a84e79e1283a5bc64164225435e"},
     {file = "boto3_type_annotations-0.3.1.tar.gz", hash = "sha256:e5682093d035e935c8189f24c601ef6eaccedfcd1e642ba7922429d093b1b885"},
 ]
 botocore = [
-    {file = "botocore-1.25.9-py3-none-any.whl", hash = "sha256:71962de55b053a0124a0514155f4cdcf0bce81795ffc2bd6e000c1594e99125a"},
-    {file = "botocore-1.25.9.tar.gz", hash = "sha256:a1d26b95aaa5b2e126df74b223d774fae7e6597bb55c363782178f5b87f0cad3"},
+    {file = "botocore-1.25.10-py3-none-any.whl", hash = "sha256:a4e9dd2b7ce4bf41200108af6b9d3f21ff53a95324f8a66638c4afdf27da44d3"},
+    {file = "botocore-1.25.10.tar.gz", hash = "sha256:d4738b1c6ae3a905be39422e7a5ca99e4028efc9017c2694cbebbe12c899fc78"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
@@ -2284,12 +2284,12 @@ execnet = [
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
 faker = [
-    {file = "Faker-13.7.0-py3-none-any.whl", hash = "sha256:b1903db92175d78051858128ada397c7dc76f376f6967975419da232b3ebd429"},
-    {file = "Faker-13.7.0.tar.gz", hash = "sha256:0301ace8365d98f3d0bf6e9a40200c8548e845d3812402ae1daf589effe3fb01"},
+    {file = "Faker-13.11.0-py3-none-any.whl", hash = "sha256:7b25b2b980d3f0e61c586ec6365a39c797bae095f594890cc7bfb6f5ee8e66b4"},
+    {file = "Faker-13.11.0.tar.gz", hash = "sha256:f1b6dccdd57261918830b974a7cfa5b6a9044cf05d17d57bcbc757e0220db56f"},
 ]
 fastapi = [
-    {file = "fastapi-0.76.0-py3-none-any.whl", hash = "sha256:1e05c868651e3935bd9b290c61a3661a54e37471d3a0700bc5e4380f9ed935ae"},
-    {file = "fastapi-0.76.0.tar.gz", hash = "sha256:a5f99f6e827c7108a8efaf1d7f19d6cf2d735ad984f5e44d33ccec6ee88a7da1"},
+    {file = "fastapi-0.77.1-py3-none-any.whl", hash = "sha256:041d8935a13c8f22a7ef80c76d8eea54953c44476d7057e7734138ee8951b9dc"},
+    {file = "fastapi-0.77.1.tar.gz", hash = "sha256:6dfa715a334d1fafedcea33d74c7382afd2ce123093f83be2f4e322e89d45e22"},
 ]
 filelock = [
     {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
@@ -2916,8 +2916,8 @@ readme-renderer = [
     {file = "readme_renderer-35.0.tar.gz", hash = "sha256:a727999acfc222fc21d82a12ed48c957c4989785e5865807c65a487d21677497"},
 ]
 redis = [
-    {file = "redis-4.2.2-py3-none-any.whl", hash = "sha256:4e95f4ec5f49e636efcf20061a5a9110c20852f607cfca6865c07aaa8a739ee2"},
-    {file = "redis-4.2.2.tar.gz", hash = "sha256:0107dc8e98a4f1d1d4aa00100e044287f77121a1e6d2085545c4b7fa94a7a27f"},
+    {file = "redis-4.3.1-py3-none-any.whl", hash = "sha256:84316970995a7adb907a56754d2b92d88fc2d252963dc5ac34c88f0f1a22c25d"},
+    {file = "redis-4.3.1.tar.gz", hash = "sha256:94b617b4cd296e94991146f66fc5559756fbefe9493604f0312e4d3298ac63e9"},
 ]
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
@@ -3038,8 +3038,8 @@ sqlalchemy-utils = [
     {file = "SQLAlchemy_Utils-0.37.9-py3-none-any.whl", hash = "sha256:bb6f4da8ac044cb0dd4d0278b1fb434141a5ee9d1881c757a076830ddbb04160"},
 ]
 starlette = [
-    {file = "starlette-0.18.0-py3-none-any.whl", hash = "sha256:377d64737a0e03560cb8eaa57604afee143cea5a4996933242798a7820e64f53"},
-    {file = "starlette-0.18.0.tar.gz", hash = "sha256:b45c6e9a617ecb5caf7e6446bd8d767b0084d6217e8e1b08187ca5191e10f097"},
+    {file = "starlette-0.19.1-py3-none-any.whl", hash = "sha256:5a60c5c2d051f3a8eb546136aa0c9399773a689595e099e0877704d5888279bf"},
+    {file = "starlette-0.19.1.tar.gz", hash = "sha256:c6d21096774ecb9639acad41b86b7706e52ba3bf1dc13ea4ed9ad593d47e24c7"},
 ]
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},

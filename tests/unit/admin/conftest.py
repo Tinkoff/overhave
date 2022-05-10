@@ -111,7 +111,7 @@ def test_feature_filepath(request: FixtureRequest, faker: Faker) -> str:
     return faker.word()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_severity(faker: Faker) -> allure.severity_level:
     lst = list(allure.severity_level)
     return lst[faker.random_int(0, len(lst) - 1)]
