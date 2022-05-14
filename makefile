@@ -68,7 +68,7 @@ check-cov-badge:
 check-package:
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
 
-check: lint test cov-badge check-cov-badge check-package build-docs
+check: lint test cov-badge check-package build-docs
 
 clear:
 	rm -rf ./.mypy_cache
