@@ -42,7 +42,11 @@ class TestOverhaveSynchronizer:
     @pytest.mark.parametrize("create_db_features", [True])
     @pytest.mark.parametrize("test_system_user_login", ["alternate_user_login"], indirect=True)
     def test_synchronize_create_ru_without_user(
-        self, test_resolved_synchronizer: OverhaveSynchronizer, test_db_user: SystemUserModel, create_db_features: bool
+        self,
+        test_resolved_synchronizer: OverhaveSynchronizer,
+        test_db_user: SystemUserModel,
+        test_db_feature_types: List[FeatureTypeModel],
+        create_db_features: bool,
     ) -> None:
         with pytest.raises(FeatureInfoUserNotFoundError):
             test_resolved_synchronizer.synchronize(create_db_features=create_db_features)

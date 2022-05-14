@@ -9,6 +9,8 @@ DOCS_DIR ?= docs
 DOCS_BUILD_DIR ?= _build
 DOCS_BUILDER ?= html
 DOCS_INCLUDES_DIR = $(DOCS_DIR)/includes
+DOCS_IMAGES_DIR = $(DOCS_INCLUDES_DIR)/images
+COV_BADGE_SVG = $(DOCS_IMAGES_DIR)/coverage.svg
 DOCS_REFERENCES_DIR = $(DOCS_INCLUDES_DIR)/_references
 SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
 
@@ -57,10 +59,16 @@ build-docs:
 	sphinx-build $(DOCS_DIR) $(DOCS_BUILD_DIR)/$(DOCS_BUILDER) -j 4 -b $(DOCS_BUILDER) -a -q -W
 	@echo "Docs build finished. The results have been placed in '$(DOCS_BUILD_DIR)/$(DOCS_BUILDER)'"
 
+cov-badge:
+	$(VENV)/bin/poetry run coverage-badge -f -o $(COV_BADGE_SVG)
+
+check-cov-badge:
+	git diff --exit-code $(COV_BADGE_SVG)  # if failed --> add to commit actual badge
+
 check-package:
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
 
-check: lint test check-package build-docs
+check: lint test cov-badge check-package build-docs
 
 clear:
 	rm -rf ./.mypy_cache
