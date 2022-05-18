@@ -88,7 +88,7 @@ class ScenarioCompiler(PrefixMixin):
         return "\n".join(
             (
                 f"{self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name)} "
-                f"{self._get_additional_tags(scenario_text=text, tags=generate_tags_list(context))}"
+                f"{self._get_additional_tags(scenario_text=text, tags=generate_tags_list(context))} "
                 f"{self._get_severity_tag(severity=context.feature.severity)}",
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 f"{self._compilation_settings.id_prefix} {context.feature.id}",
