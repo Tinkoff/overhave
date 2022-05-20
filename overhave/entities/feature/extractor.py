@@ -45,7 +45,7 @@ class FeatureExtractor(IFeatureExtractor):
             raise FeatureTypeExtractionError(
                 f"Could not find any subdirectory in specified features directory '{self._file_settings.features_dir}'!"
             )
-        self._feature_types = [FeatureTypeName(t.name) for t in feature_type_dirs]
+        self._feature_types = [FeatureTypeName(t.name.strip()) for t in feature_type_dirs]
         logger.info("Registered feature types: %s", self._feature_types)
         self._feature_type_to_dir_mapping = {FeatureTypeName(t.name): t for t in feature_type_dirs}
 
