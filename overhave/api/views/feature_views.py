@@ -3,10 +3,14 @@ from http import HTTPStatus
 from typing import List, Optional
 
 import fastapi
+import flask
+from flask_login import current_user
 
 from overhave.api.deps import get_feature_storage, get_feature_tag_storage
 from overhave.api.views.tags_views import tags_item_handler
+from overhave.factory import IAdminFactory, get_admin_factory
 from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage
+from overhave.transport import TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
 
@@ -27,3 +31,16 @@ def get_features_handler(
     raise fastapi.HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail="'tag_id' or 'tag_value' query parameter should be set"
     )
+
+
+def run_test_for_procedure_handler(
+    procedure_name: str,
+    factory: IAdminFactory = fastapi.Depends(get_admin_factory),
+) -> list[str]:
+    features = get_features_handler(tag_value=procedure_name)
+    urls = []
+    for feature in features:
+        test_run_id = factory.test_run_storage.create_test_run(scenario_id=feature.id, executed_by=current_user.login)
+        factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
+        urls.append(flask.url_for("testrun.details_view", id=test_run_id))
+    return urls
