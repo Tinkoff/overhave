@@ -33,6 +33,8 @@ from overhave.pytest_plugin.plugin import (
     pytest_configure,
     pytest_runtest_makereport,
     pytest_runtest_setup,
+    pytest_runtest_teardown,
+    pytest_sessionstart,
 )
 from overhave.utils import make_url
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
@@ -305,74 +307,74 @@ class TestPytestCommonHooks:
         self,
         test_clean_item: Item,
         severity_handler_mock: mock.MagicMock,
+        link_handler_mock: mock.MagicMock,
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
             pytest_runtest_setup(item=test_clean_item)
             mocked_description_manager.assert_not_called()
+            link_handler_mock.assert_not_called()
             severity_handler_mock.assert_not_called()
 
+    @pytest.mark.parametrize(
+        ("browse_url", "links_keyword"),
+        [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")],
+    )
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
     def test_pytest_runtest_setup_pytest_bdd(
         self,
         test_pytest_bdd_item: Item,
+        test_pytest_bdd_session: Session,
         severity_handler_mock: mock.MagicMock,
         test_severity: allure.severity_level,
+        link_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
+        browse_url: Optional[str],
+        links_keyword: Optional[str],
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
+            patched_hook_test_execution_proxy_manager.factory.context.project_settings.browse_url = make_url(browse_url)
+            patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
+
+            pytest_collection_modifyitems(test_pytest_bdd_session)
             pytest_runtest_setup(item=test_pytest_bdd_item)
             mocked_description_manager.assert_not_called()
+
+            if browse_url is None:
+                link_handler_mock.assert_not_called()
+            else:
+                assert has_issue_links(test_pytest_bdd_item)
+                assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
+
+            assert getattr(test_pytest_bdd_item, "severity") == test_severity.value
             severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("enable_html", [True])
-    def test_pytest_runtest_makereport_clean(
+    def test_pytest_runtest_teardown_clean(
         self,
         clear_get_description_manager: None,
         description_handler_mock: mock.MagicMock,
-        link_handler_mock: mock.MagicMock,
         faker: Faker,
         test_clean_item: Item,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
         description_manager = get_description_manager()
         description_manager.add_description(faker.word())
-        pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
+        pytest_runtest_teardown(item=test_clean_item, nextitem=None)
         description_handler_mock.assert_called_once()
-        link_handler_mock.assert_not_called()
 
-    @pytest.mark.parametrize(
-        ("browse_url", "links_keyword", "enable_html"),
-        [(None, None, True), ("https://overhave.readthedocs.io/browse", "Tasks", True)],
-    )
-    @pytest.mark.parametrize("test_severity", [None], indirect=True)
-    def test_pytest_runtest_makereport_bdd(
+    def test_pytest_sessionstart(
         self,
-        clear_get_description_manager: None,
-        description_handler_mock: mock.MagicMock,
-        link_handler_mock: mock.MagicMock,
-        faker: Faker,
-        test_pytest_bdd_item: Item,
-        test_pytest_bdd_session: Session,
-        patched_hook_test_execution_proxy_manager: IProxyManager,
-        browse_url: Optional[str],
-        links_keyword: Optional[str],
+        test_pytest_clean_session: Session,
     ) -> None:
-        description_manager = get_description_manager()
-        description_manager.add_description(faker.word())
+        pytest_sessionstart(test_pytest_clean_session)
+        assert getattr(test_pytest_clean_session, "results") == {}
 
-        patched_hook_test_execution_proxy_manager.factory.context.project_settings.browse_url = make_url(browse_url)
-        patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
-
-        pytest_collection_modifyitems(test_pytest_bdd_session)
-        pytest_runtest_makereport(item=test_pytest_bdd_item, call=mock.MagicMock())
-        description_handler_mock.assert_called_once()
-
-        if browse_url is None:
-            link_handler_mock.assert_not_called()
-        else:
-            assert has_issue_links(test_pytest_bdd_item)
-            assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
+    def test_pytest_runtest_makereport(
+        self,
+        test_clean_item: Item,
+    ) -> None:
+        pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())

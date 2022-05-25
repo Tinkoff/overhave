@@ -9,4 +9,4 @@ from .allure_utils import (
     set_severity_level,
 )
 from .basic import get_full_step_name, get_scenario, is_pytest_bdd_item
-from .links import add_issue_links_to_report, has_issue_links, set_issue_links
+from .links import add_issue_links_to_report, has_issue_links, set_item_issue_links

@@ -21,7 +21,7 @@ def _get_issue_links(scenario: Scenario, keyword: str) -> Optional[List[str]]:
     return None
 
 
-def set_issue_links(item: Item, keyword: str) -> None:
+def set_item_issue_links(item: Item, keyword: str) -> None:
     scenario = get_scenario(item)
     links = _get_issue_links(scenario, keyword)
     if links:
