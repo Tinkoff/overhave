@@ -43,4 +43,5 @@ def set_severity_level(item: Item, keyword: str) -> None:
         if parsed_severity is None:
             continue
         allure.dynamic.severity(parsed_severity)
+        setattr(item, "severity", parsed_severity.value)
         return

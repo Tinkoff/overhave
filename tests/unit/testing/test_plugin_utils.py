@@ -13,7 +13,7 @@ from overhave.pytest_plugin.helpers import (
     add_scenario_title_to_report,
     get_full_step_name,
     is_pytest_bdd_item,
-    set_issue_links,
+    set_item_issue_links,
     set_severity_level,
 )
 from overhave.test_execution.settings import EmptyBrowseURLError, OverhaveProjectSettings
@@ -36,7 +36,7 @@ class TestPluginUtils:
     @pytest.mark.parametrize("keyword", ["Tasks"])
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_issue_links_with_correct_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
-        set_issue_links(item=test_pytest_bdd_item, keyword=keyword)
+        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
         assert hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
         assert set(getattr(get_scenario(test_pytest_bdd_item).feature, "links")) == {"PRJ-1234", "PRJ-1235"}
         assert has_issue_links(test_pytest_bdd_item)
@@ -44,7 +44,7 @@ class TestPluginUtils:
     @pytest.mark.parametrize("keyword", ["Trash"])
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_issue_links_with_incorrect_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
-        set_issue_links(item=test_pytest_bdd_item, keyword=keyword)
+        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
         assert not hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
         assert not has_issue_links(test_pytest_bdd_item)
 
@@ -58,7 +58,7 @@ class TestPluginUtils:
         test_browse_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
-        set_issue_links(item=test_pytest_bdd_item, keyword=keyword)
+        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
         add_issue_links_to_report(project_settings=test_project_settings, scenario=get_scenario(test_pytest_bdd_item))
 
     @pytest.mark.parametrize("keyword", ["Tasks"])
@@ -71,7 +71,7 @@ class TestPluginUtils:
         test_browse_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
-        set_issue_links(item=test_pytest_bdd_item, keyword=keyword)
+        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
         with pytest.raises(EmptyBrowseURLError):
             add_issue_links_to_report(
                 project_settings=test_project_settings, scenario=get_scenario(test_pytest_bdd_item)
@@ -100,6 +100,7 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=severity_keyword)
+        assert getattr(test_pytest_bdd_item, "severity") == allure.severity_level.NORMAL.value
         severity_handler_mock.assert_called_once_with(allure.severity_level.NORMAL)
 
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
@@ -111,6 +112,7 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
+        assert getattr(test_pytest_bdd_item, "severity") == test_severity.value
         severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
@@ -122,4 +124,5 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
+        assert getattr(test_pytest_bdd_item, "severity") == allure.severity_level.CRITICAL.value
         severity_handler_mock.assert_called_once_with(allure.severity_level.CRITICAL)
