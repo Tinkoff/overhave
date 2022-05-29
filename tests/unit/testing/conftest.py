@@ -16,15 +16,18 @@ from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSett
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin.items_cache import PytestItemsCache
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
 from tests.objects import get_test_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
-@pytest.fixture(scope="session")
-def test_clean_item() -> Item:
-    return cast(Item, mock.MagicMock())
+@pytest.fixture()
+def test_clean_item(faker: Faker) -> Item:
+    item_mock = mock.MagicMock()
+    item_mock.nodeid = faker.word()
+    return cast(Item, item_mock)
 
 
 @pytest.fixture()
@@ -250,3 +253,8 @@ def patched_hook_test_execution_proxy_manager(
 def severity_handler_mock() -> mock.MagicMock:
     with mock.patch("allure.dynamic.severity", return_value=mock.MagicMock()) as mocked_severity_handler:
         yield mocked_severity_handler
+
+
+@pytest.fixture()
+def test_items_cache() -> PytestItemsCache:
+    return PytestItemsCache()
