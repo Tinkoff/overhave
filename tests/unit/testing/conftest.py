@@ -9,6 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item, Mark
 from _pytest.python import Function
+from _pytest.reports import TestReport
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
@@ -16,15 +17,18 @@ from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSett
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin.items_cache import PytestItemsCache
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
 from tests.objects import get_test_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
-@pytest.fixture(scope="session")
-def test_clean_item() -> Item:
-    return cast(Item, mock.MagicMock())
+@pytest.fixture()
+def test_clean_item(faker: Faker) -> Item:
+    item_mock = mock.MagicMock()
+    item_mock.nodeid = faker.word()
+    return cast(Item, item_mock)
 
 
 @pytest.fixture()
@@ -57,8 +61,10 @@ def test_pytest_bdd_item(
     mocked_context: BaseFactoryContext,
     test_pytest_bdd_scenario: Scenario,
     test_severity: Optional[allure.severity_level],
+    faker: Faker,
 ) -> Item:
     item = mock.create_autospec(Item)
+    item.nodeid = faker.word()
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
     if test_severity is not None:
@@ -250,3 +256,31 @@ def patched_hook_test_execution_proxy_manager(
 def severity_handler_mock() -> mock.MagicMock:
     with mock.patch("allure.dynamic.severity", return_value=mock.MagicMock()) as mocked_severity_handler:
         yield mocked_severity_handler
+
+
+@pytest.fixture()
+def test_items_cache() -> PytestItemsCache:
+    return PytestItemsCache()
+
+
+@pytest.fixture()
+def clear_get_pytest_items_cache() -> None:
+    from overhave.pytest_plugin.deps import get_pytest_items_cache
+
+    get_pytest_items_cache.cache_clear()
+    return get_pytest_items_cache()
+
+
+@pytest.fixture()
+def report_when(request: FixtureRequest) -> str:
+    if hasattr(request, "param"):
+        return cast(str, request.param)
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_report(report_when: str) -> TestReport:
+    report_mock = mock.create_autospec(TestReport)
+    report_mock.when = report_when
+    report_mock.user_properties = []
+    return report_mock

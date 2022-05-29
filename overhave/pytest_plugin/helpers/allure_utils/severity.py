@@ -6,7 +6,7 @@ from typing import Any, Optional, Pattern
 import allure
 from _pytest.nodes import Item
 
-from overhave.pytest_plugin.helpers.basic import get_scenario
+from overhave.pytest_plugin.helpers.bdd import get_scenario
 
 
 def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.severity_level]:
@@ -37,11 +37,19 @@ def _get_default_severity(*args: Any, **kwargs: Any) -> allure.severity_level:
     return allure.severity_level.NORMAL
 
 
+def _set_item_severity_level(item: Item, severity: allure.severity_level) -> None:
+    setattr(item, "severity", severity)
+
+
 def set_severity_level(item: Item, keyword: str) -> None:
     for extractor_func in _get_severity_level_from_tags, _get_severity_level_from_feature, _get_default_severity:
         parsed_severity = extractor_func(*(item, keyword))  # type: ignore
         if parsed_severity is None:
             continue
         allure.dynamic.severity(parsed_severity)
-        setattr(item, "severity", parsed_severity.value)
+        _set_item_severity_level(item, parsed_severity)
         return
+
+
+def get_item_severity_level(item: Item) -> allure.severity_level:
+    return getattr(item, "severity", allure.severity_level.NORMAL)

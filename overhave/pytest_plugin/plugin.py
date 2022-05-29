@@ -10,22 +10,24 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
-from _pytest.reports import TestReport
+from _pytest.reports import CollectReport, TestReport
 from _pytest.runner import CallInfo
 from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave.factory import IAdminFactory
+from overhave.pytest_plugin.deps import get_description_manager, get_pytest_items_cache, get_step_context_runner
 from overhave.pytest_plugin.helpers import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
-    get_description_manager,
     get_full_step_name,
+    get_item_call_report,
+    get_item_severity_level,
     get_scenario,
-    get_step_context_runner,
     has_issue_links,
     is_pytest_bdd_item,
+    set_item_call_report,
     set_item_issue_links,
     set_severity_level,
 )
@@ -70,11 +72,6 @@ _GROUP_HELP = "Overhave PyTest plugin commands"
 def pytest_addoption(parser: Parser) -> None:
     group = parser.getgroup(_PLUGIN_NAME, _GROUP_HELP)
     group.addoption(*_Options.enable_injection.names(), **_Options.enable_injection.attrs())
-
-
-def pytest_sessionstart(session: Session) -> None:
-    session_results: Dict[Function, TestReport] = {}
-    setattr(session, "results", session_results)
 
 
 def pytest_configure(config: Config) -> None:
@@ -173,9 +170,10 @@ def pytest_runtest_setup(item: Item) -> None:
     """Hook for purgation of `get_description_manager` func and upgrading item for Allure report."""
     get_description_manager.cache_clear()
     proxy_manager = get_proxy_manager()
+    get_pytest_items_cache().register_item(item)
     if not is_pytest_bdd_item(item):
         return
-    if all((proxy_manager.factory.context.project_settings.browse_url is not None, has_issue_links(item))):
+    if proxy_manager.factory.context.project_settings.browse_url is not None and has_issue_links(item):
         add_issue_links_to_report(
             project_settings=proxy_manager.factory.context.project_settings, scenario=get_scenario(item)
         )
@@ -189,12 +187,18 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:  # type: ignore
-    """Hook for session results collection."""
+    """Hook for item results collection and description attachment to Allure report."""
     outcome = yield
-    result = outcome.get_result()
-    if result.when == "call":
-        session_results = getattr(item.session, "results")
-        if session_results is None:
-            raise RuntimeError("Should no be there")
-        session_results[item] = result
+    report = outcome.get_result()
+    if report.when == "call":
+        set_item_call_report(item=item, report=report)
     return None  # noqa: R501
+
+
+def pytest_report_teststatus(report: CollectReport | TestReport, config: Config) -> None:
+    if not isinstance(report, TestReport) or report.when != "teardown":
+        return
+    item = get_pytest_items_cache().get_item(report.nodeid)
+    report.user_properties.extend(
+        (("severity", get_item_severity_level(item).value), ("status", get_item_call_report(item).outcome))
+    )
