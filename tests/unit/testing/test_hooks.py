@@ -34,7 +34,6 @@ from overhave.pytest_plugin.plugin import (
     pytest_runtest_makereport,
     pytest_runtest_setup,
     pytest_runtest_teardown,
-    pytest_sessionstart,
 )
 from overhave.utils import make_url
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
@@ -365,13 +364,6 @@ class TestPytestCommonHooks:
         description_manager.add_description(faker.word())
         pytest_runtest_teardown(item=test_clean_item, nextitem=None)
         description_handler_mock.assert_called_once()
-
-    def test_pytest_sessionstart(
-        self,
-        test_pytest_clean_session: Session,
-    ) -> None:
-        pytest_sessionstart(test_pytest_clean_session)
-        assert getattr(test_pytest_clean_session, "results") == {}
 
     def test_pytest_runtest_makereport(
         self,

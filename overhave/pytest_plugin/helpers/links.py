@@ -6,7 +6,7 @@ import allure_commons.types
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
 
-from overhave.pytest_plugin.helpers.basic import get_scenario, is_pytest_bdd_item
+from overhave.pytest_plugin.helpers.bdd import get_scenario, is_pytest_bdd_item
 from overhave.test_execution import OverhaveProjectSettings
 
 
@@ -33,7 +33,7 @@ def has_issue_links(item: Item) -> bool:
 
 
 def add_issue_links_to_report(project_settings: OverhaveProjectSettings, scenario: Scenario) -> None:
-    for link in scenario.feature.links:
+    for link in getattr(scenario.feature, "links"):
         allure.dynamic.link(
             url=project_settings.get_link_url(link), link_type=allure_commons.types.LinkType.LINK, name=link
         )
