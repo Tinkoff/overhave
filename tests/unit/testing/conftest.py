@@ -9,6 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item, Mark
 from _pytest.python import Function
+from _pytest.reports import TestReport
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 
@@ -268,3 +269,18 @@ def clear_get_pytest_items_cache() -> None:
 
     get_pytest_items_cache.cache_clear()
     return get_pytest_items_cache()
+
+
+@pytest.fixture()
+def report_when(request: FixtureRequest) -> str:
+    if hasattr(request, "param"):
+        return cast(str, request.param)
+    raise NotImplementedError
+
+
+@pytest.fixture()
+def test_report(report_when: str) -> TestReport:
+    report_mock = mock.create_autospec(TestReport)
+    report_mock.when = report_when
+    report_mock.user_properties = []
+    return report_mock

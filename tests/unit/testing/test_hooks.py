@@ -9,6 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
+from _pytest.reports import CollectReport, TestReport
 from faker import Faker
 from pytest_bdd.parser import Step
 
@@ -32,6 +33,7 @@ from overhave.pytest_plugin.plugin import (
     pytest_collection_finish,
     pytest_collection_modifyitems,
     pytest_configure,
+    pytest_report_teststatus,
     pytest_runtest_makereport,
     pytest_runtest_setup,
     pytest_runtest_teardown,
@@ -375,3 +377,26 @@ class TestPytestCommonHooks:
         test_clean_item: Item,
     ) -> None:
         pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
+
+    def test_pytest_report_teststatus_collectreport(self) -> None:
+        report = mock.create_autospec(CollectReport)
+        pytest_report_teststatus(report=report, config=mock.MagicMock())
+        report.assert_not_called()
+
+    @pytest.mark.parametrize("report_when", ["setup", "call"], indirect=True)
+    def test_pytest_report_teststatus_testreport_other_when(self, test_report: TestReport) -> None:
+        pytest_report_teststatus(report=test_report, config=mock.MagicMock())
+        test_report.assert_not_called()
+
+    @pytest.mark.parametrize("report_when", ["teardown"], indirect=True)
+    def test_pytest_report_teststatus_testreport_teardown(
+        self, test_report: TestReport, test_clean_item: Item, clear_get_pytest_items_cache: PytestItemsCache
+    ) -> None:
+        setattr(test_clean_item, "severity", allure.severity_level.NORMAL)
+        call_report_mock = mock.MagicMock()
+        call_report_mock.outcome = "passed"
+        setattr(test_clean_item, "call_report", call_report_mock)
+        test_report.nodeid = test_clean_item.nodeid
+        clear_get_pytest_items_cache.register_item(test_clean_item)
+        pytest_report_teststatus(report=test_report, config=mock.MagicMock())
+        assert test_report.user_properties == [("severity", allure.severity_level.NORMAL.value), ("status", "passed")]
