@@ -60,8 +60,10 @@ def test_pytest_bdd_item(
     mocked_context: BaseFactoryContext,
     test_pytest_bdd_scenario: Scenario,
     test_severity: Optional[allure.severity_level],
+    faker: Faker,
 ) -> Item:
     item = mock.create_autospec(Item)
+    item.nodeid = faker.word()
     setattr(item, "_obj", mock.MagicMock())
     item._obj.__scenario__ = test_pytest_bdd_scenario
     if test_severity is not None:
@@ -258,3 +260,11 @@ def severity_handler_mock() -> mock.MagicMock:
 @pytest.fixture()
 def test_items_cache() -> PytestItemsCache:
     return PytestItemsCache()
+
+
+@pytest.fixture()
+def clear_get_pytest_items_cache() -> None:
+    from overhave.pytest_plugin.deps import get_pytest_items_cache
+
+    get_pytest_items_cache.cache_clear()
+    return get_pytest_items_cache()

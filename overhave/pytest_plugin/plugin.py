@@ -187,7 +187,7 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:  # type: ignore
-    """Hook for item results collection."""
+    """Hook for item results collection and description attachment to Allure report."""
     outcome = yield
     report = outcome.get_result()
     if report.when == "call":

@@ -15,6 +15,7 @@ from pytest_bdd.parser import Step
 from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
+from overhave.pytest_plugin.items_cache import PytestItemsCache
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
@@ -307,11 +308,13 @@ class TestPytestCommonHooks:
         test_clean_item: Item,
         severity_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
+        clear_get_pytest_items_cache: PytestItemsCache,
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
             pytest_runtest_setup(item=test_clean_item)
+            assert clear_get_pytest_items_cache.get_item(test_clean_item.nodeid) == test_clean_item
             mocked_description_manager.assert_not_called()
             link_handler_mock.assert_not_called()
             severity_handler_mock.assert_not_called()
@@ -329,6 +332,7 @@ class TestPytestCommonHooks:
         test_severity: allure.severity_level,
         link_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
+        clear_get_pytest_items_cache: PytestItemsCache,
         browse_url: Optional[str],
         links_keyword: Optional[str],
     ) -> None:
@@ -340,6 +344,7 @@ class TestPytestCommonHooks:
 
             pytest_collection_modifyitems(test_pytest_bdd_session)
             pytest_runtest_setup(item=test_pytest_bdd_item)
+            assert clear_get_pytest_items_cache.get_item(test_pytest_bdd_item.nodeid) == test_pytest_bdd_item
             mocked_description_manager.assert_not_called()
 
             if browse_url is None:
