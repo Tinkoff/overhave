@@ -10,24 +10,19 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
-from _pytest.reports import CollectReport, TestReport
-from _pytest.runner import CallInfo
 from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
 
 from overhave.factory import IAdminFactory
-from overhave.pytest_plugin.deps import get_description_manager, get_pytest_items_cache, get_step_context_runner
+from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
 from overhave.pytest_plugin.helpers import (
     add_issue_links_to_report,
     add_scenario_title_to_report,
     get_full_step_name,
-    get_item_call_report,
-    get_item_severity_level,
     get_scenario,
     has_issue_links,
     is_pytest_bdd_item,
-    set_item_call_report,
     set_item_issue_links,
     set_severity_level,
 )
@@ -169,36 +164,16 @@ def pytest_collection_finish(session: Session) -> None:
 def pytest_runtest_setup(item: Item) -> None:
     """Hook for purgation of `get_description_manager` func and upgrading item for Allure report."""
     get_description_manager.cache_clear()
-    proxy_manager = get_proxy_manager()
-    get_pytest_items_cache().register_item(item)
     if not is_pytest_bdd_item(item):
         return
+    proxy_manager = get_proxy_manager()
     if proxy_manager.factory.context.project_settings.browse_url is not None and has_issue_links(item):
         add_issue_links_to_report(
             project_settings=proxy_manager.factory.context.project_settings, scenario=get_scenario(item)
         )
-    set_severity_level(item=item, keyword=get_proxy_manager().factory.context.compilation_settings.severity_keyword)
+    set_severity_level(item=item, keyword=proxy_manager.factory.context.compilation_settings.severity_keyword)
 
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
     """Hook for description attachment to Allure report."""
     get_description_manager().apply_description()
-
-
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item: Item, call: CallInfo[None]) -> Optional[TestReport]:  # type: ignore
-    """Hook for item results collection and description attachment to Allure report."""
-    outcome = yield
-    report = outcome.get_result()
-    if report.when == "call":
-        set_item_call_report(item=item, report=report)
-    return None  # noqa: R501
-
-
-def pytest_report_teststatus(report: CollectReport | TestReport, config: Config) -> None:
-    if not isinstance(report, TestReport) or report.when != "teardown":
-        return
-    item = get_pytest_items_cache().get_item(report.nodeid)
-    report.user_properties.extend(
-        (("severity", get_item_severity_level(item).value), ("status", get_item_call_report(item).outcome))
-    )

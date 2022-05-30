@@ -9,14 +9,12 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Function
-from _pytest.reports import CollectReport, TestReport
 from faker import Faker
 from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
-from overhave.pytest_plugin.items_cache import PytestItemsCache
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
@@ -33,8 +31,6 @@ from overhave.pytest_plugin.plugin import (
     pytest_collection_finish,
     pytest_collection_modifyitems,
     pytest_configure,
-    pytest_report_teststatus,
-    pytest_runtest_makereport,
     pytest_runtest_setup,
     pytest_runtest_teardown,
 )
@@ -310,13 +306,11 @@ class TestPytestCommonHooks:
         test_clean_item: Item,
         severity_handler_mock: mock.MagicMock,
         link_handler_mock: mock.MagicMock,
-        clear_get_pytest_items_cache: PytestItemsCache,
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
             pytest_runtest_setup(item=test_clean_item)
-            assert clear_get_pytest_items_cache.get_item(test_clean_item.nodeid) == test_clean_item
             mocked_description_manager.assert_not_called()
             link_handler_mock.assert_not_called()
             severity_handler_mock.assert_not_called()
@@ -334,7 +328,6 @@ class TestPytestCommonHooks:
         test_severity: allure.severity_level,
         link_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-        clear_get_pytest_items_cache: PytestItemsCache,
         browse_url: Optional[str],
         links_keyword: Optional[str],
     ) -> None:
@@ -346,7 +339,6 @@ class TestPytestCommonHooks:
 
             pytest_collection_modifyitems(test_pytest_bdd_session)
             pytest_runtest_setup(item=test_pytest_bdd_item)
-            assert clear_get_pytest_items_cache.get_item(test_pytest_bdd_item.nodeid) == test_pytest_bdd_item
             mocked_description_manager.assert_not_called()
 
             if browse_url is None:
@@ -355,7 +347,6 @@ class TestPytestCommonHooks:
                 assert has_issue_links(test_pytest_bdd_item)
                 assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
 
-            assert getattr(test_pytest_bdd_item, "severity") == test_severity.value
             severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("enable_html", [True])
@@ -371,32 +362,3 @@ class TestPytestCommonHooks:
         description_manager.add_description(faker.word())
         pytest_runtest_teardown(item=test_clean_item, nextitem=None)
         description_handler_mock.assert_called_once()
-
-    def test_pytest_runtest_makereport(
-        self,
-        test_clean_item: Item,
-    ) -> None:
-        pytest_runtest_makereport(item=test_clean_item, call=mock.MagicMock())
-
-    def test_pytest_report_teststatus_collectreport(self) -> None:
-        report = mock.create_autospec(CollectReport)
-        pytest_report_teststatus(report=report, config=mock.MagicMock())
-        report.assert_not_called()
-
-    @pytest.mark.parametrize("report_when", ["setup", "call"], indirect=True)
-    def test_pytest_report_teststatus_testreport_other_when(self, test_report: TestReport) -> None:
-        pytest_report_teststatus(report=test_report, config=mock.MagicMock())
-        test_report.assert_not_called()
-
-    @pytest.mark.parametrize("report_when", ["teardown"], indirect=True)
-    def test_pytest_report_teststatus_testreport_teardown(
-        self, test_report: TestReport, test_clean_item: Item, clear_get_pytest_items_cache: PytestItemsCache
-    ) -> None:
-        setattr(test_clean_item, "severity", allure.severity_level.NORMAL)
-        call_report_mock = mock.MagicMock()
-        call_report_mock.outcome = "passed"
-        setattr(test_clean_item, "call_report", call_report_mock)
-        test_report.nodeid = test_clean_item.nodeid
-        clear_get_pytest_items_cache.register_item(test_clean_item)
-        pytest_report_teststatus(report=test_report, config=mock.MagicMock())
-        assert test_report.user_properties == [("severity", allure.severity_level.NORMAL.value), ("status", "passed")]

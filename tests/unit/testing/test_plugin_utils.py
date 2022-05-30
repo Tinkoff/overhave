@@ -100,7 +100,6 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=severity_keyword)
-        assert getattr(test_pytest_bdd_item, "severity") == allure.severity_level.NORMAL.value
         severity_handler_mock.assert_called_once_with(allure.severity_level.NORMAL)
 
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
@@ -112,7 +111,6 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
-        assert getattr(test_pytest_bdd_item, "severity") == test_severity.value
         severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
@@ -124,5 +122,4 @@ class TestPluginUtils:
         severity_handler_mock: mock.MagicMock,
     ) -> None:
         set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
-        assert getattr(test_pytest_bdd_item, "severity") == allure.severity_level.CRITICAL.value
         severity_handler_mock.assert_called_once_with(allure.severity_level.CRITICAL)
