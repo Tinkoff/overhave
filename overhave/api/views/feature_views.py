@@ -9,7 +9,8 @@ from yarl import URL
 
 from overhave.api.deps import get_feature_storage, get_feature_tag_storage
 from overhave.api.views.tags_views import tags_item_handler, tags_list_handler
-from overhave.factory.getters import IAdminFactory, get_admin_factory
+from overhave.factory.components.admin_factory import IAdminFactory
+from overhave.factory.getters import get_admin_factory
 from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage
 from overhave.transport import TestRunData, TestRunTask
 
