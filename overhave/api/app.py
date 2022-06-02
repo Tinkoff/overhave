@@ -54,7 +54,7 @@ def _get_feature_router() -> fastapi.APIRouter:
         "/run_test_for_procedure/",
         run_test_for_procedure_handler,
         methods=["GET"],
-        response_model=List[URL],
+        response_model=list[str],
         summary="Get list of test run for procedure name",
         description="Get list of test run by `procedure_name`",
     )

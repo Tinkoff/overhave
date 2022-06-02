@@ -38,11 +38,18 @@ def get_features_handler(
 def run_test_for_procedure_handler(
     procedure_name: str,
     factory: IAdminFactory = fastapi.Depends(get_admin_factory),
-) -> List[URL]:
-    features = tags_list_handler(procedure_name)
-    urls: List[URL] = []
+    feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
+    tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
+) -> list[str]:
+    tag = tags_item_handler(value=procedure_name, feature_tag_storage=tag_storage)
+    features = feature_storage.get_features_by_tag(tag_id=tag.id)
+    if len(features) == 0:
+        raise fastapi.HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"Features with tag='{procedure_name}' does not exist"
+        )
+    urls: list[str] = []
     for feature in features:
         test_run_id = factory.test_run_storage.create_test_run(scenario_id=feature.id, executed_by=current_user.login)
         factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
-        urls.append(URL(flask.url_for("testrun.details_view", id=test_run_id)))
+        urls.append(flask.url_for("testrun.details_view", id=test_run_id))
     return urls

@@ -5,7 +5,6 @@ import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
-from yarl import URL
 
 from overhave import db
 from overhave.storage import FeatureModel, TagModel
@@ -88,16 +87,28 @@ class TestFeatureAPI:
         features = parse_obj_as(List[FeatureModel], response.json())
         assert features == [test_feature_with_tag]
 
-    @pytest.mark.parametrize("procedure_name", 'test_procedure', indirect=True)
-    def test_run_test_for_procedure_handler(
+    def test_run_test_for_procedure_handler_absent_tag(
         self,
-        procedure_name: str,
         test_api_client: TestClient,
         test_api_bearer_auth: BearerAuth,
+        test_user_role: db.Role,
+        procedure_name: str = "absent_procedure_name_tag",
+    ) -> None:
+        response = test_api_client.get(
+            f"/feature/run_test_for_procedure/?procedure_name={procedure_name}", auth=test_api_bearer_auth
+        )
+        assert response.status_code == 400
+        validate_content_null(response, False)
+
+    def test_run_test_for_procedure_handler(
+            self,
+            test_api_client: TestClient,
+            test_api_bearer_auth: BearerAuth,
+            test_user_role: db.Role,
+            procedure_name: str = "procedure_name",
     ) -> None:
         response = test_api_client.get(
             f"/feature/run_test_for_procedure/?procedure_name={procedure_name}", auth=test_api_bearer_auth
         )
         assert response.status_code == 200
         validate_content_null(response, False)
-        assert response.json()
