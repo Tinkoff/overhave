@@ -24,7 +24,7 @@ from overhave.db import (
 )
 
 FeatureTypeName = NewType("FeatureTypeName", str)
-TestUserSpecification = NewType("TestUserSpecification", dict[str, str])
+TestUserSpecification = NewType("TestUserSpecification", dict[str, str | None])
 
 
 class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
