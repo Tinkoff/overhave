@@ -4,11 +4,9 @@ from typing import List, Optional
 
 import fastapi
 import flask
-from flask_login import current_user
-from yarl import URL
 
 from overhave.api.deps import get_feature_storage, get_feature_tag_storage
-from overhave.api.views.tags_views import tags_item_handler, tags_list_handler
+from overhave.api.views.tags_views import tags_item_handler
 from overhave.factory.components.admin_factory import IAdminFactory
 from overhave.factory.getters import get_admin_factory
 from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage
@@ -35,21 +33,21 @@ def get_features_handler(
     )
 
 
-def run_test_for_procedure_handler(
-    procedure_name: str,
+def run_test_by_tag_handler(
+    tag_run: str,
     factory: IAdminFactory = fastapi.Depends(get_admin_factory),
     feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
     tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
 ) -> list[str]:
-    tag = tags_item_handler(value=procedure_name, feature_tag_storage=tag_storage)
-    features = feature_storage.get_features_by_tag(tag_id=tag.id)
+    tag_model = tags_item_handler(value=tag_run, feature_tag_storage=tag_storage)
+    features = feature_storage.get_features_by_tag(tag_id=tag_model.id)
     if len(features) == 0:
         raise fastapi.HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=f"Features with tag='{procedure_name}' does not exist"
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"Features with tag='{tag_run}' does not exist"
         )
     urls: list[str] = []
     for feature in features:
-        test_run_id = factory.test_run_storage.create_test_run(scenario_id=feature.id, executed_by=current_user.login)
+        test_run_id = factory.test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.author)
         factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         urls.append(flask.url_for("testrun.details_view", id=test_run_id))
     return urls
