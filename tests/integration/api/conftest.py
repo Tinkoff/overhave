@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 from unittest import mock
 
 import pytest
@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
 
 from overhave import db, overhave_api
-from overhave.storage import SystemUserModel, SystemUserStorage, TestUserSpecification
+from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, SystemUserStorage, TestUserSpecification
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
 from overhave.transport.http.api_client.storage import AuthStorage
@@ -19,6 +19,9 @@ from overhave.transport.http.base_client import BearerAuth
 def envs_for_mock() -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_API_AUTH_SECRET_KEY": "123",
+        "OVERHAVE_FEATURES_DIR": "/features",
+        "OVERHAVE_FIXTURES_DIR": "/fixtures",
+        "OVERHAVE_STEPS_DIR": "/steps",
     }
 
 
@@ -70,3 +73,19 @@ def test_new_specification() -> TestUserSpecification:
 
 def validate_content_null(response: requests.Response, statement: bool) -> None:
     assert (response.content.decode() == "null") is statement
+
+
+@pytest.fixture()
+def test_scenario_run(test_feature_with_tag: FeatureModel, faker: Faker) -> ScenarioModel:
+    with db.create_session() as session:
+        db_scenario = db.Scenario(feature_id=test_feature_with_tag.id, text=faker.word())
+        session.add(db_scenario)
+        session.flush()
+        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture()
+def flask_urlfor_handler_mock(faker: Faker) -> mock.MagicMock:
+    with mock.patch("flask.url_for") as flask_urlfor_handler:
+        flask_urlfor_handler.return_value = f"/testrun/details/?id={faker.random_int()}"
+        yield flask_urlfor_handler

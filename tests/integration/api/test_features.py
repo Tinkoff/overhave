@@ -1,4 +1,5 @@
 from typing import List
+from unittest import mock
 
 import allure
 import pytest
@@ -7,7 +8,7 @@ from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
 from overhave import db
-from overhave.storage import FeatureModel, TagModel
+from overhave.storage import FeatureModel, ScenarioModel, TagModel
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
@@ -86,3 +87,27 @@ class TestFeatureAPI:
         assert response.json()
         features = parse_obj_as(List[FeatureModel], response.json())
         assert features == [test_feature_with_tag]
+
+    def test_run_test_by_tag_handler_absent_tag(
+        self,
+        test_api_client: TestClient,
+        test_api_bearer_auth: BearerAuth,
+        test_user_role: db.Role,
+        faker: Faker,
+    ) -> None:
+        response = test_api_client.get(f"/feature/run_test_by_tag/?tag_run={faker.word()}", auth=test_api_bearer_auth)
+        assert response.status_code == 400
+        validate_content_null(response, False)
+
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    def test_run_test_by_tag_handler_handler(
+        self,
+        test_api_client: TestClient,
+        test_api_bearer_auth: BearerAuth,
+        test_tag: TagModel,
+        test_scenario_run: ScenarioModel,
+        flask_urlfor_handler_mock: mock.MagicMock,
+    ) -> None:
+        response = test_api_client.get(f"/feature/run_test_by_tag/?tag_run={test_tag.value}", auth=test_api_bearer_auth)
+        assert response.status_code == 200
+        validate_content_null(response, False)

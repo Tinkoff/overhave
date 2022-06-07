@@ -20,7 +20,6 @@ from overhave.storage import (
     FeatureTagStorage,
     FeatureTypeStorage,
     ScenarioModel,
-    ScenarioStorage,
     SystemUserModel,
     TestRunStorage,
 )
@@ -76,11 +75,6 @@ def test_feature_storage(test_tag_storage: FeatureTagStorage) -> FeatureStorage:
 @pytest.fixture(scope="class")
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
-
-
-@pytest.fixture(scope="class")
-def test_scenario_storage() -> ScenarioStorage:
-    return ScenarioStorage()
 
 
 @pytest.fixture()

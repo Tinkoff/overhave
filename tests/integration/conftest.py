@@ -10,6 +10,7 @@ from overhave import db
 from overhave.storage import (
     FeatureModel,
     FeatureTypeModel,
+    ScenarioStorage,
     SystemUserGroupStorage,
     SystemUserModel,
     SystemUserStorage,
@@ -126,3 +127,8 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
         feature.feature_tags.append(tag)
         session.flush()
         return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_scenario_storage() -> ScenarioStorage:
+    return ScenarioStorage()

@@ -8,6 +8,7 @@ from overhave.api.views import (
     favicon,
     get_features_handler,
     login_for_access_token,
+    run_test_by_tag_handler,
     tags_item_handler,
     tags_list_handler,
     test_user_get_spec_handler,
@@ -47,6 +48,14 @@ def _get_feature_router() -> fastapi.APIRouter:
         response_model=List[FeatureModel],
         summary="Get list of Feature info",
         description="Get list of feature info by `tag_id` or `tag_value`",
+    )
+    feature_router.add_api_route(
+        "/run_test_by_tag/",
+        run_test_by_tag_handler,
+        methods=["GET"],
+        response_model=list[str],
+        summary="Get list of test run by tag_value",
+        description="Get list of test run by `tag_value`",
     )
     return feature_router
 
