@@ -65,10 +65,10 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     root_dir: Optional[Path]
 
     # Base directory for feature files, by default - root_dir / 'features'
-    features_dir: Path = Path("/features")
+    features_dir: Path
 
     # Base directory for pytest files with template mask, by default - root_dir / 'fixtures'
-    fixtures_dir: Path = Path("/fixtures")
+    fixtures_dir: Path
     # Template mask for fixtures pytest files which contain `feature_type` key
     fixtures_file_template_mask: str = "test_{feature_type}.py"
 
@@ -76,7 +76,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     validate_steps_dir: bool = False
 
     # Base directory for pytest-bdd steps, , by default - root_dir / 'steps'
-    steps_dir: Path = Path("/steps")
+    steps_dir: Path
 
     # Temporary directory for scenarios test runs
     tmp_dir: Path = Path("/tmp/overhave")  # noqa: S108

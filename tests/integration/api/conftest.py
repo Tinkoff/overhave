@@ -19,6 +19,9 @@ from overhave.transport.http.base_client import BearerAuth
 def envs_for_mock() -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_API_AUTH_SECRET_KEY": "123",
+        "OVERHAVE_FEATURES_DIR": "/features",
+        "OVERHAVE_FIXTURES_DIR": "/fixtures",
+        "OVERHAVE_STEPS_DIR": "/steps",
     }
 
 
