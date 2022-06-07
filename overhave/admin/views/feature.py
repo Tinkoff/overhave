@@ -154,6 +154,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "feature_tags.value",
     ]
     column_filters = (
+        "id",
         "name",
         "feature_type",
         "last_edited_by",
