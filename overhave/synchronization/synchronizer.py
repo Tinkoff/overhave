@@ -7,8 +7,7 @@ import allure
 import pytz
 
 from overhave.entities import BaseFileExtractor, FeatureExtractor, GitRepositoryInitializer, OverhaveFileSettings
-from overhave.scenario import ScenarioParser
-from overhave.scenario.parser import FeatureInfo
+from overhave.scenario import FeatureInfo, ScenarioParser
 from overhave.storage import (
     FeatureModel,
     IDraftStorage,

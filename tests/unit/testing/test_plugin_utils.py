@@ -7,13 +7,14 @@ from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario, Step
 
 from overhave.factory.context.base_context import BaseFactoryContext
-from overhave.pytest_plugin import get_scenario, has_issue_links
+from overhave.pytest_plugin import IProxyManager, get_scenario
 from overhave.pytest_plugin.helpers import (
-    add_issue_links_to_report,
     add_scenario_title_to_report,
+    add_task_links_to_report,
+    get_feature_info_from_item,
     get_full_step_name,
     is_pytest_bdd_item,
-    set_item_issue_links,
+    set_feature_info_for_item,
     set_severity_level,
 )
 from overhave.test_execution.settings import EmptyBrowseURLError, OverhaveProjectSettings
@@ -33,49 +34,31 @@ class TestPluginUtils:
     def test_not_pytest_bdd_item(self, test_clean_item: Item) -> None:
         assert not is_pytest_bdd_item(test_clean_item)
 
-    @pytest.mark.parametrize("keyword", ["Tasks"])
-    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_issue_links_with_correct_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
-        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
-        assert hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
-        assert set(getattr(get_scenario(test_pytest_bdd_item).feature, "links")) == {"PRJ-1234", "PRJ-1235"}
-        assert has_issue_links(test_pytest_bdd_item)
-
-    @pytest.mark.parametrize("keyword", ["Trash"])
-    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_issue_links_with_incorrect_keyword(self, test_pytest_bdd_item: Item, keyword: str) -> None:
-        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
-        assert not hasattr(get_scenario(test_pytest_bdd_item).feature, "links")
-        assert not has_issue_links(test_pytest_bdd_item)
-
-    @pytest.mark.parametrize("keyword", ["Tasks"])
+    @pytest.mark.parametrize("links_keyword", ["Tasks"])
     @pytest.mark.parametrize("test_browse_url", ["https://overhave.readthedocs.io/"], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_add_issue_links_to_report_with_correct_browse_url(
         self,
         test_pytest_bdd_item: Item,
-        keyword: str,
         test_browse_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
-        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
-        add_issue_links_to_report(project_settings=test_project_settings, scenario=get_scenario(test_pytest_bdd_item))
+        set_feature_info_for_item(
+            item=test_pytest_bdd_item, scenario_parser=patched_hook_test_execution_proxy_manager.factory.scenario_parser
+        )
+        feature_info = get_feature_info_from_item(test_pytest_bdd_item)
+        assert feature_info.tasks
+        add_task_links_to_report(project_settings=test_project_settings, tasks=feature_info.tasks)
 
-    @pytest.mark.parametrize("keyword", ["Tasks"])
     @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_add_issue_links_to_report_with_empty_browse_url(
         self,
-        test_pytest_bdd_item: Item,
-        keyword: str,
         test_browse_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
-        set_item_issue_links(item=test_pytest_bdd_item, keyword=keyword)
         with pytest.raises(EmptyBrowseURLError):
-            add_issue_links_to_report(
-                project_settings=test_project_settings, scenario=get_scenario(test_pytest_bdd_item)
-            )
+            add_task_links_to_report(project_settings=test_project_settings, tasks=["PRJ-321"])
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_add_scenario_title_to_report(self, test_scenario_name: str, test_pytest_bdd_item: Item) -> None:
@@ -92,14 +75,18 @@ class TestPluginUtils:
         )
 
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
-    @pytest.mark.parametrize("severity_keyword", ["yet_another_keyword"])
+    @pytest.mark.parametrize("severity_prefix", ["yet_another_prefix"])
     def test_set_severity_not_match_keyword(
         self,
+        mocked_context: BaseFactoryContext,
         test_pytest_bdd_item: Item,
-        severity_keyword: str,
         severity_handler_mock: mock.MagicMock,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
-        set_severity_level(item=test_pytest_bdd_item, keyword=severity_keyword)
+        set_feature_info_for_item(
+            item=test_pytest_bdd_item, scenario_parser=patched_hook_test_execution_proxy_manager.factory.scenario_parser
+        )
+        set_severity_level(item=test_pytest_bdd_item, compilation_settings=mocked_context.compilation_settings)
         severity_handler_mock.assert_called_once_with(allure.severity_level.NORMAL)
 
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
@@ -110,7 +97,7 @@ class TestPluginUtils:
         test_severity: allure.severity_level,
         severity_handler_mock: mock.MagicMock,
     ) -> None:
-        set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
+        set_severity_level(item=test_pytest_bdd_item, compilation_settings=mocked_context.compilation_settings)
         severity_handler_mock.assert_called_once_with(test_severity)
 
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
@@ -120,6 +107,10 @@ class TestPluginUtils:
         test_pytest_bdd_item: Item,
         test_severity: Optional[allure.severity_level],
         severity_handler_mock: mock.MagicMock,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
-        set_severity_level(item=test_pytest_bdd_item, keyword=mocked_context.compilation_settings.severity_keyword)
+        set_feature_info_for_item(
+            item=test_pytest_bdd_item, scenario_parser=patched_hook_test_execution_proxy_manager.factory.scenario_parser
+        )
+        set_severity_level(item=test_pytest_bdd_item, compilation_settings=mocked_context.compilation_settings)
         severity_handler_mock.assert_called_once_with(allure.severity_level.CRITICAL)
