@@ -1,12 +1,10 @@
-import re
-from functools import cache
-from pathlib import Path
-from typing import Any, Optional, Pattern
+from typing import Any, Optional
 
 import allure
 from _pytest.nodes import Item
 
-from overhave.pytest_plugin.helpers.bdd import get_scenario
+from overhave.entities import OverhaveScenarioCompilerSettings
+from overhave.pytest_plugin.helpers.parsed_info import get_feature_info_from_item
 
 
 def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.severity_level]:
@@ -18,29 +16,21 @@ def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.s
     return None
 
 
-@cache
-def _get_severity_pattern(keyword: str) -> Pattern[str]:
-    return re.compile(rf"({keyword})(?P<severity>\w+)\b")
-
-
-def _get_severity_level_from_feature(item: Item, keyword: str) -> Optional[allure.severity_level]:
-    scenario = get_scenario(item)
-    with Path(scenario.feature.filename).open() as feature_file:
-        head_line = next(iter(feature_file))
-        parsed_severity = _get_severity_pattern(keyword).search(head_line)
-        if parsed_severity is not None:
-            return allure.severity_level(parsed_severity.group("severity"))
-    return None
+def _get_parsed_feature_severity(item: Item, **kwargs: Any) -> Optional[allure.severity_level]:
+    return get_feature_info_from_item(item).severity
 
 
 def _get_default_severity(*args: Any, **kwargs: Any) -> allure.severity_level:
     return allure.severity_level.NORMAL
 
 
-def set_severity_level(item: Item, keyword: str) -> None:
-    for extractor_func in _get_severity_level_from_tags, _get_severity_level_from_feature, _get_default_severity:
-        parsed_severity = extractor_func(*(item, keyword))  # type: ignore
-        if parsed_severity is None:
+def set_severity_level(
+    compilation_settings: OverhaveScenarioCompilerSettings,
+    item: Item,
+) -> None:
+    for extractor_func in _get_severity_level_from_tags, _get_parsed_feature_severity, _get_default_severity:
+        severity_lvl = extractor_func(item=item, keyword=compilation_settings.severity_keyword)  # type: ignore
+        if severity_lvl is None:
             continue
-        allure.dynamic.severity(parsed_severity)
+        allure.dynamic.severity(severity_lvl)
         return

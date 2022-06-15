@@ -10,7 +10,7 @@ from overhave.entities import (
     ReportManager,
 )
 from overhave.factory.context import TApplicationContext
-from overhave.scenario import FileManager, ScenarioCompiler
+from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
 from overhave.storage import (
     DraftStorage,
     EmulationStorage,
@@ -56,6 +56,11 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
     @property
     @abc.abstractmethod
     def feature_extractor(self) -> IFeatureExtractor:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def scenario_parser(self) -> ScenarioParser:
         pass
 
     @property
@@ -181,6 +186,19 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
             language_settings=self.context.language_settings,
             task_links_keyword=self.context.project_settings.links_keyword,
         )
+
+    @cached_property
+    def _scenario_parser(self) -> ScenarioParser:
+        return ScenarioParser(
+            compilation_settings=self.context.compilation_settings,
+            language_settings=self.context.language_settings,
+            feature_extractor=self._feature_extractor,
+            task_links_keyword=self.context.project_settings.links_keyword,
+        )
+
+    @property
+    def scenario_parser(self) -> ScenarioParser:
+        return self._scenario_parser
 
     @cached_property
     def _scenario_storage(self) -> IScenarioStorage:

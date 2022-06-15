@@ -1,5 +1,5 @@
 from _pytest.nodes import Item
-from pytest_bdd.parser import Scenario, Step
+from pytest_bdd.parser import Scenario, ScenarioTemplate, Step
 
 
 def get_scenario(item: Item) -> Scenario:
@@ -8,7 +8,9 @@ def get_scenario(item: Item) -> Scenario:
 
 def is_pytest_bdd_item(item: Item) -> bool:
     if hasattr(item, "_obj"):
-        return hasattr(item._obj, "__scenario__") and isinstance(get_scenario(item), Scenario)  # type: ignore
+        return hasattr(item._obj, "__scenario__") and isinstance(  # type: ignore
+            get_scenario(item), (Scenario, ScenarioTemplate)
+        )
     return False
 
 

@@ -40,8 +40,9 @@ from overhave.publication import OverhaveGitlabPublisherSettings, OverhaveStashP
 from overhave.publication import PublicationManagerType as OverhavePublicationManagerType
 from overhave.publication import PublicationSettings as OverhavePublicationSettings
 from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
-from overhave.pytest_plugin import get_description_manager
+from overhave.pytest_plugin import get_description_manager, get_feature_info_from_item
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
+from overhave.scenario import FeatureInfo as OverhaveFeatureInfo
 from overhave.storage import FeatureTypeName as OverhaveFeatureName
 from overhave.storage import TestUserSpecification, TestUserStorage
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings

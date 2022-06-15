@@ -14,7 +14,7 @@ from pytest_bdd.parser import Step
 
 from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
-from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_scenario, has_issue_links
+from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_feature_info_from_item, get_scenario
 from overhave.pytest_plugin.plugin import (
     _GROUP_HELP,
     _PLUGIN_NAME,
@@ -34,6 +34,7 @@ from overhave.pytest_plugin.plugin import (
     pytest_runtest_setup,
     pytest_runtest_teardown,
 )
+from overhave.scenario import FeatureInfo
 from overhave.utils import make_url
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
@@ -231,10 +232,6 @@ class TestPytestCommonHooks:
         assert (
             test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name  # type: ignore
         )
-        if links_keyword is None:
-            assert not has_issue_links(test_pytest_bdd_item)
-        else:
-            assert has_issue_links(test_pytest_bdd_item)
 
     @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
@@ -314,6 +311,8 @@ class TestPytestCommonHooks:
             mocked_description_manager.assert_not_called()
             link_handler_mock.assert_not_called()
             severity_handler_mock.assert_not_called()
+            with pytest.raises(AttributeError):
+                get_feature_info_from_item(test_clean_item)
 
     @pytest.mark.parametrize(
         ("browse_url", "links_keyword"),
@@ -341,10 +340,11 @@ class TestPytestCommonHooks:
             pytest_runtest_setup(item=test_pytest_bdd_item)
             mocked_description_manager.assert_not_called()
 
+            assert isinstance(get_feature_info_from_item(test_pytest_bdd_item), FeatureInfo)
+
             if browse_url is None:
                 link_handler_mock.assert_not_called()
             else:
-                assert has_issue_links(test_pytest_bdd_item)
                 assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
 
             severity_handler_mock.assert_called_once_with(test_severity)

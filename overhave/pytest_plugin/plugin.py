@@ -17,13 +17,12 @@ from pytest_bdd.parser import Feature, Scenario, Step
 from overhave.factory import IAdminFactory
 from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
 from overhave.pytest_plugin.helpers import (
-    add_issue_links_to_report,
     add_scenario_title_to_report,
+    add_task_links_to_report,
+    get_feature_info_from_item,
     get_full_step_name,
-    get_scenario,
-    has_issue_links,
     is_pytest_bdd_item,
-    set_item_issue_links,
+    set_feature_info_for_item,
     set_severity_level,
 )
 from overhave.pytest_plugin.proxy_manager import get_proxy_manager
@@ -85,12 +84,9 @@ def pytest_configure(config: Config) -> None:
 
 
 def pytest_collection_modifyitems(session: Session) -> None:
-    links_keyword = get_proxy_manager().factory.context.project_settings.links_keyword
     pytest_bdd_scenario_items = (item for item in session.items if is_pytest_bdd_item(item))
     for item in pytest_bdd_scenario_items:
         add_scenario_title_to_report(item)
-        if isinstance(links_keyword, str):
-            set_item_issue_links(item=item, keyword=links_keyword)
 
 
 def pytest_bdd_before_step(
@@ -162,16 +158,22 @@ def pytest_collection_finish(session: Session) -> None:
 
 
 def pytest_runtest_setup(item: Item) -> None:
-    """Hook for purgation of `get_description_manager` func and upgrading item for Allure report."""
+    """Hook for purgation of `get_description_manager` func and upgrading item for reports."""
     get_description_manager.cache_clear()
     if not is_pytest_bdd_item(item):
         return
+
     proxy_manager = get_proxy_manager()
-    if proxy_manager.factory.context.project_settings.browse_url is not None and has_issue_links(item):
-        add_issue_links_to_report(
-            project_settings=proxy_manager.factory.context.project_settings, scenario=get_scenario(item)
-        )
-    set_severity_level(item=item, keyword=proxy_manager.factory.context.compilation_settings.severity_keyword)
+    set_feature_info_for_item(item=item, scenario_parser=proxy_manager.factory.scenario_parser)
+
+    links_keyword = get_proxy_manager().factory.context.project_settings.links_keyword
+    project_tasks = get_feature_info_from_item(item).tasks
+    if isinstance(links_keyword, str) and project_tasks:
+        add_task_links_to_report(project_settings=proxy_manager.factory.context.project_settings, tasks=project_tasks)
+    set_severity_level(
+        compilation_settings=proxy_manager.factory.context.compilation_settings,
+        item=item,
+    )
 
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:

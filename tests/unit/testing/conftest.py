@@ -18,7 +18,7 @@ from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
-from tests.objects import get_test_file_settings
+from tests.objects import get_test_feature_extractor, get_test_file_settings
 from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 
 
@@ -26,6 +26,7 @@ from tests.unit.testing.getoption_mock import ConfigGetOptionMock
 def test_clean_item(faker: Faker) -> Item:
     item_mock = mock.MagicMock()
     item_mock.nodeid = faker.word()
+    item_mock.feature_info = None
     return cast(Item, item_mock)
 
 
@@ -223,11 +224,31 @@ def patched_hook_admin_factory(
 
 
 @pytest.fixture()
+def links_keyword(request: FixtureRequest) -> Optional[str]:
+    if hasattr(request, "param"):
+        return cast(str, request.param)
+    return None
+
+
+@pytest.fixture()
+def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest) -> str:
+    if hasattr(request, "param"):
+        return cast(str, request.param)
+    return mocked_context.compilation_settings.severity_prefix
+
+
+@pytest.fixture()
 def patched_hook_test_execution_factory(
-    mocked_context: BaseFactoryContext, clean_test_execution_factory: Callable[[], ITestExecutionFactory]
+    mocked_context: BaseFactoryContext,
+    clean_test_execution_factory: Callable[[], ITestExecutionFactory],
+    links_keyword: Optional[str],
+    severity_prefix: str,
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()
     factory.set_context(mocked_context)
+    factory._feature_extractor = get_test_feature_extractor()
+    factory._scenario_parser._task_links_keyword = links_keyword
+    factory.context.compilation_settings.severity_prefix = severity_prefix
     return factory
 
 
