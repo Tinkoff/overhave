@@ -8,10 +8,16 @@ from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
 
 from overhave import db, overhave_api
-from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, SystemUserStorage, TestUserSpecification
+from overhave.storage import (
+    AuthStorage,
+    FeatureModel,
+    ScenarioModel,
+    SystemUserModel,
+    SystemUserStorage,
+    TestUserSpecification,
+)
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
-from overhave.transport.http.api_client.storage import AuthStorage
 from overhave.transport.http.base_client import BearerAuth
 
 

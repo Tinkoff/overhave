@@ -2,9 +2,8 @@ from faker import Faker
 from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
 
-from overhave.api import AuthToken
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.storage import SystemUserModel
+from overhave.storage import AuthToken, SystemUserModel
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.models import TokenRequestData
 from overhave.transport.http.base_client import BearerAuth

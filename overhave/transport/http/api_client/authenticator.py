@@ -3,10 +3,9 @@ from typing import Optional
 
 from pydantic.types import SecretStr
 
-from overhave.api import AuthToken
+from overhave.storage import AuthStorage, AuthToken
 from overhave.transport.http.api_client.models import TokenRequestData
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
-from overhave.transport.http.api_client.storage import AuthStorage
 from overhave.transport.http.base_client import BaseHttpClient, BearerAuth, HttpMethod
 
 logger = logging.getLogger(__name__)

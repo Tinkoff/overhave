@@ -5,6 +5,8 @@ from .http import (
     GitlabMrCreationResponse,
     GitlabMrRequest,
     GitlabRepository,
+    OverhaveApiAuthenticator,
+    OverhaveApiAuthenticatorSettings,
     OverhaveGitlabClientSettings,
     OverhaveStashClientSettings,
     StashBranch,

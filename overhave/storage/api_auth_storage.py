@@ -1,8 +1,19 @@
 import abc
+from datetime import datetime
 from typing import Optional
 
-from overhave.api import AuthToken
+from pydantic.fields import Field
+from pydantic.main import BaseModel
+
 from overhave.utils import get_current_time
+
+
+class AuthToken(BaseModel):
+    """Model for OAuth2 auth_managers token."""
+
+    access_token: str
+    expires_at: datetime
+    token_type: str = Field("Bearer", const=True)
 
 
 class IAuthStorage(abc.ABC):
