@@ -1,2 +1,3 @@
 # flake8: noqa
-from .storage import AuthStorage, IAuthStorage
+from .authenticator import OverhaveApiAuthenticator
+from .settings import OverhaveApiAuthenticatorSettings

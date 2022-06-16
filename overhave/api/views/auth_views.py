@@ -4,10 +4,10 @@ import fastapi
 from fastapi import security as fastapi_security
 from pydantic.types import SecretStr
 
-from overhave.api.auth import AUTH_HEADERS, AuthToken, create_access_token
+from overhave.api.auth import AUTH_HEADERS, create_access_token
 from overhave.api.deps import get_api_auth_settings, get_system_user_storage
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.storage import ISystemUserStorage
+from overhave.storage import AuthToken, ISystemUserStorage
 from overhave.utils import get_current_time
 
 

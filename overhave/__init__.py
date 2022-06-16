@@ -47,6 +47,8 @@ from overhave.storage import FeatureTypeName as OverhaveFeatureName
 from overhave.storage import TestUserSpecification, TestUserStorage
 from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
 from overhave.transport import (
+    OverhaveApiAuthenticator,
+    OverhaveApiAuthenticatorSettings,
     OverhaveGitlabClientSettings,
     OverhaveLdapClientSettings,
     OverhaveS3ManagerSettings,
