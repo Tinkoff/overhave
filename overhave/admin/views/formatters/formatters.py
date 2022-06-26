@@ -38,7 +38,7 @@ def datetime_formatter(view: ModelView, context: Any, model: db.BaseTable, value
 
 @safe_formatter(type=list, supported_models=(db.Feature,))
 def task_formatter(view: ModelView, context: Any, model: db.Feature, value: List[str]) -> Markup:
-    browse_url = getattr(view, "browse_url")
+    browse_url = getattr(view, "task_tracker_url")
     if not browse_url:
         return Markup(", ".join(value))
     task_links: List[str] = []

@@ -44,12 +44,12 @@ class ScenarioParser(PrefixMixin):
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
-        task_links_keyword: Optional[str],
+        tasks_keyword: Optional[str],
     ) -> None:
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
         self._feature_extractor = feature_extractor
-        self._task_links_keyword = task_links_keyword
+        self._tasks_keyword = tasks_keyword
 
     @cached_property
     def _feature_prefixes(self) -> List[str]:
@@ -61,8 +61,8 @@ class ScenarioParser(PrefixMixin):
 
     @cached_property
     def _task_prefix(self) -> Optional[str]:
-        if isinstance(self._task_links_keyword, str):
-            return self._as_prefix(self._task_links_keyword)
+        if isinstance(self._tasks_keyword, str):
+            return self._as_prefix(self._tasks_keyword)
         return None
 
     def _get_id(self, id_line: str) -> int:

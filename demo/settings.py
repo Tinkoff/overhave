@@ -52,7 +52,7 @@ class OverhaveDemoSettingsGenerator:
             language_settings=language_settings,
             file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
             project_settings=OverhaveProjectSettings(
-                browse_url="https://tracker.myorg.com/browse", links_keyword="Tasks"
+                task_tracker_url="https://tracker.myorg.com/browse", tasks_keyword="Tasks"
             ),
         )
 

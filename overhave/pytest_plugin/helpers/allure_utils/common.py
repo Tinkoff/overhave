@@ -15,5 +15,5 @@ def add_scenario_title_to_report(item: Item) -> None:
 def add_task_links_to_report(project_settings: OverhaveProjectSettings, tasks: List[str]) -> None:
     for task in tasks:
         allure.dynamic.link(
-            url=project_settings.get_link_url(task), link_type=allure_commons.types.LinkType.LINK, name=task
+            url=project_settings.get_task_link(task), link_type=allure_commons.types.LinkType.LINK, name=task
         )

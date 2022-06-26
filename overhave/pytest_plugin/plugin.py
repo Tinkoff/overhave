@@ -166,7 +166,7 @@ def pytest_runtest_setup(item: Item) -> None:
     proxy_manager = get_proxy_manager()
     set_feature_info_for_item(item=item, scenario_parser=proxy_manager.factory.scenario_parser)
 
-    links_keyword = get_proxy_manager().factory.context.project_settings.links_keyword
+    links_keyword = get_proxy_manager().factory.context.project_settings.tasks_keyword
     project_tasks = get_feature_info_from_item(item).tasks
     if isinstance(links_keyword, str) and project_tasks:
         add_task_links_to_report(project_settings=proxy_manager.factory.context.project_settings, tasks=project_tasks)

@@ -32,15 +32,15 @@ def mocked_git_initializer(mocker: MockFixture) -> GitRepositoryInitializer:
 
 
 @pytest.fixture()
-def test_browse_url(request: FixtureRequest) -> Optional[str]:
+def test_task_tracker_url(request: FixtureRequest) -> Optional[str]:
     if hasattr(request, "param"):
         return cast(Optional[str], request.param)
     raise NotImplementedError
 
 
 @pytest.fixture()
-def test_project_settings(test_browse_url: Optional[str]) -> OverhaveProjectSettings:
-    return OverhaveProjectSettings(browse_url=test_browse_url)
+def test_project_settings(test_task_tracker_url: Optional[str]) -> OverhaveProjectSettings:
+    return OverhaveProjectSettings(task_tracker_url=test_task_tracker_url)
 
 
 @pytest.fixture()

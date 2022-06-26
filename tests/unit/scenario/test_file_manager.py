@@ -10,8 +10,8 @@ from overhave.storage import TestExecutorContext
 from overhave.test_execution import OverhaveProjectSettings
 
 
-@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
-@pytest.mark.parametrize("task_links_keyword", ["Tasks"])
+@pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
+@pytest.mark.parametrize("tasks_keyword", ["Tasks"])
 @pytest.mark.parametrize("language_settings", [OverhaveLanguageSettings()])
 class TestFileManager:
     """Unit tests for :class:`FileManager`."""

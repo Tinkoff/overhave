@@ -17,7 +17,7 @@ from overhave.pytest_plugin.helpers import (
     set_feature_info_for_item,
     set_severity_level,
 )
-from overhave.test_execution.settings import EmptyBrowseURLError, OverhaveProjectSettings
+from overhave.test_execution.settings import EmptyTaskTrackerURLError, OverhaveProjectSettings
 
 
 class TestPluginUtils:
@@ -34,13 +34,13 @@ class TestPluginUtils:
     def test_not_pytest_bdd_item(self, test_clean_item: Item) -> None:
         assert not is_pytest_bdd_item(test_clean_item)
 
-    @pytest.mark.parametrize("links_keyword", ["Tasks"])
-    @pytest.mark.parametrize("test_browse_url", ["https://overhave.readthedocs.io/"], indirect=True)
+    @pytest.mark.parametrize("tasks_keyword", ["Tasks"])
+    @pytest.mark.parametrize("test_task_tracker_url", ["https://overhave.readthedocs.io/"], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_add_issue_links_to_report_with_correct_browse_url(
+    def test_add_issue_links_to_report_with_correct_tracker_url(
         self,
         test_pytest_bdd_item: Item,
-        test_browse_url: Optional[str],
+        test_task_tracker_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
@@ -51,13 +51,13 @@ class TestPluginUtils:
         assert feature_info.tasks
         add_task_links_to_report(project_settings=test_project_settings, tasks=feature_info.tasks)
 
-    @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
-    def test_add_issue_links_to_report_with_empty_browse_url(
+    @pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
+    def test_add_issue_links_to_report_with_empty_tracker_url(
         self,
-        test_browse_url: Optional[str],
+        test_task_tracker_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
-        with pytest.raises(EmptyBrowseURLError):
+        with pytest.raises(EmptyTaskTrackerURLError):
             add_task_links_to_report(project_settings=test_project_settings, tasks=["PRJ-321"])
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)

@@ -84,7 +84,7 @@ class FactoryViewUtilsMixin:
 
     @property
     def browse_url(self) -> Optional[str]:
-        browse_url_value = get_admin_factory().context.project_settings.browse_url
+        browse_url_value = get_admin_factory().context.project_settings.task_tracker_url
         if browse_url_value is not None:
             return browse_url_value.human_repr()
         return None

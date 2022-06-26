@@ -120,10 +120,10 @@ class TestDatetimeFormatter:
 class TestTaskFormatter:
     """Unit tests for task_formatter."""
 
-    @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+    @pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
     def test_task_without_url(
         self,
-        test_browse_url: None,
+        test_task_tracker_url: None,
         test_feature_view_mocked: FeatureView,
         column_name: str,
         value: Sequence[str],
@@ -138,10 +138,10 @@ class TestTaskFormatter:
             name=column_name,
         ) == Markup(", ".join(value))
 
-    @pytest.mark.parametrize("test_browse_url", ["https://overhave.readthedocs.io"], indirect=True)
+    @pytest.mark.parametrize("test_task_tracker_url", ["https://overhave.readthedocs.io"], indirect=True)
     def test_task_with_url(
         self,
-        test_browse_url: str,
+        test_task_tracker_url: str,
         test_feature_view_mocked: FeatureView,
         column_name: str,
         value: Sequence[str],
@@ -151,7 +151,7 @@ class TestTaskFormatter:
         setattr(test_feature_row, column_name, value)
         task_links = []
         for task in value:
-            task_links.append(f"<a href='{test_browse_url}/{task}' target='blank'>{task}</a>")
+            task_links.append(f"<a href='{test_task_tracker_url}/{task}' target='blank'>{task}</a>")
         assert task_formatter(
             view=test_feature_view_mocked,
             context=mocker.MagicMock(),
@@ -253,7 +253,7 @@ class TestJsonFormatter:
 class TestFeatureLinkFormatter:
     """Unit tests for feature_link_formatter."""
 
-    @pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+    @pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
     def test_with_feature(
         self,
         test_feature_view_mocked: FeatureView,
@@ -364,7 +364,7 @@ class TestDraftPrUrlFormatter:
         ("individ/credit_account_closing_chatbot.feature", "credit_account_closing_chatbot"),
     ],
 )
-@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+@pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
 class TestFilePathFormatter:
     """Unit tests for file_path_formatter."""
 
@@ -391,7 +391,7 @@ class TestFilePathFormatter:
     ("value", "correct_value"),
     [(severity, _get_severity_color(severity)) for severity in list(allure.severity_level)],
 )
-@pytest.mark.parametrize("test_browse_url", [None], indirect=True)
+@pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
 class TestSeverityFormatter:
     """Unit tests for feature_severity_formatter."""
 
