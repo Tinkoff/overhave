@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import fastapi as fastapi
 
@@ -7,6 +7,7 @@ from overhave.api.views import (
     docs,
     favicon,
     get_features_handler,
+    get_test_run_id_handler,
     login_for_access_token,
     run_test_by_tag_handler,
     tags_item_handler,
@@ -56,6 +57,14 @@ def _get_feature_router() -> fastapi.APIRouter:
         response_model=list[str],
         summary="Get list of test run by tag_value",
         description="Get list of test run by `tag_value`",
+    )
+    feature_router.add_api_route(
+        "/get_test_run_id/",
+        get_test_run_id_handler,
+        methods=["GET"],
+        response_model=dict[str, Optional[str]],
+        summary="Get test run by test_run_id",
+        description="Get test run by `test_run_id`",
     )
     return feature_router
 

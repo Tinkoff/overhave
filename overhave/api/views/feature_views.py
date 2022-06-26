@@ -1,6 +1,6 @@
 import logging
 from http import HTTPStatus
-from typing import List, Optional
+from typing import List, Optional, cast
 
 import fastapi
 import flask
@@ -9,7 +9,7 @@ from overhave.api.deps import get_feature_storage, get_feature_tag_storage
 from overhave.api.views.tags_views import tags_item_handler
 from overhave.factory.components.admin_factory import IAdminFactory
 from overhave.factory.getters import get_admin_factory
-from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage
+from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage, TestRunModel
 from overhave.transport import TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
@@ -51,3 +51,15 @@ def run_test_by_tag_handler(
         factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         urls.append(flask.url_for("testrun.details_view", id=test_run_id))
     return urls
+
+
+def get_test_run_id_handler(
+    test_run_id: int,
+    factory: IAdminFactory = fastapi.Depends(get_admin_factory),
+) -> dict[str, Optional[str]]:
+    test_run = cast(TestRunModel, factory.test_run_storage.get_test_run(test_run_id))
+    if test_run is None:
+        raise fastapi.HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"Test run id ='{test_run_id}' didn't found"
+        )
+    return {"status": test_run.status.value, "report": test_run.report}

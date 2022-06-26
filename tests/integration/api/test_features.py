@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from unittest import mock
 
 import allure
@@ -8,7 +8,8 @@ from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
 from overhave import db
-from overhave.storage import FeatureModel, ScenarioModel, TagModel
+from overhave.db import TestReportStatus, TestRunStatus
+from overhave.storage import FeatureModel, ScenarioModel, TagModel, TestRunStorage
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
@@ -111,3 +112,54 @@ class TestFeatureAPI:
         response = test_api_client.get(f"/feature/run_test_by_tag/?tag_run={test_tag.value}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
+
+    def test_get_test_run_id_handler_not_found(
+        self,
+        test_api_client: TestClient,
+        test_user_role: db.Role,
+        test_api_bearer_auth: BearerAuth,
+    ) -> None:
+        response = test_api_client.get(f"/feature/get_test_run_id/?test_run_id={9999}", auth=test_api_bearer_auth)
+        assert response.status_code == 400
+        validate_content_null(response, False)
+
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    def test_get_test_run_id_handler_found_running(
+        self,
+        test_api_client: TestClient,
+        test_user_role: db.Role,
+        test_api_bearer_auth: BearerAuth,
+        test_run_storage: TestRunStorage,
+        test_feature: FeatureModel,
+        test_created_test_run_id: int,
+    ) -> None:
+        test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.RUNNING)
+        response = test_api_client.get(
+            f"/feature/get_test_run_id/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth
+        )
+        assert response.status_code == 200
+        validate_content_null(response, False)
+        assert response.json()["status"] == TestRunStatus.RUNNING
+        assert response.json()["report"] is None
+
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    def test_get_test_run_id_handler_found_finished(
+        self,
+        test_api_client: TestClient,
+        test_user_role: db.Role,
+        test_api_bearer_auth: BearerAuth,
+        test_run_storage: TestRunStorage,
+        test_feature: FeatureModel,
+        test_created_test_run_id: int,
+        test_report: Optional[str],
+    ) -> None:
+        test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.SUCCESS)
+        test_run_storage.set_report(run_id=test_created_test_run_id, status=TestReportStatus.SAVED, report=test_report)
+
+        response = test_api_client.get(
+            f"/feature/get_test_run_id/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth
+        )
+        assert response.status_code == 200
+        validate_content_null(response, False)
+        assert response.json()["status"] == TestRunStatus.SUCCESS
+        assert response.json()["report"] == test_report
