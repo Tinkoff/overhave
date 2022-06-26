@@ -27,6 +27,10 @@ class OverhaveAdminLinkSettings(BaseOverhavePrefix):
     def make_admin_url(cls, v: Optional[str]) -> Optional[URL]:
         return make_url(v)
 
+    @property
+    def enabled(self) -> bool:
+        return self.admin_url is not None
+
     def get_feature_url(self, feature_id: int) -> URL:
         if isinstance(self.admin_url, URL):
             return self.admin_url / self.feature_id_filter_path.format(feature_id=feature_id)

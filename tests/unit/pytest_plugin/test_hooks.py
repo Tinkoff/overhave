@@ -36,7 +36,7 @@ from overhave.pytest_plugin.plugin import (
 )
 from overhave.scenario import FeatureInfo
 from overhave.utils import make_url
-from tests.unit.testing.getoption_mock import ConfigGetOptionMock
+from tests.unit.pytest_plugin.getoption_mock import ConfigGetOptionMock
 
 
 @pytest.mark.usefixtures("clear_get_step_context_runner")

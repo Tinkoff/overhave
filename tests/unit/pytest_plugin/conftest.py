@@ -19,7 +19,7 @@ from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
 from tests.objects import get_test_feature_extractor, get_test_file_settings
-from tests.unit.testing.getoption_mock import ConfigGetOptionMock
+from tests.unit.pytest_plugin.getoption_mock import ConfigGetOptionMock
 
 
 @pytest.fixture()
