@@ -5,7 +5,7 @@ from faker import Faker
 from yarl import URL
 
 from overhave import OverhaveAdminLinkSettings
-from overhave.test_execution.settings import EmptyTaskTrackerURLError
+from overhave.pytest_plugin.settings import EmptyOverhaveAdminURLError
 
 
 @pytest.mark.parametrize("admin_url", [None])
@@ -15,7 +15,7 @@ class TestAdminLinkSettingsDisabled:
     def test_disabled(self, admin_url: Optional[str], faker: Faker) -> None:
         settings = OverhaveAdminLinkSettings(admin_url=admin_url)
         assert not settings.enabled
-        with pytest.raises(EmptyTaskTrackerURLError):
+        with pytest.raises(EmptyOverhaveAdminURLError):
             assert settings.get_feature_url(faker.random_int())
 
 

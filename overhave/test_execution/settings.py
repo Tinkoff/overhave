@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Type
 
 from pydantic import BaseModel, validator
@@ -7,37 +8,12 @@ from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
 
 
-class EmptyOverhaveAdminURLError(ValueError):
-    """Exception for situation with empty ````admin_url``` while trying to ```get_feature_url```."""
-
-
 class EmptyTaskTrackerURLError(ValueError):
     """Exception for situation with empty ```task_tracker_url``` while trying to ```get_task_link```."""
 
 
-class OverhaveAdminLinkSettings(BaseOverhavePrefix):
-    """Settings for dynamic links to Overhave Admin in Allure report."""
-
-    admin_url: Optional[URL]
-
-    feature_id_filter_path: str = "feature/?flt2_0={feature_id}"
-    feature_id_placeholder: str = "Overhave feature #{feature_id}"
-
-    @validator("admin_url", pre=True)
-    def make_admin_url(cls, v: Optional[str]) -> Optional[URL]:
-        return make_url(v)
-
-    @property
-    def enabled(self) -> bool:
-        return self.admin_url is not None
-
-    def get_feature_url(self, feature_id: int) -> URL:
-        if isinstance(self.admin_url, URL):
-            return self.admin_url / self.feature_id_filter_path.format(feature_id=feature_id)
-        raise EmptyTaskTrackerURLError("Overhave admin URL is None, so could not create link URL!")
-
-    def get_feature_link_name(self, feature_id: int) -> str:
-        return self.feature_id_placeholder.format(feature_id=feature_id)
+class EmptyGitProjectURLError(ValueError):
+    """Exception for situation with empty ```git_project_url``` while trying to ```get_git_feature_url```."""
 
 
 class OverhaveProjectSettings(BaseOverhavePrefix):
@@ -87,6 +63,11 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
         if isinstance(self.task_tracker_url, URL):
             return self.task_tracker_url / link
         raise EmptyTaskTrackerURLError("Task tracker URL is None, so could not create link URL!")
+
+    def get_git_feature_url(self, filepath: Path) -> URL:
+        if isinstance(self.git_project_url, URL):
+            return self.git_project_url / filepath.as_posix()
+        raise EmptyGitProjectURLError("Git project URL is None, so could not create link URL!")
 
 
 class OverhaveTestSettings(BaseOverhavePrefix):
