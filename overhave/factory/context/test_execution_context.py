@@ -9,7 +9,7 @@ from overhave.entities import (
     OverhaveStepContextSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
-from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
+from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveProjectSettings, OverhaveTestSettings
 from overhave.transport import OverhaveS3ManagerSettings
 
 
@@ -30,6 +30,7 @@ class OverhaveTestExecutionContext(BaseFactoryContext):
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         step_context_settings: Optional[OverhaveStepContextSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
+        admin_link_settings: Optional[OverhaveAdminLinkSettings] = None,
     ) -> None:
         super().__init__(
             compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),
@@ -42,3 +43,4 @@ class OverhaveTestExecutionContext(BaseFactoryContext):
         )
         self.description_manager_settings = description_manager_settings or OverhaveDescriptionManagerSettings()
         self.step_context_settings = step_context_settings or OverhaveStepContextSettings()
+        self.admin_link_settings = admin_link_settings or OverhaveAdminLinkSettings()

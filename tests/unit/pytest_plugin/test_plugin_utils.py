@@ -2,13 +2,16 @@ from typing import Optional
 from unittest import mock
 
 import allure
+import allure_commons.types
 import pytest
 from _pytest.nodes import Item
+from faker import Faker
 from pytest_bdd.parser import Scenario, Step
 
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager, get_scenario
 from overhave.pytest_plugin.helpers import (
+    add_admin_feature_link_to_report,
     add_scenario_title_to_report,
     add_task_links_to_report,
     get_feature_info_from_item,
@@ -59,6 +62,22 @@ class TestPluginUtils:
     ) -> None:
         with pytest.raises(EmptyTaskTrackerURLError):
             add_task_links_to_report(project_settings=test_project_settings, tasks=["PRJ-321"])
+
+    @pytest.mark.parametrize("admin_url", ["https://overhave.mydomain.com"], indirect=True)
+    def test_add_admin_feature_link_succeed(
+        self,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+        link_handler_mock: mock.MagicMock,
+        faker: Faker,
+    ) -> None:
+        settings = patched_hook_test_execution_proxy_manager.factory.context.admin_link_settings  # type: ignore
+        feature_id = faker.random_int()
+        add_admin_feature_link_to_report(admin_link_settings=settings, feature_id=feature_id)
+        link_handler_mock.assert_called_once_with(
+            url=settings.get_feature_url(feature_id),
+            link_type=allure_commons.types.LinkType.TEST_CASE,
+            name=settings.get_feature_link_name(feature_id),
+        )
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_add_scenario_title_to_report(self, test_scenario_name: str, test_pytest_bdd_item: Item) -> None:

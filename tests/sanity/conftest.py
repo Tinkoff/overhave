@@ -111,7 +111,9 @@ def test_demo_language(request: FixtureRequest) -> Optional[str]:
 @pytest.fixture()
 def test_demo_settings_generator(test_demo_language: OverhaveDemoAppLanguage) -> OverhaveDemoSettingsGenerator:
     logger.debug("Test demo language: %s", test_demo_language)
-    return OverhaveDemoSettingsGenerator(language=test_demo_language, threadpool=False)
+    return OverhaveDemoSettingsGenerator(
+        admin_host="localhost", admin_port=8076, language=test_demo_language, threadpool=False
+    )
 
 
 @pytest.fixture(scope="module")

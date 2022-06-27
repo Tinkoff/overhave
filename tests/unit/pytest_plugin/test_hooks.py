@@ -11,6 +11,7 @@ from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Step
+from yarl import URL
 
 from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
@@ -316,8 +317,9 @@ class TestPytestCommonHooks:
 
     @pytest.mark.parametrize(
         ("task_tracker_url", "tasks_keyword"),
-        [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")],
+        [(None, None), ("https://tasktracker.mydomain.com/browse", "Tasks")],
     )
+    @pytest.mark.parametrize("admin_url", [None, "https://overhave.mydomain.com"])
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
     def test_pytest_runtest_setup_pytest_bdd(
         self,
@@ -329,6 +331,8 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager: IProxyManager,
         task_tracker_url: Optional[str],
         tasks_keyword: Optional[str],
+        admin_url: Optional[URL],
+        faker: Faker,
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()

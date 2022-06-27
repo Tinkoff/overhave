@@ -9,4 +9,3 @@ from .helpers import (
 )
 from .plugin_resolver import IPluginResolver, PluginResolver
 from .proxy_manager import IProxyManager, ProxyManager, get_proxy_manager
-from .settings import OverhaveAdminLinkSettings

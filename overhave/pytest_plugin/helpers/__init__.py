@@ -3,6 +3,7 @@ from .allure_utils import (
     DescriptionManager,
     StepContextNotDefinedError,
     StepContextRunner,
+    add_admin_feature_link_to_report,
     add_scenario_title_to_report,
     add_task_links_to_report,
     set_severity_level,

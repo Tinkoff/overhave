@@ -23,14 +23,19 @@ overhave_demo = typer.Typer(context_settings={"help_option_names": ["-h", "--hel
 
 
 def _get_overhave_settings_generator(
-    language: OverhaveDemoAppLanguage, threadpool: bool = False
+    language: OverhaveDemoAppLanguage,
+    threadpool: bool = False,
+    admin_host: str = "localhost",
+    admin_port: int = 8076,
 ) -> OverhaveDemoSettingsGenerator:
-    return OverhaveDemoSettingsGenerator(language=language, threadpool=threadpool)
+    return OverhaveDemoSettingsGenerator(
+        language=language, threadpool=threadpool, admin_host=admin_host, admin_port=admin_port
+    )
 
 
 def _prepare_test_execution_factory(settings_generator: OverhaveDemoSettingsGenerator) -> None:
     test_execution_context: OverhaveTestExecutionContext = OverhaveTestExecutionContext(
-        **settings_generator.default_context_settings  # type: ignore
+        **settings_generator.test_execution_settings  # type: ignore
     )
     overhave_test_execution_factory().set_context(test_execution_context)
 
@@ -70,11 +75,13 @@ def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
     demo_admin_app = _get_admin_app()
     with mock.patch("git.Repo", return_value=mock.MagicMock()):
         _ensure_demo_app_has_features(settings_generator)
-        demo_admin_app.run(host="localhost", port=8076, debug=True)
+        demo_admin_app.run(host=settings_generator.admin_host, port=settings_generator.admin_port, debug=True)
 
 
 @overhave_demo.command(short_help="Run Overhave web-service in demo mode")
 def admin(
+    host: str = typer.Option("localhost", "-h", "--host", help="Run Overhave admin with specified host"),
+    port: int = typer.Option(8076, "-p", "--port", help="Run Overhave admin with specified port"),
     threadpool: bool = typer.Option(
         False,
         "-t",
@@ -89,7 +96,11 @@ def admin(
         help="Overhave application language (defines step prefixes only right now)",
     ),
 ) -> None:
-    _run_demo_admin(settings_generator=_get_overhave_settings_generator(language=language, threadpool=threadpool))
+    _run_demo_admin(
+        settings_generator=_get_overhave_settings_generator(
+            language=language, threadpool=threadpool, admin_host=host, admin_port=port
+        )
+    )
 
 
 def _run_demo_consumer(stream: OverhaveRedisStream, settings_generator: OverhaveDemoSettingsGenerator) -> None:
