@@ -31,8 +31,8 @@
         ),
         language_settings=OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES),
         project_settings=OverhaveProjectSettings(
-            browse_url="https://jira.company.com/browse",
-            links_keyword="Tasks",
+            task_tracker_url="https://jira.company.com/browse",
+            tasks_keyword="Tasks",
         ),
         admin_settings=OverhaveAdminSettings(index_template_path=path_settings.index_template_path),
         auth_settings=OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP),

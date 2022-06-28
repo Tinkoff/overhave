@@ -38,12 +38,12 @@ def datetime_formatter(view: ModelView, context: Any, model: db.BaseTable, value
 
 @safe_formatter(type=list, supported_models=(db.Feature,))
 def task_formatter(view: ModelView, context: Any, model: db.Feature, value: List[str]) -> Markup:
-    browse_url = getattr(view, "browse_url")
-    if not browse_url:
+    task_tracker_url = getattr(view, "task_tracker_url")
+    if not task_tracker_url:
         return Markup(", ".join(value))
     task_links: List[str] = []
     for task in value:
-        task_links.append(f"<a href='{browse_url}/{task}' target='blank'>{task}</a>")
+        task_links.append(f"<a href='{task_tracker_url}/{task}' target='blank'>{task}</a>")
     return Markup(", ".join(task_links))
 
 

@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 85.3
+MIN_COVERAGE ?= 85.4
 BUILD_DIR ?= dist
 PYTHON_VERSION ?= 3.10
 
@@ -13,6 +13,7 @@ DOCS_IMAGES_DIR = $(DOCS_INCLUDES_DIR)/images
 COV_BADGE_SVG = $(DOCS_IMAGES_DIR)/coverage.svg
 DOCS_REFERENCES_DIR = $(DOCS_INCLUDES_DIR)/_references
 SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
+MYPY_CACHE_DIR = .mypy_cache
 
 ALL = $(CODE) $(DOCS_DIR) tests demo
 
@@ -71,12 +72,13 @@ check-package:
 check: lint test cov-badge check-package build-docs
 
 clear:
-	rm -rf ./.mypy_cache
+	rm -rf ./$(MYPY_CACHE_DIR)
 	rm -rf ./.pytest_cache
 	rm -rf ./$(BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
 	rm ./.coverage*
+	mkdir ./$(MYPY_CACHE_DIR)
 
 build-docker:
 	docker-compose build base

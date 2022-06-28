@@ -36,7 +36,7 @@ from overhave.pytest_plugin.plugin import (
 )
 from overhave.scenario import FeatureInfo
 from overhave.utils import make_url
-from tests.unit.testing.getoption_mock import ConfigGetOptionMock
+from tests.unit.pytest_plugin.getoption_mock import ConfigGetOptionMock
 
 
 @pytest.mark.usefixtures("clear_get_step_context_runner")
@@ -212,22 +212,25 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
         with mock.patch(
-            "overhave.pytest_plugin.helpers.allure_utils.common.add_scenario_title_to_report",
+            "overhave.pytest_plugin.helpers.bdd_item.add_scenario_title_to_report",
             return_value=mock.MagicMock(),
         ) as mocked_title_func:
             pytest_collection_modifyitems(test_pytest_clean_session)
             mocked_title_func.assert_not_called()
 
-    @pytest.mark.parametrize("links_keyword", [None, "Tasks"])
+    @pytest.mark.parametrize(
+        ("task_tracker_url", "tasks_keyword"),
+        [(None, None), ("https://tasktracker.mydomain.com/browse", "Tasks")],
+    )
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_modifyitems_bdd(
         self,
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-        links_keyword: Optional[str],
+        tasks_keyword: Optional[str],
     ) -> None:
-        patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
+        patched_hook_test_execution_proxy_manager.factory.context.project_settings.tasks_keyword = tasks_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
         assert (
             test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name  # type: ignore
@@ -315,10 +318,12 @@ class TestPytestCommonHooks:
                 get_feature_info_from_item(test_clean_item)
 
     @pytest.mark.parametrize(
-        ("browse_url", "links_keyword"),
-        [(None, None), ("https://overhave.readthedocs.io/browse", "Tasks")],
+        ("task_tracker_url", "tasks_keyword"),
+        [(None, None), ("https://tasktracker.mydomain.com/browse", "Tasks")],
     )
+    @pytest.mark.parametrize("admin_url", [None, "https://overhave.mydomain.com"])
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
+    @pytest.mark.parametrize("git_project_url", [None, "https://overhave.mydomain.com/bdd-features"], indirect=True)
     def test_pytest_runtest_setup_pytest_bdd(
         self,
         test_pytest_bdd_item: Item,
@@ -327,14 +332,19 @@ class TestPytestCommonHooks:
         test_severity: allure.severity_level,
         link_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-        browse_url: Optional[str],
-        links_keyword: Optional[str],
+        task_tracker_url: Optional[str],
+        tasks_keyword: Optional[str],
+        admin_url: Optional[str],
+        git_project_url: Optional[str],
+        faker: Faker,
     ) -> None:
         with mock.patch(
             "overhave.get_description_manager", return_value=mock.MagicMock()
         ) as mocked_description_manager:
-            patched_hook_test_execution_proxy_manager.factory.context.project_settings.browse_url = make_url(browse_url)
-            patched_hook_test_execution_proxy_manager.factory.context.project_settings.links_keyword = links_keyword
+            patched_hook_test_execution_proxy_manager.factory.context.project_settings.task_tracker_url = make_url(
+                task_tracker_url
+            )
+            patched_hook_test_execution_proxy_manager.factory.context.project_settings.tasks_keyword = tasks_keyword
 
             pytest_collection_modifyitems(test_pytest_bdd_session)
             pytest_runtest_setup(item=test_pytest_bdd_item)
@@ -342,10 +352,12 @@ class TestPytestCommonHooks:
 
             assert isinstance(get_feature_info_from_item(test_pytest_bdd_item), FeatureInfo)
 
-            if browse_url is None:
-                link_handler_mock.assert_not_called()
-            else:
-                assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
+            link_handler_mock_calls = 0
+            if task_tracker_url is not None:
+                link_handler_mock_calls += 2
+            if git_project_url is not None:
+                link_handler_mock_calls += 1
+            assert link_handler_mock.call_count == link_handler_mock_calls
 
             severity_handler_mock.assert_called_once_with(test_severity)
 

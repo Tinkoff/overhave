@@ -86,7 +86,7 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
                 f"Last edited by: @{context.feature.last_edited_by}.",
                 f"PR from Test Run ID: {context.test_run.id}. Executed by: @{context.test_run.executed_by}",
                 f"Published by: @{context.draft.published_by}.",
-                generate_task_info(tasks=context.feature.task, header=self._project_settings.links_keyword),
+                generate_task_info(tasks=context.feature.task, header=self._project_settings.tasks_keyword),
             )
         )
 
