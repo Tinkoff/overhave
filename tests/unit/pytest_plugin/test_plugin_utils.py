@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 from unittest import mock
 
@@ -7,6 +8,7 @@ import pytest
 from _pytest.nodes import Item
 from faker import Faker
 from pytest_bdd.parser import Scenario, Step
+from yarl import URL
 
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager, get_scenario
@@ -18,6 +20,7 @@ from overhave.pytest_plugin.helpers import (
     get_full_step_name,
     is_pytest_bdd_item,
     set_feature_info_for_item,
+    set_git_project_url_if_necessary,
     set_severity_level,
 )
 from overhave.test_execution.settings import EmptyTaskTrackerURLError, OverhaveProjectSettings
@@ -38,12 +41,12 @@ class TestPluginUtils:
         assert not is_pytest_bdd_item(test_clean_item)
 
     @pytest.mark.parametrize("tasks_keyword", ["Tasks"])
-    @pytest.mark.parametrize("test_task_tracker_url", ["https://overhave.readthedocs.io/"], indirect=True)
+    @pytest.mark.parametrize("task_tracker_url", ["https://overhave.readthedocs.io/"], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_add_issue_links_to_report_with_correct_tracker_url(
         self,
         test_pytest_bdd_item: Item,
-        test_task_tracker_url: Optional[str],
+        task_tracker_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
@@ -54,10 +57,10 @@ class TestPluginUtils:
         assert feature_info.tasks
         add_task_links_to_report(project_settings=test_project_settings, tasks=feature_info.tasks)
 
-    @pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
+    @pytest.mark.parametrize("task_tracker_url", [None], indirect=True)
     def test_add_issue_links_to_report_with_empty_tracker_url(
         self,
-        test_task_tracker_url: Optional[str],
+        task_tracker_url: Optional[str],
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
         with pytest.raises(EmptyTaskTrackerURLError):
@@ -77,6 +80,70 @@ class TestPluginUtils:
             url=settings.get_feature_url(feature_id),
             link_type=allure_commons.types.LinkType.TEST_CASE,
             name=settings.get_feature_link_name(feature_id),
+        )
+
+    @pytest.mark.parametrize("task_tracker_url", [None], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    @pytest.mark.parametrize("git_project_url", ["https://overhave.mydomain.com"], indirect=True)
+    def test_git_project_feature_link_not_relative(
+        self,
+        test_project_settings: OverhaveProjectSettings,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+        link_handler_mock: mock.MagicMock,
+        test_pytest_bdd_item: Item,
+        faker: Faker,
+    ) -> None:
+        set_feature_info_for_item(
+            item=test_pytest_bdd_item, scenario_parser=patched_hook_test_execution_proxy_manager.factory.scenario_parser
+        )
+        feature_info = get_feature_info_from_item(test_pytest_bdd_item)
+        assert feature_info.type is not None
+        scenario = get_scenario(test_pytest_bdd_item)
+        scenario.feature.filename = "not_relative_path"
+        set_git_project_url_if_necessary(
+            project_settings=test_project_settings,
+            feature_extractor=patched_hook_test_execution_proxy_manager.factory.feature_extractor,
+            item=test_pytest_bdd_item,
+            feature_type=feature_info.type,
+        )
+        link_handler_mock.assert_not_called()
+
+    @pytest.mark.parametrize("task_tracker_url", [None], indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    @pytest.mark.parametrize("git_project_url", ["https://overhave.mydomain.com/bdd-features"], indirect=True)
+    def test_git_project_feature_link_succeed(
+        self,
+        git_project_url: str,
+        test_project_settings: OverhaveProjectSettings,
+        patched_hook_test_execution_proxy_manager: IProxyManager,
+        link_handler_mock: mock.MagicMock,
+        test_pytest_bdd_item: Item,
+        faker: Faker,
+    ) -> None:
+        set_feature_info_for_item(
+            item=test_pytest_bdd_item, scenario_parser=patched_hook_test_execution_proxy_manager.factory.scenario_parser
+        )
+        feature_info = get_feature_info_from_item(test_pytest_bdd_item)
+        assert feature_info.type is not None
+        set_git_project_url_if_necessary(
+            project_settings=test_project_settings,
+            feature_extractor=patched_hook_test_execution_proxy_manager.factory.feature_extractor,
+            item=test_pytest_bdd_item,
+            feature_type=feature_info.type,
+        )
+        scenario = get_scenario(test_pytest_bdd_item)
+        filename = Path(scenario.feature.filename)
+        feature_type_dir = (
+            patched_hook_test_execution_proxy_manager.factory.feature_extractor.feature_type_to_dir_mapping[
+                feature_info.type
+            ]
+        )
+        relative_filename = filename.relative_to(feature_type_dir.parent)
+        feature_url = URL(f"{git_project_url}/{relative_filename.as_posix()}")
+        link_handler_mock.assert_called_once_with(
+            url=feature_url,
+            link_type=allure_commons.types.LinkType.TEST_CASE,
+            name=relative_filename.as_posix(),
         )
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)

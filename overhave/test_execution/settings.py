@@ -81,7 +81,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     @validator("tasks_keyword")
     def validate_links_keyword(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
         if isinstance(v, str) and values.get("task_tracker_url") is None:
-            raise ValueError("Browse URL should be specified in case of links keyword usage!")
+            raise ValueError("Task tracker URL should be specified in case of links keyword usage!")
         return v
 
     @validator("git_project_url", pre=True)

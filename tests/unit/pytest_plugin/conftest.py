@@ -13,7 +13,12 @@ from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
 from yarl import URL
 
-from overhave import OverhaveDescriptionManagerSettings, OverhaveStepContextSettings, OverhaveTestExecutionContext
+from overhave import (
+    OverhaveDescriptionManagerSettings,
+    OverhaveProjectSettings,
+    OverhaveStepContextSettings,
+    OverhaveTestExecutionContext,
+)
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
@@ -225,13 +230,6 @@ def patched_hook_admin_factory(
 
 
 @pytest.fixture()
-def tasks_keyword(request: FixtureRequest) -> Optional[str]:
-    if hasattr(request, "param"):
-        return cast(str, request.param)
-    return None
-
-
-@pytest.fixture()
 def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest) -> str:
     if hasattr(request, "param"):
         return cast(str, request.param)
@@ -249,14 +247,14 @@ def admin_url(request: FixtureRequest) -> Optional[URL]:
 def patched_hook_test_execution_factory(
     mocked_context: OverhaveTestExecutionContext,
     clean_test_execution_factory: Callable[[], ITestExecutionFactory],
-    tasks_keyword: Optional[str],
     severity_prefix: str,
     admin_url: Optional[URL],
+    test_project_settings: OverhaveProjectSettings,
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()
     factory.set_context(mocked_context)
+    factory.context.project_settings = test_project_settings
     factory._feature_extractor = get_test_feature_extractor()
-    factory._scenario_parser._tasks_keyword = tasks_keyword
     factory.context.compilation_settings.severity_prefix = severity_prefix
     factory.context.admin_link_settings.admin_url = admin_url
     return factory

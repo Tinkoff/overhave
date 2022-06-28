@@ -11,7 +11,6 @@ from _pytest.nodes import Item
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Step
-from yarl import URL
 
 from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
@@ -219,7 +218,10 @@ class TestPytestCommonHooks:
             pytest_collection_modifyitems(test_pytest_clean_session)
             mocked_title_func.assert_not_called()
 
-    @pytest.mark.parametrize("tasks_keyword", [None, "Tasks"])
+    @pytest.mark.parametrize(
+        ("task_tracker_url", "tasks_keyword"),
+        [(None, None), ("https://tasktracker.mydomain.com/browse", "Tasks")],
+    )
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_modifyitems_bdd(
         self,
@@ -321,6 +323,7 @@ class TestPytestCommonHooks:
     )
     @pytest.mark.parametrize("admin_url", [None, "https://overhave.mydomain.com"])
     @pytest.mark.parametrize("test_severity", list(allure.severity_level), indirect=True)
+    @pytest.mark.parametrize("git_project_url", [None, "https://overhave.mydomain.com/bdd-features"], indirect=True)
     def test_pytest_runtest_setup_pytest_bdd(
         self,
         test_pytest_bdd_item: Item,
@@ -331,7 +334,8 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager: IProxyManager,
         task_tracker_url: Optional[str],
         tasks_keyword: Optional[str],
-        admin_url: Optional[URL],
+        admin_url: Optional[str],
+        git_project_url: Optional[str],
         faker: Faker,
     ) -> None:
         with mock.patch(
@@ -348,10 +352,12 @@ class TestPytestCommonHooks:
 
             assert isinstance(get_feature_info_from_item(test_pytest_bdd_item), FeatureInfo)
 
-            if task_tracker_url is None:
-                link_handler_mock.assert_not_called()
-            else:
-                assert link_handler_mock.call_count == 2  # 2 tags in test_pytest_bdd_item feature
+            link_handler_mock_calls = 0
+            if task_tracker_url is not None:
+                link_handler_mock_calls += 2
+            if git_project_url is not None:
+                link_handler_mock_calls += 1
+            assert link_handler_mock.call_count == link_handler_mock_calls
 
             severity_handler_mock.assert_called_once_with(test_severity)
 

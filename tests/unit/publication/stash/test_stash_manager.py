@@ -9,7 +9,7 @@ from overhave.transport import StashBranch, StashProject, StashRepository, Stash
 from tests.objects import get_test_file_settings
 
 
-@pytest.mark.parametrize("test_task_tracker_url", [None], indirect=True)
+@pytest.mark.parametrize("task_tracker_url", [None], indirect=True)
 @pytest.mark.parametrize("test_file_settings", [get_test_file_settings()], indirect=True)
 class TestStashProjectManager:
     """Unit tests for :class:`StashVersionPublisher`."""
