@@ -113,18 +113,19 @@ class TestFeatureAPI:
         assert response.status_code == 200
         validate_content_null(response, False)
 
-    def test_get_test_run_id_handler_not_found(
+    def test_get_test_run_handler_not_found(
         self,
         test_api_client: TestClient,
         test_user_role: db.Role,
         test_api_bearer_auth: BearerAuth,
+        faker: Faker,
     ) -> None:
-        response = test_api_client.get(f"/feature/get_test_run_id/?test_run_id={9999}", auth=test_api_bearer_auth)
+        response = test_api_client.get(f"/test_run/?test_run_id={faker.random_int()}", auth=test_api_bearer_auth)
         assert response.status_code == 400
         validate_content_null(response, False)
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_get_test_run_id_handler_found_running(
+    def test_get_test_run_handler_found_running(
         self,
         test_api_client: TestClient,
         test_user_role: db.Role,
@@ -134,16 +135,14 @@ class TestFeatureAPI:
         test_created_test_run_id: int,
     ) -> None:
         test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.RUNNING)
-        response = test_api_client.get(
-            f"/feature/get_test_run_id/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth
-        )
+        response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()["status"] == TestRunStatus.RUNNING
         assert response.json()["report"] is None
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_get_test_run_id_handler_found_finished(
+    def test_get_test_run_handler_found_finished(
         self,
         test_api_client: TestClient,
         test_user_role: db.Role,
@@ -156,9 +155,7 @@ class TestFeatureAPI:
         test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.SUCCESS)
         test_run_storage.set_report(run_id=test_created_test_run_id, status=TestReportStatus.SAVED, report=test_report)
 
-        response = test_api_client.get(
-            f"/feature/get_test_run_id/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth
-        )
+        response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()["status"] == TestRunStatus.SUCCESS

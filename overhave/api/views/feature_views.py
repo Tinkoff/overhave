@@ -53,13 +53,13 @@ def run_test_by_tag_handler(
     return urls
 
 
-def get_test_run_id_handler(
+def get_test_run_handler(
     test_run_id: int,
     factory: IAdminFactory = fastapi.Depends(get_admin_factory),
-) -> dict[str, Optional[str]]:
-    test_run = cast(TestRunModel, factory.test_run_storage.get_test_run(test_run_id))
+) -> TestRunModel:
+    test_run = factory.test_run_storage.get_test_run(test_run_id)
     if test_run is None:
         raise fastapi.HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=f"Test run id ='{test_run_id}' didn't found"
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"Test run with id ='{test_run_id}' not found"
         )
-    return {"status": test_run.status.value, "report": test_run.report}
+    return test_run
