@@ -213,7 +213,7 @@ class TestPytestCommonHooks:
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
         with mock.patch(
-            "overhave.pytest_plugin.helpers.allure_utils.common.add_scenario_title_to_report",
+            "overhave.pytest_plugin.helpers.bdd_item.add_scenario_title_to_report",
             return_value=mock.MagicMock(),
         ) as mocked_title_func:
             pytest_collection_modifyitems(test_pytest_clean_session)

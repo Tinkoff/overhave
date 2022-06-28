@@ -16,6 +16,7 @@ from overhave.scenario.errors import (
     FeatureTypeParsingError,
 )
 from overhave.scenario.mixin import PrefixMixin
+from overhave.storage import FeatureTypeName
 
 logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1
@@ -26,7 +27,7 @@ class FeatureInfo(BaseModel):
 
     id: Optional[int]
     name: Optional[str]
-    type: Optional[str]
+    type: Optional[FeatureTypeName]
     tags: Optional[List[str]]
     severity: Optional[allure.severity_level]
     author: Optional[str]
@@ -79,11 +80,11 @@ class ScenarioParser(PrefixMixin):
     def _get_tags(self, tags_line: str) -> List[str]:
         return [tag.strip() for tag in tags_line.split(self._compilation_settings.tag_prefix) if tag]
 
-    def _get_feature_type(self, tags: Sequence[str]) -> str:
+    def _get_feature_type(self, tags: Sequence[str]) -> FeatureTypeName:
         for tag in tags:
             if tag not in self._feature_extractor.feature_types:
                 continue
-            return tag
+            return FeatureTypeName(tag)
         raise FeatureTypeParsingError(
             f"Could not get feature type from tags {tags}!",
         )

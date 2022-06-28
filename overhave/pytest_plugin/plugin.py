@@ -13,6 +13,7 @@ from _pytest.python import Function
 from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 from pytest_bdd.parser import Feature, Scenario, Step
+from yarl import URL
 
 from overhave.factory import IAdminFactory
 from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
@@ -24,6 +25,7 @@ from overhave.pytest_plugin.helpers import (
     get_full_step_name,
     is_pytest_bdd_item,
     set_feature_info_for_item,
+    set_git_project_url_if_necessary,
     set_severity_level,
 )
 from overhave.pytest_plugin.proxy_manager import get_proxy_manager
@@ -172,11 +174,16 @@ def pytest_runtest_setup(item: Item) -> None:
     if admin_link_settings.enabled and feature_info.id is not None:
         add_admin_feature_link_to_report(admin_link_settings=admin_link_settings, feature_id=feature_info.id)
 
-    tasks_keyword = proxy_manager.factory.context.project_settings.tasks_keyword
-    if isinstance(tasks_keyword, str) and feature_info.tasks:
-        add_task_links_to_report(
-            project_settings=proxy_manager.factory.context.project_settings, tasks=feature_info.tasks
+    project_settings = proxy_manager.factory.context.project_settings
+    if isinstance(project_settings.git_project_url, URL) and feature_info.type is not None:
+        set_git_project_url_if_necessary(
+            project_settings=project_settings,
+            feature_extractor=proxy_manager.factory.feature_extractor,
+            item=item,
+            feature_type=feature_info.type,
         )
+    if isinstance(project_settings.tasks_keyword, str) and feature_info.tasks:
+        add_task_links_to_report(project_settings=project_settings, tasks=feature_info.tasks)
 
     set_severity_level(
         compilation_settings=proxy_manager.factory.context.compilation_settings,

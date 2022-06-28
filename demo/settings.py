@@ -72,7 +72,9 @@ class OverhaveDemoSettingsGenerator:
             language_settings=language_settings,
             file_settings=OverhaveFileSettings(root_dir=self._root_dir.as_posix()),
             project_settings=OverhaveProjectSettings(
-                task_tracker_url="https://tasktracker.myorg.com/browse", tasks_keyword="Tasks"
+                task_tracker_url="https://tasktracker.myorg.com/browse",
+                tasks_keyword="Tasks",
+                git_project_url="https://ci.myorg.com/project/bdd-features",
             ),
         )
 

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List
 
 import allure
@@ -11,6 +12,14 @@ def add_task_links_to_report(project_settings: OverhaveProjectSettings, tasks: L
         allure.dynamic.link(
             url=project_settings.get_task_link(task), link_type=allure_commons.types.LinkType.LINK, name=task
         )
+
+
+def add_git_project_feature_link_to_report(project_settings: OverhaveProjectSettings, filepath: Path) -> None:
+    allure.dynamic.link(
+        url=project_settings.get_git_feature_url(filepath),
+        link_type=allure_commons.types.LinkType.TEST_CASE,
+        name=filepath.as_posix(),
+    )
 
 
 def add_admin_feature_link_to_report(admin_link_settings: OverhaveAdminLinkSettings, feature_id: int) -> None:
