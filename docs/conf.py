@@ -4,7 +4,7 @@
 from typing import List
 
 project = "Overhave"
-copyright = "2021, TCS group, Inc."
+copyright = "2022, TCS group, Inc."
 author = "Vladislav Mukhamatnurov <livestreamepidemz@yandex.ru>"
 
 # -- General configuration ---------------------------------------------------

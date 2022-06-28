@@ -309,6 +309,28 @@ Gherkin from `pytest-bdd`_ with unique updates:
 An example of filled feature content is located in
 `feature_example.rst`_.
 
+Feature links
+-------------
+
+**Overhave** has ability to set links to it's own admin service in `Allure`_
+test-cases. Link will be set automatically when you generate `Allure`_ report.
+This function can be enabled via setup of environment variable
+```OVERHAVE_ADMIN_URL```:
+
+.. code-block:: bash
+
+    export OVERHAVE_ADMIN_URL=https://overhave-admin.myorg.com
+
+Also, **Overhave** has ability to set links to feature file in `Git`_ repository.
+Link will be set automatically when you generate `Allure`_ report. This function
+can be enabled via setup of environment variable
+```OVERHAVE_GIT_PROJECT_URL```:
+
+.. code-block:: bash
+
+    export OVERHAVE_GIT_PROJECT_URL=https://git.myorg.com/bdd-features-repo
+
+
 Language
 --------
 
