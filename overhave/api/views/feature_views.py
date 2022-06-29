@@ -5,12 +5,10 @@ from typing import List, Optional
 import fastapi
 import flask
 
-from overhave.api.deps import get_feature_storage, get_feature_tag_storage
+from overhave.api.deps import get_feature_storage, get_feature_tag_storage, get_redis_producer, get_test_run_storage
 from overhave.api.views.tags_views import tags_item_handler
-from overhave.factory.components.admin_factory import IAdminFactory
-from overhave.factory.getters import get_admin_factory
-from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage, TestRunModel
-from overhave.transport import TestRunData, TestRunTask
+from overhave.storage import FeatureModel, IFeatureStorage, IFeatureTagStorage, TestRunModel, TestRunStorage
+from overhave.transport import RedisProducer, TestRunData, TestRunTask
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +33,8 @@ def get_features_handler(
 
 def run_test_by_tag_handler(
     tag_run: str,
-    factory: IAdminFactory = fastapi.Depends(get_admin_factory),
+    test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
+    redis_producer: RedisProducer = fastapi.Depends(get_redis_producer),
     feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
     tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
 ) -> list[str]:
@@ -47,17 +46,17 @@ def run_test_by_tag_handler(
         )
     urls: list[str] = []
     for feature in features:
-        test_run_id = factory.test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.author)
-        factory.redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
+        test_run_id = test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.author)
+        redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         urls.append(flask.url_for("testrun.details_view", id=test_run_id))
     return urls
 
 
 def get_test_run_handler(
     test_run_id: int,
-    factory: IAdminFactory = fastapi.Depends(get_admin_factory),
+    test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
 ) -> TestRunModel:
-    test_run = factory.test_run_storage.get_test_run(test_run_id)
+    test_run = test_run_storage.get_test_run(test_run_id)
     if test_run is None:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=f"Test run with id ='{test_run_id}' not found"
