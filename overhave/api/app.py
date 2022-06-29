@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 import fastapi as fastapi
 
@@ -16,7 +16,7 @@ from overhave.api.views import (
     test_user_handler,
     test_user_put_spec_handler,
 )
-from overhave.storage import AuthToken, FeatureModel, TagModel, TestUserModel, TestUserSpecification, TestRunModel
+from overhave.storage import AuthToken, FeatureModel, TagModel, TestRunModel, TestUserModel, TestUserSpecification
 
 
 def _get_tags_router() -> fastapi.APIRouter:

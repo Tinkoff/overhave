@@ -1,6 +1,6 @@
 import logging
 from http import HTTPStatus
-from typing import List, Optional, cast
+from typing import List, Optional
 
 import fastapi
 import flask
