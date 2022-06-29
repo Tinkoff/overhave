@@ -91,12 +91,12 @@ def test_executor_ctx(
 def test_scenario_compiler(
     language_settings: OverhaveLanguageSettings,
     test_compilation_settings: OverhaveScenarioCompilerSettings,
-    task_links_keyword: Optional[str],
+    tasks_keyword: Optional[str],
 ) -> ScenarioCompiler:
     return ScenarioCompiler(
         compilation_settings=test_compilation_settings,
         language_settings=language_settings,
-        task_links_keyword=task_links_keyword,
+        tasks_keyword=tasks_keyword,
     )
 
 
@@ -104,13 +104,13 @@ def test_scenario_compiler(
 def test_scenario_parser(
     test_compilation_settings: OverhaveScenarioCompilerSettings,
     language_settings: OverhaveLanguageSettings,
-    task_links_keyword: Optional[str],
+    tasks_keyword: Optional[str],
 ) -> ScenarioParser:
     return ScenarioParser(
         compilation_settings=test_compilation_settings,
         language_settings=language_settings,
         feature_extractor=get_test_feature_extractor(),
-        task_links_keyword=task_links_keyword,
+        tasks_keyword=tasks_keyword,
     )
 
 

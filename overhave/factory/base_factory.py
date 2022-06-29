@@ -184,7 +184,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
         return ScenarioCompiler(
             compilation_settings=self.context.compilation_settings,
             language_settings=self.context.language_settings,
-            task_links_keyword=self.context.project_settings.links_keyword,
+            tasks_keyword=self.context.project_settings.tasks_keyword,
         )
 
     @cached_property
@@ -193,7 +193,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
             compilation_settings=self.context.compilation_settings,
             language_settings=self.context.language_settings,
             feature_extractor=self._feature_extractor,
-            task_links_keyword=self.context.project_settings.links_keyword,
+            tasks_keyword=self.context.project_settings.tasks_keyword,
         )
 
     @property

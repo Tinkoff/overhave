@@ -28,11 +28,11 @@ class ScenarioCompiler(PrefixMixin):
         self,
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
-        task_links_keyword: Optional[str],
+        tasks_keyword: Optional[str],
     ):
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
-        self._task_links_keyword = task_links_keyword
+        self._tasks_keyword = tasks_keyword
 
     def _get_feature_type_tag(self, scenario_text: str, tag: str) -> str:
         if f"{self._compilation_settings.tag_prefix}{tag}" in scenario_text:
@@ -101,7 +101,7 @@ class ScenarioCompiler(PrefixMixin):
                     f"{blocks_delimiter}"
                     f"{self._compilation_settings.published_by_prefix} {context.test_run.executed_by}"
                 ),
-                generate_task_info(tasks=context.feature.task, header=self._task_links_keyword),
+                generate_task_info(tasks=context.feature.task, header=self._tasks_keyword),
                 "",
             )
         )

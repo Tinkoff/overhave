@@ -27,7 +27,7 @@ class TestGenerateTaskInfo:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
 
-@pytest.mark.parametrize("task_links_keyword", [None, "Tasks"])
+@pytest.mark.parametrize("tasks_keyword", [None, "Tasks"])
 @pytest.mark.parametrize(
     "language_settings",
     [OverhaveLanguageSettings(), OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)],
@@ -47,7 +47,7 @@ class TestScenarioCompiler:
 
     def test_compile_scenario_from_correct_text(
         self,
-        task_links_keyword: Optional[str],
+        tasks_keyword: Optional[str],
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,
@@ -68,7 +68,7 @@ class TestScenarioCompiler:
         assert parsed_info.last_edited_at is not None
         assert parsed_info.last_edited_at.date() == test_feature.last_edited_at.date()
         assert parsed_info.last_edited_at.tzinfo is None
-        if task_links_keyword is not None:
+        if tasks_keyword is not None:
             assert parsed_info.tasks == test_feature.task
         else:
             assert parsed_info.tasks is None

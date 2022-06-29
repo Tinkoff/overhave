@@ -16,6 +16,7 @@ from overhave.scenario.errors import (
     FeatureTypeParsingError,
 )
 from overhave.scenario.mixin import PrefixMixin
+from overhave.storage import FeatureTypeName
 
 logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1
@@ -26,7 +27,7 @@ class FeatureInfo(BaseModel):
 
     id: Optional[int]
     name: Optional[str]
-    type: Optional[str]
+    type: Optional[FeatureTypeName]
     tags: Optional[List[str]]
     severity: Optional[allure.severity_level]
     author: Optional[str]
@@ -44,12 +45,12 @@ class ScenarioParser(PrefixMixin):
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
-        task_links_keyword: Optional[str],
+        tasks_keyword: Optional[str],
     ) -> None:
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
         self._feature_extractor = feature_extractor
-        self._task_links_keyword = task_links_keyword
+        self._tasks_keyword = tasks_keyword
 
     @cached_property
     def _feature_prefixes(self) -> List[str]:
@@ -61,8 +62,8 @@ class ScenarioParser(PrefixMixin):
 
     @cached_property
     def _task_prefix(self) -> Optional[str]:
-        if isinstance(self._task_links_keyword, str):
-            return self._as_prefix(self._task_links_keyword)
+        if isinstance(self._tasks_keyword, str):
+            return self._as_prefix(self._tasks_keyword)
         return None
 
     def _get_id(self, id_line: str) -> int:
@@ -79,11 +80,11 @@ class ScenarioParser(PrefixMixin):
     def _get_tags(self, tags_line: str) -> List[str]:
         return [tag.strip() for tag in tags_line.split(self._compilation_settings.tag_prefix) if tag]
 
-    def _get_feature_type(self, tags: Sequence[str]) -> str:
+    def _get_feature_type(self, tags: Sequence[str]) -> FeatureTypeName:
         for tag in tags:
             if tag not in self._feature_extractor.feature_types:
                 continue
-            return tag
+            return FeatureTypeName(tag)
         raise FeatureTypeParsingError(
             f"Could not get feature type from tags {tags}!",
         )

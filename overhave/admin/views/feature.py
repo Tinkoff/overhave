@@ -18,6 +18,7 @@ from wtforms.widgets import HiddenInput
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
+from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import FeatureTypeName
 from overhave.test_execution import BddStepModel, StepTypeName
 from overhave.transport import TestRunData, TestRunTask
@@ -83,10 +84,10 @@ class FactoryViewUtilsMixin:
         return path
 
     @property
-    def browse_url(self) -> Optional[str]:
-        browse_url_value = get_admin_factory().context.project_settings.browse_url
-        if browse_url_value is not None:
-            return browse_url_value.human_repr()
+    def task_tracker_url(self) -> Optional[str]:
+        task_tracker_url_value = get_admin_factory().context.project_settings.task_tracker_url
+        if task_tracker_url_value is not None:
+            return task_tracker_url_value.human_repr()
         return None
 
     @cached_property
@@ -223,6 +224,10 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
             return rendered
         test_run_id = factory.test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=current_user.login)
         if not factory.context.admin_settings.consumer_based:
+            proxy_manager = get_proxy_manager()
+            test_execution_factory = get_test_execution_factory()
+            proxy_manager.clear_factory()
+            proxy_manager.set_factory(test_execution_factory)
             factory.threadpool.apply_async(get_test_execution_factory().test_executor.execute_test, args=(test_run_id,))
         if factory.context.admin_settings.consumer_based and not factory.redis_producer.add_task(
             TestRunTask(data=TestRunData(test_run_id=test_run_id))
