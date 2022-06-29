@@ -1,4 +1,5 @@
 from typing import cast
+from uuid import uuid1
 
 import allure
 import pytest
@@ -10,11 +11,13 @@ from overhave import db
 from overhave.storage import (
     FeatureModel,
     FeatureTypeModel,
+    ScenarioModel,
     ScenarioStorage,
     SystemUserGroupStorage,
     SystemUserModel,
     SystemUserStorage,
     TagModel,
+    TestRunStorage,
     TestUserModel,
     TestUserSpecification,
     TestUserStorage,
@@ -132,3 +135,29 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
 @pytest.fixture()
 def test_scenario_storage() -> ScenarioStorage:
     return ScenarioStorage()
+
+
+@pytest.fixture(scope="class")
+def test_run_storage() -> TestRunStorage:
+    return TestRunStorage()
+
+
+@pytest.fixture()
+def test_created_test_run_id(
+    test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
+) -> int:
+    return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+
+
+@pytest.fixture()
+def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
+    with db.create_session() as session:
+        db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
+        session.add(db_scenario)
+        session.flush()
+        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture(scope="class")
+def test_report() -> str:
+    return uuid1().hex

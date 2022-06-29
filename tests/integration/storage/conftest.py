@@ -2,7 +2,6 @@ import datetime
 import socket
 from typing import cast
 from unittest import mock
-from uuid import uuid1
 
 import pytest
 from faker import Faker
@@ -58,11 +57,6 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 
 
 @pytest.fixture(scope="class")
-def test_run_storage() -> TestRunStorage:
-    return TestRunStorage()
-
-
-@pytest.fixture(scope="class")
 def test_tag_storage() -> FeatureTagStorage:
     return FeatureTagStorage()
 
@@ -75,27 +69,6 @@ def test_feature_storage(test_tag_storage: FeatureTagStorage) -> FeatureStorage:
 @pytest.fixture(scope="class")
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
-
-
-@pytest.fixture()
-def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
-    with db.create_session() as session:
-        db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
-        session.add(db_scenario)
-        session.flush()
-        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
-
-
-@pytest.fixture(scope="class")
-def test_report() -> str:
-    return uuid1().hex
-
-
-@pytest.fixture()
-def test_created_test_run_id(
-    test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
-) -> int:
-    return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture()
