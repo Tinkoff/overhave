@@ -64,6 +64,7 @@ typer = "^0.4.0"
 Flask-Login = "^0.6.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
+pytest-bdd = "^6.0.1"
 
 
 [tool.poetry.dev-dependencies]
@@ -83,7 +84,7 @@ mypy-extensions = "^0.4.3"
 alchemy-mock = "^0.4.3"
 coverage = {version = "^6.0.1", extras = ["toml"]}
 pytest-mock = "^3.6.1"
-pytest-bdd = "^5.0.0"
+pytest-bdd = "^6.0.0"
 pytest = "^6.2.5"
 allure-pytest = "^2.9.45"
 pytest-xdist = "^2.5.0"
