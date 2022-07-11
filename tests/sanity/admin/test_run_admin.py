@@ -76,7 +76,7 @@ class TestOverhaveRunAdmin:
     ) -> None:
         from pytest_bdd.parser import STEP_PREFIXES
 
-        assert len(STEP_PREFIXES) == 23  # len of base STEP_PREFIXES + appended RUSSIAN_PREFIXES
+        assert len(STEP_PREFIXES) == 21  # len of base STEP_PREFIXES + appended RUSSIAN_PREFIXES
         # TODO: check steps content
         for feature_type in test_feature_types[0:2]:  # prevent xfailed test for feature_type_3
             assert test_resolved_admin_proxy_manager.factory.step_collector.get_steps(FeatureTypeName(feature_type))

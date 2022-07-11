@@ -71,7 +71,7 @@ class StepCollector:
             BddStepModel(
                 type=f.func.step_type,  # type: ignore
                 name=self._compile_full_step_name(
-                    fixture_name=f.func.parser.name,  # type: ignore
+                    fixture_name=f.func._pytest_bdd_parsers[0].name,  # type: ignore
                     step_type=f.func.step_type,  # type: ignore
                 ),
                 doc=f.func.__doc__,
