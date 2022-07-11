@@ -13,7 +13,6 @@ class StepPrefixesModel(BaseModel):
     SCENARIO: str
     BACKGROUND: str
     EXAMPLES: str
-    EXAMPLES_VERTICAL: str
     GIVEN: str
     WHEN: str
     THEN: str
@@ -28,7 +27,6 @@ class StepPrefixesModel(BaseModel):
         STEP_PREFIXES.append((self.BACKGROUND, default_types.BACKGROUND))
 
         STEP_PREFIXES.append((self.EXAMPLES, default_types.EXAMPLES))
-        STEP_PREFIXES.append((self.EXAMPLES_VERTICAL, default_types.EXAMPLES_VERTICAL))
 
         STEP_PREFIXES.append((self.GIVEN, default_types.GIVEN))
         STEP_PREFIXES.append((self.WHEN, default_types.WHEN))
