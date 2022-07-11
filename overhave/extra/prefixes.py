@@ -6,7 +6,6 @@ RUSSIAN_PREFIXES = StepPrefixesModel(
     SCENARIO="Сценарий:",
     BACKGROUND="Предыстория:",
     EXAMPLES="Примеры:",
-    EXAMPLES_VERTICAL="Примеры: Вертикально",
     GIVEN="Дано ",
     WHEN="Когда ",
     THEN="То ",

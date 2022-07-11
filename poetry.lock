@@ -1194,7 +1194,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "pytest-bdd"
-version = "5.0.0"
+version = "6.0.0"
 description = "BDD for pytest"
 category = "dev"
 optional = false
