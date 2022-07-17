@@ -96,7 +96,7 @@ class TestFeatureAPI:
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:
-        response = test_api_client.get(f"/feature/run_test_by_tag/?tag_run={faker.word()}", auth=test_api_bearer_auth)
+        response = test_api_client.post(f"/test_run/create/?tag_value={faker.word()}", auth=test_api_bearer_auth)
         assert response.status_code == 400
         validate_content_null(response, False)
 
@@ -109,7 +109,7 @@ class TestFeatureAPI:
         test_scenario_run: ScenarioModel,
         flask_urlfor_handler_mock: mock.MagicMock,
     ) -> None:
-        response = test_api_client.get(f"/feature/run_test_by_tag/?tag_run={test_tag.value}", auth=test_api_bearer_auth)
+        response = test_api_client.post(f"/test_run/create/?tag_value={test_tag.value}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
 

@@ -50,15 +50,28 @@ def _get_feature_router() -> fastapi.APIRouter:
         summary="Get list of Feature info",
         description="Get list of feature info by `tag_id` or `tag_value`",
     )
-    feature_router.add_api_route(
-        "/run_test_by_tag/",
-        run_test_by_tag_handler,
-        methods=["GET"],
-        response_model=list[str],
-        summary="Get list of test run by tag_value",
-        description="Get list of test run by `tag_value`",
-    )
     return feature_router
+
+
+def _get_testrun_router() -> fastapi.APIRouter:
+    test_run_router = fastapi.APIRouter()
+    test_run_router.add_api_route(
+        "/",
+        get_test_run_handler,
+        methods=["GET"],
+        response_model=TestRunModel,
+        summary="Get test run by id",
+        description="Get test run by `id`",
+    )
+    test_run_router.add_api_route(
+        "/create/",
+        run_test_by_tag_handler,
+        methods=["POST"],
+        response_model=list[str],
+        summary="Create TestRunTasks for Features by tag_value",
+        description="Create TestRunTasks for Features by `tag_value`",
+    )
+    return test_run_router
 
 
 def _get_testuser_router() -> fastapi.APIRouter:
@@ -89,19 +102,6 @@ def _get_testuser_router() -> fastapi.APIRouter:
     return test_user_router
 
 
-def _get_test_run_router() -> fastapi.APIRouter:
-    feature_router = fastapi.APIRouter()
-    feature_router.add_api_route(
-        "/",
-        get_test_run_handler,
-        methods=["GET"],
-        response_model=TestRunModel,
-        summary="Get test run by id",
-        description="Get test run by `id`",
-    )
-    return feature_router
-
-
 def _get_auth_router() -> fastapi.APIRouter:
     auth_router = fastapi.APIRouter()
     auth_router.add_api_route(
@@ -123,7 +123,7 @@ def create_overhave_api() -> fastapi.FastAPI:
     app.include_router(_get_tags_router(), dependencies=auth_deps, prefix="/feature/tags", tags=["feature_tags"])
     app.include_router(_get_feature_router(), dependencies=auth_deps, prefix="/feature", tags=["features"])
     app.include_router(_get_testuser_router(), dependencies=auth_deps, prefix="/test_user", tags=["test_users"])
-    app.include_router(_get_test_run_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_run"])
+    app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_run"])
 
     app.include_router(_get_auth_router())
     app.add_api_route("/", docs, methods=["GET"], include_in_schema=False)
