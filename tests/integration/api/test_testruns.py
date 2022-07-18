@@ -40,6 +40,7 @@ class TestTestRunAPI:
         response = test_api_client.post(f"/test_run/create/?tag_value={test_tag.value}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
+        assert response.json() == ["1"]
 
     def test_get_test_run_handler_not_found(
         self,
