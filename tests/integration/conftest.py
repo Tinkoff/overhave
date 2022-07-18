@@ -24,19 +24,29 @@ from overhave.storage import (
 )
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def test_system_user_storage() -> SystemUserStorage:
     return SystemUserStorage()
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def test_system_user_group_storage() -> SystemUserGroupStorage:
     return SystemUserGroupStorage()
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def test_user_storage() -> TestUserStorage:
     return TestUserStorage()
+
+
+@pytest.fixture(scope="module")
+def test_scenario_storage() -> ScenarioStorage:
+    return ScenarioStorage()
+
+
+@pytest.fixture(scope="module")
+def test_run_storage() -> TestRunStorage:
+    return TestRunStorage()
 
 
 @pytest.fixture()
@@ -133,16 +143,6 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
 
 
 @pytest.fixture()
-def test_scenario_storage() -> ScenarioStorage:
-    return ScenarioStorage()
-
-
-@pytest.fixture(scope="class")
-def test_run_storage() -> TestRunStorage:
-    return TestRunStorage()
-
-
-@pytest.fixture()
 def test_created_test_run_id(
     test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
@@ -158,6 +158,6 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_report() -> str:
     return uuid1().hex

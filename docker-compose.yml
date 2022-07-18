@@ -3,8 +3,7 @@ version: '3.6'
 services:
   db:
     image: postgres:11.6
-    command:
-      -c fsync=${FSYNC:-off}
+    command: postgres -c fsync=${FSYNC:-off} -c max_connections=200
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=postgres

@@ -1,5 +1,5 @@
 import abc
-from functools import cached_property
+from functools import cached_property, partial
 from multiprocessing.pool import ThreadPool
 from typing import Callable, Mapping
 
@@ -33,7 +33,7 @@ class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
     def feature_type_storage(self) -> IFeatureTypeStorage:
         pass
 
-    @property
+    @cached_property
     @abc.abstractmethod
     def auth_manager(self) -> IAdminAuthorizationManager:
         pass
@@ -59,34 +59,37 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
 
     context_cls = OverhaveAdminContext
 
-    @cached_property
-    def _simple_auth_manager(self) -> SimpleAdminAuthorizationManager:
-        return SimpleAdminAuthorizationManager(system_user_storage=self._system_user_storage)
+    def _get_simple_auth_manager(self) -> partial[SimpleAdminAuthorizationManager]:
+        return partial(SimpleAdminAuthorizationManager, system_user_storage=self._system_user_storage)
 
-    @cached_property
-    def _default_auth_manager(self) -> DefaultAdminAuthorizationManager:
-        return DefaultAdminAuthorizationManager(system_user_storage=self._system_user_storage)
+    def _get_default_auth_manager(self) -> partial[DefaultAdminAuthorizationManager]:
+        return partial(DefaultAdminAuthorizationManager, system_user_storage=self._system_user_storage)
 
-    @cached_property
-    def _ldap_auth_manager(self) -> LDAPAdminAuthorizationManager:
-        return LDAPAdminAuthorizationManager(
+    def _get_ldap_auth_manager(self) -> partial[LDAPAdminAuthorizationManager]:
+        return partial(
+            LDAPAdminAuthorizationManager,
             settings=self.context.ldap_manager_settings,
             system_user_storage=self._system_user_storage,
             system_user_group_storage=SystemUserGroupStorage(),
             ldap_authenticator=LDAPAuthenticator(settings=self.context.ldap_client_settings),
         )
 
-    @cached_property
-    def _auth_manager_mapping(self) -> Mapping[AuthorizationStrategy, Callable[[], IAdminAuthorizationManager]]:
+    @property
+    def _auth_manager_mapping(
+        self,
+    ) -> Mapping[AuthorizationStrategy, Callable[[None], partial[IAdminAuthorizationManager]]]:
         return {
-            AuthorizationStrategy.SIMPLE: lambda: self._simple_auth_manager,
-            AuthorizationStrategy.DEFAULT: lambda: self._default_auth_manager,
-            AuthorizationStrategy.LDAP: lambda: self._ldap_auth_manager,
+            AuthorizationStrategy.SIMPLE: self._get_simple_auth_manager,  # type: ignore
+            AuthorizationStrategy.DEFAULT: self._get_default_auth_manager,  # type: ignore
+            AuthorizationStrategy.LDAP: self._get_ldap_auth_manager,  # type: ignore
         }
 
-    @property
+    @cached_property
     def auth_manager(self) -> IAdminAuthorizationManager:
-        return self._auth_manager_mapping[self.context.auth_settings.auth_strategy]()
+        partial_auth_manager: partial[IAdminAuthorizationManager] = self._auth_manager_mapping[  # type: ignore
+            self.context.auth_settings.auth_strategy
+        ]()
+        return partial_auth_manager()
 
     @property
     def feature_type_storage(self) -> IFeatureTypeStorage:

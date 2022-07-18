@@ -1,4 +1,4 @@
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 from unittest import mock
 
 import pytest
@@ -8,14 +8,7 @@ from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
 
 from overhave import db, overhave_api
-from overhave.storage import (
-    AuthStorage,
-    FeatureModel,
-    ScenarioModel,
-    SystemUserModel,
-    SystemUserStorage,
-    TestUserSpecification,
-)
+from overhave.storage import AuthStorage, SystemUserModel, SystemUserStorage, TestUserSpecification
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
 from overhave.transport.http.base_client import BearerAuth
@@ -79,15 +72,6 @@ def test_new_specification() -> TestUserSpecification:
 
 def validate_content_null(response: requests.Response, statement: bool) -> None:
     assert (response.content.decode() == "null") is statement
-
-
-@pytest.fixture()
-def test_scenario_run(test_feature_with_tag: FeatureModel, faker: Faker) -> ScenarioModel:
-    with db.create_session() as session:
-        db_scenario = db.Scenario(feature_id=test_feature_with_tag.id, text=faker.word())
-        session.add(db_scenario)
-        session.flush()
-        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
 
 
 @pytest.fixture()
