@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import NewType
 
 import fastapi
 import flask
@@ -7,6 +8,8 @@ from overhave.api.deps import get_feature_storage, get_feature_tag_storage, get_
 from overhave.api.views.tags_views import tags_item_handler
 from overhave.storage import IFeatureStorage, IFeatureTagStorage, TestRunModel, TestRunStorage
 from overhave.transport import RedisProducer, TestRunData, TestRunTask
+
+TestRunUrl = NewType("TestRunUrl", str)
 
 
 def get_test_run_handler(
@@ -21,22 +24,22 @@ def get_test_run_handler(
     )
 
 
-def run_test_by_tag_handler(
+def run_tests_by_tag_handler(
     tag_value: str,
-    test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
     feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
     tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
+    test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
     redis_producer: RedisProducer = fastapi.Depends(get_redis_producer),
-) -> list[str]:
+) -> list[TestRunUrl]:
     tag_model = tags_item_handler(value=tag_value, feature_tag_storage=tag_storage)
     features = feature_storage.get_features_by_tag(tag_id=tag_model.id)
-    if len(features) == 0:
+    if not features:
         raise fastapi.HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=f"Features with tag='{tag_value}' does not exist"
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"Features with tag='{tag_value}' do not exist"
         )
-    urls: list[str] = []
+    testrun_urls: list[TestRunUrl] = []
     for feature in features:
-        test_run_id = test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.author)
+        test_run_id = test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.last_edited_by)
         redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
-        urls.append(flask.url_for("testrun.details_view", id=test_run_id))
-    return urls
+        testrun_urls.append(TestRunUrl(flask.url_for("testrun.details_view", id=test_run_id)))
+    return testrun_urls

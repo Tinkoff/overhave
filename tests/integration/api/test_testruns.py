@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
-from overhave.storage import FeatureModel, ScenarioModel, TagModel, TestRunStorage
+from overhave.storage import FeatureModel, ScenarioModel, TagModel, TestRunModel, TestRunStorage
 from overhave.transport.http import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
@@ -64,8 +64,10 @@ class TestTestRunAPI:
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
-        assert response.json()["status"] == TestRunStatus.RUNNING
-        assert response.json()["report"] is None
+        model = TestRunModel.parse_obj(response.json())
+        assert model.status == TestRunStatus.RUNNING
+        assert model.report is None
+        assert model.report_status == TestReportStatus.EMPTY
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
@@ -83,5 +85,7 @@ class TestTestRunAPI:
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
-        assert response.json()["status"] == TestRunStatus.SUCCESS
-        assert response.json()["report"] == test_report
+        model = TestRunModel.parse_obj(response.json())
+        assert model.status == TestRunStatus.SUCCESS
+        assert model.report == test_report
+        assert model.report_status == TestReportStatus.SAVED

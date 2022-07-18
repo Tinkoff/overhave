@@ -9,7 +9,7 @@ from overhave.api.views import (
     get_features_handler,
     get_test_run_handler,
     login_for_access_token,
-    run_test_by_tag_handler,
+    run_tests_by_tag_handler,
     tags_item_handler,
     tags_list_handler,
     test_user_get_spec_handler,
@@ -65,7 +65,7 @@ def _get_testrun_router() -> fastapi.APIRouter:
     )
     test_run_router.add_api_route(
         "/create/",
-        run_test_by_tag_handler,
+        run_tests_by_tag_handler,
         methods=["POST"],
         response_model=list[str],
         summary="Create TestRunTasks for Features by tag_value",
