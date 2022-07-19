@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
+from unittest import mock
 
 import py
 import pytest
@@ -25,7 +26,13 @@ from overhave import (
 from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
-from tests.objects import DataBaseContext, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
+from tests.objects import (
+    PROJECT_WORKDIR,
+    DataBaseContext,
+    FeatureTestContainer,
+    XDistWorkerValueType,
+    get_test_feature_containers,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -148,3 +155,9 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
     test_feature_container_name = "test_feature_container"
     if test_feature_container_name in metafunc.fixturenames:
         metafunc.parametrize(test_feature_container_name, get_test_feature_containers())
+
+
+@pytest.fixture(scope="session", autouse=True)
+def flask_scaffold_findpackagepath_mock() -> None:
+    with mock.patch("flask.scaffold._find_package_path", return_value=PROJECT_WORKDIR.as_posix()):
+        yield
