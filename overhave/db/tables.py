@@ -172,6 +172,7 @@ class TestUser(BaseTable, PrimaryKeyMixin):
     feature_type_id = sa.Column(sa.Integer(), sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     specification = sa.Column(sa.JSON(none_as_null=True))
     created_by = sa.Column(sa.String(), sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
+    allow_update = sa.Column(sa.Boolean(), doc="User updating allowance", nullable=False, default=False)
 
     feature_type = so.relationship(FeatureType)
 
