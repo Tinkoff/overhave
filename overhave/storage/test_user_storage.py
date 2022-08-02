@@ -1,5 +1,5 @@
 import abc
-from typing import Optional, cast
+from typing import List, Optional, cast
 
 from overhave import db
 from overhave.storage import FeatureTypeName, FeatureTypeStorage, TestUserModel, TestUserSpecification
@@ -24,6 +24,11 @@ class ITestUserStorage(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
         pass
 
     @staticmethod
@@ -57,6 +62,16 @@ class TestUserStorage(ITestUserStorage):
             if user is not None:
                 return cast(TestUserModel, TestUserModel.from_orm(user))
             return None
+
+    @staticmethod
+    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
+        with db.create_session() as session:
+            db_users: List[db.TestUser] = (
+                session.query(db.TestUser)
+                .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update == allow_update)
+                .all()
+            )
+            return [cast(TestUserModel, TestUserModel.from_orm(user)) for user in db_users]
 
     @staticmethod
     def create_test_user(

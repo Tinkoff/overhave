@@ -4,7 +4,7 @@ from overhave import db
 from overhave.storage import FeatureTypeModel, SystemUserModel, TestUserModel, TestUserSpecification, TestUserStorage
 
 
-@pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestTestUserStorage:
     """Integration tests for :class:`TestUserStorage`."""
 
@@ -17,6 +17,22 @@ class TestTestUserStorage:
         test_user = test_user_storage.get_test_user_by_name(test_testuser.name)
         assert test_user is not None
         assert test_user == test_testuser
+
+    @pytest.mark.parametrize("feature_type_id", [1234])
+    def test_get_user_list_empty(
+        self, test_user_storage: TestUserStorage, test_testuser: TestUserModel, feature_type_id: int
+    ) -> None:
+        test_users = test_user_storage.get_test_users(
+            feature_type_id=feature_type_id, allow_update=test_testuser.allow_update
+        )
+        assert not test_users
+
+    def test_get_user_list(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
+        test_users = test_user_storage.get_test_users(
+            feature_type_id=test_testuser.feature_type_id, allow_update=test_testuser.allow_update
+        )
+        assert len(test_users) == 1
+        assert test_users[0] == test_testuser
 
     def test_create_test_user(
         self,

@@ -14,6 +14,7 @@ from overhave.api.views import (
     tags_list_handler,
     test_user_get_spec_handler,
     test_user_handler,
+    test_user_list_handler,
     test_user_put_spec_handler,
 )
 from overhave.storage import AuthToken, FeatureModel, TagModel, TestRunModel, TestUserModel, TestUserSpecification
@@ -83,6 +84,14 @@ def _get_testuser_router() -> fastapi.APIRouter:
         response_model=TestUserModel,
         summary="Get TestUser",
         description="Get test user full info by `user_id` or `user_name`",
+    )
+    test_user_router.add_api_route(
+        "/list",
+        test_user_list_handler,
+        methods=["GET"],
+        response_model=List[TestUserModel],
+        summary="Get list of TestUsers",
+        description="Get list of test users with given `feature_type` and `allow_update`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",

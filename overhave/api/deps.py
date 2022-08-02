@@ -7,9 +7,11 @@ from overhave.storage import (
     DraftStorage,
     FeatureStorage,
     FeatureTagStorage,
+    FeatureTypeStorage,
     IDraftStorage,
     IFeatureStorage,
     IFeatureTagStorage,
+    IFeatureTypeStorage,
     ISystemUserStorage,
     ITestUserStorage,
     SystemUserStorage,
@@ -37,6 +39,11 @@ def get_system_user_storage() -> ISystemUserStorage:
 @cache
 def get_feature_tag_storage() -> IFeatureTagStorage:
     return FeatureTagStorage()
+
+
+@cache
+def get_feature_type_storage() -> IFeatureTypeStorage:
+    return FeatureTypeStorage()
 
 
 @cache

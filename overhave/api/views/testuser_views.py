@@ -1,11 +1,19 @@
 import logging
 from http import HTTPStatus
-from typing import Optional
+from typing import List, Optional
 
 import fastapi
 
-from overhave.api.deps import get_test_user_storage
-from overhave.storage import ITestUserStorage, TestUserDoesNotExistError, TestUserModel, TestUserSpecification
+from overhave.api.deps import get_feature_type_storage, get_test_user_storage
+from overhave.storage import (
+    FeatureTypeName,
+    FeatureTypeNotExistsError,
+    IFeatureTypeStorage,
+    ITestUserStorage,
+    TestUserDoesNotExistError,
+    TestUserModel,
+    TestUserSpecification,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +48,27 @@ def test_user_handler(
     raise fastapi.HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail="'user_id' or 'user_name' query parameter should be set"
     )
+
+
+def test_user_list_handler(
+    feature_type: FeatureTypeName,
+    allow_update: bool,
+    feature_type_storage: IFeatureTypeStorage = fastapi.Depends(get_feature_type_storage),
+    test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
+) -> List[TestUserModel]:
+    logger.info(
+        "Getting %s list with feature_type=%s and allow_update=%s ...",
+        TestUserModel.__name__,
+        feature_type,
+        allow_update,
+    )
+    try:
+        feature_type_model = feature_type_storage.get_feature_type_by_name(feature_type)
+        return test_user_storage.get_test_users(feature_type_id=feature_type_model.id, allow_update=allow_update)
+    except FeatureTypeNotExistsError:
+        raise fastapi.HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"FeatureType with name='{feature_type}' does not exist"
+        )
 
 
 def test_user_get_spec_handler(

@@ -3,6 +3,7 @@ import json
 import pytest as pytest
 from faker import Faker
 from fastapi.testclient import TestClient
+from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.storage import TestUserModel, TestUserSpecification
@@ -51,6 +52,34 @@ class TestTestUserAPI:
         assert response.json()
         obj = TestUserModel.parse_obj(response.json())
         assert obj == test_testuser
+
+    def test_get_user_list_no_query(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
+        response = test_api_client.get("/test_user/list", auth=test_api_bearer_auth)
+        assert response.status_code == 422
+        validate_content_null(response, False)
+
+    @pytest.mark.parametrize("allow_update", [True, False])
+    def test_get_test_user_list_feature_type_empty(
+        self, test_api_client: TestClient, faker: Faker, test_api_bearer_auth: BearerAuth, allow_update: bool
+    ) -> None:
+        response = test_api_client.get(
+            f"/test_user/list?feature_type={faker.word()}&allow_update={str(allow_update)}",
+            auth=test_api_bearer_auth,
+        )
+        validate_content_null(response, False)
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+    def test_get_test_user_list(
+        self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
+    ) -> None:
+        response = test_api_client.get(
+            f"/test_user/list?feature_type={test_testuser.feature_type.name}&allow_update={test_testuser.allow_update}",
+            auth=test_api_bearer_auth,
+        )
+        assert response.status_code == 200
+        obj = parse_obj_as(list[TestUserModel], response.json())
+        assert len(obj) == 1
+        assert obj[0] == test_testuser
 
     def test_get_user_spec_no_query(self, test_api_client: TestClient) -> None:
         response = test_api_client.get("/test_user//specification")
