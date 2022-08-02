@@ -10,7 +10,15 @@ class BaseTestUserStorageException(Exception):
 
 
 class TestUserDoesNotExistError(BaseTestUserStorageException):
-    """Error for situation when feature not found."""
+    """Error for situation when test user not found."""
+
+    __test__ = False
+
+
+class TestUserUpdatingNotAllowedError(BaseTestUserStorageException):
+    """Error for situation when test user has allow_update=False."""
+
+    __test__ = False
 
 
 class ITestUserStorage(abc.ABC):
@@ -95,4 +103,6 @@ class TestUserStorage(ITestUserStorage):
             test_user = session.query(db.TestUser).get(user_id)
             if test_user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
+            if not test_user.allow_update:
+                raise TestUserUpdatingNotAllowedError(f"Test user updating with id {user_id} not allowed!")
             test_user.specification = specification

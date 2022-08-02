@@ -1,7 +1,14 @@
 import pytest
 
 from overhave import db
-from overhave.storage import FeatureTypeModel, SystemUserModel, TestUserModel, TestUserSpecification, TestUserStorage
+from overhave.storage import (
+    FeatureTypeModel,
+    SystemUserModel,
+    TestUserModel,
+    TestUserSpecification,
+    TestUserStorage,
+    TestUserUpdatingNotAllowedError,
+)
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -55,6 +62,20 @@ class TestTestUserStorage:
         assert test_user.specification == test_specification
 
     @pytest.mark.parametrize("new_specification", [{"kek": "lol", "overhave": "test"}, {}, {"test": "new_value"}])
+    @pytest.mark.parametrize("testuser_allow_update", [False], indirect=True)
+    def test_update_test_user_specification_not_allowed(
+        self,
+        test_user_storage: TestUserStorage,
+        test_testuser: TestUserModel,
+        test_specification: TestUserSpecification,
+        new_specification: TestUserSpecification,
+    ) -> None:
+        assert test_testuser.specification == test_specification
+        with pytest.raises(TestUserUpdatingNotAllowedError):
+            test_user_storage.update_test_user_specification(test_testuser.id, new_specification)
+
+    @pytest.mark.parametrize("new_specification", [{"kek": "lol", "overhave": "test"}, {}, {"test": "new_value"}])
+    @pytest.mark.parametrize("testuser_allow_update", [True], indirect=True)
     def test_update_test_user_specification(
         self,
         test_user_storage: TestUserStorage,

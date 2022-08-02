@@ -129,6 +129,24 @@ class TestTestUserAPI:
         validate_content_null(response, False)
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+    @pytest.mark.parametrize("testuser_allow_update", [False], indirect=True)
+    def test_put_user_spec_not_allowed(
+        self,
+        test_api_client: TestClient,
+        test_testuser: TestUserModel,
+        test_new_specification: TestUserSpecification,
+        test_api_bearer_auth: BearerAuth,
+    ) -> None:
+        response = test_api_client.put(
+            f"/test_user/{test_testuser.id}/specification",
+            auth=test_api_bearer_auth,
+            data=json.dumps(test_new_specification),
+        )
+        assert response.status_code == 400
+        validate_content_null(response, False)
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+    @pytest.mark.parametrize("testuser_allow_update", [True], indirect=True)
     def test_put_user_spec(
         self,
         test_api_client: TestClient,

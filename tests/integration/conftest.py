@@ -80,8 +80,19 @@ def test_specification() -> TestUserSpecification:
 
 
 @pytest.fixture()
+def testuser_allow_update(request: FixtureRequest) -> bool:
+    if hasattr(request, "param"):
+        return request.param
+    return False
+
+
+@pytest.fixture()
 def test_testuser(
-    test_system_user: SystemUserModel, faker: Faker, test_feature_type, test_specification: TestUserSpecification
+    test_system_user: SystemUserModel,
+    faker: Faker,
+    test_feature_type,
+    test_specification: TestUserSpecification,
+    testuser_allow_update: bool,
 ) -> TestUserModel:
     with db.create_session() as session:
         test_user = db.TestUser(
@@ -89,6 +100,7 @@ def test_testuser(
             name=cast(str, faker.word()),
             created_by=test_system_user.login,
             specification=test_specification,
+            allow_update=testuser_allow_update,
         )
         session.add(test_user)
         session.flush()

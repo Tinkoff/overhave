@@ -1,6 +1,6 @@
 from typing import List
 
-import fastapi as fastapi
+import fastapi
 
 from overhave.api.auth import get_authorized_user
 from overhave.api.views import (
@@ -77,6 +77,7 @@ def _get_testrun_router() -> fastapi.APIRouter:
 
 def _get_testuser_router() -> fastapi.APIRouter:
     test_user_router = fastapi.APIRouter()
+
     test_user_router.add_api_route(
         "/",
         test_user_handler,
