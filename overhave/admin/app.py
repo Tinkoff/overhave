@@ -56,7 +56,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
         if flask.request.method == "POST":
             test_run_id = flask.request.form.get("run_id")
             if test_run_id is None:
-                return flask.abort(status=HTTPStatus.BAD_REQUEST)
+                return flask.abort(HTTPStatus.BAD_REQUEST)
             report_precense_resolution = factory.report_manager.get_report_precense_resolution(
                 report=request, run_id=int(test_run_id)
             )
@@ -65,7 +65,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
                     return typing.cast(
                         flask.Response, flask.redirect(f"/reports/{request}", code=HTTPStatus.TEMPORARY_REDIRECT)
                     )
-                return flask.abort(status=HTTPStatus.NOT_FOUND)
+                return flask.abort(HTTPStatus.NOT_FOUND)
         return flask.send_from_directory(factory.context.file_settings.tmp_reports_dir, request)
 
     @flask_app.route("/emulations/<path:url>")
