@@ -167,4 +167,5 @@ class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
 class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
     """Model for :class:`EmulationRun` row."""
 
+    changed_at: datetime
     emulation: EmulationModel

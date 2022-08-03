@@ -1,9 +1,10 @@
 import abc
 import logging
 import socket
-from typing import cast
+from typing import List, cast
 
 import sqlalchemy.orm as so
+from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.entities.settings import OverhaveEmulationSettings
@@ -28,8 +29,9 @@ class AllPortsAreBusyError(EmulationStorageError):
 class IEmulationStorage(abc.ABC):
     """Abstract class for emulation runs storage."""
 
+    @staticmethod
     @abc.abstractmethod
-    def create_emulation_run(self, emulation_id: int, initiated_by: str) -> EmulationRunModel:
+    def create_emulation_run(emulation_id: int, initiated_by: str) -> EmulationRunModel:
         pass
 
     @abc.abstractmethod
@@ -44,6 +46,11 @@ class IEmulationStorage(abc.ABC):
     def set_error_emulation_run(self, emulation_run_id: int, traceback: str) -> None:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def get_emulation_runs_by_test_user_id(test_user_id: int) -> List[EmulationRunModel]:
+        pass
+
 
 class EmulationStorage(IEmulationStorage):
     """Class for emulation runs storage."""
@@ -51,7 +58,8 @@ class EmulationStorage(IEmulationStorage):
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
 
-    def create_emulation_run(self, emulation_id: int, initiated_by: str) -> EmulationRunModel:
+    @staticmethod
+    def create_emulation_run(emulation_id: int, initiated_by: str) -> EmulationRunModel:
         with db.create_session() as session:
             emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
             session.add(emulation_run)
@@ -126,3 +134,17 @@ class EmulationStorage(IEmulationStorage):
                 self._get_emulation_run(session, emulation_run_id)
             )
             return emulation_run
+
+    @staticmethod
+    def get_emulation_runs_by_test_user_id(test_user_id: int) -> List[EmulationRunModel]:
+        with db.create_session() as session:
+            emulation_ids_query = (
+                session.query(db.Emulation)
+                .with_entities(db.Emulation.id)
+                .filter(db.Emulation.test_user_id == test_user_id)
+                .scalar_subquery()
+            )
+            emulation_runs = (
+                session.query(db.EmulationRun).filter(db.EmulationRun.emulation_id == emulation_ids_query).all()
+            )
+            return parse_obj_as(List[EmulationRunModel], emulation_runs)
