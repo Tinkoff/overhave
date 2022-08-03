@@ -6,6 +6,7 @@ from overhave.api.auth import get_authorized_user
 from overhave.api.views import (
     delete_test_user_handler,
     docs,
+    emulation_run_list_handler,
     favicon,
     get_features_handler,
     get_test_run_handler,
@@ -18,7 +19,15 @@ from overhave.api.views import (
     test_user_list_handler,
     test_user_put_spec_handler,
 )
-from overhave.storage import AuthToken, FeatureModel, TagModel, TestRunModel, TestUserModel, TestUserSpecification
+from overhave.storage import (
+    AuthToken,
+    EmulationRunModel,
+    FeatureModel,
+    TagModel,
+    TestRunModel,
+    TestUserModel,
+    TestUserSpecification,
+)
 
 
 def _get_tags_router() -> fastapi.APIRouter:
@@ -120,6 +129,19 @@ def _get_testuser_router() -> fastapi.APIRouter:
     return test_user_router
 
 
+def _get_emulation_router() -> fastapi.APIRouter:
+    emulation_router = fastapi.APIRouter()
+    emulation_router.add_api_route(
+        "/run/list",
+        emulation_run_list_handler,
+        methods=["GET"],
+        response_model=List[EmulationRunModel],
+        summary="Get list of EmulationRun info",
+        description="Get list of EmulationRun info by `test_user_id`",
+    )
+    return emulation_router
+
+
 def _get_auth_router() -> fastapi.APIRouter:
     auth_router = fastapi.APIRouter()
     auth_router.add_api_route(
@@ -142,6 +164,7 @@ def create_overhave_api() -> fastapi.FastAPI:
     app.include_router(_get_feature_router(), dependencies=auth_deps, prefix="/feature", tags=["features"])
     app.include_router(_get_testuser_router(), dependencies=auth_deps, prefix="/test_user", tags=["test_users"])
     app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_run"])
+    app.include_router(_get_emulation_router(), dependencies=auth_deps, prefix="/emulation", tags=["emulation"])
 
     app.include_router(_get_auth_router())
     app.add_api_route("/", docs, methods=["GET"], include_in_schema=False)

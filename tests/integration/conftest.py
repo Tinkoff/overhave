@@ -7,8 +7,11 @@ from _pytest.fixtures import FixtureRequest
 from faker import Faker
 from pydantic import SecretStr
 
-from overhave import db
+from overhave import OverhaveEmulationSettings, db
+from overhave.db import EmulationRun
 from overhave.storage import (
+    EmulationModel,
+    EmulationStorage,
     FeatureModel,
     FeatureTypeModel,
     ScenarioModel,
@@ -47,6 +50,11 @@ def test_scenario_storage() -> ScenarioStorage:
 @pytest.fixture(scope="module")
 def test_run_storage() -> TestRunStorage:
     return TestRunStorage()
+
+
+@pytest.fixture(scope="module")
+def test_emulation_storage() -> EmulationStorage:
+    return EmulationStorage(OverhaveEmulationSettings())
 
 
 @pytest.fixture()
@@ -173,3 +181,26 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
 @pytest.fixture()
 def test_report() -> str:
     return uuid1().hex
+
+
+@pytest.fixture()
+def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
+    with db.create_session() as session:
+        emulation = db.Emulation(
+            name=cast(str, faker.word()),
+            command=cast(str, faker.word()),
+            test_user_id=test_testuser.id,
+            created_by=test_system_user.login,
+        )
+        session.add(emulation)
+        session.flush()
+        return cast(EmulationModel, EmulationModel.from_orm(emulation))
+
+
+@pytest.fixture()
+def test_emulation_run(
+    test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: EmulationModel
+) -> EmulationRun:
+    return test_emulation_storage.create_emulation_run(
+        emulation_id=test_emulation.id, initiated_by=test_system_user.login
+    )

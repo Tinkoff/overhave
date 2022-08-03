@@ -2,17 +2,20 @@ from functools import cache
 from pathlib import Path
 
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.entities import OverhaveRedisSettings
+from overhave.entities import OverhaveEmulationSettings, OverhaveRedisSettings
 from overhave.storage import (
     DraftStorage,
+    EmulationStorage,
     FeatureStorage,
     FeatureTagStorage,
     FeatureTypeStorage,
     IDraftStorage,
+    IEmulationStorage,
     IFeatureStorage,
     IFeatureTagStorage,
     IFeatureTypeStorage,
     ISystemUserStorage,
+    ITestRunStorage,
     ITestUserStorage,
     SystemUserStorage,
     TestRunStorage,
@@ -62,8 +65,13 @@ def get_test_user_storage() -> ITestUserStorage:
 
 
 @cache
-def get_test_run_storage() -> TestRunStorage:
+def get_test_run_storage() -> ITestRunStorage:
     return TestRunStorage()
+
+
+@cache
+def get_emulation_storage() -> IEmulationStorage:
+    return EmulationStorage(OverhaveEmulationSettings())
 
 
 @cache

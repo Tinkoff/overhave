@@ -9,7 +9,7 @@ from overhave.storage import EmulationStorage, SystemUserModel
 from overhave.storage.emulation_storage import NotFoundEmulationError
 
 
-@pytest.mark.usefixtures("database")
+@pytest.mark.usefixtures("database", "socket_mock")
 class TestEmulationStorage:
     """Integration tests for :class:`EmulationStorage`."""
 
