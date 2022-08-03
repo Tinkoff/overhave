@@ -4,16 +4,17 @@ import fastapi
 
 from overhave.api.auth import get_authorized_user
 from overhave.api.views import (
+    delete_test_user_handler,
     docs,
     favicon,
     get_features_handler,
     get_test_run_handler,
+    get_test_user_handler,
     login_for_access_token,
     run_tests_by_tag_handler,
     tags_item_handler,
     tags_list_handler,
     test_user_get_spec_handler,
-    test_user_handler,
     test_user_list_handler,
     test_user_put_spec_handler,
 )
@@ -80,7 +81,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
 
     test_user_router.add_api_route(
         "/",
-        test_user_handler,
+        get_test_user_handler,
         methods=["GET"],
         response_model=TestUserModel,
         summary="Get TestUser",
@@ -93,6 +94,13 @@ def _get_testuser_router() -> fastapi.APIRouter:
         response_model=List[TestUserModel],
         summary="Get list of TestUsers",
         description="Get list of test users with given `feature_type` and `allow_update`",
+    )
+    test_user_router.add_api_route(
+        "/{user_id}/delete",
+        delete_test_user_handler,
+        methods=["DELETE"],
+        summary="Delete TestUser",
+        description="Delete test user by `user_id`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",

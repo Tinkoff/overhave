@@ -51,6 +51,11 @@ class ITestUserStorage(abc.ABC):
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def delete_test_user(user_id: int) -> None:
+        pass
+
 
 class TestUserStorage(ITestUserStorage):
     """Class for Test User storage."""
@@ -106,3 +111,11 @@ class TestUserStorage(ITestUserStorage):
             if not test_user.allow_update:
                 raise TestUserUpdatingNotAllowedError(f"Test user updating with id {user_id} not allowed!")
             test_user.specification = specification
+
+    @staticmethod
+    def delete_test_user(user_id: int) -> None:
+        with db.create_session() as session:
+            user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
+            if user is None:
+                raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
+            session.delete(user)
