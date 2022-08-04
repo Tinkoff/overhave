@@ -178,14 +178,14 @@ dev = ["build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "pip-tools (=
 
 [[package]]
 name = "boto3"
-version = "1.24.43"
+version = "1.24.45"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.43,<1.28.0"
+botocore = ">=1.27.45,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -202,7 +202,7 @@ python-versions = "*"
 
 [[package]]
 name = "botocore"
-version = "1.27.43"
+version = "1.27.45"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -621,7 +621,7 @@ flake8-plugin-utils = ">=1.0,<2.0"
 
 [[package]]
 name = "flask"
-version = "2.2.0"
+version = "2.2.1"
 description = "A simple framework for building complex web applications."
 category = "main"
 optional = false
@@ -635,8 +635,8 @@ Jinja2 = ">=3.0"
 Werkzeug = ">=2.2.0"
 
 [package.extras]
-dotenv = ["python-dotenv"]
 async = ["asgiref (>=3.2)"]
+dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-admin"
