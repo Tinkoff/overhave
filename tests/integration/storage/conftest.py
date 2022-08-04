@@ -8,12 +8,9 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import DraftStatus
-from overhave.entities.settings import OverhaveEmulationSettings
 from overhave.storage import (
     DraftModel,
     DraftStorage,
-    EmulationModel,
-    EmulationStorage,
     FeatureModel,
     FeatureStorage,
     FeatureTagStorage,
@@ -24,36 +21,10 @@ from overhave.storage import (
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="class")
 def socket_mock() -> mock.MagicMock:
     with mock.patch("socket.socket", return_value=mock.create_autospec(socket.socket)) as mocked_socket:
         yield mocked_socket
-
-
-@pytest.fixture(scope="class")
-def test_emulation_settings() -> OverhaveEmulationSettings:
-    return OverhaveEmulationSettings()
-
-
-@pytest.fixture(scope="class")
-def test_emulation_storage(
-    socket_mock: mock.MagicMock, test_emulation_settings: OverhaveEmulationSettings
-) -> EmulationStorage:
-    return EmulationStorage(test_emulation_settings)
-
-
-@pytest.fixture()
-def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
-    with db.create_session() as session:
-        emulation = db.Emulation(
-            name=cast(str, faker.word()),
-            command=cast(str, faker.word()),
-            test_user_id=test_testuser.id,
-            created_by=test_system_user.login,
-        )
-        session.add(emulation)
-        session.flush()
-        return cast(EmulationModel, EmulationModel.from_orm(emulation))
 
 
 @pytest.fixture(scope="class")

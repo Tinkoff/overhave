@@ -1,22 +1,33 @@
 from typing import List
 
-import fastapi as fastapi
+import fastapi
 
 from overhave.api.auth import get_authorized_user
 from overhave.api.views import (
+    delete_test_user_handler,
     docs,
+    emulation_run_list_handler,
     favicon,
     get_features_handler,
     get_test_run_handler,
+    get_test_user_handler,
     login_for_access_token,
     run_tests_by_tag_handler,
     tags_item_handler,
     tags_list_handler,
     test_user_get_spec_handler,
-    test_user_handler,
+    test_user_list_handler,
     test_user_put_spec_handler,
 )
-from overhave.storage import AuthToken, FeatureModel, TagModel, TestRunModel, TestUserModel, TestUserSpecification
+from overhave.storage import (
+    AuthToken,
+    EmulationRunModel,
+    FeatureModel,
+    TagModel,
+    TestRunModel,
+    TestUserModel,
+    TestUserSpecification,
+)
 
 
 def _get_tags_router() -> fastapi.APIRouter:
@@ -76,13 +87,29 @@ def _get_testrun_router() -> fastapi.APIRouter:
 
 def _get_testuser_router() -> fastapi.APIRouter:
     test_user_router = fastapi.APIRouter()
+
     test_user_router.add_api_route(
         "/",
-        test_user_handler,
+        get_test_user_handler,
         methods=["GET"],
         response_model=TestUserModel,
         summary="Get TestUser",
         description="Get test user full info by `user_id` or `user_name`",
+    )
+    test_user_router.add_api_route(
+        "/list",
+        test_user_list_handler,
+        methods=["GET"],
+        response_model=List[TestUserModel],
+        summary="Get list of TestUsers",
+        description="Get list of test users with given `feature_type` and `allow_update`",
+    )
+    test_user_router.add_api_route(
+        "/{user_id}/delete",
+        delete_test_user_handler,
+        methods=["DELETE"],
+        summary="Delete TestUser",
+        description="Delete test user by `user_id`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",
@@ -100,6 +127,19 @@ def _get_testuser_router() -> fastapi.APIRouter:
         description="Update test user specification by `user_id` and given payload",
     )
     return test_user_router
+
+
+def _get_emulation_router() -> fastapi.APIRouter:
+    emulation_router = fastapi.APIRouter()
+    emulation_router.add_api_route(
+        "/run/list",
+        emulation_run_list_handler,
+        methods=["GET"],
+        response_model=List[EmulationRunModel],
+        summary="Get list of EmulationRun info",
+        description="Get list of EmulationRun info by `test_user_id`",
+    )
+    return emulation_router
 
 
 def _get_auth_router() -> fastapi.APIRouter:
@@ -123,7 +163,8 @@ def create_overhave_api() -> fastapi.FastAPI:
     app.include_router(_get_tags_router(), dependencies=auth_deps, prefix="/feature/tags", tags=["feature_tags"])
     app.include_router(_get_feature_router(), dependencies=auth_deps, prefix="/feature", tags=["features"])
     app.include_router(_get_testuser_router(), dependencies=auth_deps, prefix="/test_user", tags=["test_users"])
-    app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_run"])
+    app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_runs"])
+    app.include_router(_get_emulation_router(), dependencies=auth_deps, prefix="/emulation", tags=["emulations"])
 
     app.include_router(_get_auth_router())
     app.add_api_route("/", docs, methods=["GET"], include_in_schema=False)

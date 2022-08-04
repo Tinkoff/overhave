@@ -9,7 +9,7 @@ from overhave.storage import EmulationStorage, SystemUserModel
 from overhave.storage.emulation_storage import NotFoundEmulationError
 
 
-@pytest.mark.usefixtures("database")
+@pytest.mark.usefixtures("database", "socket_mock")
 class TestEmulationStorage:
     """Integration tests for :class:`EmulationStorage`."""
 
@@ -102,3 +102,26 @@ class TestEmulationStorage:
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )
         assert test_emulation_storage.get_emulation_run_by_id(test_emulation.id) == emulation_run
+
+    def test_get_emulation_run_by_test_user_id_empty(
+        self,
+        test_emulation_storage: EmulationStorage,
+        faker: Faker,
+    ) -> None:
+        filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=faker.random_int())
+        assert not filtered_runs
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_get_emulation_run_by_test_user_id(
+        self,
+        test_emulation_storage: EmulationStorage,
+        test_system_user: SystemUserModel,
+        test_emulation: db.Emulation,
+        faker: Faker,
+    ) -> None:
+        emulation_run = test_emulation_storage.create_emulation_run(
+            emulation_id=test_emulation.id, initiated_by=test_system_user.login
+        )
+        filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=test_system_user.id)
+        assert len(filtered_runs) == 1
+        assert filtered_runs[0] == emulation_run

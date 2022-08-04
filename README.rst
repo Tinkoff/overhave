@@ -528,7 +528,12 @@ Right now, API implements types of resources:
 * `features`
     get features info by tag ID or tag value;
 * `test_users`
-    get test user info, specification or put new test user specification.
+    get test user info, specification, put new specification or delete
+    test user;
+* `test_runs`
+    get test run info or create test run with given parameters;
+* `emulations`
+    get emulation runs by test user id.
 
 ------------
 Contributing

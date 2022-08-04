@@ -149,11 +149,13 @@ class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     __test__ = False
 
     id: int
+    created_at: datetime
     name: str
     created_by: str
     specification: TestUserSpecification
     feature_type_id: int
     feature_type: FeatureTypeModel
+    allow_update: bool
 
 
 class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
@@ -165,4 +167,5 @@ class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
 class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
     """Model for :class:`EmulationRun` row."""
 
+    changed_at: datetime
     emulation: EmulationModel

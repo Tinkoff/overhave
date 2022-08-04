@@ -28,9 +28,9 @@ class TestUserView(ModelViewConfigured):
     edit_template = "test_user_edit.html"
 
     can_view_details = False
-    column_list = ("name", "feature_type", "specification", "created_by")
-    column_searchable_list = ("name", "created_by")
-    column_filters = ("name", "created_by")
+    column_list = ("id", "name", "feature_type", "specification", "allow_update", "created_by")
+    column_searchable_list = ("id", "name", "created_by")
+    column_filters = ("id", "name", "created_by", "allow_update")
     form_excluded_columns = ("created_at", "emulations")
     form_overrides = dict(specification=JSONField)
 
@@ -46,6 +46,7 @@ class TestUserView(ModelViewConfigured):
         "feature_type": "Type of scenarios set, where test user will be used",
         "specification": "Test user specification in JSON format placed below",
         "created_by": "Author of test user set",
+        "allow_update": "Property of updating allowance through API",
     }
 
     _feature_type: Optional[str] = None

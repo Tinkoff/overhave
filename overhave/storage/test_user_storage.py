@@ -1,5 +1,5 @@
 import abc
-from typing import Optional, cast
+from typing import List, Optional, cast
 
 from overhave import db
 from overhave.storage import FeatureTypeName, FeatureTypeStorage, TestUserModel, TestUserSpecification
@@ -10,7 +10,15 @@ class BaseTestUserStorageException(Exception):
 
 
 class TestUserDoesNotExistError(BaseTestUserStorageException):
-    """Error for situation when feature not found."""
+    """Error for situation when test user not found."""
+
+    __test__ = False
+
+
+class TestUserUpdatingNotAllowedError(BaseTestUserStorageException):
+    """Error for situation when test user has allow_update=False."""
+
+    __test__ = False
 
 
 class ITestUserStorage(abc.ABC):
@@ -28,6 +36,11 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def create_test_user(
         name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
     ) -> TestUserModel:
@@ -36,6 +49,11 @@ class ITestUserStorage(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def delete_test_user(user_id: int) -> None:
         pass
 
 
@@ -59,6 +77,16 @@ class TestUserStorage(ITestUserStorage):
             return None
 
     @staticmethod
+    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
+        with db.create_session() as session:
+            db_users: List[db.TestUser] = (
+                session.query(db.TestUser)
+                .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update == allow_update)
+                .all()
+            )
+            return [cast(TestUserModel, TestUserModel.from_orm(user)) for user in db_users]
+
+    @staticmethod
     def create_test_user(
         name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
     ) -> TestUserModel:
@@ -80,4 +108,14 @@ class TestUserStorage(ITestUserStorage):
             test_user = session.query(db.TestUser).get(user_id)
             if test_user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
+            if not test_user.allow_update:
+                raise TestUserUpdatingNotAllowedError(f"Test user updating with id {user_id} not allowed!")
             test_user.specification = specification
+
+    @staticmethod
+    def delete_test_user(user_id: int) -> None:
+        with db.create_session() as session:
+            user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
+            if user is None:
+                raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
+            session.delete(user)
