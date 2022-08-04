@@ -163,8 +163,8 @@ def create_overhave_api() -> fastapi.FastAPI:
     app.include_router(_get_tags_router(), dependencies=auth_deps, prefix="/feature/tags", tags=["feature_tags"])
     app.include_router(_get_feature_router(), dependencies=auth_deps, prefix="/feature", tags=["features"])
     app.include_router(_get_testuser_router(), dependencies=auth_deps, prefix="/test_user", tags=["test_users"])
-    app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_run"])
-    app.include_router(_get_emulation_router(), dependencies=auth_deps, prefix="/emulation", tags=["emulation"])
+    app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_runs"])
+    app.include_router(_get_emulation_router(), dependencies=auth_deps, prefix="/emulation", tags=["emulations"])
 
     app.include_router(_get_auth_router())
     app.add_api_route("/", docs, methods=["GET"], include_in_schema=False)
