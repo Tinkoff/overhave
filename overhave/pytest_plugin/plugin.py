@@ -15,9 +15,8 @@ from pytest_bdd.parser import Feature, Scenario, Step
 from yarl import URL
 
 from overhave.factory import IAdminFactory
-from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
+from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner, get_tag_controller
 from overhave.pytest_plugin.helpers import (
-    OverhaveTagController,
     add_admin_feature_link_to_report,
     add_scenario_title_to_report,
     add_task_links_to_report,
@@ -127,7 +126,7 @@ def pytest_bdd_step_error(
 
 
 def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
-    controller = OverhaveTagController()
+    controller = get_tag_controller()
     if not controller.get_suitable_pattern(tag):
         return None
     marker = controller.evaluate_tag(tag)
