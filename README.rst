@@ -304,10 +304,40 @@ Gherkin from `pytest-bdd`_ with unique updates:
 * severity tag - implements `Allure`_ severity to feature or just tagged
     scenario (for example: ```@severity.blocker```);
 * info about feature - who is creator, last editor and publisher;
-* task tracker's tickets with format ```PRJ-1234```.
+* task tracker's tickets with format ```PRJ-1234```;
 
 An example of filled feature content is located in
 `feature_example.rst`_.
+
+Pytest markers
+--------------
+
+**Overhave** implements solution for `PyTest`_ markers usage with custom
+additional information:
+
+* "`disabled`": same as `skip` marker, but it's necessary to setup reason;
+* "`xfail`": traditional `xfail` with strict reason presence.
+
+Examples:
+
+.. code-block:: gherkin
+
+    @disabled(not ready)
+    Feature: My business feature
+
+.. code-block:: gherkin
+
+    @disabled(TODO: https://tracker.myorg.com/browse/PRJ-333; deadline 01.01.25)
+    Scenario: Yet another business feature
+
+
+.. code-block:: gherkin
+
+    @xfail(bug: https://tracker.myorg.com/browse/PRJ-555)
+    Scenario outline: Other business feature
+
+If reason contains URL, so **Overhave** will attach `Allure` link to report:
+for `disabled` - it will be `LinkType.LINK`, for `xfail` - `LinkType.ISSUE`.
 
 Feature links
 -------------
