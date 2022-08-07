@@ -3,7 +3,7 @@ import logging
 from typing import Any, Callable, Dict, Optional
 
 import _pytest
-import pytest
+import allure
 from _pytest.config import Config
 from _pytest.config.argparsing import Argument, Parser
 from _pytest.fixtures import FixtureRequest
@@ -16,7 +16,7 @@ from pytest_bdd.parser import Feature, Scenario, Step
 from yarl import URL
 
 from overhave.factory import IAdminFactory
-from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
+from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner, get_tag_controller
 from overhave.pytest_plugin.helpers import (
     add_admin_feature_link_to_report,
     add_scenario_title_to_report,
@@ -127,10 +127,13 @@ def pytest_bdd_step_error(
 
 
 def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
-    if tag != "skip":
+    controller = get_tag_controller()
+    if not controller.get_suitable_pattern(tag):
         return None
-    marker = pytest.mark.skip(reason="Scenario manually marked as skipped")
-    marker(function)
+    result = controller.evaluate_tag(tag)
+    result.marker(function)
+    if result.url is not None:
+        allure.dynamic.link(url=result.url, link_type=result.link_type, name=result.url)
     return True
 
 

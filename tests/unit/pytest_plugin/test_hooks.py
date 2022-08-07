@@ -124,13 +124,28 @@ class TestPytestBddHooks:
             exception=Exception("babah!"),
         )
 
-    @pytest.mark.parametrize("tag", ["random"])
-    def test_pytest_bdd_apply_tag_not_skip(self, test_pytest_function: Function, tag: str) -> None:
-        assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is None
+    def test_pytest_bdd_apply_tag_not_suitable(self, test_pytest_function: Function, faker: Faker) -> None:
+        assert pytest_bdd_apply_tag(tag=faker.word(), function=test_pytest_function) is None
 
-    @pytest.mark.parametrize("tag", ["skip"])
-    def test_pytest_bdd_apply_tag_skip(self, test_pytest_function: Function, tag: str) -> None:
+    @pytest.mark.parametrize("tag", ["disabled(kek)", "xfail(lol)"])
+    def test_pytest_bdd_apply_tag_without_url(
+        self, link_handler_mock: mock.MagicMock, test_pytest_function: Function, tag: str
+    ) -> None:
         assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is True
+        link_handler_mock.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "tag",
+        [
+            "disabled(TODO: https://link/to/disabling/reason; deadline: 01.01.99)",
+            "xfail(wait until bug https://link/to/bug will be fixed)",
+        ],
+    )
+    def test_pytest_bdd_apply_tag_with_url(
+        self, link_handler_mock: mock.MagicMock, test_pytest_function: Function, tag: str
+    ) -> None:
+        assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is True
+        link_handler_mock.assert_called_once()
 
     @pytest.mark.parametrize("exception", [Exception])
     def test_pytest_bdd_step_func_lookup_error(
