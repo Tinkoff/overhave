@@ -124,10 +124,12 @@ class TestPytestBddHooks:
             exception=Exception("babah!"),
         )
 
+    @pytest.mark.skip()
     @pytest.mark.parametrize("tag", ["random"])
     def test_pytest_bdd_apply_tag_not_skip(self, test_pytest_function: Function, tag: str) -> None:
         assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is None
 
+    @pytest.mark.skip()
     @pytest.mark.parametrize("tag", ["skip"])
     def test_pytest_bdd_apply_tag_skip(self, test_pytest_function: Function, tag: str) -> None:
         assert pytest_bdd_apply_tag(tag=tag, function=test_pytest_function) is True

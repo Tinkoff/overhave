@@ -3,7 +3,6 @@ import logging
 from typing import Any, Callable, Dict, Optional
 
 import _pytest
-import pytest
 from _pytest.config import Config
 from _pytest.config.argparsing import Argument, Parser
 from _pytest.fixtures import FixtureRequest
@@ -18,6 +17,7 @@ from yarl import URL
 from overhave.factory import IAdminFactory
 from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner
 from overhave.pytest_plugin.helpers import (
+    OverhaveTagController,
     add_admin_feature_link_to_report,
     add_scenario_title_to_report,
     add_task_links_to_report,
@@ -127,9 +127,10 @@ def pytest_bdd_step_error(
 
 
 def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
-    if tag != "skip":
+    controller = OverhaveTagController()
+    if not controller.get_suitable_pattern(tag):
         return None
-    marker = pytest.mark.skip(reason="Scenario manually marked as skipped")
+    marker = controller.evaluate_tag(tag)
     marker(function)
     return True
 

@@ -22,6 +22,7 @@ from overhave import (
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
+from overhave.pytest_plugin.helpers import OverhaveTagController
 from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
 from tests.objects import get_test_feature_extractor, get_test_file_settings
@@ -283,3 +284,8 @@ def patched_hook_test_execution_proxy_manager(
 def severity_handler_mock() -> mock.MagicMock:
     with mock.patch("allure.dynamic.severity", return_value=mock.MagicMock()) as mocked_severity_handler:
         yield mocked_severity_handler
+
+
+@pytest.fixture(scope="module")
+def tag_controller() -> OverhaveTagController:
+    return OverhaveTagController()
