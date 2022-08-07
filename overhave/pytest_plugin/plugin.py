@@ -3,6 +3,7 @@ import logging
 from typing import Any, Callable, Dict, Optional
 
 import _pytest
+import allure
 from _pytest.config import Config
 from _pytest.config.argparsing import Argument, Parser
 from _pytest.fixtures import FixtureRequest
@@ -129,8 +130,10 @@ def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
     controller = get_tag_controller()
     if not controller.get_suitable_pattern(tag):
         return None
-    marker = controller.evaluate_tag(tag)
-    marker(function)
+    result = controller.evaluate_tag(tag)
+    result.marker(function)
+    if result.url is not None:
+        allure.dynamic.link(url=result.url, link_type=result.link_type, name=result.url)
     return True
 
 
