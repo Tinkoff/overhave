@@ -42,7 +42,11 @@ class ITestUserStorage(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def create_test_user(
-        name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
+        name: str,
+        specification: TestUserSpecification,
+        created_by: str,
+        feature_type: FeatureTypeName,
+        allow_update: bool,
     ) -> TestUserModel:
         pass
 
@@ -88,7 +92,11 @@ class TestUserStorage(ITestUserStorage):
 
     @staticmethod
     def create_test_user(
-        name: str, specification: TestUserSpecification, created_by: str, feature_type: FeatureTypeName
+        name: str,
+        specification: TestUserSpecification,
+        created_by: str,
+        feature_type: FeatureTypeName,
+        allow_update: bool,
     ) -> TestUserModel:
         feature_type = FeatureTypeStorage.get_feature_type_by_name(name=feature_type)
         with db.create_session() as session:
@@ -97,6 +105,7 @@ class TestUserStorage(ITestUserStorage):
                 specification=specification,
                 feature_type_id=feature_type.id,
                 created_by=created_by,
+                allow_update=allow_update,
             )
             session.add(test_user)
             session.flush()
