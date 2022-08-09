@@ -47,6 +47,7 @@ class TestTestUserStorage:
         assert test_users[0] == test_testuser
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+    @pytest.mark.parametrize("allow_update", [True, False])
     def test_create_test_user(
         self,
         test_user_storage: TestUserStorage,
@@ -54,6 +55,7 @@ class TestTestUserStorage:
         test_specification: TestUserSpecification,
         test_feature_type: FeatureTypeModel,
         test_system_user: SystemUserModel,
+        allow_update: bool,
     ) -> None:
         assert test_user_storage.get_test_user_by_name(test_user_name) is None
         test_user_storage.create_test_user(
@@ -61,11 +63,13 @@ class TestTestUserStorage:
             specification=test_specification,
             feature_type=test_feature_type.name,
             created_by=test_system_user.login,
+            allow_update=allow_update,
         )
         test_user = test_user_storage.get_test_user_by_name(test_user_name)
         assert test_user is not None
         assert test_user.name == test_user_name
         assert test_user.specification == test_specification
+        assert test_user.allow_update == allow_update
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("new_specification", [{"kek": "lol", "overhave": "test"}, {}, {"test": "new_value"}])
