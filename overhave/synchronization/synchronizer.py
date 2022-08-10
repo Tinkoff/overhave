@@ -94,6 +94,8 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         if info.last_edited_by is not None:
             model.last_edited_by = info.last_edited_by
         model.last_edited_at = file_ts
+        if info.severity is not None:
+            model.severity = info.severity
         if info.tasks is not None:
             model.task = info.tasks
         model.feature_tags = tags

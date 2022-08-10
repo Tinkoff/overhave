@@ -61,7 +61,7 @@ class TestTestUserStorage:
         test_user_storage.create_test_user(
             name=test_user_name,
             specification=test_specification,
-            feature_type=test_feature_type.name,
+            feature_type_id=test_feature_type.id,
             created_by=test_system_user.login,
             allow_update=allow_update,
         )

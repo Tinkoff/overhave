@@ -2,7 +2,7 @@ import abc
 from typing import List, Optional, cast
 
 from overhave import db
-from overhave.storage import FeatureTypeName, FeatureTypeStorage, TestUserModel, TestUserSpecification
+from overhave.storage import TestUserModel, TestUserSpecification
 
 
 class BaseTestUserStorageException(Exception):
@@ -45,7 +45,7 @@ class ITestUserStorage(abc.ABC):
         name: str,
         specification: TestUserSpecification,
         created_by: str,
-        feature_type: FeatureTypeName,
+        feature_type_id: int,
         allow_update: bool,
     ) -> TestUserModel:
         pass
@@ -95,15 +95,14 @@ class TestUserStorage(ITestUserStorage):
         name: str,
         specification: TestUserSpecification,
         created_by: str,
-        feature_type: FeatureTypeName,
+        feature_type_id: int,
         allow_update: bool,
     ) -> TestUserModel:
-        feature_type = FeatureTypeStorage.get_feature_type_by_name(name=feature_type)
         with db.create_session() as session:
             test_user = db.TestUser(  # type: ignore
                 name=name,
                 specification=specification,
-                feature_type_id=feature_type.id,
+                feature_type_id=feature_type_id,
                 created_by=created_by,
                 allow_update=allow_update,
             )
