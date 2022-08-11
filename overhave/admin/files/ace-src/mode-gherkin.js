@@ -14,7 +14,7 @@ var GherkinHighlightRules = function() {
         labels: "Функция|Предыстория|Сценарий|Структура сценария|Примеры(?: вертикально)?",
         keywords: "Дано|Когда|То|И|Но"
     }];
-    
+
     var labels = languages.map(function(l) {
         return l.labels;
     }).join("|");
@@ -22,9 +22,9 @@ var GherkinHighlightRules = function() {
         return l.keywords;
     }).join("|");
     this.$rules = {
-        start : [{
-            token: "constant.numeric",
-            regex: "(?:(?:[1-9]\\d*)|(?:0))"
+        start: [{
+            token : "constant.numeric",
+            regex : "(?:(?:[1-9]\\d*)|(?:0))"
         }, {
             token : "comment",
             regex : "#.*$"
@@ -35,17 +35,20 @@ var GherkinHighlightRules = function() {
             token : "keyword",
             regex : "\\*"
         }, {
+            token : "variable",
+            regex : "(?:{[\\w_]*:[\\w]*})|(?:<[\\w]*>)"
+        }, {
             token : "string",           // multi line """ string start
             regex : '"{3}',
-            next : "qqstring3"
+            next  : "qqstring3"
         }, {
             token : "string",           // " string
             regex : '"',
-            next : "qqstring"
+            next  : "qqstring"
         }, {
             token : "text",
             regex : "^\\s*(?=@[\\w])",
-            next : [{
+            next  : [{
                 token : "text",
                 regex : "\\s+"
             }, {
@@ -54,31 +57,31 @@ var GherkinHighlightRules = function() {
             }, {
                 token : "empty",
                 regex : "",
-                next : "start"
+                next  : "start"
             }]
         }, {
-            token : "comment",
+            token : "variable",
             regex : "<[^>]+>"
         }, {
             token : "comment",
             regex : "\\|(?=.)",
-            next : "table-item"
+            next  : "table-item"
         }, {
             token : "comment",
             regex : "\\|$",
-            next : "start"
+            next  : "start"
         }],
-        "qqstring3" : [ {
+        "qqstring3": [{
             token : "constant.language.escape",
             regex : stringEscape
         }, {
             token : "string", // multi line """ string end
             regex : '"{3}',
-            next : "start"
+            next  : "start"
         }, {
-            defaultToken : "string"
+            defaultToken: "string"
         }],
-        "qqstring" : [{
+        "qqstring": [{
             token : "constant.language.escape",
             regex : stringEscape
         }, {
@@ -92,10 +95,10 @@ var GherkinHighlightRules = function() {
         }, {
             defaultToken: "string"
         }],
-        "table-item" : [{
+        "table-item": [{
             token : "comment",
             regex : /$/,
-            next : "start"
+            next  : "start"
         }, {
             token : "comment",
             regex : /\|/
@@ -103,7 +106,7 @@ var GherkinHighlightRules = function() {
             token : "string",
             regex : /\\./
         }, {
-            defaultToken : "string"
+            defaultToken: "string"
         }]
     };
     this.normalizeRules();
@@ -137,25 +140,23 @@ oop.inherits(Mode, TextMode);
         var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
         var tokens = tokenizedLine.tokens;
         
-        if(line.match("[ ]*\\|")) {
+        if (line.match("[ ]*\\|")) {
             indent += "| ";
         }
 
         if (tokens.length && tokens[tokens.length-1].type == "comment") {
             return indent;
         }
-        
 
         if (state == "start") {
             if (line.match("Scenario:|Feature:|Scenario Outline:|Background:|Сценарий:|Функция:|Структура сценария:|Предыстория:")) {
                 indent += space2;
-            } else if(line.match("(Given|Then|Дано|То).+(:)$|Examples:|Примеры:")) {
+            } else if (line.match("(Given|Then|Дано|То).+(:)$|Examples:|Примеры:")) {
                 indent += space2;
-            } else if(line.match("\\*.+")) {
+            } else if (line.match("\\*.+")) {
                 indent += "* ";
-            } 
+            }
         }
-        
 
         return indent;
     };
@@ -169,4 +170,3 @@ exports.Mode = Mode;
                         }
                     });
                 })();
-            
