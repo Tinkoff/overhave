@@ -8,6 +8,17 @@ from _pytest.mark.structures import MarkDecorator
 from pydantic import BaseModel
 
 
+class TagParsingModel(BaseModel):
+    """Class for tag parsing info."""
+
+    tag_pattern: Pattern[str]
+    mark_decorator: MarkDecorator
+    link_type: str
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class TagEvaluationResult(BaseModel):
     """Class for tag evaluation result."""
 
@@ -23,10 +34,6 @@ class BaseOverhaveTagControllerException(Exception):
     """Base exception for :class:`OverhaveTagController`."""
 
 
-class NotSuitableTagForEvaluationError(Exception):
-    """Exception for situation with not suitable tag."""
-
-
 class NoReasonForMarkDecoratorError(Exception):
     """Exception for situation with nullable reason in tag."""
 
@@ -36,16 +43,26 @@ class OverhaveTagController:
 
     @staticmethod
     def _get_tag_pattern(keyword: str) -> Pattern[str]:
-        return re.compile(rf"({keyword})+\(?(?P<text>[^@()]+)?\)?")
+        return re.compile(rf"\b({keyword})+(\(+[^@()]+\)+)?\b")
 
     @cached_property
-    def _tag_pattern_to_mark_mapping(
-        self,
-    ) -> Mapping[Pattern[str], tuple[MarkDecorator, allure_commons.types.LinkType]]:
+    def _tag_to_parsing_model_mapping(self) -> Mapping[str, TagParsingModel]:
         return {
-            self._get_tag_pattern("disabled"): (pytest.mark.skip, allure_commons.types.LinkType.LINK),
-            self._get_tag_pattern("xfail"): (pytest.mark.xfail, allure_commons.types.LinkType.ISSUE),
+            "disabled": TagParsingModel(
+                tag_pattern=self._get_tag_pattern("disabled"),
+                mark_decorator=pytest.mark.skip,
+                link_type=allure_commons.types.LinkType.LINK,
+            ),
+            "xfail": TagParsingModel(
+                tag_pattern=self._get_tag_pattern("xfail"),
+                mark_decorator=pytest.mark.xfail,
+                link_type=allure_commons.types.LinkType.ISSUE,
+            ),
         }
+
+    @cached_property
+    def _reason_pattern(self) -> Pattern[str]:
+        return re.compile(r"\w+\((?P<reason>[^@()]+)\)")
 
     @cached_property
     def _url_pattern(self) -> Pattern[str]:
@@ -57,27 +74,25 @@ class OverhaveTagController:
             return searched.group("url")
         return None
 
-    def get_suitable_pattern(self, name: str) -> Optional[Pattern[str]]:
-        for pattern in self._tag_pattern_to_mark_mapping:
-            result = pattern.match(name)
+    def get_suitable_parsing_model(self, name: str) -> Optional[TagParsingModel]:
+        for parsing_model in self._tag_to_parsing_model_mapping.values():
+            result = parsing_model.tag_pattern.match(name)
             if result is not None:
-                return pattern
+                return parsing_model
         return None
 
-    def evaluate_tag(self, name: str) -> TagEvaluationResult:
-        pattern = self.get_suitable_pattern(name)
-        not_suitable_error = NotSuitableTagForEvaluationError(f"Tag '{name}' could not be processed!")
-        if pattern is None:
-            raise not_suitable_error
-        match = pattern.match(name)
+    def evaluate_tag(self, name: str, parsing_model: TagParsingModel) -> TagEvaluationResult:
+        reason_error = NoReasonForMarkDecoratorError(
+            f"Tag '{name}' has been used without reason! Please, setup reason using round brackets `(`, `)`\n"
+            "For example: `@disabled(TODO: https://tracker.mydomain.com/browse/PRJ-333)`"
+        )
+        match = self._reason_pattern.match(name)
         if match is None:
-            raise not_suitable_error
-        reason = match.group("text")
+            raise reason_error
+        reason = match.group("reason")
         if reason is None:
-            raise NoReasonForMarkDecoratorError(
-                f"Tag '{name}' has been used without reason! Please, setup reason using round brackets `(`, `)`\n"
-                "For example: `@disabled(TODO: https://tracker.mydomain.com/browse/PRJ-333)`"
-            )
+            raise reason_error
         kwargs = {"reason": reason}
-        marker, link_type = self._tag_pattern_to_mark_mapping[pattern]
-        return TagEvaluationResult(marker=marker(**kwargs), url=self._get_url(reason), link_type=link_type)
+        return TagEvaluationResult(
+            marker=parsing_model.mark_decorator(**kwargs), url=self._get_url(reason), link_type=parsing_model.link_type
+        )
