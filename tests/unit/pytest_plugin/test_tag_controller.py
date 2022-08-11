@@ -1,33 +1,32 @@
+from unittest import mock
+
 import allure_commons.types
 import pytest
 from faker import Faker
 
 from overhave.pytest_plugin.helpers import OverhaveTagController
-from overhave.pytest_plugin.helpers.tag_controller import (
-    NoReasonForMarkDecoratorError,
-    NotSuitableTagForEvaluationError,
-    TagEvaluationResult,
-)
+from overhave.pytest_plugin.helpers.tag_controller import NoReasonForMarkDecoratorError, TagEvaluationResult
 
 
 class TestOverhaveTagController:
     """Unit tests for OverhaveTagController."""
 
     def test_get_suitable_pattern_no_pattern(self, tag_controller: OverhaveTagController, faker: Faker) -> None:
-        assert tag_controller.get_suitable_pattern(faker.word()) is None
+        assert tag_controller.get_suitable_parsing_model(faker.word()) is None
 
-    @pytest.mark.parametrize("tag", ["disabled", "xfail"])
-    def test_get_suitable_pattern_disabled(self, tag_controller: OverhaveTagController, tag: str) -> None:
-        assert tag_controller.get_suitable_pattern(tag) == tag_controller._get_tag_pattern(tag)
+    @pytest.mark.parametrize("tag", ["disabled", "xfail", "disabled(kek)", "xfail(lol)"])
+    def test_get_suitable_pattern(self, tag_controller: OverhaveTagController, tag: str) -> None:
+        clear_tag = tag.split("(")[0]
+        assert tag_controller.get_suitable_parsing_model(tag) == tag_controller._tag_to_parsing_model_mapping[clear_tag]
 
-    def test_evaluate_tag_unsuitable(self, tag_controller: OverhaveTagController, faker: Faker) -> None:
-        with pytest.raises(NotSuitableTagForEvaluationError):
-            tag_controller.evaluate_tag(faker.word())
+    @pytest.mark.parametrize("tag", ["disabled_smth", "xfail_smth", "smth_disabled", "smth_xfail"])
+    def test_get_suitable_pattern_not_matched(self, tag_controller: OverhaveTagController, tag: str) -> None:
+        assert tag_controller.get_suitable_parsing_model(tag) is None
 
     @pytest.mark.parametrize("tag", ["disabled", "xfail"])
     def test_evaluate_tag_no_reason(self, tag_controller: OverhaveTagController, tag: str) -> None:
         with pytest.raises(NoReasonForMarkDecoratorError):
-            tag_controller.evaluate_tag(tag)
+            tag_controller.evaluate_tag(name=tag, parsing_model=mock.MagicMock())
 
     @pytest.mark.parametrize(
         ("tag", "result"),
@@ -63,4 +62,6 @@ class TestOverhaveTagController:
         ],
     )
     def test_evaluate_tag(self, tag_controller: OverhaveTagController, tag: str, result: TagEvaluationResult) -> None:
-        assert tag_controller.evaluate_tag(tag) == result
+        parsing_model = tag_controller.get_suitable_parsing_model(tag)
+        assert parsing_model is not None
+        assert tag_controller.evaluate_tag(name=tag, parsing_model=parsing_model) == result

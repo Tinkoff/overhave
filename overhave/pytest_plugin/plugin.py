@@ -128,10 +128,11 @@ def pytest_bdd_step_error(
 
 def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
     controller = get_tag_controller()
-    if not controller.get_suitable_pattern(tag):
+    parsing_model = controller.get_suitable_parsing_model(tag)
+    if not parsing_model:
         logger.debug("Tag '%s' is not suitable for evaluation", tag)
         return None
-    result = controller.evaluate_tag(tag)
+    result = controller.evaluate_tag(name=tag, parsing_model=parsing_model)
     result.marker(function)
     if result.url is not None:
         allure.dynamic.link(url=result.url, link_type=result.link_type, name=result.url)
