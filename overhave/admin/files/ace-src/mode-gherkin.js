@@ -35,8 +35,8 @@ var GherkinHighlightRules = function() {
             token : "keyword",
             regex : "\\*"
         }, {
-            token : "variable",
-            regex : "(?:{[\\w_]*:[\\w]*})|(?:<[\\w]*>)"
+            token : "string.regex",
+            regex : "(?:{[\\w_]*:[\\w]*})"
         }, {
             token : "string",           // multi line """ string start
             regex : '"{3}',
