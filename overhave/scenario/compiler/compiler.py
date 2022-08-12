@@ -3,7 +3,8 @@ from typing import List, Optional, cast
 import allure
 from pytest_bdd import types as default_types
 
-from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import OverhaveLanguageSettings
+from overhave.scenario.compiler.settings import OverhaveScenarioCompilerSettings
 from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import TestExecutorContext
 

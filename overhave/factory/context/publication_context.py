@@ -1,10 +1,10 @@
 from typing import Optional
 
-from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
+from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
 from overhave.publication.settings import BaseGitPublisherSettings, PublicationSettings
-from overhave.test_execution import OverhaveProjectSettings
+from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings
 from overhave.transport import OverhaveGitlabClientSettings
 from overhave.transport.http.base_client.settings import HttpSettingsType
 

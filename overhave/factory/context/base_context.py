@@ -7,9 +7,9 @@ from overhave.entities import (
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveReportManagerSettings,
-    OverhaveScenarioCompilerSettings,
 )
-from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
+from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
+from overhave.test_execution import OverhaveTestSettings
 from overhave.transport import OverhaveS3ManagerSettings
 
 
@@ -27,6 +27,7 @@ class BaseFactoryContext:
     def __init__(
         self,
         compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
+        parser_settings: Optional[OverhaveScenarioParserSettings] = None,
         emulation_settings: Optional[OverhaveEmulationSettings] = None,
         file_settings: Optional[OverhaveFileSettings] = None,
         language_settings: Optional[OverhaveLanguageSettings] = None,
@@ -36,6 +37,7 @@ class BaseFactoryContext:
         test_settings: Optional[OverhaveTestSettings] = None,
     ):
         self._compilation_settings = compilation_settings
+        self._parser_settings = parser_settings
         self._emulation_settings = emulation_settings
         self._file_settings = file_settings
         self._language_settings = language_settings
@@ -53,6 +55,10 @@ class BaseFactoryContext:
     @property
     def compilation_settings(self) -> OverhaveScenarioCompilerSettings:
         return cast(OverhaveScenarioCompilerSettings, self._ensured_settings(self._compilation_settings))
+
+    @property
+    def parser_settings(self) -> OverhaveScenarioParserSettings:
+        return cast(OverhaveScenarioParserSettings, self._ensured_settings(self._parser_settings))
 
     @property
     def emulation_settings(self) -> OverhaveEmulationSettings:

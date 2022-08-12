@@ -6,8 +6,8 @@ from pathlib import Path
 
 from overhave.entities import IFeatureExtractor, OverhaveFileSettings
 from overhave.scenario.compiler import ScenarioCompiler
+from overhave.scenario.file_manager.settings import OverhaveProjectSettings
 from overhave.storage import TestExecutorContext
-from overhave.test_execution.settings import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)
 

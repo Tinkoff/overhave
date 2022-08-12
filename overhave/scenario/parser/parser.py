@@ -7,8 +7,10 @@ from typing import List, Optional, Sequence
 import allure
 from pytest_bdd import types as default_types
 
-from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
-from overhave.scenario.parser.models import FeatureInfo
+from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings
+from overhave.scenario.compiler import OverhaveScenarioCompilerSettings
+from overhave.scenario.parser.models import FeatureInfo, StrictFeatureInfo
+from overhave.scenario.parser.settings import OverhaveScenarioParserSettings
 from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import FeatureTypeName
 
@@ -41,11 +43,13 @@ class ScenarioParser(PrefixMixin):
 
     def __init__(
         self,
+        parser_settings: OverhaveScenarioParserSettings,
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
         tasks_keyword: Optional[str],
     ) -> None:
+        self._parser_settings = parser_settings
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
         self._feature_extractor = feature_extractor
@@ -173,4 +177,6 @@ class ScenarioParser(PrefixMixin):
         header = blocks.pop(0)
         feature_info = self._parse_feature_info(header)
         feature_info.scenarios = blocks_delimiter.join(blocks).replace(indent_substitute, indent)
+        if self._parser_settings.parser_strict_mode:
+            return StrictFeatureInfo(**feature_info.dict())
         return feature_info

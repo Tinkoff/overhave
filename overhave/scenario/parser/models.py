@@ -20,3 +20,18 @@ class FeatureInfo(BaseModel):
     last_edited_at: Optional[datetime]
     tasks: Optional[List[str]]
     scenarios: Optional[str]
+
+
+class StrictFeatureInfo(FeatureInfo):
+    """Model for feature info keeping with strict presence of fields."""
+
+    id: int
+    name: str
+    type: FeatureTypeName
+    tags: List[str]
+    severity: allure.severity_level
+    author: str
+    last_edited_by: str
+    last_edited_at: datetime
+    tasks: List[str]
+    scenarios: str

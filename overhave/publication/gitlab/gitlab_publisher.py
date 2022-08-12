@@ -10,9 +10,8 @@ from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
-from overhave.scenario import FileManager
+from overhave.scenario import FileManager, OverhaveProjectSettings
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
-from overhave.test_execution import OverhaveProjectSettings
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
 
 logger = logging.getLogger(__name__)

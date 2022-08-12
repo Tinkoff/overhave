@@ -3,8 +3,8 @@ from typing import Any, Optional
 import allure
 from _pytest.nodes import Item
 
-from overhave.entities import OverhaveScenarioCompilerSettings
 from overhave.pytest_plugin.helpers.parsed_info import get_feature_info_from_item
+from overhave.scenario import OverhaveScenarioCompilerSettings
 
 
 def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.severity_level]:
