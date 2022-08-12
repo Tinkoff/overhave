@@ -5,36 +5,35 @@ from functools import cached_property
 from typing import List, Optional, Sequence
 
 import allure
-from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
 from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
-from overhave.scenario.errors import (
-    AdditionalInfoParsingError,
-    DatetimeParsingError,
-    FeatureNameParsingError,
-    FeatureTypeParsingError,
-)
-from overhave.scenario.mixin import PrefixMixin
+from overhave.scenario.parser.models import FeatureInfo
+from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import FeatureTypeName
 
 logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1
 
 
-class FeatureInfo(BaseModel):
-    """Model for feature info keeping."""
+class ScenarioParserError(Exception):
+    """Base exception for parsing error."""
 
-    id: Optional[int]
-    name: Optional[str]
-    type: Optional[FeatureTypeName]
-    tags: Optional[List[str]]
-    severity: Optional[allure.severity_level]
-    author: Optional[str]
-    last_edited_by: Optional[str]
-    last_edited_at: Optional[datetime]
-    tasks: Optional[List[str]]
-    scenarios: Optional[str]
+
+class FeatureNameParsingError(ScenarioParserError):
+    """Exception for feature name parsing error."""
+
+
+class FeatureTypeParsingError(ScenarioParserError):
+    """Exception for feature type parsing error."""
+
+
+class AdditionalInfoParsingError(ScenarioParserError):
+    """Exception for additional info parsing error."""
+
+
+class DatetimeParsingError(ScenarioParserError):
+    """Exception for datetime parsing error."""
 
 
 class ScenarioParser(PrefixMixin):

@@ -4,8 +4,7 @@ import allure
 from pytest_bdd import types as default_types
 
 from overhave.entities import OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
-from overhave.scenario.errors import IncorrectScenarioTextError
-from overhave.scenario.mixin import PrefixMixin
+from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import TestExecutorContext
 
 
@@ -19,6 +18,14 @@ def generate_tags_list(context: TestExecutorContext) -> Optional[List[str]]:
     if feature_tags := [i.value for i in context.feature.feature_tags]:
         return feature_tags
     return None
+
+
+class ScenarioCompilerError(Exception):
+    """Base exception for :class:`ScenarioCompiler` errors."""
+
+
+class IncorrectScenarioTextError(ScenarioCompilerError):
+    """Exception for incorrect scenario text format."""
 
 
 class ScenarioCompiler(PrefixMixin):
