@@ -1,3 +1,4 @@
 # flake8: noqa
 from .abstract import IOverhaveSynchronizer
-from .synchronizer import FeatureInfoUserNotFoundError, OverhaveSynchronizer
+from .storage_manager import FeatureInfoUserNotFoundError, SynchronizerStorageManager
+from .synchronizer import OverhaveSynchronizer

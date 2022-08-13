@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import datetime
 from functools import cached_property
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
 import allure
 from pytest_bdd import types as default_types
@@ -18,24 +18,32 @@ logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1
 
 
-class ScenarioParserError(Exception):
+class BaseScenarioParserError(Exception):
     """Base exception for parsing error."""
 
 
-class FeatureNameParsingError(ScenarioParserError):
+class FeatureNameParsingError(BaseScenarioParserError):
     """Exception for feature name parsing error."""
 
 
-class FeatureTypeParsingError(ScenarioParserError):
+class FeatureTypeParsingError(BaseScenarioParserError):
     """Exception for feature type parsing error."""
 
 
-class AdditionalInfoParsingError(ScenarioParserError):
+class AdditionalInfoParsingError(BaseScenarioParserError):
     """Exception for additional info parsing error."""
 
 
-class DatetimeParsingError(ScenarioParserError):
+class DatetimeParsingError(BaseScenarioParserError):
     """Exception for datetime parsing error."""
+
+
+class StrictFeatureParsingError(BaseScenarioParserError):
+    """Exception for ValueError while initialization of StrictFeatureInfo."""
+
+
+class NullableFeatureIdError(BaseScenarioParserError):
+    """Exception for situation when feature id not specified (it's manually created feature)."""
 
 
 class ScenarioParser(PrefixMixin):
@@ -54,6 +62,9 @@ class ScenarioParser(PrefixMixin):
         self._language_settings = language_settings
         self._feature_extractor = feature_extractor
         self._tasks_keyword = tasks_keyword
+
+    def set_strict_mode(self, mode: bool) -> None:
+        self._parser_settings.parser_strict_mode = mode
 
     @cached_property
     def _feature_prefixes(self) -> List[str]:
@@ -167,7 +178,7 @@ class ScenarioParser(PrefixMixin):
             raise FeatureNameParsingError(f"Could not parse feature name from header:\n{header}")
         return feature_info
 
-    def parse(self, feature_txt: str) -> FeatureInfo:
+    def parse(self, feature_txt: str) -> Union[FeatureInfo, StrictFeatureInfo]:
         blocks_delimiter = "\n\n"
         indent = "  "
         indent_substitute = "__"
@@ -177,6 +188,11 @@ class ScenarioParser(PrefixMixin):
         header = blocks.pop(0)
         feature_info = self._parse_feature_info(header)
         feature_info.scenarios = blocks_delimiter.join(blocks).replace(indent_substitute, indent)
-        if self._parser_settings.parser_strict_mode:
+        if not self._parser_settings.parser_strict_mode:
+            return feature_info
+        if feature_info.id is None:
+            raise NullableFeatureIdError("Feature has not got specified ID!")
+        try:
             return StrictFeatureInfo(**feature_info.dict())
-        return feature_info
+        except ValueError as err:
+            raise StrictFeatureParsingError("Could not parse feature to StrictFeatureInfo!") from err

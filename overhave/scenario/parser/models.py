@@ -22,16 +22,16 @@ class FeatureInfo(BaseModel):
     scenarios: Optional[str]
 
 
-class StrictFeatureInfo(FeatureInfo):
+class StrictFeatureInfo(BaseModel):
     """Model for feature info keeping with strict presence of fields."""
 
     id: int
     name: str
     type: FeatureTypeName
-    tags: List[str]
-    severity: allure.severity_level
+    tags: List[str] = []
+    severity: allure.severity_level = allure.severity_level.NORMAL
     author: str
     last_edited_by: str
     last_edited_at: datetime
-    tasks: List[str]
+    tasks: List[str] = []
     scenarios: str
