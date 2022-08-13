@@ -24,7 +24,7 @@ def get_flask_admin(factory: IAdminFactory) -> Admin:
         auth_manager=factory.auth_manager,
         index_template_path=factory.context.admin_settings.index_template_path,
     )
-    admin = Admin(name="Overhave", template_mode="bootstrap3", index_view=index_view)
+    admin = Admin(name="Overhave", template_mode="bootstrap4", index_view=index_view, base_template='overhave_master.html')
     admin.add_link(MenuLink(name="Log out", url="/logout"))
     views_list = [
         FeatureView(db.Feature, db.current_session, category="Scenarios", name="Features"),
