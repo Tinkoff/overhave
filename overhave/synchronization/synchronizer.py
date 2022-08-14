@@ -103,16 +103,15 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             feature_text = feature_file.read_text()
             self._scenario_parser.set_strict_mode(True)
             try:
-                feature_info = cast(StrictFeatureInfo, self._scenario_parser.parse(feature_text))
+                feature_info: StrictFeatureInfo = cast(StrictFeatureInfo, self._scenario_parser.parse(feature_text))
             except NullableFeatureIdError:
                 logger.warning("Feature has not got Overhave ID or ID format is incorrect.")
                 if not create_db_features:
                     logger.warning("create_db_features=%s. Skip it.", create_db_features)
                     continue
                 self._scenario_parser.set_strict_mode(False)
-                self._create_feature(
-                    file=feature_file, info=cast(FeatureInfo, self._scenario_parser.parse(feature_text))
-                )
+                optional_feature_info = cast(FeatureInfo, self._scenario_parser.parse(feature_text))
+                self._create_feature(file=feature_file, info=optional_feature_info)
                 continue
             logger.debug("Parsed feature info: %s", feature_info)
             feature_model = self._storage_manager.get_feature(feature_info.id)

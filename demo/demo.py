@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+from typing import Iterator
 from unittest import mock
 
 import typer
@@ -17,7 +19,7 @@ from overhave import (
 )
 from overhave.cli.admin import _get_admin_app
 from overhave.cli.consumers import _run_consumer
-from overhave.cli.synchronization import _create_synchronizer
+from overhave.cli.synchronizer import _create_synchronizer, _create_validator
 
 overhave_demo = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
 
@@ -52,6 +54,12 @@ def _prepare_synchronizer_factory(settings_generator: OverhaveDemoSettingsGenera
         **settings_generator.default_context_settings  # type: ignore
     )
     overhave_synchronizer_factory().set_context(synchronizer_context)
+
+
+@contextmanager
+def _mock_git_repo() -> Iterator[None]:
+    with mock.patch("git.Repo", return_value=mock.MagicMock()):
+        yield
 
 
 def _ensure_demo_app_has_features(settings_generator: OverhaveDemoSettingsGenerator) -> None:
@@ -125,7 +133,7 @@ def consumer(
 
 
 @overhave_demo.command(short_help="Run Overhave feature synchronization")
-def synchronize(
+def sync_run(
     create_db_features: bool = typer.Option(
         False, "-c", "--create-db-features", is_flag=True, help="Create features in database if necessary"
     ),
@@ -137,4 +145,22 @@ def synchronize(
     ),
 ) -> None:
     _prepare_synchronizer_factory(settings_generator=_get_overhave_settings_generator(language=language))
-    _create_synchronizer().synchronize(create_db_features)
+    with _mock_git_repo():
+        _create_synchronizer().synchronize(create_db_features)
+
+
+@overhave_demo.command(short_help="Run Overhave feature synchronization")
+def validate_features(
+    language: OverhaveDemoAppLanguage = typer.Option(
+        OverhaveDemoAppLanguage.RU,
+        "-l",
+        "--language",
+        help="Overhave application language (defines step prefixes only right now)",
+    ),
+    raise_if_nullable_id: bool = typer.Option(
+        False, "-r", "--raise-if-nullable-id", is_flag=True, help="Raise if validator find features with nullable IDs"
+    ),
+) -> None:
+    _prepare_synchronizer_factory(settings_generator=_get_overhave_settings_generator(language=language))
+    with _mock_git_repo():
+        _create_validator().validate(raise_if_nullable_id)
