@@ -450,8 +450,9 @@ You are able to set necessary settings for your project:
 
 .. code-block:: bash
 
-    overhave synchronize  # only update existing features
-    overhave synchronize --create-db-features  # update + create new features
+    overhave sync run  # only update existing features
+    overhave sync run --create-db-features  # update + create new features
+    overhave sync run --pull-repository  # pull git repo and run sync
 
 You are able to test this tool with **Overhave** demo mode.
 By default, 3 features are created in demo database. Just try
@@ -460,7 +461,24 @@ command - you will get the result.
 
 .. code-block:: bash
 
-    overhave-demo synchronize  # or with '--create-db-features'
+    overhave-demo sync-run  # or with '--create-db-features'
+
+**Overhave** supports validation of existing feature files.
+Command try to parse features and fill defined feature info format.
+If there is any problem, special error will be thrown.
+
+.. code-block:: bash
+
+    overhave sync validate-features
+    overhave sync validate-features --raise-if-nullable-id
+    overhave sync validate-features --pull-repository
+
+And yes, your are able to try it with demo mode:
+
+.. code-block:: bash
+
+    overhave-demo validate-features
+    overhave sync validate-features -r  # --raise-if-nullable-id
 
 Custom index
 ------------
