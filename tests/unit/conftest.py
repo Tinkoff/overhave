@@ -4,7 +4,12 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from pytest_mock import MockFixture
 
-from overhave import OverhaveFileSettings, OverhaveProjectSettings, OverhaveScenarioCompilerSettings
+from overhave import (
+    OverhaveFileSettings,
+    OverhaveProjectSettings,
+    OverhaveScenarioCompilerSettings,
+    OverhaveScenarioParserSettings,
+)
 from overhave.entities import FeatureExtractor, GitRepositoryInitializer
 from overhave.scenario import FileManager
 
@@ -12,6 +17,11 @@ from overhave.scenario import FileManager
 @pytest.fixture(scope="session")
 def test_compilation_settings() -> OverhaveScenarioCompilerSettings:
     return OverhaveScenarioCompilerSettings()
+
+
+@pytest.fixture(scope="session")
+def test_parser_settings() -> OverhaveScenarioParserSettings:
+    return OverhaveScenarioParserSettings()
 
 
 @pytest.fixture()

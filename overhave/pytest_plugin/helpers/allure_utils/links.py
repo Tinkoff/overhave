@@ -4,7 +4,8 @@ from typing import List
 import allure
 import allure_commons.types
 
-from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveProjectSettings
+from overhave.scenario import OverhaveProjectSettings
+from overhave.test_execution import OverhaveAdminLinkSettings
 
 
 def add_task_links_to_report(project_settings: OverhaveProjectSettings, tasks: List[str]) -> None:

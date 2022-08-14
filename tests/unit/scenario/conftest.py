@@ -13,6 +13,7 @@ from overhave import (
     OverhaveLanguageSettings,
     OverhaveProjectSettings,
     OverhaveScenarioCompilerSettings,
+    OverhaveScenarioParserSettings,
 )
 from overhave.entities import FeatureExtractor
 from overhave.scenario import FileManager, ScenarioCompiler, ScenarioParser
@@ -102,11 +103,13 @@ def test_scenario_compiler(
 
 @pytest.fixture()
 def test_scenario_parser(
+    test_parser_settings: OverhaveScenarioParserSettings,
     test_compilation_settings: OverhaveScenarioCompilerSettings,
     language_settings: OverhaveLanguageSettings,
     tasks_keyword: Optional[str],
 ) -> ScenarioParser:
     return ScenarioParser(
+        parser_settings=test_parser_settings,
         compilation_settings=test_compilation_settings,
         language_settings=language_settings,
         feature_extractor=get_test_feature_extractor(),

@@ -23,7 +23,7 @@ from overhave.pytest_plugin.helpers import (
     set_git_project_url_if_necessary,
     set_severity_level,
 )
-from overhave.test_execution.settings import EmptyTaskTrackerURLError, OverhaveProjectSettings
+from overhave.scenario import EmptyTaskTrackerURLError, OverhaveProjectSettings
 
 
 class TestPluginUtils:

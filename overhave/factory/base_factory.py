@@ -190,6 +190,7 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     @cached_property
     def _scenario_parser(self) -> ScenarioParser:
         return ScenarioParser(
+            parser_settings=self.context.parser_settings,
             compilation_settings=self.context.compilation_settings,
             language_settings=self.context.language_settings,
             feature_extractor=self._feature_extractor,

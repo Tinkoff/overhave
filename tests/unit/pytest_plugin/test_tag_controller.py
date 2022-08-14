@@ -12,21 +12,21 @@ class TestOverhaveTagController:
     """Unit tests for OverhaveTagController."""
 
     def test_get_suitable_pattern_no_pattern(self, tag_controller: OverhaveTagController, faker: Faker) -> None:
-        assert tag_controller.get_suitable_parsing_model(faker.word()) is None
+        assert tag_controller.get_suitable_pattern(faker.word()) is None
 
     @pytest.mark.parametrize("tag", ["disabled", "xfail", "disabled(kek)", "xfail(lol)"])
     def test_get_suitable_pattern(self, tag_controller: OverhaveTagController, tag: str) -> None:
         clear_tag = tag.split("(")[0]
-        assert tag_controller.get_suitable_parsing_model(tag) == tag_controller._tag_to_parsing_model_mapping[clear_tag]
+        assert tag_controller.get_suitable_pattern(tag) == tag_controller._get_tag_pattern(clear_tag)
 
     @pytest.mark.parametrize("tag", ["disabled_smth", "xfail_smth", "smth_disabled", "smth_xfail"])
     def test_get_suitable_pattern_not_matched(self, tag_controller: OverhaveTagController, tag: str) -> None:
-        assert tag_controller.get_suitable_parsing_model(tag) is None
+        assert tag_controller.get_suitable_pattern(tag) is None
 
     @pytest.mark.parametrize("tag", ["disabled", "xfail"])
     def test_evaluate_tag_no_reason(self, tag_controller: OverhaveTagController, tag: str) -> None:
         with pytest.raises(NoReasonForMarkDecoratorError):
-            tag_controller.evaluate_tag(name=tag, parsing_model=mock.MagicMock())
+            tag_controller.evaluate_tag(name=tag, pattern=mock.MagicMock())
 
     @pytest.mark.parametrize(
         ("tag", "result"),
@@ -62,6 +62,6 @@ class TestOverhaveTagController:
         ],
     )
     def test_evaluate_tag(self, tag_controller: OverhaveTagController, tag: str, result: TagEvaluationResult) -> None:
-        parsing_model = tag_controller.get_suitable_parsing_model(tag)
-        assert parsing_model is not None
-        assert tag_controller.evaluate_tag(name=tag, parsing_model=parsing_model) == result
+        pattern = tag_controller.get_suitable_pattern(tag)
+        assert pattern is not None
+        assert tag_controller.evaluate_tag(name=tag, pattern=pattern) == result

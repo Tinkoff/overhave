@@ -6,8 +6,8 @@ from pytest_bdd.parser import Scenario, ScenarioTemplate, Step
 
 from overhave.entities import IFeatureExtractor
 from overhave.pytest_plugin.helpers.allure_utils import add_git_project_feature_link_to_report
+from overhave.scenario import OverhaveProjectSettings
 from overhave.storage import FeatureTypeName
-from overhave.test_execution import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)
 
