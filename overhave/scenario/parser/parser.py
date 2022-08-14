@@ -2,39 +2,48 @@ import logging
 import re
 from datetime import datetime
 from functools import cached_property
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
 import allure
-from pydantic import BaseModel
 from pytest_bdd import types as default_types
 
-from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings, OverhaveScenarioCompilerSettings
-from overhave.scenario.errors import (
-    AdditionalInfoParsingError,
-    DatetimeParsingError,
-    FeatureNameParsingError,
-    FeatureTypeParsingError,
-)
-from overhave.scenario.mixin import PrefixMixin
+from overhave.entities import IFeatureExtractor, OverhaveLanguageSettings
+from overhave.scenario.compiler import OverhaveScenarioCompilerSettings
+from overhave.scenario.parser.models import FeatureInfo, StrictFeatureInfo
+from overhave.scenario.parser.settings import OverhaveScenarioParserSettings
+from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import FeatureTypeName
 
 logger = logging.getLogger(__name__)
 _DEFAULT_ID = 1
 
 
-class FeatureInfo(BaseModel):
-    """Model for feature info keeping."""
+class BaseScenarioParserError(Exception):
+    """Base exception for parsing error."""
 
-    id: Optional[int]
-    name: Optional[str]
-    type: Optional[FeatureTypeName]
-    tags: Optional[List[str]]
-    severity: Optional[allure.severity_level]
-    author: Optional[str]
-    last_edited_by: Optional[str]
-    last_edited_at: Optional[datetime]
-    tasks: Optional[List[str]]
-    scenarios: Optional[str]
+
+class FeatureNameParsingError(BaseScenarioParserError):
+    """Exception for feature name parsing error."""
+
+
+class FeatureTypeParsingError(BaseScenarioParserError):
+    """Exception for feature type parsing error."""
+
+
+class AdditionalInfoParsingError(BaseScenarioParserError):
+    """Exception for additional info parsing error."""
+
+
+class DatetimeParsingError(BaseScenarioParserError):
+    """Exception for datetime parsing error."""
+
+
+class StrictFeatureParsingError(BaseScenarioParserError):
+    """Exception for ValueError while initialization of StrictFeatureInfo."""
+
+
+class NullableFeatureIdError(BaseScenarioParserError):
+    """Exception for situation when feature id not specified (it's manually created feature)."""
 
 
 class ScenarioParser(PrefixMixin):
@@ -42,15 +51,20 @@ class ScenarioParser(PrefixMixin):
 
     def __init__(
         self,
+        parser_settings: OverhaveScenarioParserSettings,
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
         tasks_keyword: Optional[str],
     ) -> None:
+        self._parser_settings = parser_settings
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
         self._feature_extractor = feature_extractor
         self._tasks_keyword = tasks_keyword
+
+    def set_strict_mode(self, mode: bool) -> None:
+        self._parser_settings.parser_strict_mode = mode
 
     @cached_property
     def _feature_prefixes(self) -> List[str]:
@@ -164,7 +178,7 @@ class ScenarioParser(PrefixMixin):
             raise FeatureNameParsingError(f"Could not parse feature name from header:\n{header}")
         return feature_info
 
-    def parse(self, feature_txt: str) -> FeatureInfo:
+    def parse(self, feature_txt: str) -> Union[FeatureInfo, StrictFeatureInfo]:
         blocks_delimiter = "\n\n"
         indent = "  "
         indent_substitute = "__"
@@ -174,4 +188,11 @@ class ScenarioParser(PrefixMixin):
         header = blocks.pop(0)
         feature_info = self._parse_feature_info(header)
         feature_info.scenarios = blocks_delimiter.join(blocks).replace(indent_substitute, indent)
-        return feature_info
+        if not self._parser_settings.parser_strict_mode:
+            return feature_info
+        if feature_info.id is None:
+            raise NullableFeatureIdError("Feature has not got specified ID!")
+        try:
+            return StrictFeatureInfo(**feature_info.dict())
+        except ValueError as err:
+            raise StrictFeatureParsingError("Could not parse feature to StrictFeatureInfo!") from err

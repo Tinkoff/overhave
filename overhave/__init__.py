@@ -14,7 +14,6 @@ from overhave.entities import (
     OverhaveLanguageSettings,
     OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
-    OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
     StepPrefixesModel,
 )
@@ -43,9 +42,10 @@ from overhave.pytest_plugin import IProxyManager as OverhaveProxyManager
 from overhave.pytest_plugin import get_description_manager, get_feature_info_from_item
 from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
 from overhave.scenario import FeatureInfo as OverhaveFeatureInfo
+from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
 from overhave.storage import FeatureTypeName as OverhaveFeatureName
 from overhave.storage import TestUserSpecification, TestUserStorage
-from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveProjectSettings, OverhaveTestSettings
+from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveTestSettings
 from overhave.transport import (
     OverhaveApiAuthenticator,
     OverhaveApiAuthenticatorSettings,

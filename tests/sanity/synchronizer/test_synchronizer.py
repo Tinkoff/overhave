@@ -5,10 +5,9 @@ import sqlalchemy.exc
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
-from overhave.scenario.errors import FeatureNameParsingError
+from overhave.scenario import FeatureNameParsingError
 from overhave.storage import FeatureTypeModel, SystemUserModel
-from overhave.synchronization import OverhaveSynchronizer
-from overhave.synchronization.synchronizer import FeatureInfoUserNotFoundError
+from overhave.synchronization import FeatureInfoUserNotFoundError, OverhaveSynchronizer
 
 
 def _check_db_no_features() -> None:

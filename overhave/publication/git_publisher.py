@@ -7,9 +7,8 @@ import git
 from overhave.entities import GitPullError, GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.base_publisher import BaseVersionPublisher, BaseVersionPublisherException
 from overhave.publication.settings import GitPublisherSettings
-from overhave.scenario import FileManager
+from overhave.scenario import FileManager, OverhaveProjectSettings
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
-from overhave.test_execution import OverhaveProjectSettings
 
 logger = logging.getLogger(__name__)
 

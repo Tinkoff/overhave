@@ -5,11 +5,11 @@ from overhave.entities import (
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveReportManagerSettings,
-    OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
-from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveProjectSettings, OverhaveTestSettings
+from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
+from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveTestSettings
 from overhave.transport import OverhaveS3ManagerSettings
 
 
@@ -22,6 +22,7 @@ class OverhaveTestExecutionContext(BaseFactoryContext):
     def __init__(
         self,
         compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
+        parser_settings: Optional[OverhaveScenarioParserSettings] = None,
         description_manager_settings: Optional[OverhaveDescriptionManagerSettings] = None,
         file_settings: Optional[OverhaveFileSettings] = None,
         language_settings: Optional[OverhaveLanguageSettings] = None,
@@ -34,6 +35,7 @@ class OverhaveTestExecutionContext(BaseFactoryContext):
     ) -> None:
         super().__init__(
             compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),
+            parser_settings=parser_settings or OverhaveScenarioParserSettings(),
             file_settings=file_settings or OverhaveFileSettings(),
             language_settings=language_settings or OverhaveLanguageSettings(),
             project_settings=project_settings or OverhaveProjectSettings(),

@@ -6,8 +6,9 @@ import pytest
 from demo.demo import _prepare_synchronizer_factory
 from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import db, overhave_synchronizer_factory
-from overhave.cli.synchronization import _create_synchronizer
+from overhave.cli.synchronizer import _create_synchronizer, _create_validator
 from overhave.factory import ISynchronizerFactory
+from overhave.scenario import FeatureValidator
 from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import IOverhaveSynchronizer
 from tests.objects import get_test_feature_containers
@@ -45,6 +46,17 @@ def test_resolved_synchronizer(
 ) -> IOverhaveSynchronizer:
     _prepare_synchronizer_factory(settings_generator=test_demo_settings_generator)
     return _create_synchronizer()
+
+
+@pytest.fixture()
+def test_resolved_validator(
+    test_synchronizer_factory: ISynchronizerFactory,
+    mocked_git_repo: mock.MagicMock,
+    mock_envs: None,
+    test_demo_settings_generator: OverhaveDemoSettingsGenerator,
+) -> FeatureValidator:
+    _prepare_synchronizer_factory(settings_generator=test_demo_settings_generator)
+    return _create_validator()
 
 
 @pytest.fixture()

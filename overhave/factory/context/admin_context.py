@@ -9,10 +9,10 @@ from overhave.entities import (
     OverhaveLdapManagerSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
-    OverhaveScenarioCompilerSettings,
 )
 from overhave.factory.context.base_context import BaseFactoryContext
-from overhave.test_execution import OverhaveProjectSettings, OverhaveTestSettings
+from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings
+from overhave.test_execution import OverhaveTestSettings
 from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings
 
 

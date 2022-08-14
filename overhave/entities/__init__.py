@@ -20,7 +20,6 @@ from .settings import (
     OverhaveLanguageSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
-    OverhaveScenarioCompilerSettings,
     OverhaveStepContextSettings,
     ProcessorSettings,
 )

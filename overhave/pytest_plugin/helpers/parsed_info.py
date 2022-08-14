@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, cast
 
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
@@ -10,7 +10,7 @@ from overhave.scenario import FeatureInfo, ScenarioParser
 
 def _parse_feature_info_from_file(scenario: Scenario, scenario_parser: ScenarioParser) -> FeatureInfo:
     feature_txt = Path(scenario.feature.filename).read_text()
-    return scenario_parser.parse(feature_txt)
+    return cast(FeatureInfo, scenario_parser.parse(feature_txt))
 
 
 def set_feature_info_for_item(item: Item, scenario_parser: ScenarioParser) -> None:
