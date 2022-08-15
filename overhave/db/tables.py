@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import List, Optional, cast
 
 import allure
@@ -48,7 +49,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     file_path = sa.Column(sa.String(), doc="Feature file path", nullable=False, unique=True)
     task = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=False)
     last_edited_by = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
-    last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
+    last_edited_at = sa.Column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
     released = sa.Column(sa.Boolean, doc="Feature release state boolean", nullable=False, default=False)
     severity = sa.Column(
         sa.Enum(allure.severity_level),
@@ -61,7 +62,14 @@ class Feature(BaseTable, PrimaryKeyMixin):
     feature_tags = so.relationship(Tags, order_by=Tags.value, secondary="feature_tags_association_table")
 
     def __init__(
-        self, name: str, author: str, type_id: int, file_path: str, task: List[str], severity: allure.severity_level
+        self,
+        name: str,
+        author: str,
+        type_id: int,
+        file_path: str,
+        task: List[str],
+        severity: allure.severity_level,
+        last_edited_at: datetime.datetime,
     ) -> None:
         self.name = name
         self.author = author
@@ -70,6 +78,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
         self.task = task
         self.last_edited_by = author
         self.severity = severity
+        self.last_edited_at = last_edited_at
 
 
 class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
@@ -173,6 +182,7 @@ class TestUser(BaseTable, PrimaryKeyMixin):
     specification = sa.Column(sa.JSON(none_as_null=True))
     created_by = sa.Column(sa.String(), sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)
     allow_update = sa.Column(sa.Boolean(), doc="User updating allowance", nullable=False, default=False)
+    changed_at = sa.Column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
 
     feature_type = so.relationship(FeatureType)
 
