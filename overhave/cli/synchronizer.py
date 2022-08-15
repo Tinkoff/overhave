@@ -29,7 +29,7 @@ def _create_validator() -> FeatureValidator:
     return get_synchronizer_factory().feature_validator
 
 
-@sync_app.command(short_help="Run Overhave features synchronization")
+@sync_app.command(short_help="Run Overhave feature files validation")
 def validate_features(
     raise_if_nullable_id: bool = typer.Option(
         False, "-r", "--raise-if-nullable-id", is_flag=True, help="Raise if validator find features with nullable IDs"
