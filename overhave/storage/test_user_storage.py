@@ -3,6 +3,7 @@ from typing import List, Optional, cast
 
 from overhave import db
 from overhave.storage import TestUserModel, TestUserSpecification
+from overhave.utils import get_current_time
 
 
 class BaseTestUserStorageException(Exception):
@@ -105,6 +106,7 @@ class TestUserStorage(ITestUserStorage):
                 feature_type_id=feature_type_id,
                 created_by=created_by,
                 allow_update=allow_update,
+                changed_at=get_current_time(),
             )
             session.add(test_user)
             session.flush()
@@ -119,6 +121,7 @@ class TestUserStorage(ITestUserStorage):
             if not test_user.allow_update:
                 raise TestUserUpdatingNotAllowedError(f"Test user updating with id {user_id} not allowed!")
             test_user.specification = specification
+            test_user.changed_at = get_current_time()
 
     @staticmethod
     def delete_test_user(user_id: int) -> None:

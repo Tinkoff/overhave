@@ -14,6 +14,7 @@ from pytest_mock import MockerFixture
 from overhave import db
 from overhave.admin import views
 from overhave.admin.views.formatters.helpers import get_button_class_by_status
+from overhave.utils import get_current_time
 
 
 def _generate_tables_with_views_tests(metafunc: Metafunc):
@@ -135,6 +136,7 @@ def test_feature_row(
         file_path=test_feature_filepath,
         task=test_feature_model_task,
         severity=test_severity,
+        last_edited_at=get_current_time(),
     )
     row.id = test_feature_id
     return row

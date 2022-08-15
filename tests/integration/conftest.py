@@ -25,6 +25,7 @@ from overhave.storage import (
     TestUserSpecification,
     TestUserStorage,
 )
+from overhave.utils import get_current_time
 
 
 @pytest.fixture(scope="module")
@@ -146,6 +147,7 @@ def test_feature(
             task=[faker.word()[:11]],
             file_path=f"{faker.word()}/{faker.word()}",
             severity=test_severity,
+            last_edited_at=get_current_time(),
         )
         session.add(feature)
         session.flush()

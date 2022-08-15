@@ -54,6 +54,7 @@ class ModelViewConfigured(ModelView):
         "last_edited_at": datetime_formatter,
         "start": datetime_formatter,
         "end": datetime_formatter,
+        "changed_at": datetime_formatter,
         "task": task_formatter,
         "status": result_report_formatter,
         "specification": json_formatter,

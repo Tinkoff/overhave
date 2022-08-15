@@ -7,6 +7,7 @@ from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.storage.converters import FeatureModel
+from overhave.utils import get_current_time
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,7 @@ class FeatureStorage(IFeatureStorage):
                 file_path=model.file_path,
                 task=model.task,
                 severity=model.severity,
+                last_edited_at=get_current_time(),
             )
             feature.last_edited_at = model.last_edited_at
             feature.released = model.released
@@ -98,6 +100,7 @@ class FeatureStorage(IFeatureStorage):
             feature.task = model.task
             feature.severity = model.severity
             feature.last_edited_by = model.last_edited_by
+            feature.last_edited_at = get_current_time()
             feature.released = True
             session.flush()
 

@@ -156,6 +156,7 @@ class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     feature_type_id: int
     feature_type: FeatureTypeModel
     allow_update: bool
+    changed_at: datetime
 
 
 class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
