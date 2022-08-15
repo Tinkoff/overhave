@@ -1,0 +1,88 @@
+body {
+    font-size: 14px;
+}
+
+a.toggle-block {
+    color: #dd4814 !important;
+}
+
+h4 {
+    font-size: 18px;
+    color: #dd4814 !important;
+}
+
+.bg-dark {
+    background-color: #dd4814 !important;
+}
+
+.navbar {
+    border-radius: 4px;
+}
+
+.nav-link {
+    font-size: 1rem;
+}
+
+.page-item {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.help-block {
+    color: #868e96 !important;
+}
+
+.control-label {
+    text-align: right;
+    font-weight: bold;
+    display: inline-block !important;
+}
+
+.btn-primary,
+.btn-danger {
+    background-color: #dd4814;
+    border-color: #c14011;
+}
+
+.form-control-lg {
+    width: 100%;
+}
+
+.table td {
+    padding: 8px;
+}
+
+.table > tbody > tr.success > td {
+    background-color: #dff0d8;
+}
+
+.table > tbody > tr.warning > td {
+    background-color: #fcf8e3;
+}
+
+.table > tbody > tr.info > td {
+    background-color: #d9edf7;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: #dd4814;
+}
+
+li.dropdown {
+    font-weight: 400 !important;
+}
+
+.dropdown-menu a {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+.navbar .nav > li > a {
+    padding: 0.5rem 1rem !important;
+}

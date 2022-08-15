@@ -26,6 +26,7 @@
             left:auto;
             display:none;
             padding:10px;
+            font-size: 12px;
         }
         div.step_hint {
             background-color:#00a6ed;
@@ -259,9 +260,9 @@
             <tbody>
             {% for bdd_step in bdd_fixtures[feature_type][step_type] %}
                 <tr class="inserter {{ step_classes[step_type] }}">
-                    <td style="width:10%;"><a href="#" class="btn btn-success btn-xs">insert</a></td>
+                    <td style="width:10%;"><a href="#" class="btn btn-success btn-sm">insert</a></td>
                     <td style="width:10%;">
-                        <div class="btn btn-default btn-xs step_hint">
+                        <div class="btn btn-default btn-sm step_hint">
                             info
                             <span class="step_hint_block">{{ bdd_step.html_doc }}</span>
                         </div>

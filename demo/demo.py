@@ -1,8 +1,10 @@
+import logging
 from contextlib import contextmanager
 from typing import Iterator
 from unittest import mock
 
 import typer
+from pydantic import SecretStr
 
 from demo.settings import OverhaveDemoAppLanguage, OverhaveDemoSettingsGenerator
 from overhave import (
@@ -20,6 +22,9 @@ from overhave import (
 from overhave.cli.admin import _get_admin_app
 from overhave.cli.consumers import _run_consumer
 from overhave.cli.synchronizer import _create_synchronizer, _create_validator
+from overhave.scenario.parser.parser import BaseScenarioParserError
+
+logger = logging.getLogger(__name__)
 
 overhave_demo = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
 
@@ -69,8 +74,13 @@ def _ensure_demo_app_has_features(settings_generator: OverhaveDemoSettingsGenera
     if not overhave_synchronizer_factory().system_user_storage.get_user_by_credits(
         login=settings_generator.default_feature_user
     ):
-        overhave_synchronizer_factory().system_user_storage.create_user(login=settings_generator.default_feature_user)
-    synchronizer.synchronize(create_db_features=create_db_features)
+        overhave_synchronizer_factory().system_user_storage.create_user(
+            login=settings_generator.default_feature_user, password=SecretStr(settings_generator.default_feature_user)
+        )
+    try:
+        synchronizer.synchronize(create_db_features=create_db_features)
+    except BaseScenarioParserError:
+        logger.exception("Could not create features completely! Skip it.")
 
 
 def _run_demo_admin(settings_generator: OverhaveDemoSettingsGenerator) -> None:
