@@ -8,6 +8,7 @@ from wtforms import Form, ValidationError
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_admin_factory
+from overhave.utils import get_current_time
 
 
 def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str, Union[int, str]]]:
@@ -78,6 +79,7 @@ class TestUserView(ModelViewConfigured):
         self._validate_json(model)
         if is_created:
             model.created_by = current_user.login
+        model.changed_at = get_current_time()
 
     def on_model_delete(self, model: db.TestUser) -> None:
         if not (current_user.login == model.created_by or current_user.role == db.Role.admin):
