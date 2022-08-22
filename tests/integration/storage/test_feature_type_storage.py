@@ -25,3 +25,17 @@ class TestFeatureTypeStorage:
         model = test_feature_type_storage.get_feature_type_by_name(test_feature_type.name)
         assert model is not None
         _check_base_feature_type_model(test_model=model, validation_model=test_feature_type)
+
+    def test_get_all_types_empty(
+        self,
+        test_feature_type_storage: FeatureTypeStorage,
+    ) -> None:
+        models = test_feature_type_storage.get_all_feature_types()
+        assert not models
+
+    def test_get_all_types(
+        self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel
+    ) -> None:
+        models = test_feature_type_storage.get_all_feature_types()
+        assert len(models) == 1
+        assert models[0] == test_feature_type

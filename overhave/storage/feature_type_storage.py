@@ -1,5 +1,5 @@
 import abc
-from typing import cast
+from typing import List, cast
 
 from overhave import db
 from overhave.storage.converters import FeatureTypeModel
@@ -26,6 +26,11 @@ class IFeatureTypeStorage(abc.ABC):
     def get_feature_type_by_name(name: str) -> FeatureTypeModel:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def get_all_feature_types() -> List[FeatureTypeModel]:
+        pass
+
 
 class FeatureTypeStorage(IFeatureTypeStorage):
     """Class for feature type storage."""
@@ -45,3 +50,9 @@ class FeatureTypeStorage(IFeatureTypeStorage):
             if feature_type is None:
                 raise FeatureTypeNotExistsError(f"Could not find feature type with name='{name}'!")
             return cast(FeatureTypeModel, FeatureTypeModel.from_orm(feature_type))
+
+    @staticmethod
+    def get_all_feature_types() -> List[FeatureTypeModel]:
+        with db.create_session() as session:
+            db_feature_types = session.query(db.FeatureType).all()
+            return cast(List[FeatureTypeModel], [FeatureTypeModel.from_orm(x) for x in db_feature_types])
