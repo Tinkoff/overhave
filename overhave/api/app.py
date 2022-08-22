@@ -8,6 +8,7 @@ from overhave.api.views import (
     docs,
     emulation_run_list_handler,
     favicon,
+    feature_types_list_handler,
     get_features_handler,
     get_test_run_handler,
     get_test_user_handler,
@@ -23,6 +24,7 @@ from overhave.storage import (
     AuthToken,
     EmulationRunModel,
     FeatureModel,
+    FeatureTypeModel,
     TagModel,
     TestRunModel,
     TestUserModel,
@@ -49,6 +51,19 @@ def _get_tags_router() -> fastapi.APIRouter:
         description="Get list of feature tags like `value`",
     )
     return tags_router
+
+
+def _get_feature_type_router() -> fastapi.APIRouter:
+    feature_router = fastapi.APIRouter()
+    feature_router.add_api_route(
+        "/list",
+        feature_types_list_handler,
+        methods=["GET"],
+        response_model=List[FeatureTypeModel],
+        summary="Get list of FeatureType info",
+        description="Get list of feature types",
+    )
+    return feature_router
 
 
 def _get_feature_router() -> fastapi.APIRouter:
@@ -161,6 +176,9 @@ def create_overhave_api() -> fastapi.FastAPI:
     auth_deps = [fastapi.Depends(get_authorized_user)]
 
     app.include_router(_get_tags_router(), dependencies=auth_deps, prefix="/feature/tags", tags=["feature_tags"])
+    app.include_router(
+        _get_feature_type_router(), dependencies=auth_deps, prefix="/feature/types", tags=["feature_types"]
+    )
     app.include_router(_get_feature_router(), dependencies=auth_deps, prefix="/feature", tags=["features"])
     app.include_router(_get_testuser_router(), dependencies=auth_deps, prefix="/test_user", tags=["test_users"])
     app.include_router(_get_testrun_router(), dependencies=auth_deps, prefix="/test_run", tags=["test_runs"])
