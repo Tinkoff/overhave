@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "3.8.3"
+version = "3.8.4"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -64,6 +64,7 @@ typer = "^0.4.0"
 Flask-Login = "^0.6.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
+aiofiles = "^0.8.0"
 
 
 [tool.poetry.dev-dependencies]
