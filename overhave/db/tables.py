@@ -177,7 +177,8 @@ class TestUser(BaseTable, PrimaryKeyMixin):
 
     __test__ = False
 
-    name = sa.Column(sa.String(), nullable=False, unique=True)
+    key = sa.Column(sa.String(), nullable=False, unique=True, doc="Unique user key")
+    name = sa.Column(sa.String(), nullable=False, unique=True, doc="Informational user name")
     feature_type_id = sa.Column(sa.Integer(), sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     specification = sa.Column(sa.JSON(none_as_null=True))
     created_by = sa.Column(sa.String(), sa.ForeignKey(UserRole.login), doc="Author login", nullable=False)

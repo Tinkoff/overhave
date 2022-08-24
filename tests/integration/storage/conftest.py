@@ -74,5 +74,10 @@ def test_draft(
 
 
 @pytest.fixture()
+def test_user_key(faker: Faker) -> str:
+    return faker.word()
+
+
+@pytest.fixture()
 def test_user_name(faker: Faker) -> str:
     return faker.word()

@@ -32,7 +32,7 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
+    def get_test_user_by_key(key: str) -> Optional[TestUserModel]:
         pass
 
     @staticmethod
@@ -43,6 +43,7 @@ class ITestUserStorage(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def create_test_user(
+        key: str,
         name: str,
         specification: TestUserSpecification,
         created_by: str,
@@ -74,9 +75,9 @@ class TestUserStorage(ITestUserStorage):
             return None
 
     @staticmethod
-    def get_test_user_by_name(name: str) -> Optional[TestUserModel]:
+    def get_test_user_by_key(key: str) -> Optional[TestUserModel]:
         with db.create_session() as session:
-            user: Optional[db.TestUser] = session.query(db.TestUser).filter(db.TestUser.name == name).one_or_none()
+            user: Optional[db.TestUser] = session.query(db.TestUser).filter(db.TestUser.key == key).one_or_none()
             if user is not None:
                 return cast(TestUserModel, TestUserModel.from_orm(user))
             return None
@@ -93,6 +94,7 @@ class TestUserStorage(ITestUserStorage):
 
     @staticmethod
     def create_test_user(
+        key: str,
         name: str,
         specification: TestUserSpecification,
         created_by: str,
@@ -101,6 +103,7 @@ class TestUserStorage(ITestUserStorage):
     ) -> TestUserModel:
         with db.create_session() as session:
             test_user = db.TestUser(  # type: ignore
+                key=key,
                 name=name,
                 specification=specification,
                 feature_type_id=feature_type_id,

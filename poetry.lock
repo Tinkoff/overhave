@@ -45,20 +45,20 @@ tz = ["python-dateutil"]
 
 [[package]]
 name = "allure-pytest"
-version = "2.9.45"
+version = "2.10.0"
 description = "Allure pytest integration"
 category = "dev"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-allure-python-commons = "2.9.45"
+allure-python-commons = "2.10.0"
 pytest = ">=4.5.0"
 six = ">=1.9.0"
 
 [[package]]
 name = "allure-python-commons"
-version = "2.9.45"
+version = "2.10.0"
 description = "Common module for integrate allure with python-based frameworks"
 category = "dev"
 optional = false
@@ -186,14 +186,14 @@ dev = ["build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "pip-tools (=
 
 [[package]]
 name = "boto3"
-version = "1.24.54"
+version = "1.24.57"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.54,<1.28.0"
+botocore = ">=1.27.57,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -210,7 +210,7 @@ python-versions = "*"
 
 [[package]]
 name = "botocore"
-version = "1.27.54"
+version = "1.27.57"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -245,7 +245,7 @@ pycparser = "*"
 
 [[package]]
 name = "charset-normalizer"
-version = "2.1.0"
+version = "2.1.1"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "main"
 optional = false
@@ -342,20 +342,21 @@ python-versions = "*"
 
 [[package]]
 name = "docker"
-version = "5.0.3"
+version = "6.0.0"
 description = "A Python library for the Docker Engine API."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
-pywin32 = {version = "227", markers = "sys_platform == \"win32\""}
-requests = ">=2.14.2,<2.18.0 || >2.18.0"
+packaging = ">=14.0"
+pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
+requests = ">=2.26.0"
+urllib3 = ">=1.26.0"
 websocket-client = ">=0.32.0"
 
 [package.extras]
-ssh = ["paramiko (>=2.4.2)"]
-tls = ["pyOpenSSL (>=17.5.0)", "cryptography (>=3.4.7)", "idna (>=2.0.0)"]
+ssh = ["paramiko (>=2.4.3)"]
 
 [[package]]
 name = "docutils"
@@ -413,7 +414,7 @@ typing-extensions = {version = ">=3.10.0.2", markers = "python_version < \"3.8\"
 
 [[package]]
 name = "fastapi"
-version = "0.79.0"
+version = "0.79.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
 optional = false
@@ -568,7 +569,7 @@ test = ["pytest-cov"]
 
 [[package]]
 name = "flake8-logging-format"
-version = "0.7.4"
+version = "0.7.5"
 description = ""
 category = "dev"
 optional = false
@@ -1012,11 +1013,11 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
 name = "pep8-naming"
-version = "0.13.1"
+version = "0.13.2"
 description = "Check PEP-8 naming conventions, plugin for flake8"
 category = "dev"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 
 [package.dependencies]
 flake8 = ">=3.9.1"
@@ -1396,7 +1397,7 @@ python-versions = "*"
 
 [[package]]
 name = "pywin32"
-version = "227"
+version = "304"
 description = "Python for Window Extensions"
 category = "main"
 optional = false
@@ -1412,7 +1413,7 @@ python-versions = "*"
 
 [[package]]
 name = "readme-renderer"
-version = "36.0"
+version = "37.0"
 description = "readme_renderer is a library for rendering \"readme\" descriptions for Warehouse"
 category = "dev"
 optional = false
@@ -1880,7 +1881,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
@@ -1888,7 +1889,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, 
 
 [package.extras]
 brotli = ["brotlicffi (>=0.8.0)", "brotli (>=1.0.9)", "brotlipy (>=0.6.0)"]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
+secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "urllib3-secure-extra", "ipaddress"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
@@ -2050,14 +2051,8 @@ alchemy-mock = [
     {file = "alchemy_mock-0.4.3-py2.py3-none-any.whl", hash = "sha256:e076b11cdef76638f4de70d50f0d8cb851d69c41346d984371f757c8fb4a0efa"},
 ]
 alembic = []
-allure-pytest = [
-    {file = "allure-pytest-2.9.45.tar.gz", hash = "sha256:20620fde08a597578b157a60ff38bdcc300e312d12eaa38cf28e4a62e22bdaa3"},
-    {file = "allure_pytest-2.9.45-py3-none-any.whl", hash = "sha256:9b0325e06f8f79cf03289d4f4d741e57607d0fa12d9c094e243cbb042283f083"},
-]
-allure-python-commons = [
-    {file = "allure-python-commons-2.9.45.tar.gz", hash = "sha256:c238d28aeac35e8c7c517d8a2327e25ae5bbf2c30b5e2313d20ef11d75f5549d"},
-    {file = "allure_python_commons-2.9.45-py3-none-any.whl", hash = "sha256:3572f0526db3946fb14470c58b0b41d343483aad91d37d414e4641815e13691a"},
-]
+allure-pytest = []
+allure-python-commons = []
 anyio = [
     {file = "anyio-3.6.1-py3-none-any.whl", hash = "sha256:cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be"},
     {file = "anyio-3.6.1.tar.gz", hash = "sha256:413adf95f93886e442aea925f3ee43baa5a765a64a0f52c6081894f9992fdd0b"},
@@ -2109,10 +2104,7 @@ deprecated = [
     {file = "Deprecated-1.2.13.tar.gz", hash = "sha256:43ac5335da90c31c24ba028af536a91d41d53f9e6901ddb021bcc572ce44e38d"},
 ]
 distlib = []
-docker = [
-    {file = "docker-5.0.3-py2.py3-none-any.whl", hash = "sha256:7a79bb439e3df59d0a72621775d600bc8bc8b422d285824cb37103eab91d1ce0"},
-    {file = "docker-5.0.3.tar.gz", hash = "sha256:d916a26b62970e7c2f554110ed6af04c7ccff8e9f81ad17d0d40c75637e227fb"},
-]
+docker = []
 docutils = [
     {file = "docutils-0.17.1-py2.py3-none-any.whl", hash = "sha256:cf316c8370a737a022b72b56874f6602acf974a37a9fba42ec2876387549fc61"},
     {file = "docutils-0.17.1.tar.gz", hash = "sha256:686577d2e4c32380bb50cbb22f575ed742d58168cee37e99117a854bcd88f125"},
@@ -2614,20 +2606,7 @@ python-multipart = [
     {file = "python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
 ]
 pytz = []
-pywin32 = [
-    {file = "pywin32-227-cp27-cp27m-win32.whl", hash = "sha256:371fcc39416d736401f0274dd64c2302728c9e034808e37381b5e1b22be4a6b0"},
-    {file = "pywin32-227-cp27-cp27m-win_amd64.whl", hash = "sha256:4cdad3e84191194ea6d0dd1b1b9bdda574ff563177d2adf2b4efec2a244fa116"},
-    {file = "pywin32-227-cp35-cp35m-win32.whl", hash = "sha256:f4c5be1a293bae0076d93c88f37ee8da68136744588bc5e2be2f299a34ceb7aa"},
-    {file = "pywin32-227-cp35-cp35m-win_amd64.whl", hash = "sha256:a929a4af626e530383a579431b70e512e736e9588106715215bf685a3ea508d4"},
-    {file = "pywin32-227-cp36-cp36m-win32.whl", hash = "sha256:300a2db938e98c3e7e2093e4491439e62287d0d493fe07cce110db070b54c0be"},
-    {file = "pywin32-227-cp36-cp36m-win_amd64.whl", hash = "sha256:9b31e009564fb95db160f154e2aa195ed66bcc4c058ed72850d047141b36f3a2"},
-    {file = "pywin32-227-cp37-cp37m-win32.whl", hash = "sha256:47a3c7551376a865dd8d095a98deba954a98f326c6fe3c72d8726ca6e6b15507"},
-    {file = "pywin32-227-cp37-cp37m-win_amd64.whl", hash = "sha256:31f88a89139cb2adc40f8f0e65ee56a8c585f629974f9e07622ba80199057511"},
-    {file = "pywin32-227-cp38-cp38-win32.whl", hash = "sha256:7f18199fbf29ca99dff10e1f09451582ae9e372a892ff03a28528a24d55875bc"},
-    {file = "pywin32-227-cp38-cp38-win_amd64.whl", hash = "sha256:7c1ae32c489dc012930787f06244426f8356e129184a02c25aef163917ce158e"},
-    {file = "pywin32-227-cp39-cp39-win32.whl", hash = "sha256:c054c52ba46e7eb6b7d7dfae4dbd987a1bb48ee86debe3f245a2884ece46e295"},
-    {file = "pywin32-227-cp39-cp39-win_amd64.whl", hash = "sha256:f27cec5e7f588c3d1051651830ecc00294f90728d19c3bf6916e6dba93ea357c"},
-]
+pywin32 = []
 pywin32-ctypes = [
     {file = "pywin32-ctypes-0.2.0.tar.gz", hash = "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942"},
     {file = "pywin32_ctypes-0.2.0-py2.py3-none-any.whl", hash = "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"},

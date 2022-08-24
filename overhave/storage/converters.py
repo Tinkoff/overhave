@@ -150,6 +150,7 @@ class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
 
     id: int
     created_at: datetime
+    key: str
     name: str
     created_by: str
     specification: TestUserSpecification

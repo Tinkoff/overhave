@@ -39,10 +39,12 @@ class TestUserView(ModelViewConfigured):
     form_widget_args = {"template": {"readonly": True}}
 
     column_labels = {
-        "name": "Test user name",
+        "key": "Key",
+        "name": "Name",
         "feature_type": "Feature type",
     }
     column_descriptions = {
+        "key": "Test user key",
         "name": "Custom name for test user",
         "feature_type": "Type of scenarios set, where test user will be used",
         "specification": "Test user specification in JSON format placed below",

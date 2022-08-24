@@ -29,27 +29,27 @@ def _get_test_user_by_id_handler(user_id: int, test_user_storage: ITestUserStora
     return test_user
 
 
-def _get_test_user_by_name_handler(user_name: str, test_user_storage: ITestUserStorage) -> TestUserModel:
-    logger.info("Getting %s with user_name='%s'...", TestUserModel.__name__, user_name)
-    test_user = test_user_storage.get_test_user_by_name(user_name)
+def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserStorage) -> TestUserModel:
+    logger.info("Getting %s with user_key='%s'...", TestUserModel.__name__, user_key)
+    test_user = test_user_storage.get_test_user_by_key(user_key)
     if test_user is None:
         raise fastapi.HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=f"User with name='{user_name}' does not exist!"
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"User with name='{user_key}' does not exist!"
         )
     return test_user
 
 
 def get_test_user_handler(
     user_id: Optional[int] = None,
-    user_name: Optional[str] = None,
+    user_key: Optional[str] = None,
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
 ) -> TestUserModel:
     if user_id is not None:
         return _get_test_user_by_id_handler(user_id=user_id, test_user_storage=test_user_storage)
-    if user_name is not None:
-        return _get_test_user_by_name_handler(user_name=user_name, test_user_storage=test_user_storage)
+    if user_key is not None:
+        return _get_test_user_by_key_handler(user_key=user_key, test_user_storage=test_user_storage)
     raise fastapi.HTTPException(
-        status_code=HTTPStatus.BAD_REQUEST, detail="'user_id' or 'user_name' query parameter should be set!"
+        status_code=HTTPStatus.BAD_REQUEST, detail="'user_id' or 'user_key' query parameter should be set!"
     )
 
 

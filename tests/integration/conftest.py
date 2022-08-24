@@ -106,6 +106,7 @@ def test_testuser(
     with db.create_session() as session:
         test_user = db.TestUser(
             feature_type_id=test_feature_type.id,
+            key=cast(str, faker.word()),
             name=cast(str, faker.word()),
             created_by=test_system_user.login,
             specification=test_specification,
