@@ -34,7 +34,7 @@ def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserSto
     test_user = test_user_storage.get_test_user_by_key(user_key)
     if test_user is None:
         raise fastapi.HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=f"User with name='{user_key}' does not exist!"
+            status_code=HTTPStatus.BAD_REQUEST, detail=f"User with key='{user_key}' does not exist!"
         )
     return test_user
 
