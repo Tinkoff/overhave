@@ -36,18 +36,18 @@ class TestTestUserAPI:
         obj = TestUserModel.parse_obj(response.json())
         assert obj == test_testuser
 
-    def test_get_user_by_name_empty(
+    def test_get_user_by_key_empty(
         self, test_api_client: TestClient, faker: Faker, test_api_bearer_auth: BearerAuth
     ) -> None:
-        response = test_api_client.get(f"/test_user/?user_name={faker.random_int()}", auth=test_api_bearer_auth)
+        response = test_api_client.get(f"/test_user/?user_key={faker.random_int()}", auth=test_api_bearer_auth)
         assert response.status_code == 400
         validate_content_null(response, False)
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
-    def test_get_user_by_name(
+    def test_get_user_by_key(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
-        response = test_api_client.get(f"/test_user/?user_name={test_testuser.name}", auth=test_api_bearer_auth)
+        response = test_api_client.get(f"/test_user/?user_key={test_testuser.key}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         assert response.json()
         obj = TestUserModel.parse_obj(response.json())

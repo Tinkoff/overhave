@@ -23,8 +23,8 @@ class TestTestUserStorage:
         assert test_user == test_testuser
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
-    def test_get_user_by_name(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
-        test_user = test_user_storage.get_test_user_by_name(test_testuser.name)
+    def test_get_user_by_key(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
+        test_user = test_user_storage.get_test_user_by_key(test_testuser.key)
         assert test_user is not None
         assert test_user == test_testuser
 
@@ -51,22 +51,25 @@ class TestTestUserStorage:
     def test_create_test_user(
         self,
         test_user_storage: TestUserStorage,
+        test_user_key: str,
         test_user_name: str,
         test_specification: TestUserSpecification,
         test_feature_type: FeatureTypeModel,
         test_system_user: SystemUserModel,
         allow_update: bool,
     ) -> None:
-        assert test_user_storage.get_test_user_by_name(test_user_name) is None
+        assert test_user_storage.get_test_user_by_key(test_user_key) is None
         test_user_storage.create_test_user(
+            key=test_user_key,
             name=test_user_name,
             specification=test_specification,
             feature_type_id=test_feature_type.id,
             created_by=test_system_user.login,
             allow_update=allow_update,
         )
-        test_user = test_user_storage.get_test_user_by_name(test_user_name)
+        test_user = test_user_storage.get_test_user_by_key(test_user_key)
         assert test_user is not None
+        assert test_user.key == test_user_key
         assert test_user.name == test_user_name
         assert test_user.specification == test_specification
         assert test_user.allow_update == allow_update
@@ -97,7 +100,7 @@ class TestTestUserStorage:
     ) -> None:
         assert test_testuser.specification == test_specification
         test_user_storage.update_test_user_specification(test_testuser.id, new_specification)
-        test_user = test_user_storage.get_test_user_by_name(test_testuser.name)
+        test_user = test_user_storage.get_test_user_by_key(test_testuser.key)
         assert test_user is not None
         assert test_user.specification == new_specification
 
