@@ -204,7 +204,9 @@
         <hr>
         <div class="col-md-8">
             {% macro extra() %}
-                <input type="submit" class="btn btn-info" value="Run test" name="run" formtarget="_blank">
+                {% if 'edit' in url_for(request.endpoint) %}
+                    <input type="submit" class="btn btn-info" value="Run test" name="run" formtarget="_blank">
+                {% endif %}
             {% endmacro %}
             {{ lib.render_form(form, return_url, extra(), form_opts) }}
 
