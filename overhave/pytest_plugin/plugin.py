@@ -199,4 +199,5 @@ def pytest_runtest_setup(item: Item) -> None:
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
     """Hook for description attachment to Allure report."""
-    get_description_manager().apply_description()
+    if item.config.getoption(_OptionName.ENABLE_INJECTION.as_variable):
+        get_description_manager().apply_description()
