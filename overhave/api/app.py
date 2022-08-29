@@ -109,7 +109,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
         methods=["GET"],
         response_model=TestUserModel,
         summary="Get TestUser",
-        description="Get test user full info by `user_id` or `user_name`",
+        description="Get test user full info by `user_id` or `user_key`",
     )
     test_user_router.add_api_route(
         "/list",
