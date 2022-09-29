@@ -31,7 +31,7 @@ class TestUserView(ModelViewConfigured):
     can_view_details = False
     column_list = ("id", "name", "feature_type", "specification", "allow_update", "created_by", "changed_at")
     column_searchable_list = ("id", "name", "created_by")
-    column_filters = ("id", "name", "created_by", "allow_update")
+    column_filters = ("id", "name", "key", "created_by", "allow_update")
     form_excluded_columns = ("created_at", "emulations", "changed_at")
     form_overrides = dict(specification=JSONField)
 
