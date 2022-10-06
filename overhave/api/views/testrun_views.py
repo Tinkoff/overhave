@@ -2,9 +2,15 @@ from http import HTTPStatus
 
 import fastapi
 
-from overhave.api.deps import get_feature_storage, get_feature_tag_storage, get_redis_producer, get_test_run_storage
+from overhave.api.deps import (
+    get_feature_storage,
+    get_feature_tag_storage,
+    get_redis_producer,
+    get_scenario_storage,
+    get_test_run_storage,
+)
 from overhave.api.views.tags_views import tags_item_handler
-from overhave.storage import IFeatureStorage, IFeatureTagStorage, TestRunModel, TestRunStorage
+from overhave.storage import IFeatureStorage, IFeatureTagStorage, IScenarioStorage, TestRunModel, TestRunStorage
 from overhave.transport import RedisProducer, TestRunData, TestRunTask
 
 
@@ -24,6 +30,7 @@ def run_tests_by_tag_handler(
     tag_value: str,
     feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
     tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
+    scenario_storage: IScenarioStorage = fastapi.Depends(get_scenario_storage),
     test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
     redis_producer: RedisProducer = fastapi.Depends(get_redis_producer),
 ) -> list[int]:
@@ -35,7 +42,8 @@ def run_tests_by_tag_handler(
         )
     test_run_ids: list[int] = []
     for feature in features:
-        test_run_id = test_run_storage.create_test_run(scenario_id=feature.id, executed_by=feature.last_edited_by)
+        scenario_id = scenario_storage.get_scenario_by_feature_id(feature.id)
+        test_run_id = test_run_storage.create_test_run(scenario_id=scenario_id, executed_by=feature.last_edited_by)
         redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         test_run_ids.append(test_run_id)
     return test_run_ids

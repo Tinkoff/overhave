@@ -14,9 +14,11 @@ from overhave.storage import (
     IFeatureStorage,
     IFeatureTagStorage,
     IFeatureTypeStorage,
+    IScenarioStorage,
     ISystemUserStorage,
     ITestRunStorage,
     ITestUserStorage,
+    ScenarioStorage,
     SystemUserStorage,
     TestRunStorage,
     TestUserStorage,
@@ -42,6 +44,11 @@ def get_system_user_storage() -> ISystemUserStorage:
 @cache
 def get_feature_tag_storage() -> IFeatureTagStorage:
     return FeatureTagStorage()
+
+
+@cache
+def get_scenario_storage() -> IScenarioStorage:
+    return ScenarioStorage()
 
 
 @cache
