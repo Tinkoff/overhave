@@ -44,7 +44,7 @@ from overhave.pytest_plugin import get_proxy_manager as overhave_proxy_manager
 from overhave.scenario import FeatureInfo as OverhaveFeatureInfo
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
 from overhave.storage import FeatureTypeName as OverhaveFeatureName
-from overhave.storage import TestUserSpecification, TestUserStorage, ITestUserStorage
+from overhave.storage import ITestUserStorage, TestUserSpecification, TestUserStorage
 from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveTestSettings
 from overhave.transport import (
     OverhaveApiAuthenticator,
