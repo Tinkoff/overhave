@@ -42,8 +42,8 @@ def run_tests_by_tag_handler(
         )
     test_run_ids: list[int] = []
     for feature in features:
-        scenario_id = scenario_storage.get_scenario_by_feature_id(feature.id)
-        test_run_id = test_run_storage.create_test_run(scenario_id=scenario_id, executed_by=feature.last_edited_by)
+        scenario = scenario_storage.get_scenario_by_feature_id(feature.id)
+        test_run_id = test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=feature.last_edited_by)
         redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         test_run_ids.append(test_run_id)
     return test_run_ids
