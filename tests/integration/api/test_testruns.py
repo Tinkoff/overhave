@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 from unittest import mock
 
 import allure
@@ -40,7 +40,10 @@ class TestTestRunAPI:
         response = test_api_client.post(f"/test_run/create/?tag_value={test_tag.value}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
-        assert response.json() == ["1"]
+        test_run_id = cast(list[int], response.json())
+        response_test_run = test_api_client.get(f"/test_run/?test_run_id={test_run_id[0]}", auth=test_api_bearer_auth)
+        test_run = TestRunModel.parse_obj(response_test_run.json())
+        assert test_run.scenario_id == test_scenario.id
 
     def test_get_test_run_handler_not_found(
         self,
