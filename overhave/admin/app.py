@@ -21,7 +21,9 @@ OverhaveAdminApp = typing.NewType("OverhaveAdminApp", flask.Flask)
 
 
 class ApiSettings(BaseSettings):
-    url: typing.Optional[URL] = None
+    """Settings for Overhave API."""
+
+    url: URL | None = None
 
     class Config:
         env_prefix = "OVERHAVE_API_"
