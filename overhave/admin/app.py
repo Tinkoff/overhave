@@ -5,6 +5,8 @@ from pathlib import Path
 
 import flask
 import werkzeug
+from pydantic import BaseSettings
+from yarl import URL
 
 from overhave import db
 from overhave.admin.flask import FlaskLoginManager, get_flask_admin, get_flask_app
@@ -16,6 +18,13 @@ from overhave.transport import PublicationData, PublicationTask
 logger = logging.getLogger(__name__)
 
 OverhaveAdminApp = typing.NewType("OverhaveAdminApp", flask.Flask)
+
+
+class ApiSettings(BaseSettings):
+    url: typing.Optional[URL] = None
+
+    class Config:
+        env_prefix = "OVERHAVE_API_"
 
 
 def _prepare_factory(factory: IAdminFactory) -> None:
@@ -104,5 +113,12 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     @flask_app.route("/favicon.ico")
     def favicon() -> flask.Response:
         return flask.send_from_directory(files_dir, "favicon.ico", mimetype="image/vnd.microsoft.icon")
+
+    @flask_app.route("/api")
+    def api() -> flask.Response:
+        url = ApiSettings().url
+        if url is None:
+            return flask.Response(status=404)
+        return flask.redirect(url.human_repr())
 
     return OverhaveAdminApp(flask_app)
