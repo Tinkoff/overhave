@@ -123,5 +123,5 @@ class FeatureStorage(IFeatureStorage):
                 .filter(db.FeatureTagsAssociationTable.tags_id == tag_id)
                 .scalar_subquery()
             )
-            features = session.query(db.Feature).filter(db.Feature.id == feature_ids_query).all()
+            features = session.query(db.Feature).filter(db.Feature.id.in_(feature_ids_query)).all()
             return parse_obj_as(List[FeatureModel], features)
