@@ -156,6 +156,32 @@ def test_feature(
 
 
 @pytest.fixture()
+def test_features(
+    test_system_user: SystemUserModel,
+    test_feature_type: FeatureTypeModel,
+    test_severity: allure.severity_level,
+    faker: Faker,
+    num_features: int = 2,
+) -> list[FeatureModel]:
+    features = []
+    with db.create_session() as session:
+        for x in range(num_features):
+            feature = db.Feature(
+                name=faker.word(),
+                author=test_system_user.login,
+                type_id=test_feature_type.id,
+                task=[faker.word()[:11]],
+                file_path=f"{faker.word()}/{faker.word()}",
+                severity=test_severity,
+                last_edited_at=get_current_time(),
+            )
+            session.add(feature)
+            session.flush()
+            features.append(cast(FeatureModel, FeatureModel.from_orm(feature)))
+    return features
+
+
+@pytest.fixture()
 def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> FeatureModel:
     with db.create_session() as session:
         tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
@@ -163,6 +189,19 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
         feature.feature_tags.append(tag)
         session.flush()
         return cast(FeatureModel, FeatureModel.from_orm(feature))
+
+
+@pytest.fixture()
+def test_features_with_tag(test_features: list[FeatureModel], test_tag: TagModel) -> list[FeatureModel]:
+    features = []
+    with db.create_session() as session:
+        tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
+        for test_feature in test_features:
+            feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
+            feature.feature_tags.append(tag)
+            session.flush()
+            features.append(cast(FeatureModel, FeatureModel.from_orm(feature)))
+    return features
 
 
 @pytest.fixture()
@@ -179,6 +218,18 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         session.add(db_scenario)
         session.flush()
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture()
+def test_scenarios(test_features: list[FeatureModel], faker: Faker) -> list[ScenarioModel]:
+    scenarios = []
+    with db.create_session() as session:
+        for test_feature in test_features:
+            db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
+            session.add(db_scenario)
+            session.flush()
+        scenarios.append(cast(ScenarioModel, ScenarioModel.from_orm(db_scenario)))
+    return scenarios
 
 
 @pytest.fixture()
