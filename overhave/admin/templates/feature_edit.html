@@ -1,6 +1,10 @@
 {% extends 'admin/model/edit.html' %}
 {% import 'feature.html' as feature_lib with context %}
 
+{% block title %}
+    Feature / {{ model.name }}
+{% endblock %}
+
 {% block tail %}
     {{ super() }}
     {{ feature_lib.render_style() }}
