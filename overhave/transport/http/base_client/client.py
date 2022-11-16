@@ -2,11 +2,11 @@ import logging
 from json import JSONDecodeError
 from typing import Any, Dict, Generic, Mapping, Optional, Union, cast
 
+import httpx
 import requests
 import tenacity
 from pydantic import BaseModel, ValidationError
 from pydantic.main import ModelMetaclass
-from requests.auth import AuthBase
 from yarl import URL
 
 from overhave.transport.http.base_client.objects import HttpMethod
@@ -51,7 +51,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[str, bytes, Mapping[Any, Any]]] = None,
-        auth: Optional[AuthBase] = None,
+        auth: Optional[httpx.Auth] = None,
         raise_for_status: bool = True,
     ) -> requests.Response:
         response = requests.request(
@@ -60,7 +60,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
             params=params,
             json=json,
             data=data,
-            auth=auth,
+            auth=auth,  # type: ignore
             timeout=self._settings.timeout,
         )
         if raise_for_status:

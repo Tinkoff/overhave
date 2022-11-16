@@ -47,7 +47,7 @@ def service_system_user(
 
 @pytest.fixture()
 def api_authenticator_settings(test_api_client: TestClient) -> OverhaveApiAuthenticatorSettings:
-    return OverhaveApiAuthenticatorSettings(url=test_api_client.base_url)
+    return OverhaveApiAuthenticatorSettings(url=str(test_api_client.base_url))
 
 
 @pytest.fixture()

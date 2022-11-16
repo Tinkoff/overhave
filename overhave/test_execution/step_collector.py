@@ -38,7 +38,7 @@ class StepCollector:
             and not fixture.argname.endswith(_PYTESTBDD_FIXTURE_TRACE_MARK)
         )
         logger.debug("Fixture: %s - is_bdd_step=%s", fixture.argname, is_bdd_step)
-        if is_bdd_step and not isinstance(fixture.func.__doc__, str):
+        if is_bdd_step and not isinstance(fixture.func._pytest_bdd_step_context.step_func.__doc__, str):  # type: ignore
             raise BddStepWithoutDocsError(
                 f"Fixture {fixture} does not have description! Please, set it via docstrings."
             )
@@ -55,7 +55,7 @@ class StepCollector:
                     for fx in fx_list
                     if cls._is_bdd_step(fx)
                 ),
-                key=attrgetter("func.step_type"),
+                key=attrgetter("func._pytest_bdd_step_context.type"),
                 reverse=True,
             ),
         )
@@ -69,12 +69,12 @@ class StepCollector:
     def _compile_step_models(self, steps: Tuple[FixtureDef[Any]]) -> List[BddStepModel]:
         return [
             BddStepModel(
-                type=f.func.step_type,  # type: ignore
+                type=f.func._pytest_bdd_step_context.type,  # type: ignore
                 name=self._compile_full_step_name(
-                    fixture_name=f.func._pytest_bdd_parsers[0].name,  # type: ignore
-                    step_type=f.func.step_type,  # type: ignore
+                    fixture_name=f.func._pytest_bdd_step_context.parser.name,  # type: ignore
+                    step_type=f.func._pytest_bdd_step_context.type,  # type: ignore
                 ),
-                doc=f.func.__doc__,
+                doc=f.func._pytest_bdd_step_context.step_func.__doc__,  # type: ignore
             )
             for f in steps
         ]

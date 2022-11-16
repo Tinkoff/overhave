@@ -143,7 +143,7 @@ class TestTestUserAPI:
         response = test_api_client.put(
             f"/test_user/{faker.random_int()}/specification",
             auth=test_api_bearer_auth,
-            data=json.dumps(test_new_specification),
+            data=json.dumps(test_new_specification),  # type: ignore
         )
         assert response.status_code == 400
         validate_content_null(response, False)
@@ -160,7 +160,7 @@ class TestTestUserAPI:
         response = test_api_client.put(
             f"/test_user/{test_testuser.id}/specification",
             auth=test_api_bearer_auth,
-            data=json.dumps(test_new_specification),
+            data=json.dumps(test_new_specification),  # type: ignore
         )
         assert response.status_code == 400
         validate_content_null(response, False)
@@ -177,7 +177,7 @@ class TestTestUserAPI:
         response = test_api_client.put(
             f"/test_user/{test_testuser.id}/specification",
             auth=test_api_bearer_auth,
-            data=json.dumps(test_new_specification),
+            data=json.dumps(test_new_specification),  # type: ignore
         )
         assert response.status_code == 200
         validate_content_null(response, True)

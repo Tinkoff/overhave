@@ -65,6 +65,7 @@ Flask-Login = "^0.6.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
 aiofiles = "^0.8.0"
+httpx = "^0.23.0"
 
 
 [tool.poetry.dev-dependencies]

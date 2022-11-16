@@ -23,7 +23,6 @@ from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.helpers import OverhaveTagController
-from overhave.pytest_plugin.plugin import pytest_addoption
 from overhave.pytest_plugin.proxy_manager import IProxyManager
 from tests.objects import get_test_feature_extractor, get_test_file_settings
 from tests.unit.pytest_plugin.getoption_mock import ConfigGetOptionMock
@@ -166,16 +165,6 @@ def clear_get_description_manager() -> None:
 
 
 @pytest.fixture()
-def test_pytest_parser() -> Parser:
-    return Parser()
-
-
-@pytest.fixture(scope="session")
-def test_empty_config() -> Config:
-    return Config(PytestPluginManager())
-
-
-@pytest.fixture()
 def terminal_writer_mock() -> mock.MagicMock:
     with mock.patch("_pytest.config.create_terminal_writer", return_value=mock.MagicMock()) as terminal_writer:
         yield terminal_writer
@@ -187,7 +176,6 @@ def test_prepared_config(terminal_writer_mock: mock.MagicMock) -> Config:
     test_pytest_parser = Parser(
         usage="%(prog)s [options] [file_or_dir] [file_or_dir] [...]", processopt=config._processopt
     )
-    pytest_addoption(test_pytest_parser)
     config._parser = test_pytest_parser
     return config
 
@@ -196,7 +184,7 @@ def test_prepared_config(terminal_writer_mock: mock.MagicMock) -> Config:
 def getoption_mapping(request: FixtureRequest) -> Mapping[str, Any]:
     if hasattr(request, "param"):
         return cast(Mapping[str, Any], request.param)
-    raise NotImplementedError
+    return {}
 
 
 @pytest.fixture()

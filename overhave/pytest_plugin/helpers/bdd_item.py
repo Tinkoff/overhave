@@ -42,7 +42,7 @@ def set_git_project_url_if_necessary(
     filename = Path(scenario.feature.filename)
     feature_type_dir = feature_extractor.feature_type_to_dir_mapping[feature_type]
     if not filename.is_relative_to(feature_type_dir):
-        logger.warning("pytest_bdd item file '%s' is not relative to '%s'!")
+        logger.warning("pytest_bdd item file '%s' is not relative to '%s'!", filename, feature_type_dir)
         return
     relative_path = filename.relative_to(feature_type_dir.parent)
     add_git_project_feature_link_to_report(project_settings=project_settings, filepath=relative_path)
