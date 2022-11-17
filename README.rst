@@ -227,21 +227,6 @@ be realised with follow code:
 * ```my_custom_context``` is an example of context configuration, see an
     example code in `context_example.rst`_.
 
-Enabling of injection
-^^^^^^^^^^^^^^^^^^^^^
-
-**Overhave** has it's own built-in `PyTest`_ plugin, which is used to enable
-and configure injection of prepared context into application core instance.
-The plugin provides one option:
-
-* `--enable-injection` - flag to enable context injection.
-
-The `PyTest` usage should be similar to:
-
-.. code-block:: bash
-
-    pytest --enable-injection
-
 Consumers
 ---------
 

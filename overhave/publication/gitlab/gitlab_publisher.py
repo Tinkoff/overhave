@@ -1,9 +1,9 @@
 import logging
 from http import HTTPStatus
 
+import httpx
 from gitlab import GitlabCreateError, GitlabHttpError
 from gitlab.v4.objects.merge_requests import ProjectMergeRequest
-from requests import HTTPError
 
 from overhave.db import DraftStatus
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
@@ -95,6 +95,6 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                 self._save_as_duplicate(context)
                 return
             self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(e))
-        except HTTPError as e:
+        except httpx.HTTPError as e:
             self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(e))
             logger.exception("Got HTTP error while trying to sent merge-request!")
