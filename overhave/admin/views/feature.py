@@ -103,7 +103,7 @@ class FactoryViewUtilsMixin:
         factory = get_admin_factory()
         return {
             feature_type: {
-                step_type: [
+                StepTypeName(step_type): [
                     step
                     for step in self._get_feature_type_steps(factory=factory, feature_type=feature_type)
                     if step.type == step_type

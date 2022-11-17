@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, cast
+from typing import List, Optional, Tuple
 
 from pydantic.main import BaseModel
 from pytest_bdd import types as default_types
@@ -35,4 +35,4 @@ class StepPrefixesModel(BaseModel):
         STEP_PREFIXES.append((self.AND, None))
         STEP_PREFIXES.append((self.BUT, None))
 
-        return cast(List[Tuple[str, Optional[str]]], STEP_PREFIXES)
+        return STEP_PREFIXES

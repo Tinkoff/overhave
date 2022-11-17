@@ -1,6 +1,6 @@
 import logging
 
-from requests import HTTPError
+import httpx
 
 from overhave.db import DraftStatus
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
@@ -81,6 +81,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         except StashHttpClientConflictError:
             logger.exception("Gotten conflict. Try to return last pull-request for Draft with id=%s...", draft_id)
             self._save_as_duplicate(context)
-        except HTTPError as e:
+        except httpx.HTTPError as e:
             self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, str(e))
             logger.exception("Got HTTP error while trying to sent pull-request!")

@@ -1,8 +1,8 @@
 from typing import Dict, Optional
 from unittest import mock
 
+import httpx
 import pytest
-import requests
 from faker import Faker
 from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
@@ -47,14 +47,14 @@ def service_system_user(
 
 @pytest.fixture()
 def api_authenticator_settings(test_api_client: TestClient) -> OverhaveApiAuthenticatorSettings:
-    return OverhaveApiAuthenticatorSettings(url=test_api_client.base_url)
+    return OverhaveApiAuthenticatorSettings(url=str(test_api_client.base_url))
 
 
 @pytest.fixture()
 def api_authenticator(
     mock_envs, test_api_client: TestClient, api_authenticator_settings: OverhaveApiAuthenticatorSettings
 ) -> OverhaveApiAuthenticator:
-    with mock.patch.object(requests, "request", new_callable=lambda: test_api_client.request):
+    with mock.patch.object(httpx, "request", new_callable=lambda: test_api_client.request):
         yield OverhaveApiAuthenticator(settings=api_authenticator_settings, auth_storage=AuthStorage())
 
 
@@ -70,7 +70,7 @@ def test_new_specification() -> TestUserSpecification:
     return TestUserSpecification({"new_test": "new_value"})
 
 
-def validate_content_null(response: requests.Response, statement: bool) -> None:
+def validate_content_null(response: httpx.Response, statement: bool) -> None:
     assert (response.content.decode() == "null") is statement
 
 

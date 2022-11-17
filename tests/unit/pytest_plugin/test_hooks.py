@@ -1,10 +1,9 @@
-from typing import Any, Mapping, Optional, Type, cast
+from typing import Any, Callable, Mapping, Optional, Type, cast
 from unittest import mock
 
 import allure
 import pytest
 from _pytest.config import Config
-from _pytest.config.argparsing import OptionGroup, Parser
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
 from _pytest.nodes import Item
@@ -16,13 +15,8 @@ from overhave import get_description_manager
 from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, StepContextNotDefinedError, get_feature_info_from_item, get_scenario
 from overhave.pytest_plugin.plugin import (
-    _GROUP_HELP,
-    _PLUGIN_NAME,
     StepNotFoundError,
-    _OptionName,
-    _Options,
     get_step_context_runner,
-    pytest_addoption,
     pytest_bdd_after_step,
     pytest_bdd_apply_tag,
     pytest_bdd_before_step,
@@ -164,61 +158,27 @@ class TestPytestBddHooks:
 class TestPytestCommonHooks:
     """Unit tests for pytest wrapped hooks."""
 
-    def test_pytest_addoption(self, test_pytest_parser: Parser) -> None:
-        pytest_addoption(test_pytest_parser)
-        group = test_pytest_parser.getgroup(_PLUGIN_NAME, _GROUP_HELP)
-        assert isinstance(group, OptionGroup)
-        assert len(group.options) == 1
-
-        assert group.options[0].names() == _Options.enable_injection.names()
-        assert group.options[0].attrs() == _Options.enable_injection.attrs()
-
-    def test_pytest_configure_failed_no_option(self, test_empty_config: Config) -> None:
-        with pytest.raises(ValueError, match="no option named"):
-            pytest_configure(test_empty_config)
-
-    def test_pytest_configure_disabled_options(
+    def test_pytest_configure_disabled(
         self,
         terminal_writer_mock: mock.MagicMock,
         test_prepared_config: Config,
-        patched_hook_test_execution_proxy_manager: IProxyManager,
+        clean_proxy_manager: Callable[[], IProxyManager],
     ) -> None:
         pytest_configure(test_prepared_config)
-        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is False
-        terminal_writer_mock.assert_called_once()
-        assert not patched_hook_test_execution_proxy_manager.pytest_patched
+        terminal_writer_mock.assert_not_called()
+        assert not clean_proxy_manager().pytest_patched
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     def test_pytest_configure_enabled_injection(
         self,
+        terminal_writer_mock: mock.MagicMock,
         test_prepared_config: Config,
         getoption_mapping: Mapping[str, Any],
         getoption_mock: ConfigGetOptionMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
-        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
-            _OptionName.ENABLE_INJECTION.as_variable
-        )
         pytest_configure(test_prepared_config)
+        terminal_writer_mock.assert_called_once()
         assert patched_hook_test_execution_proxy_manager.pytest_patched
-
-    @pytest.mark.parametrize(
-        "getoption_mapping",
-        [{_OptionName.ENABLE_INJECTION.as_variable: False}],
-        indirect=True,
-    )
-    def test_pytest_configure_disabled_injection(
-        self,
-        test_prepared_config: Config,
-        getoption_mapping: Mapping[str, Any],
-        getoption_mock: ConfigGetOptionMock,
-        patched_hook_test_execution_proxy_manager: IProxyManager,
-    ) -> None:
-        assert test_prepared_config.getoption(_OptionName.ENABLE_INJECTION.as_variable) is getoption_mapping.get(
-            _OptionName.ENABLE_INJECTION.as_variable
-        )
-        pytest_configure(test_prepared_config)
-        assert not patched_hook_test_execution_proxy_manager.pytest_patched
 
     def test_pytest_collection_modifyitems_clean(
         self,
@@ -251,7 +211,6 @@ class TestPytestCommonHooks:
             test_pytest_bdd_item._obj.__allure_display_name__ == get_scenario(test_pytest_bdd_item).name  # type: ignore
         )
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: False}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_finish_injection_disabled(
         self,
@@ -262,7 +221,6 @@ class TestPytestCommonHooks:
         pytest_collection_finish(test_pytest_bdd_session)
         terminal_writer_mock.assert_not_called()
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_finish_admin_factory_injection_enabled_with_not_patched_pytest(
         self,
@@ -275,7 +233,6 @@ class TestPytestCommonHooks:
         terminal_writer_mock.assert_called_once()
         assert not patched_hook_admin_proxy_manager.collection_prepared
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_not_patched_pytest(
         self,
@@ -288,7 +245,6 @@ class TestPytestCommonHooks:
         terminal_writer_mock.assert_not_called()
         assert not patched_hook_test_execution_proxy_manager.collection_prepared
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_admin_factory_finish_injection_enabled_with_patched_pytest(
         self,
@@ -302,7 +258,6 @@ class TestPytestCommonHooks:
         assert terminal_writer_mock.call_count == 2
         assert patched_hook_admin_proxy_manager.collection_prepared
 
-    @pytest.mark.parametrize("getoption_mapping", [{_OptionName.ENABLE_INJECTION.as_variable: True}], indirect=True)
     @pytest.mark.parametrize("test_severity", [None], indirect=True)
     def test_pytest_collection_finish_test_execution_factory_injection_enabled_with_patched_pytest(
         self,

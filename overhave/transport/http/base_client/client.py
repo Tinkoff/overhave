@@ -2,11 +2,10 @@ import logging
 from json import JSONDecodeError
 from typing import Any, Dict, Generic, Mapping, Optional, Union, cast
 
-import requests
+import httpx
 import tenacity
 from pydantic import BaseModel, ValidationError
 from pydantic.main import ModelMetaclass
-from requests.auth import AuthBase
 from yarl import URL
 
 from overhave.transport.http.base_client.objects import HttpMethod
@@ -30,7 +29,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         self._settings = settings
 
     @staticmethod
-    def _parse_or_raise(response: requests.Response, model: ModelMetaclass) -> BaseModel:
+    def _parse_or_raise(response: httpx.Response, model: ModelMetaclass) -> BaseModel:
         try:
             return cast(BaseModel, model).parse_obj(response.json())
         except (ValueError, ValidationError, JSONDecodeError) as e:
@@ -39,7 +38,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
 
     @tenacity.retry(
         reraise=True,
-        retry=tenacity.retry_if_exception_type(requests.ConnectionError),
+        retry=tenacity.retry_if_exception_type(httpx.ConnectError),
         stop=tenacity.stop_after_attempt(3),
         before_sleep=tenacity.before_sleep_log(logger, logger.level),
         after=tenacity.after_log(logger, logger.level),
@@ -51,15 +50,15 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[str, bytes, Mapping[Any, Any]]] = None,
-        auth: Optional[AuthBase] = None,
+        auth: Optional[httpx.Auth] = None,
         raise_for_status: bool = True,
-    ) -> requests.Response:
-        response = requests.request(
+    ) -> httpx.Response:
+        response = httpx.request(
             method=method.value,
             url=url.human_repr(),
             params=params,
             json=json,
-            data=data,
+            data=data,  # type: ignore
             auth=auth,
             timeout=self._settings.timeout,
         )

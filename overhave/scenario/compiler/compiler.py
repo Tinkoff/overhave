@@ -1,4 +1,4 @@
-from typing import List, Optional, cast
+from typing import List, Optional
 
 import allure
 from pytest_bdd import types as default_types
@@ -74,7 +74,7 @@ class ScenarioCompiler(PrefixMixin):
             self._as_prefix(default_types.SCENARIO) in scenario_text
             or self._as_prefix(default_types.SCENARIO_OUTLINE) in scenario_text
         ):
-            return cast(str, default_types.FEATURE)
+            return default_types.FEATURE
         step_prefixes = self._language_settings.step_prefixes
         if step_prefixes is not None and (
             self._as_prefix(step_prefixes.SCENARIO) in scenario_text

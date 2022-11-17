@@ -46,7 +46,7 @@ class FileManager(FileSavingMixin):
         logger.debug("Feature file name: '%s'", file_name)
         with tempfile.NamedTemporaryFile(
             dir=self._file_settings.tmp_features_dir,
-            prefix=f"{file_name}_id{context.feature.id}",
+            prefix=f"{file_name}_id{context.feature.id}_",
             suffix=self._file_settings.feature_suffix,
             mode="w",
         ) as file:
