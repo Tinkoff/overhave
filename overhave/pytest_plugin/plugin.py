@@ -37,17 +37,17 @@ class StepNotFoundError(RuntimeError):
 def pytest_configure(config: Config) -> None:
     """Patch pytest_bdd objects in current hook."""
     proxy_manager = get_proxy_manager()
-    if proxy_manager.has_factory:
-        tw = _pytest.config.create_terminal_writer(config)
-        try:
-            logger.debug("Try to patch pytest objects...")
-            proxy_manager.patch_pytest()
-            logger.debug("Successfully patched pytest objects.")
-            tw.line("Overhave injector successfully initialized.", green=True)
-        except ValidationError as e:
-            tw.line(f"Could not initialize Overhave injector!\n{str(e)}", red=True)
-    else:
-        logger.debug("Overhave has not got prepared factory, so skip injection.")
+    if not proxy_manager.has_factory:
+        logger.debug("Overhave ProxyManager has not got prepared factory, so skip injection.")
+        return
+    tw = _pytest.config.create_terminal_writer(config)
+    try:
+        logger.debug("Try to patch pytest objects...")
+        proxy_manager.patch_pytest()
+        logger.debug("Successfully patched pytest objects.")
+        tw.line("Overhave injector successfully initialized.", green=True)
+    except ValidationError as e:
+        tw.line(f"Could not initialize Overhave injector!\n{str(e)}", red=True)
 
 
 def pytest_collection_modifyitems(session: Session) -> None:
