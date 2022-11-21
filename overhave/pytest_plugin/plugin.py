@@ -160,4 +160,6 @@ def pytest_runtest_setup(item: Item) -> None:
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
     """Hook for description attachment to Allure report."""
+    if not get_proxy_manager().has_factory:
+        return
     get_description_manager().apply_description()
