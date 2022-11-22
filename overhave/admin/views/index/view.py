@@ -63,6 +63,18 @@ class OverhaveIndexView(AdminIndexView):
         logout_user()
         return flask.redirect(flask.url_for("admin.login"))
 
+    @expose("/liveness/", methods=["GET"])
+    def liveness(self) -> Response:
+        return Response("OK", 200)
+
+    @expose("/readiness/", methods=["GET"])
+    def readiness(self) -> Response:
+        return Response("OK", 200)
+
+    @expose("/publication/ready", methods=["GET"])
+    def publication_ready(self) -> Response:
+        return Response("OK", 200)
+
     @expose("/", methods=["GET", "POST"])  # noqa: C901
     @login_required
     def index(self) -> Any:  # noqa: C901
