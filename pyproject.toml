@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "3.11.2"
+version = "3.11.3"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -45,7 +45,6 @@ python-ldap = "^3.2"
 ldap3 = "^2.6"
 wsgi_intercept = "^1.8"
 redis = "^4.2.0"
-walrus = "^0.8.0"
 docker = "*"
 sqlalchemy-utc = "^0.14.0"
 httptools = "^0.1.1"
@@ -65,6 +64,7 @@ python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
 aiofiles = "^0.8.0"
 httpx = "^0.23.0"
+walrus = "^0.9.2"
 
 
 [tool.poetry.dev-dependencies]
