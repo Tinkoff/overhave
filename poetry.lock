@@ -1996,7 +1996,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 
 [[package]]
 name = "walrus"
-version = "0.8.2"
+version = "0.9.2"
 description = "walrus"
 category = "main"
 optional = false
@@ -2105,7 +2105,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "791ef04e56468fe439347627b610593e5a15cfbd3d89a7a2c2564ae09aacfc4e"
+content-hash = "4490c1966a1b08fdb8520bb7faec7c55a006254efd2c66de86f900ba8fc9f6f1"
 
 [metadata.files]
 aiofiles = [
@@ -3238,7 +3238,7 @@ virtualenv = [
     {file = "virtualenv-20.16.7.tar.gz", hash = "sha256:8691e3ff9387f743e00f6bb20f70121f5e4f596cae754531f2b3b3a1b1ac696e"},
 ]
 walrus = [
-    {file = "walrus-0.8.2.tar.gz", hash = "sha256:717fe9b59f2c47f9c8ba475c13910955b28e25df2f1b4e316de8b059c96c0974"},
+    {file = "walrus-0.9.2.tar.gz", hash = "sha256:66217658830bc335ed832e4801e3e4f5ea7814576be468eca823237ad9930eae"},
 ]
 webencodings = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
