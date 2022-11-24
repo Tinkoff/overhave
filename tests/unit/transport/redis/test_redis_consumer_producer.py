@@ -1,9 +1,11 @@
-from overhave.transport import RedisProducer, RedisStream, TestRunData, TestRunTask
+from redis.client import Redis
+
 from overhave.factory import ConsumerFactory
+from overhave.transport import RedisProducer, RedisStream, TestRunData, TestRunTask
 
 
 class TestRedisConsumerAndProducer:
-    """Unit tests for :class:`RedisConsumer` and :class:`RedisProducer`"""
+    """Unit tests for :class:`RedisConsumer` and :class:`RedisProducer`."""
 
     def test_consumer_group(self, redis_consumer_factory: ConsumerFactory) -> None:
         redis_consumer = redis_consumer_factory._consumer
@@ -11,7 +13,11 @@ class TestRedisConsumerAndProducer:
         assert consumer_group.keys.get(RedisStream.TEST)
 
     def test_consume_new(
-        self, redisdb, redis_consumer_factory: ConsumerFactory, redis_producer: RedisProducer, run_id: int
+        self,
+        redis_consumer_factory: ConsumerFactory,
+        redis_producer: RedisProducer,
+        run_id: int,
+        redisdb: Redis,  # type: ignore
     ) -> None:
         redis_consumer = redis_consumer_factory._consumer
         task = TestRunTask(data=TestRunData(test_run_id=run_id))
