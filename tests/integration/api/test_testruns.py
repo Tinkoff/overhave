@@ -5,7 +5,6 @@ import allure
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from redis.client import Redis
 
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
@@ -37,7 +36,6 @@ class TestTestRunAPI:
         test_feature_with_tag: FeatureModel,
         test_scenario: ScenarioModel,
         flask_urlfor_handler_mock: mock.MagicMock,
-        redisdb: Redis,  # type: ignore
     ) -> None:
         response = test_api_client.post(f"/test_run/create/?tag_value={test_tag.value}", auth=test_api_bearer_auth)
         assert response.status_code == 200
