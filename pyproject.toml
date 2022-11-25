@@ -91,6 +91,7 @@ black = "^22.1.0"
 coverage-badge = "^1.1.0"
 pytest-bdd = "^6.0.1"
 mypy = "^0.971"
+pytest-redis = "^2.4.0"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"

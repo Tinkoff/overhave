@@ -10,6 +10,7 @@ import pytest
 import sqlalchemy_utils as sau
 from _pytest.python import Metafunc
 from pytest_mock import MockerFixture
+from pytest_redis import factories
 from sqlalchemy.engine import create_engine, make_url
 from sqlalchemy.orm import close_all_sessions
 
@@ -34,6 +35,9 @@ from tests.objects import (
     XDistWorkerValueType,
     get_test_feature_containers,
 )
+
+redis_noproc = factories.redis_noproc(port="6379")
+redisdb = factories.redisdb("redis_noproc", dbnum=1)
 
 
 @pytest.fixture(autouse=True)
