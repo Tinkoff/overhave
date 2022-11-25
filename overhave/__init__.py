@@ -13,7 +13,6 @@ from overhave.entities import (
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveLdapManagerSettings,
-    OverhaveRedisSettings,
     OverhaveStepContextSettings,
     StepPrefixesModel,
 )

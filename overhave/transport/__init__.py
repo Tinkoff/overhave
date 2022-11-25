@@ -26,6 +26,8 @@ from .redis import (
     BaseRedisTask,
     EmulationData,
     EmulationTask,
+    OverhaveRedisSentinelSettings,
+    OverhaveRedisSettings,
     PublicationData,
     PublicationTask,
     RedisConsumer,

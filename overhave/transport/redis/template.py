@@ -2,8 +2,8 @@ from functools import cached_property
 
 import walrus
 
-from overhave.entities.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.transport.redis.deps import make_redis
+from overhave.transport.redis.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 
 
 class RedisTemplate:

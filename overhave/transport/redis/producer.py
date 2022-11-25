@@ -3,8 +3,8 @@ from typing import Dict, Type
 
 import redis
 
-from overhave.entities.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.transport.redis.objects import BaseRedisTask, RedisStream
+from overhave.transport.redis.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.transport.redis.template import RedisTemplate
 
 logger = logging.getLogger(__name__)
