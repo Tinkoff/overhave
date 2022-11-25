@@ -3,7 +3,7 @@ from typing import Dict, Type
 
 import redis
 
-from overhave.entities.settings import OverhaveRedisSettings
+from overhave.entities.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.transport.redis.objects import BaseRedisTask, RedisStream
 from overhave.transport.redis.template import RedisTemplate
 
@@ -16,8 +16,13 @@ class RedisProducer(RedisTemplate):
     Producer send tasks into Redis stream specified by ```mapping``.
     """
 
-    def __init__(self, settings: OverhaveRedisSettings, mapping: Dict[Type[BaseRedisTask], RedisStream]):
-        super().__init__(settings)
+    def __init__(
+        self,
+        settings: OverhaveRedisSettings,
+        sentinel_settings: OverhaveRedisSentinelSettings,
+        mapping: Dict[Type[BaseRedisTask], RedisStream],
+    ):
+        super().__init__(settings, sentinel_settings)
         self._streams = {task: self._database.Stream(stream.value) for task, stream in mapping.items()}
 
     def add_task(self, task: BaseRedisTask) -> bool:

@@ -18,6 +18,7 @@ from .settings import (
     OverhaveEmulationSettings,
     OverhaveFileSettings,
     OverhaveLanguageSettings,
+    OverhaveRedisSentinelSettings,
     OverhaveRedisSettings,
     OverhaveReportManagerSettings,
     OverhaveStepContextSettings,

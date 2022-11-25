@@ -99,6 +99,7 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
     def _redis_producer(self) -> RedisProducer:
         return RedisProducer(
             settings=self.context.redis_settings,
+            sentinel_settings=self.context.redis_sentinel_settings,
             mapping={
                 TestRunTask: RedisStream.TEST,
                 PublicationTask: RedisStream.PUBLICATION,

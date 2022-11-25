@@ -2,7 +2,7 @@ from functools import cache
 from pathlib import Path
 
 from overhave.api.settings import OverhaveApiAuthSettings
-from overhave.entities import OverhaveEmulationSettings, OverhaveRedisSettings
+from overhave.entities import OverhaveEmulationSettings, OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.storage import (
     DraftStorage,
     EmulationStorage,
@@ -85,6 +85,7 @@ def get_emulation_storage() -> IEmulationStorage:
 def get_redis_producer() -> RedisProducer:
     return RedisProducer(
         settings=OverhaveRedisSettings(),
+        sentinel_settings=OverhaveRedisSentinelSettings(),
         mapping={
             TestRunTask: RedisStream.TEST,
             PublicationTask: RedisStream.PUBLICATION,

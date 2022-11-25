@@ -4,7 +4,7 @@ from typing import Iterator, List, Sequence, Type
 
 import walrus
 
-from overhave.entities.settings import OverhaveRedisSettings
+from overhave.entities.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 from overhave.transport.redis.objects import RedisPendingData, RedisStream, RedisUnreadData
 from overhave.transport.redis.template import RedisTemplate
 
@@ -14,8 +14,13 @@ logger = logging.getLogger(__name__)
 class RedisConsumer(RedisTemplate):
     """Class for consuming tasks from Redis stream ```stream_name```."""
 
-    def __init__(self, settings: OverhaveRedisSettings, stream_name: RedisStream):
-        super().__init__(settings)
+    def __init__(
+        self,
+        settings: OverhaveRedisSettings,
+        sentinel_settings: OverhaveRedisSentinelSettings,
+        stream_name: RedisStream,
+    ):
+        super().__init__(settings, sentinel_settings)
         self._stream_name = stream_name
 
     @property

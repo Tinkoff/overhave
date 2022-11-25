@@ -22,9 +22,13 @@ class ConsumerFactory:
 
     @cached_property
     def _consumer(self) -> RedisConsumer:
-        from overhave.entities import OverhaveRedisSettings
+        from overhave.entities import OverhaveRedisSentinelSettings, OverhaveRedisSettings
 
-        return RedisConsumer(settings=OverhaveRedisSettings(), stream_name=self._stream)
+        return RedisConsumer(
+            settings=OverhaveRedisSettings(),
+            sentinel_settings=OverhaveRedisSentinelSettings(),
+            stream_name=self._stream,
+        )
 
     @cached_property
     def runner(self) -> RedisConsumerRunner:
