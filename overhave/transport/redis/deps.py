@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def make_sentinel_master(settings: OverhaveRedisSentinelSettings) -> Redis:  # type: ignore
     logger.info("Connecting to redis through sentinel %s", settings.urls)
-    url_tuples = [(url.host, url.port) for url in settings.urls]
+    url_tuples = [(url.host, url.port) for url in settings.urls if url.host is not None and url.port is not None]
     sentinel = Sentinel(url_tuples, socket_timeout=settings.socket_timeout.total_seconds(), retry_on_timeout=True)
     return sentinel.master_for(settings.master_set, password=settings.redis_password, db=settings.redis_db)
 
