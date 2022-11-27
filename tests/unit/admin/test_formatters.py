@@ -3,11 +3,11 @@ from types import FunctionType
 from typing import Dict, Optional, Sequence
 
 import allure
+import httpx
 import pytest
 from faker import Faker
 from markupsafe import Markup
 from pytest_mock import MockerFixture
-from yarl import URL
 
 from overhave import db
 from overhave.admin.views import (
@@ -352,7 +352,7 @@ class TestDraftPrUrlFormatter:
             context=mocker.MagicMock(),
             model=test_draft_row,
             name=column_name,
-        ) == Markup(f"<a href='{URL(test_prurl).human_repr()}'>{test_prurl}</a>")
+        ) == Markup(f"<a href='{httpx.URL(test_prurl)}'>{test_prurl}</a>")
 
 
 @pytest.mark.parametrize("column_name", ["file_path"])
