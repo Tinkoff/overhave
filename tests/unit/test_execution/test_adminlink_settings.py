@@ -31,8 +31,8 @@ class TestAdminLinkSettings:
     def test_feature_url(self, admin_url: str, faker: Faker) -> None:
         settings = OverhaveAdminLinkSettings(admin_url=admin_url)
         feature_id = faker.random_int()
-        assert settings.get_feature_url(feature_id) == httpx.URL(admin_url).join(
-            f"/{settings.feature_id_filter_path.format(feature_id=feature_id)}"
+        assert settings.get_feature_url(feature_id) == httpx.URL(
+            f"{admin_url}/{settings.feature_id_filter_path.format(feature_id=feature_id)}"
         )
 
     def test_feature_link_name(self, admin_url: str, faker: Faker) -> None:
