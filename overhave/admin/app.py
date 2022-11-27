@@ -70,7 +70,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
 
     @flask_app.route("/emulations/<path:url>")
     def go_to_emulation(url: str) -> werkzeug.Response:
-        return flask.redirect(factory.context.emulation_settings.get_emulation_url(url))
+        return flask.redirect(str(factory.context.emulation_settings.get_emulation_url(url)))
 
     @flask_app.route("/pull_request/<int:run_id>")
     def publish_feature(run_id: int) -> werkzeug.Response:

@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
 
+import httpx
+import yarl
 from flask_admin.contrib.sqla import ModelView
 from pydantic import root_validator, validator
 from pydantic.datetime_parse import timedelta
-from yarl import URL
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.language import StepPrefixesModel
@@ -111,15 +112,15 @@ class ProcessorSettings(BaseOverhavePrefix):
 class OverhaveRedisSettings(BaseOverhavePrefix):
     """Settings for Redis entities, which use for work with different framework tasks."""
 
-    redis_url: URL = URL("redis://localhost:6379")
+    redis_url: yarl.URL = yarl.URL("redis://localhost:6379")
     redis_db: int = 0
     redis_block_timeout: timedelta = timedelta(seconds=1)
     redis_read_count: int = 1
 
     @validator("redis_url", pre=True)
-    def validate_url(cls, v: Union[str, URL]) -> URL:
+    def validate_url(cls, v: Union[str, yarl.URL]) -> yarl.URL:
         if isinstance(v, str):
-            return URL(v)
+            return yarl.URL(v)
         return v
 
     @property
@@ -153,16 +154,16 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     # where `emulation_service_url` = `http://my-service.domain` - URL for service,
     # and `emulation_service_mount` = `mount` - mount point for service redirection.
     # If `emulation_service_mount` is `None` - this is localhost debug.
-    emulation_service_url: URL = URL("http://localhost")
+    emulation_service_url: httpx.URL = httpx.URL("http://localhost")
     emulation_service_mount: Optional[str]
 
     # Wait until emulation become served
     emulation_wait_timeout: timedelta = timedelta(seconds=300)
 
     @validator("emulation_service_url", pre=True)
-    def validate_url(cls, v: Union[str, URL]) -> URL:
+    def validate_url(cls, v: Union[str, httpx.URL]) -> httpx.URL:
         if isinstance(v, str):
-            return URL(v)
+            return httpx.URL(v)
         return v
 
     @validator("emulation_ports", pre=True)
@@ -171,12 +172,12 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
             return [int(x.strip()) for x in v.split(",")]
         return v
 
-    def get_emulation_url(self, port: str) -> str:
+    def get_emulation_url(self, port: str) -> httpx.URL:
         if isinstance(self.emulation_service_mount, str):
-            return (
-                self.emulation_service_url / self.emulation_service_mount / port / ""
-            ).human_repr()  # NGINX should redirect to `service:port` by mount point and specified port
-        return self.emulation_service_url.with_port(int(port)).human_repr()  # only for local debug
+            return self.emulation_service_url.join(
+                self.emulation_service_mount + "/" + port + "/"
+            )  # NGINX should redirect to `service:port` by mount point and specified port
+        return self.emulation_service_url.copy_with(port=int(port))  # only for local debug
 
     @property
     def wait_timeout_seconds(self) -> int:
