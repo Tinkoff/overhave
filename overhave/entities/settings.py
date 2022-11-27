@@ -174,8 +174,8 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
 
     def get_emulation_url(self, port: str) -> httpx.URL:
         if isinstance(self.emulation_service_mount, str):
-            return self.emulation_service_url.join(
-                self.emulation_service_mount + "/" + port + "/"
+            return httpx.URL(
+                f"{self.emulation_service_url}/{self.emulation_service_mount}/{port}/"
             )  # NGINX should redirect to `service:port` by mount point and specified port
         return self.emulation_service_url.copy_with(port=int(port))  # only for local debug
 

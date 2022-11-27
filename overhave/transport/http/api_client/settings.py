@@ -1,4 +1,4 @@
-from yarl import URL
+import httpx
 
 from overhave.base_settings import OVERHAVE_ENV_PREFIX
 from overhave.transport.http.base_client import BaseHttpClientSettings
@@ -13,5 +13,5 @@ class OverhaveApiAuthenticatorSettings(BaseHttpClientSettings):
         env_prefix = OVERHAVE_ENV_PREFIX + "API_AUTH_"
 
     @property
-    def get_auth_token_url(self) -> URL:
-        return self.url / self.auth_token_path
+    def get_auth_token_url(self) -> httpx.URL:
+        return httpx.URL(f"{self.url}/{self.auth_token_path}")

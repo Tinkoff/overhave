@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Type
 
+import httpx
 from pydantic import BaseModel, validator
-from yarl import URL
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
@@ -34,19 +34,19 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     ]
 
     # Task tracker URL
-    task_tracker_url: Optional[URL]
+    task_tracker_url: Optional[httpx.URL]
     # Behaviour specification keyword for tasks attachment
     tasks_keyword: Optional[str]
 
     # Git project URL
-    git_project_url: Optional[URL]
+    git_project_url: Optional[httpx.URL]
 
     # Templates are used for creation of test user and system specifications.
     # Keys for specification mapping are still the same - feature types.
     user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
 
     @validator("task_tracker_url", pre=True)
-    def make_tasktracker_url(cls, v: Optional[str]) -> Optional[URL]:
+    def make_tasktracker_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
         return make_url(v)
 
     @validator("tasks_keyword")
@@ -56,15 +56,15 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
         return v
 
     @validator("git_project_url", pre=True)
-    def make_git_project_url(cls, v: Optional[str]) -> Optional[URL]:
+    def make_git_project_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
         return make_url(v)
 
-    def get_task_link(self, link: str) -> URL:
-        if isinstance(self.task_tracker_url, URL):
-            return self.task_tracker_url / link
+    def get_task_link(self, link: str) -> httpx.URL:
+        if isinstance(self.task_tracker_url, httpx.URL):
+            return httpx.URL(f"{self.task_tracker_url}/{link}")
         raise EmptyTaskTrackerURLError("Task tracker URL is None, so could not create link URL!")
 
-    def get_git_feature_url(self, filepath: Path) -> URL:
-        if isinstance(self.git_project_url, URL):
-            return self.git_project_url / filepath.as_posix()
+    def get_git_feature_url(self, filepath: Path) -> httpx.URL:
+        if isinstance(self.git_project_url, httpx.URL):
+            return httpx.URL(f"{self.git_project_url}/{filepath.as_posix()}")
         raise EmptyGitProjectURLError("Git project URL is None, so could not create link URL!")

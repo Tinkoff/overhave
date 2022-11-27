@@ -4,11 +4,11 @@ from unittest import mock
 
 import allure
 import allure_commons.types
+import httpx
 import pytest
 from _pytest.nodes import Item
 from faker import Faker
 from pytest_bdd.parser import Scenario, Step
-from yarl import URL
 
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager, get_scenario
@@ -77,7 +77,7 @@ class TestPluginUtils:
         feature_id = faker.random_int()
         add_admin_feature_link_to_report(admin_link_settings=settings, feature_id=feature_id)
         link_handler_mock.assert_called_once_with(
-            url=settings.get_feature_url(feature_id),
+            url=str(settings.get_feature_url(feature_id)),
             link_type=allure_commons.types.LinkType.TEST_CASE,
             name=settings.get_feature_link_name(feature_id),
         )
@@ -139,9 +139,9 @@ class TestPluginUtils:
             ]
         )
         relative_filename = filename.relative_to(feature_type_dir.parent)
-        feature_url = URL(f"{git_project_url}/{relative_filename.as_posix()}")
+        feature_url = httpx.URL(f"{git_project_url}/{relative_filename.as_posix()}")
         link_handler_mock.assert_called_once_with(
-            url=feature_url,
+            url=str(feature_url),
             link_type=allure_commons.types.LinkType.TEST_CASE,
             name=relative_filename.as_posix(),
         )
