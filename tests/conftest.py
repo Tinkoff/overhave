@@ -36,8 +36,8 @@ from tests.objects import (
     get_test_feature_containers,
 )
 
-redis_noproc = factories.redis_noproc(port="6379")
-redisdb = factories.redisdb("redis_noproc", dbnum=1)
+redis_proc = factories.redis_proc(port="6379")
+redisdb = factories.redisdb("redis_proc", dbnum=1)
 
 
 @pytest.fixture(autouse=True)
