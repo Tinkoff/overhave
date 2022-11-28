@@ -10,7 +10,6 @@ import pytest
 import sqlalchemy_utils as sau
 from _pytest.python import Metafunc
 from pytest_mock import MockerFixture
-from pytest_redis import factories
 from sqlalchemy.engine import create_engine, make_url
 from sqlalchemy.orm import close_all_sessions
 
@@ -35,9 +34,6 @@ from tests.objects import (
     XDistWorkerValueType,
     get_test_feature_containers,
 )
-
-redis_proc = factories.redis_proc(port="6379")
-redisdb = factories.redisdb("redis_proc", dbnum=1)
 
 
 @pytest.fixture(autouse=True)
