@@ -6,7 +6,6 @@ import httpx
 import tenacity
 from pydantic import BaseModel, ValidationError
 from pydantic.main import ModelMetaclass
-from yarl import URL
 
 from overhave.transport.http.base_client.objects import HttpMethod
 from overhave.transport.http.base_client.settings import HttpSettingsType
@@ -46,7 +45,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
     def _make_request(
         self,
         method: HttpMethod,
-        url: URL,
+        url: httpx.URL,
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[str, bytes, Mapping[Any, Any]]] = None,
@@ -54,8 +53,8 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         raise_for_status: bool = True,
     ) -> httpx.Response:
         response = httpx.request(
-            method=method.value,
-            url=url.human_repr(),
+            method=str(method.value),
+            url=str(url),
             params=params,
             json=json,
             data=data,  # type: ignore

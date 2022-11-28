@@ -2,6 +2,7 @@ from typing import Any, Callable, Mapping, Optional, cast
 from unittest import mock
 
 import allure
+import httpx
 import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
@@ -11,7 +12,6 @@ from _pytest.nodes import Item, Mark
 from _pytest.python import Function
 from faker import Faker
 from pytest_bdd.parser import Feature, Scenario, Step
-from yarl import URL
 
 from overhave import (
     OverhaveDescriptionManagerSettings,
@@ -226,9 +226,9 @@ def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest)
 
 
 @pytest.fixture()
-def admin_url(request: FixtureRequest) -> Optional[URL]:
+def admin_url(request: FixtureRequest) -> Optional[httpx.URL]:
     if hasattr(request, "param"):
-        return cast(Optional[URL], request.param)
+        return cast(Optional[httpx.URL], request.param)
     return None
 
 
@@ -237,7 +237,7 @@ def patched_hook_test_execution_factory(
     mocked_context: OverhaveTestExecutionContext,
     clean_test_execution_factory: Callable[[], ITestExecutionFactory],
     severity_prefix: str,
-    admin_url: Optional[URL],
+    admin_url: Optional[httpx.URL],
     test_project_settings: OverhaveProjectSettings,
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()

@@ -3,7 +3,6 @@ from typing import Optional, TypeVar
 
 import httpx
 from pydantic import BaseSettings, validator
-from yarl import URL
 
 from overhave.utils import make_url
 
@@ -11,7 +10,7 @@ from overhave.utils import make_url
 class BaseHttpClientSettings(BaseSettings):
     """Base settings for :class:`BaseHttpClient`."""
 
-    url: URL
+    url: httpx.URL
 
     default_timeout: Optional[timedelta] = None
     connect_timeout: timedelta = timedelta(seconds=1)
@@ -20,7 +19,7 @@ class BaseHttpClientSettings(BaseSettings):
     pool_timeout: Optional[timedelta] = None
 
     @validator("url", pre=True)
-    def make_url(cls, v: Optional[str]) -> Optional[URL]:
+    def make_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
         return make_url(v)
 
     @staticmethod

@@ -1,8 +1,8 @@
 from typing import Optional
 
+import httpx
 import pytest
 from faker import Faker
-from yarl import URL
 
 from overhave import OverhaveAdminLinkSettings
 from overhave.test_execution.settings import EmptyOverhaveAdminURLError
@@ -26,14 +26,13 @@ class TestAdminLinkSettings:
     def test_enabled(self, admin_url: str, faker: Faker) -> None:
         settings = OverhaveAdminLinkSettings(admin_url=admin_url)
         assert settings.enabled
-        assert isinstance(settings.get_feature_url(faker.random_int()), str)
+        assert isinstance(settings.get_feature_url(faker.random_int()), httpx.URL)
 
     def test_feature_url(self, admin_url: str, faker: Faker) -> None:
         settings = OverhaveAdminLinkSettings(admin_url=admin_url)
         feature_id = faker.random_int()
-        assert (
-            settings.get_feature_url(feature_id)
-            == URL(admin_url).human_repr() + f"/{settings.feature_id_filter_path.format(feature_id=feature_id)}"
+        assert settings.get_feature_url(feature_id) == httpx.URL(
+            f"{admin_url}/{settings.feature_id_filter_path.format(feature_id=feature_id)}"
         )
 
     def test_feature_link_name(self, admin_url: str, faker: Faker) -> None:

@@ -5,10 +5,10 @@ from typing import Any, Callable, Dict, List, Optional
 
 import boto3
 import botocore.exceptions
+import httpx
 import urllib3
 from boto3_type_annotations.s3 import Client
 from pydantic.tools import parse_obj_as
-from yarl import URL
 
 from overhave.transport.s3.models import BucketModel, DeletionResultModel, ObjectModel
 from overhave.transport.s3.objects import OverhaveS3Bucket
@@ -132,7 +132,7 @@ class S3Manager:
     def upload_file(self, file: Path, bucket: OverhaveS3Bucket) -> bool:
         logger.info("Start uploading file '%s'...", file.name)
         try:
-            self._ensured_client.upload_file(file.as_posix(), bucket.value, file.name)
+            self._ensured_client.upload_file(file.as_posix(), str(bucket.value), file.name)
             logger.info("File '%s' successfully uploaded", file.name)
             return True
         except botocore.exceptions.ClientError:
@@ -188,7 +188,7 @@ class S3Manager:
             logger.exception("Could not download file from s3 cloud!")
             return False
 
-    def create_presigned_url(self, bucket: str, object_name: str, expiration: timedelta) -> Optional[URL]:
+    def create_presigned_url(self, bucket: str, object_name: str, expiration: timedelta) -> Optional[httpx.URL]:
         try:
             response = self._ensured_client.generate_presigned_url(
                 "get_object", Params={"Bucket": bucket, "Key": object_name}, ExpiresIn=int(expiration.total_seconds())

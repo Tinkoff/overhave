@@ -3,7 +3,6 @@ from typing import Callable, List, Mapping, Optional, Sequence, cast
 import pytest
 from faker import Faker
 from pytest_mock import MockFixture
-from yarl import URL
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import GitRepositoryInitializer
@@ -58,7 +57,7 @@ def test_tokenizer_client_settings_factory(
     def get_tokenizer_settings():
         return TokenizerClientSettings(
             enabled=True,
-            url=URL(f"http://{faker.word()}.com"),
+            url=f"http://{faker.word()}.com",
             initiator=initiator,
             remote_key=remote_key,
             remote_key_name=remote_key_name,

@@ -3,6 +3,7 @@ from typing import Any, Callable, Dict, Optional
 
 import _pytest
 import allure
+import httpx
 from _pytest.config import Config
 from _pytest.fixtures import FixtureRequest
 from _pytest.main import Session
@@ -10,7 +11,6 @@ from _pytest.nodes import Item
 from _pytest.python import Function
 from pydantic import ValidationError
 from pytest_bdd.parser import Feature, Scenario, Step
-from yarl import URL
 
 from overhave.factory import IAdminFactory
 from overhave.pytest_plugin.deps import get_description_manager, get_step_context_runner, get_tag_controller
@@ -142,7 +142,7 @@ def pytest_runtest_setup(item: Item) -> None:
         add_admin_feature_link_to_report(admin_link_settings=admin_link_settings, feature_id=feature_info.id)
 
     project_settings = proxy_manager.factory.context.project_settings
-    if isinstance(project_settings.git_project_url, URL) and feature_info.type is not None:
+    if isinstance(project_settings.git_project_url, httpx.URL) and feature_info.type is not None:
         set_git_project_url_if_necessary(
             project_settings=project_settings,
             feature_extractor=proxy_manager.factory.feature_extractor,

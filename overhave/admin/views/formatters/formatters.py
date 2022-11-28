@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import allure
+import httpx
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
-from yarl import URL
 
 from overhave import db
 from overhave.admin.views.formatters.helpers import (
@@ -129,4 +129,4 @@ def draft_testrun_formatter(view: ModelView, context: Any, model: db.BaseTable, 
 
 @safe_formatter(type=str, supported_models=(db.Draft,))
 def draft_prurl_formatter(view: ModelView, context: Any, model: db.BaseTable, value: str) -> Markup:
-    return Markup(f"<a href='{URL(value).human_repr()}'>{value}</a>")
+    return Markup(f"<a href='{httpx.URL(value)}'>{value}</a>")
