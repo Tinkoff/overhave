@@ -16,8 +16,13 @@ def redis_consumer_factory() -> ConsumerFactory:
 
 
 @pytest.fixture()
-def redis_producer() -> RedisProducer:
-    return RedisProducer(settings=OverhaveRedisSettings(), mapping={TestRunTask: RedisStream.TEST})
+def redis_settings() -> OverhaveRedisSettings:
+    return OverhaveRedisSettings()
+
+
+@pytest.fixture()
+def redis_producer(redis_settings: OverhaveRedisSettings) -> RedisProducer:
+    return RedisProducer(settings=redis_settings, mapping={TestRunTask: RedisStream.TEST})
 
 
 @pytest.fixture()
