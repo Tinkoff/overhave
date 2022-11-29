@@ -18,6 +18,7 @@ RUN apt-get update -o Acquire::Check-Valid-Until=false \
         g++ \
         libgnutls28-dev \
         git \
+        redis-server \
  && rm -rf /var/lib/apt/lists/*
 
 ARG README=/code/README.rst
