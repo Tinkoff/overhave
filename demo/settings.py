@@ -4,8 +4,8 @@ from functools import cached_property
 from pathlib import Path
 from typing import Dict
 
+import httpx
 from pydantic import BaseSettings
-from yarl import URL
 
 from overhave import (
     OverhaveAdminLinkSettings,
@@ -80,12 +80,10 @@ class OverhaveDemoSettingsGenerator:
 
     @cached_property
     def test_execution_settings(self) -> Dict[str, BaseSettings]:
-        admin_url = URL(self._admin_host)
+        admin_url = httpx.URL(self._admin_host)
         if not admin_url.scheme:
-            admin_url = URL(f"http://{self._admin_host}:{self._admin_port}")
-        settings: Dict[str, BaseSettings] = dict(
-            admin_link_settings=OverhaveAdminLinkSettings(admin_url=admin_url.human_repr())
-        )
+            admin_url = httpx.URL(f"http://{self._admin_host}:{self._admin_port}")
+        settings: Dict[str, BaseSettings] = dict(admin_link_settings=OverhaveAdminLinkSettings(admin_url=admin_url))
         settings.update(self.default_context_settings)
         return settings
 

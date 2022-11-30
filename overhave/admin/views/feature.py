@@ -87,7 +87,7 @@ class FactoryViewUtilsMixin:
     def task_tracker_url(self) -> Optional[str]:
         task_tracker_url_value = get_admin_factory().context.project_settings.task_tracker_url
         if task_tracker_url_value is not None:
-            return task_tracker_url_value.human_repr()
+            return str(task_tracker_url_value)
         return None
 
     @cached_property

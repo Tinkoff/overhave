@@ -1,9 +1,9 @@
 from typing import Optional
 
-from yarl import URL
+import httpx
 
 
-def make_url(value: Optional[str]) -> Optional[URL]:
+def make_url(value: Optional[str]) -> Optional[httpx.URL]:
     if isinstance(value, str):
-        return URL(value)
+        return httpx.URL(value)
     return value
