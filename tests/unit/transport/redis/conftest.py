@@ -1,10 +1,8 @@
-from unittest import mock
-
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 from pytest_redis import factories
-from redis import Redis
+from redis import Redis, Sentinel
 
 from overhave.factory import ConsumerFactory
 from overhave.transport import (
@@ -33,15 +31,13 @@ def redis_consumer_factory() -> ConsumerFactory:
 
 
 @pytest.fixture()
-def mock_sentinel(redis_settings: BaseRedisSettings) -> mock.MagicMock:
+def mock_sentinel(redis_settings: BaseRedisSettings) -> None:
     if isinstance(redis_settings, OverhaveRedisSentinelSettings):
-        with mock.patch("redis.sentinel.Sentinel") as sentinel:
-            sentinel.master_for = lambda *args, **kwargs: Redis.from_url(
-                str(redis_settings.urls[0]),
-                db=redis_settings.db,
-                socket_timeout=redis_settings.socket_timeout.total_seconds(),
-            )
-            yield sentinel
+        Sentinel.master_for = lambda *args, **kwargs: Redis.from_url(
+            str(redis_settings.urls[0]),
+            db=redis_settings.db,
+            socket_timeout=redis_settings.socket_timeout.total_seconds(),
+        )
 
 
 @pytest.fixture()

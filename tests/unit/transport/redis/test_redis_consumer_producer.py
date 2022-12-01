@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 from redis.client import Redis
 
@@ -26,7 +24,7 @@ class TestRedisConsumerAndProducer:
         redis_producer: RedisProducer,
         run_id: int,
         redisdb: Redis,  # type: ignore
-        mock_sentinel: mock.MagicMock,
+        mock_sentinel: None,
     ) -> None:
         redis_consumer = redis_consumer_factory._consumer
         task = TestRunTask(data=TestRunData(test_run_id=run_id))
