@@ -42,7 +42,7 @@ class RedisConsumer(RedisTemplate):
             logger.info("Clean all pending messages for stream %s: %s", self._stream_name, models)
 
     def _consume(self) -> Sequence[RedisUnreadData]:
-        messages = self._stream.read(count=self._settings.redis_read_count, block=self._settings.timeout_milliseconds)
+        messages = self._stream.read(count=self._settings.read_count, block=self._settings.timeout_milliseconds)
         objects: List[RedisUnreadData] = []
         for msg in messages:
             data = RedisUnreadData(*msg)

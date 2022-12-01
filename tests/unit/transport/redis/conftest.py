@@ -32,7 +32,7 @@ def redis_consumer_factory() -> ConsumerFactory:
 @pytest.fixture()
 def redis_settings(faker: Faker, enable_sentinel: bool) -> BaseRedisSettings:
     if enable_sentinel:
-        return OverhaveRedisSentinelSettings(master_set=faker.word(), redis_password=faker.word())
+        return OverhaveRedisSentinelSettings(master_set=faker.word(), password=faker.word())
     return OverhaveRedisSettings()
 
 

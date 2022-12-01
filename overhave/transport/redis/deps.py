@@ -12,13 +12,13 @@ def make_sentinel_master(settings: OverhaveRedisSentinelSettings) -> Redis:  # t
     logger.info("Connecting to redis through sentinel %s", settings.urls)
     url_tuples = [(url.host, url.port) for url in settings.urls if url.host is not None and url.port is not None]
     sentinel = Sentinel(url_tuples, socket_timeout=settings.socket_timeout.total_seconds(), retry_on_timeout=True)
-    return sentinel.master_for(settings.master_set, password=settings.redis_password, db=settings.redis_db)
+    return sentinel.master_for(settings.master_set, password=settings.password, db=settings.db)
 
 
 def make_regular_redis(redis_settings: OverhaveRedisSettings) -> Redis:  # type: ignore
     return Redis.from_url(
-        str(redis_settings.redis_url),
-        db=redis_settings.redis_db,
+        str(redis_settings.url),
+        db=redis_settings.db,
         socket_timeout=redis_settings.socket_timeout.total_seconds(),
     )
 
