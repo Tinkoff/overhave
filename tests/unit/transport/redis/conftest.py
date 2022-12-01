@@ -41,8 +41,7 @@ def mock_sentinel(redis_settings: BaseRedisSettings) -> None:
                 db=redis_settings.db,
                 socket_timeout=redis_settings.socket_timeout.total_seconds(),
             )
-
-            yield
+            yield None
 
 
 @pytest.fixture()
