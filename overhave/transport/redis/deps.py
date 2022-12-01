@@ -30,4 +30,4 @@ def make_redis(redis_settings: BaseRedisSettings) -> Redis:  # type: ignore  # n
     if isinstance(redis_settings, OverhaveRedisSettings):
         return make_regular_redis(redis_settings)
 
-    raise RuntimeError("Should not be here!")
+    raise RuntimeError("redis_settings is not any instance of OverhaveRedisSentinelSettings, OverhaveRedisSettings")
