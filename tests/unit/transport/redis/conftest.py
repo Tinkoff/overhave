@@ -48,7 +48,7 @@ def redis_settings(faker: Faker, enable_sentinel: bool) -> BaseRedisSettings:
 
 
 @pytest.fixture()
-def redis_producer(redis_settings: BaseRedisSettings) -> RedisProducer:
+def redis_producer(redis_settings: BaseRedisSettings, mock_sentinel: None) -> RedisProducer:
     return RedisProducer(settings=redis_settings, mapping={TestRunTask: RedisStream.TEST})
 
 
