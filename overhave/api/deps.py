@@ -24,6 +24,7 @@ from overhave.storage import (
     TestUserStorage,
 )
 from overhave.transport import (
+    BaseRedisSettings,
     EmulationTask,
     OverhaveRedisSentinelSettings,
     OverhaveRedisSettings,
@@ -90,10 +91,17 @@ def get_emulation_storage() -> IEmulationStorage:
 
 
 @cache
+def get_redis_settings() -> BaseRedisSettings:
+    sentinel_settings = OverhaveRedisSentinelSettings()
+    if sentinel_settings.enabled:
+        return sentinel_settings
+    return OverhaveRedisSettings()
+
+
+@cache
 def get_redis_producer() -> RedisProducer:
     return RedisProducer(
-        settings=OverhaveRedisSettings(),
-        sentinel_settings=OverhaveRedisSentinelSettings(),
+        settings=get_redis_settings(),
         mapping={
             TestRunTask: RedisStream.TEST,
             PublicationTask: RedisStream.PUBLICATION,

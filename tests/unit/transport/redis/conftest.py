@@ -5,6 +5,7 @@ from pytest_redis import factories
 
 from overhave.factory import ConsumerFactory
 from overhave.transport import (
+    BaseRedisSettings,
     OverhaveRedisSentinelSettings,
     OverhaveRedisSettings,
     RedisProducer,
@@ -29,22 +30,15 @@ def redis_consumer_factory() -> ConsumerFactory:
 
 
 @pytest.fixture()
-def redis_settings() -> OverhaveRedisSettings:
+def redis_settings(faker: Faker, enable_sentinel: bool) -> BaseRedisSettings:
+    if enable_sentinel:
+        return OverhaveRedisSentinelSettings(master_set=faker.word(), redis_password=faker.word())
     return OverhaveRedisSettings()
 
 
 @pytest.fixture()
-def redis_sentinel_settings(faker: Faker, enable_sentinel: bool) -> OverhaveRedisSentinelSettings:
-    return OverhaveRedisSentinelSettings(enabled=enable_sentinel, master_set=faker.word(), redis_password=faker.word())
-
-
-@pytest.fixture()
-def redis_producer(
-    redis_settings: OverhaveRedisSettings, redis_sentinel_settings: redis_sentinel_settings
-) -> RedisProducer:
-    return RedisProducer(
-        settings=redis_settings, mapping={TestRunTask: RedisStream.TEST}, sentinel_settings=redis_sentinel_settings
-    )
+def redis_producer(redis_settings: BaseRedisSettings) -> RedisProducer:
+    return RedisProducer(settings=redis_settings, mapping={TestRunTask: RedisStream.TEST})
 
 
 @pytest.fixture()

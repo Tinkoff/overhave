@@ -23,6 +23,7 @@ from .http import (
 from .ldap import LDAPAuthenticator, OverhaveLdapClientSettings
 from .redis import (
     AnyRedisTask,
+    BaseRedisSettings,
     BaseRedisTask,
     EmulationData,
     EmulationTask,

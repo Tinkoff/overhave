@@ -50,6 +50,8 @@ from overhave.transport import (
     OverhaveApiAuthenticatorSettings,
     OverhaveGitlabClientSettings,
     OverhaveLdapClientSettings,
+    OverhaveRedisSentinelSettings,
+    OverhaveRedisSettings,
     OverhaveS3ManagerSettings,
     OverhaveStashClientSettings,
 )

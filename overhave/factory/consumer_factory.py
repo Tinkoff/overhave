@@ -5,7 +5,10 @@ from overhave.factory.getters import get_emulation_factory, get_publication_fact
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.transport import (
     AnyRedisTask,
+    BaseRedisSettings,
     EmulationTask,
+    OverhaveRedisSentinelSettings,
+    OverhaveRedisSettings,
     PublicationTask,
     RedisConsumer,
     RedisConsumerRunner,
@@ -21,12 +24,16 @@ class ConsumerFactory:
         self._stream = stream
 
     @cached_property
-    def _consumer(self) -> RedisConsumer:
-        from overhave.transport import OverhaveRedisSentinelSettings, OverhaveRedisSettings
+    def _redis_settings(self) -> BaseRedisSettings:
+        sentinel_settings = OverhaveRedisSentinelSettings()
+        if sentinel_settings.enabled:
+            return sentinel_settings
+        return OverhaveRedisSettings()
 
+    @cached_property
+    def _consumer(self) -> RedisConsumer:
         return RedisConsumer(
-            settings=OverhaveRedisSettings(),
-            sentinel_settings=OverhaveRedisSentinelSettings(),
+            settings=self._redis_settings,
             stream_name=self._stream,
         )
 

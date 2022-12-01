@@ -13,8 +13,8 @@ from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings
 from overhave.test_execution import OverhaveTestSettings
 from overhave.transport import (
+    BaseRedisSettings,
     OverhaveLdapClientSettings,
-    OverhaveRedisSentinelSettings,
     OverhaveRedisSettings,
     OverhaveS3ManagerSettings,
 )
@@ -35,8 +35,7 @@ class OverhaveAdminContext(BaseFactoryContext):
         language_settings: Optional[OverhaveLanguageSettings] = None,
         ldap_manager_settings: Optional[OverhaveLdapManagerSettings] = None,
         ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
-        redis_settings: Optional[OverhaveRedisSettings] = None,
-        redis_sentinel_settings: Optional[OverhaveRedisSentinelSettings] = None,
+        redis_settings: Optional[BaseRedisSettings] = None,
         project_settings: Optional[OverhaveProjectSettings] = None,
         compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
         report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
@@ -56,7 +55,6 @@ class OverhaveAdminContext(BaseFactoryContext):
         self.admin_settings = admin_settings or OverhaveAdminSettings()
         self.auth_settings = auth_settings or OverhaveAuthorizationSettings()
         self.redis_settings = redis_settings or OverhaveRedisSettings()
-        self.redis_sentinel_settings = redis_sentinel_settings or OverhaveRedisSentinelSettings()
         if self.auth_settings.auth_strategy is AuthorizationStrategy.LDAP:
             self.ldap_manager_settings = ldap_manager_settings or OverhaveLdapManagerSettings()
             self.ldap_client_settings = ldap_client_settings or OverhaveLdapClientSettings()

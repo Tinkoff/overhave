@@ -3,7 +3,7 @@ import logging
 from redis import Redis
 from redis.sentinel import Sentinel
 
-from overhave.transport.redis.settings import OverhaveRedisSentinelSettings, OverhaveRedisSettings
+from overhave.transport.redis.settings import BaseRedisSettings, OverhaveRedisSentinelSettings, OverhaveRedisSettings
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,11 @@ def make_regular_redis(redis_settings: OverhaveRedisSettings) -> Redis:  # type:
     )
 
 
-def make_redis(redis_settings: OverhaveRedisSettings, sentinel_settings: OverhaveRedisSentinelSettings) -> Redis:  # type: ignore  # noqa: E501
-    if sentinel_settings.enabled:
-        return make_sentinel_master(sentinel_settings)
+def make_redis(redis_settings: BaseRedisSettings) -> Redis:  # type: ignore  # noqa: E501
+    if isinstance(redis_settings, OverhaveRedisSentinelSettings):
+        return make_sentinel_master(redis_settings)
 
-    return make_regular_redis(redis_settings)
+    if isinstance(redis_settings, OverhaveRedisSettings):
+        return make_regular_redis(redis_settings)
+
+    raise RuntimeError("Should not be here!")
