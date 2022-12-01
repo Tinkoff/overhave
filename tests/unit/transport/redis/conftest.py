@@ -33,7 +33,7 @@ def redis_consumer_factory() -> ConsumerFactory:
 
 
 @pytest.fixture()
-def mock_sentinel(redis_settings: BaseRedisSettings) -> None:
+def mock_sentinel(redis_settings: BaseRedisSettings) -> mock.MagicMock:
     if isinstance(redis_settings, OverhaveRedisSentinelSettings):
         with mock.patch("redis.sentinel.Sentinel.master_for") as master_for_handler:
             master_for_handler.return_value = Redis.from_url(
@@ -41,7 +41,7 @@ def mock_sentinel(redis_settings: BaseRedisSettings) -> None:
                 db=redis_settings.db,
                 socket_timeout=redis_settings.socket_timeout.total_seconds(),
             )
-            yield None
+            yield master_for_handler
 
 
 @pytest.fixture()
