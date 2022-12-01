@@ -1,4 +1,3 @@
-import pytest
 from redis.client import Redis
 
 from overhave.factory import ConsumerFactory
@@ -17,7 +16,6 @@ class TestRedisConsumerAndProducer:
         consumer_group = redis_consumer._consumer_group
         assert consumer_group.keys.get(RedisStream.TEST)
 
-    @pytest.mark.parametrize("enable_sentinel", [True, False], indirect=True)
     def test_consume_new(
         self,
         redis_consumer_factory: ConsumerFactory,
