@@ -1,4 +1,5 @@
 import pytest
+from _pytest.fixtures import FixtureRequest
 from faker import Faker
 from pytest_redis import factories
 
@@ -16,6 +17,13 @@ redisdb = factories.redisdb("redis_proc", dbnum=1)
 
 
 @pytest.fixture()
+def enable_sentinel(request: FixtureRequest) -> bool:
+    if hasattr(request, "param"):
+        return request.param
+    raise NotImplementedError
+
+
+@pytest.fixture()
 def redis_consumer_factory() -> ConsumerFactory:
     return ConsumerFactory(stream=RedisStream.TEST)
 
@@ -26,8 +34,8 @@ def redis_settings() -> OverhaveRedisSettings:
 
 
 @pytest.fixture()
-def redis_sentinel_settings(faker: Faker) -> OverhaveRedisSentinelSettings:
-    return OverhaveRedisSentinelSettings(master_set=faker.word(), redis_password=faker.word())
+def redis_sentinel_settings(faker: Faker, enable_sentinel: bool) -> OverhaveRedisSentinelSettings:
+    return OverhaveRedisSentinelSettings(enabled=enable_sentinel, master_set=faker.word(), redis_password=faker.word())
 
 
 @pytest.fixture()
