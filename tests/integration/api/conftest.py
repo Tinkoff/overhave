@@ -21,6 +21,8 @@ def envs_for_mock() -> Dict[str, Optional[str]]:
         "OVERHAVE_FEATURES_DIR": "/features",
         "OVERHAVE_FIXTURES_DIR": "/fixtures",
         "OVERHAVE_STEPS_DIR": "/steps",
+        "OVERHAVE_MASTER_SET": "test",
+        "OVERHAVE_REDIS_PASSWORD": "password",
     }
 
 
