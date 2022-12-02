@@ -4,8 +4,8 @@ from typing import Iterator, List, Sequence, Type
 
 import walrus
 
-from overhave.entities.settings import OverhaveRedisSettings
 from overhave.transport.redis.objects import RedisPendingData, RedisStream, RedisUnreadData
+from overhave.transport.redis.settings import BaseRedisSettings
 from overhave.transport.redis.template import RedisTemplate
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 class RedisConsumer(RedisTemplate):
     """Class for consuming tasks from Redis stream ```stream_name```."""
 
-    def __init__(self, settings: OverhaveRedisSettings, stream_name: RedisStream):
+    def __init__(
+        self,
+        settings: BaseRedisSettings,
+        stream_name: RedisStream,
+    ):
         super().__init__(settings)
         self._stream_name = stream_name
 
@@ -38,7 +42,7 @@ class RedisConsumer(RedisTemplate):
             logger.info("Clean all pending messages for stream %s: %s", self._stream_name, models)
 
     def _consume(self) -> Sequence[RedisUnreadData]:
-        messages = self._stream.read(count=self._settings.redis_read_count, block=self._settings.timeout_milliseconds)
+        messages = self._stream.read(count=self._settings.read_count, block=self._settings.timeout_milliseconds)
         objects: List[RedisUnreadData] = []
         for msg in messages:
             data = RedisUnreadData(*msg)

@@ -13,7 +13,6 @@ from overhave.entities import (
     OverhaveFileSettings,
     OverhaveLanguageSettings,
     OverhaveLdapManagerSettings,
-    OverhaveRedisSettings,
     OverhaveStepContextSettings,
     StepPrefixesModel,
 )
@@ -51,6 +50,8 @@ from overhave.transport import (
     OverhaveApiAuthenticatorSettings,
     OverhaveGitlabClientSettings,
     OverhaveLdapClientSettings,
+    OverhaveRedisSentinelSettings,
+    OverhaveRedisSettings,
     OverhaveS3ManagerSettings,
     OverhaveStashClientSettings,
 )

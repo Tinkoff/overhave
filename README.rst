@@ -227,6 +227,12 @@ be realised with follow code:
 * ```my_custom_context``` is an example of context configuration, see an
     example code in `context_example.rst`_.
 
+Redis
+---------
+* **RedisSentinel** - redis connection through sentinel. To enable sentinel connection use env OVERHAVE_REDIS_SENTINEL_ENABLED=True
+
+* **Redis** - default redis connection without sentinel.
+
 Consumers
 ---------
 

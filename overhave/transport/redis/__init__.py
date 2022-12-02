@@ -14,3 +14,4 @@ from .objects import (
 )
 from .producer import RedisProducer
 from .runner import RedisConsumerRunner
+from .settings import BaseRedisSettings, OverhaveRedisSentinelSettings, OverhaveRedisSettings

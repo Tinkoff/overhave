@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
 
 import httpx
-import yarl
 from flask_admin.contrib.sqla import ModelView
 from pydantic import root_validator, validator
 from pydantic.datetime_parse import timedelta
@@ -107,25 +106,6 @@ class ProcessorSettings(BaseOverhavePrefix):
     """Settings for :class:`Processor`."""
 
     processes_num: int = 5
-
-
-class OverhaveRedisSettings(BaseOverhavePrefix):
-    """Settings for Redis entities, which use for work with different framework tasks."""
-
-    redis_url: yarl.URL = yarl.URL("redis://localhost:6379")
-    redis_db: int = 0
-    redis_block_timeout: timedelta = timedelta(seconds=1)
-    redis_read_count: int = 1
-
-    @validator("redis_url", pre=True)
-    def validate_url(cls, v: Union[str, yarl.URL]) -> yarl.URL:
-        if isinstance(v, str):
-            return yarl.URL(v)
-        return v
-
-    @property
-    def timeout_milliseconds(self) -> int:
-        return int(self.redis_block_timeout.total_seconds() * 1000)
 
 
 class OverhaveEmulationSettings(BaseOverhavePrefix):
