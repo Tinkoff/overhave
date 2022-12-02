@@ -36,7 +36,7 @@ class OverhaveRedisSentinelSettings(BaseRedisSettings):
     """Settings for Redis sentinel entities, which use for work with different framework tasks."""
 
     enabled: bool = False
-    urls: list[yarl.URL] = [yarl.URL("redis://localhost:26379")]
+    urls: list[yarl.URL] = [yarl.URL("redis://localhost:6379")]
     master_set: str
     password: str
 
