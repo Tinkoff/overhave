@@ -46,6 +46,8 @@ class OverhaveRedisSentinelSettings(BaseRedisSettings):
         for url in v:
             if isinstance(url, str):
                 urls.append(yarl.URL(url))
+            if isinstance(url, yarl.URL):
+                urls.append(url)
         return urls
 
     class Config:
