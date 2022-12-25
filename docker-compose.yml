@@ -38,6 +38,7 @@ services:
       - OVERHAVE_REDIS_SENTINEL_URLS=${OVERHAVE_REDIS_SENTINEL_URLS:-'["redis://redis:6379"]'}
     depends_on:
       - db
+      - redis
 
   publish:
     build:
