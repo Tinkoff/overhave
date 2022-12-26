@@ -143,6 +143,8 @@ setenv =
     WORK_DIR = {toxworkdir}
 passenv =
     OVERHAVE_DB_URL
+    OVERHAVE_REDIS_URL
+    OVERHAVE_REDIS_SENTINEL_URLS
 commands =
     make check
 """

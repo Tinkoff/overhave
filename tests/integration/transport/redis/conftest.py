@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
@@ -13,6 +15,8 @@ from overhave.transport import (
     RedisStream,
     TestRunTask,
 )
+
+logger = logging.getLogger(__name__)
 
 _REDIS_DB_NUM = 1
 redisdb = factories.redisdb("redis_nooproc", dbnum=_REDIS_DB_NUM)
@@ -66,6 +70,7 @@ def redis_producer(redis_settings: BaseRedisSettings, mock_sentinel: None) -> Re
 def redis_consumer_factory(redis_settings: BaseRedisSettings, mock_sentinel: None) -> ConsumerFactory:
     factory = ConsumerFactory(stream=RedisStream.TEST)
     factory._redis_settings = redis_settings
+    logger.info("Setup %s to consumer factory instance", factory._redis_settings)
     return factory
 
 
