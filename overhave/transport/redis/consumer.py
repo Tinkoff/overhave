@@ -46,7 +46,7 @@ class RedisConsumer(RedisTemplate):
         objects: List[RedisUnreadData] = []
         for msg in messages:
             data = RedisUnreadData(*msg)
-            logger.info("Message from redis: %s", data)
+            logger.debug("Message from redis: %s", data)
             self._stream.ack(data.message_id)
             objects.append(data)
         return objects

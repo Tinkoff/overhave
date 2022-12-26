@@ -1,4 +1,5 @@
 import logging
+from functools import cache
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -18,8 +19,18 @@ from overhave.transport import (
 
 logger = logging.getLogger(__name__)
 
-_REDIS_DB_NUM = 1
-redisdb = factories.redisdb("redis_nooproc", dbnum=_REDIS_DB_NUM)
+
+@cache
+def _get_initial_redis_settings() -> OverhaveRedisSettings:
+    """Cached function for get params from environment in tests."""
+    return OverhaveRedisSettings(db=1)
+
+
+redis_external = factories.redis_noproc(
+    host=_get_initial_redis_settings().url.host,
+    port=_get_initial_redis_settings().url.port,
+)
+redisdb = factories.redisdb("redis_external", dbnum=_get_initial_redis_settings().db)
 
 
 @pytest.fixture()
@@ -31,12 +42,12 @@ def enable_sentinel(request: FixtureRequest) -> bool:
 
 @pytest.fixture()
 def default_redis_settings(faker: Faker) -> OverhaveRedisSettings:
-    return OverhaveRedisSettings(db=_REDIS_DB_NUM)
+    return OverhaveRedisSettings(db=_get_initial_redis_settings().db)
 
 
 @pytest.fixture()
 def sentinel_redis_settings(faker: Faker) -> OverhaveRedisSentinelSettings:
-    return OverhaveRedisSentinelSettings(db=_REDIS_DB_NUM, master_set=faker.word(), password=faker.word())
+    return OverhaveRedisSentinelSettings(db=_get_initial_redis_settings().db)
 
 
 @pytest.fixture()
@@ -70,7 +81,7 @@ def redis_producer(redis_settings: BaseRedisSettings, mock_sentinel: None) -> Re
 def redis_consumer_factory(redis_settings: BaseRedisSettings, mock_sentinel: None) -> ConsumerFactory:
     factory = ConsumerFactory(stream=RedisStream.TEST)
     factory._redis_settings = redis_settings
-    logger.info("Setup %s to consumer factory instance", factory._redis_settings)
+    logger.info("Setup redis settings (%s) to consumer factory instance", factory._redis_settings)
     return factory
 
 
