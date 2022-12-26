@@ -37,8 +37,8 @@ class OverhaveRedisSentinelSettings(BaseRedisSettings):
 
     enabled: bool = False
     urls: list[yarl.URL] = [yarl.URL("redis://localhost:6379")]
-    master_set: str
-    password: str
+    master_set: str = "foo"
+    password: str = "bar"
 
     @validator("urls", pre=True)
     def validate_urls(cls, v: list[str] | list[yarl.URL]) -> list[yarl.URL]:

@@ -26,8 +26,6 @@ def envs_for_mock(db_settings: OverhaveDBSettings) -> Dict[str, Optional[str]]:
     return {
         "OVERHAVE_DB_URL": str(db_settings.db_url),
         "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix(),
-        "OVERHAVE_REDIS_SENTINEL_MASTER_SET": "test",
-        "OVERHAVE_REDIS_SENTINEL_PASSWORD": "password",
     }
 
 

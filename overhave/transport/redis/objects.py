@@ -99,6 +99,9 @@ class RedisUnreadData:
     def decoded_message(self) -> Dict[str, Any]:
         return {key.decode(): json.loads(value.decode("utf-8")) for key, value in self.message.items()}
 
+    def __str__(self) -> str:
+        return f"{RedisUnreadData.__name__}(id={self.message_id}, message='{self.message}')"
+
 
 class RedisContainer(BaseModel):
     """Class for parsing instance of :class:`RedisUnreadData` from Redis stream.
