@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 @cache
 def _get_initial_redis_settings() -> OverhaveRedisSettings:
     """Cached function for get params from environment in tests."""
-    return OverhaveRedisSettings(db=1)
+    return OverhaveRedisSettings(db=0)
 
 
 redis_external = factories.redis_noproc(

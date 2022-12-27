@@ -1,4 +1,5 @@
 import logging
+from functools import cache
 
 from redis import Redis
 from redis.sentinel import Sentinel
@@ -31,3 +32,11 @@ def make_redis(redis_settings: BaseRedisSettings) -> Redis:  # type: ignore  # n
         return make_regular_redis(redis_settings)
 
     raise RuntimeError("redis_settings is not any instance of OverhaveRedisSentinelSettings, OverhaveRedisSettings")
+
+
+@cache
+def get_redis_settings() -> BaseRedisSettings:
+    sentinel_settings = OverhaveRedisSentinelSettings()
+    if sentinel_settings.enabled:
+        return sentinel_settings
+    return OverhaveRedisSettings()

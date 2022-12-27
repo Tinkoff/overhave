@@ -23,6 +23,7 @@ from overhave.transport import (
     RedisStream,
     TestRunTask,
 )
+from overhave.transport.redis.deps import get_redis_settings
 
 
 class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
@@ -98,7 +99,7 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
     @cached_property
     def _redis_producer(self) -> RedisProducer:
         return RedisProducer(
-            settings=self.context.redis_settings,
+            settings=get_redis_settings(),
             mapping={
                 TestRunTask: RedisStream.TEST,
                 PublicationTask: RedisStream.PUBLICATION,
