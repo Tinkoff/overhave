@@ -33,14 +33,14 @@ class ReportManager:
         self._s3_manager = s3_manager
 
     def _generate_report(self, alluredir: Path, report_dir: Path) -> Optional[int]:
-        generation_cmd = [
+        generation_cmd = (
             self._settings.allure_cmdline,
             "generate",
             f"{alluredir}/",
             "--output",
             report_dir.as_posix(),
             "--clean",
-        ]
+        )
         logger.debug("Allure report generation command: %s", " ".join(generation_cmd))
         makedirs(report_dir.as_posix(), exist_ok=True)
         try:

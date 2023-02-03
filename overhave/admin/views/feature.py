@@ -145,7 +145,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "feature_tags.value",
     )
 
-    column_searchable_list = [
+    column_searchable_list = (
         "id",
         "name",
         "task",
@@ -153,7 +153,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         "file_path",
         "last_edited_by",
         "feature_tags.value",
-    ]
+    )
     column_filters = (
         "id",
         "name",

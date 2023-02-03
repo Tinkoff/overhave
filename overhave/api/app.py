@@ -173,7 +173,7 @@ def _get_auth_router() -> fastapi.APIRouter:
 
 def create_overhave_api() -> fastapi.FastAPI:
     app = fastapi.FastAPI()
-    auth_deps = [fastapi.Depends(get_authorized_user)]
+    auth_deps = (fastapi.Depends(get_authorized_user),)
 
     app.include_router(_get_tags_router(), dependencies=auth_deps, prefix="/feature/tags", tags=["feature_tags"])
     app.include_router(
