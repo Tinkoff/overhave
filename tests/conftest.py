@@ -144,8 +144,7 @@ def step_prefixes_clean(step_prefixes_backup: List[Tuple[Any]]) -> None:
     from pytest_bdd.parser import STEP_PREFIXES
 
     STEP_PREFIXES.clear()
-    for step in step_prefixes_backup:
-        STEP_PREFIXES.append(step)
+    STEP_PREFIXES.extend(step_prefixes_backup)
 
 
 @pytest.fixture(scope="session")

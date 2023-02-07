@@ -11,13 +11,8 @@ from overhave.factory import get_admin_factory
 from overhave.utils import get_current_time
 
 
-def _make_dict_from_model(model: Optional[Type[BaseModel]]) -> Optional[Dict[str, Union[int, str]]]:
-    if model is not None:
-        prepared_dict = {}
-        for key, value in model.__fields__.items():
-            prepared_dict[key] = value.type_.__name__
-        return prepared_dict
-    return None
+def _make_dict_from_model(model: Type[BaseModel]) -> Dict[str, Union[int, str]]:
+    return {key: value.type_.__name__ for key, value in model.__fields__.items()}
 
 
 class TestUserView(ModelViewConfigured):
@@ -63,7 +58,9 @@ class TestUserView(ModelViewConfigured):
         if self._feature_type is None:
             self._feature_type = factory.feature_type_storage.get_default_feature_type().name
         parser = factory.context.project_settings.user_spec_template_mapping.get(self._feature_type)
-        return _make_dict_from_model(parser)
+        if parser is not None:
+            return _make_dict_from_model(parser)
+        return None
 
     @staticmethod
     def _validate_json(model: db.TestUser) -> None:

@@ -1,5 +1,6 @@
 import logging
 from functools import cache
+from typing import Dict, Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -16,6 +17,7 @@ from overhave.transport import (
     RedisStream,
     TestRunTask,
 )
+from overhave.transport.redis.deps import get_redis_settings
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,19 @@ logger = logging.getLogger(__name__)
 @cache
 def _get_initial_redis_settings() -> OverhaveRedisSettings:
     """Cached function for get params from environment in tests."""
-    return OverhaveRedisSettings(db=0)
+    return OverhaveRedisSettings(db=15)  # for exclusion of intersections with other test configs
+
+
+@pytest.fixture(scope="module")
+def envs_for_mock() -> Dict[str, Optional[str]]:
+    return {
+        "OVERHAVE_REDIS_DB": f"{_get_initial_redis_settings().db}",
+    }
+
+
+@pytest.fixture(scope="module")
+def mock_default_value() -> str:
+    return ""
 
 
 redis_external = factories.redis_noproc(
@@ -78,11 +92,18 @@ def redis_producer(redis_settings: BaseRedisSettings, mock_sentinel: None) -> Re
 
 
 @pytest.fixture()
-def redis_consumer_factory(redis_settings: BaseRedisSettings, mock_sentinel: None) -> ConsumerFactory:
-    factory = ConsumerFactory(stream=RedisStream.TEST)
-    factory._redis_settings = redis_settings
-    logger.info("Setup redis settings (%s) to consumer factory instance", factory._redis_settings)
-    return factory
+def clear_redis_settings(redis_settings: BaseRedisSettings) -> None:
+    get_redis_settings.cache_clear()
+
+
+@pytest.fixture()
+def redis_consumer_factory(
+    mock_envs: None,
+    redis_settings: BaseRedisSettings,
+    mock_sentinel: None,
+    clear_redis_settings: None,
+) -> ConsumerFactory:
+    return ConsumerFactory(stream=RedisStream.TEST)
 
 
 @pytest.fixture()

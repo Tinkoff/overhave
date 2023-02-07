@@ -25,9 +25,8 @@ class FeatureExtractor(IFeatureExtractor):
             logger.exception("Extraction error while trying to collect features!")
 
     def _extract_project_data(self) -> None:
-        feature_type_dirs = []
         try:
-            feature_type_dirs = [
+            feature_type_dirs = tuple(
                 d
                 for d in self._file_settings.features_dir.iterdir()
                 if all(
@@ -38,13 +37,11 @@ class FeatureExtractor(IFeatureExtractor):
                         not d.name.startswith("_"),
                     )
                 )
-            ]
-        except FileNotFoundError:
-            pass
-        if not feature_type_dirs:
+            )
+        except FileNotFoundError as err:
             raise FeatureTypeExtractionError(
                 f"Could not find any subdirectory in specified features directory '{self._file_settings.features_dir}'!"
-            )
+            ) from err
         self._feature_types = [FeatureTypeName(t.name) for t in feature_type_dirs]
         logger.info("Registered feature types: %s", self._feature_types)
         self._feature_type_to_dir_mapping = {FeatureTypeName(t.name): t for t in feature_type_dirs}

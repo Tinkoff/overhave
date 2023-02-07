@@ -7,11 +7,9 @@ from typing import List, Tuple, Type, Union
 
 import sqlalchemy as sa
 from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy.orm import Mapper
+from sqlalchemy.orm import Mapper, Query
 from sqlalchemy.orm import Session as SessionClass
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.orm.query import Query
+from sqlalchemy.orm import as_declarative, declared_attr, scoped_session, sessionmaker
 
 logger = logging.getLogger(__name__)
 
