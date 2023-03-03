@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 
 from flask import redirect
 from flask_login import LoginManager
@@ -33,22 +34,20 @@ class AdminPanelUser(BaseModel):
         return self.user_data is None
 
     def get_id(self) -> int:
-        self._raise_if_user_unauthorized()
-        return self.user_data.id
+        return self._get_authorized_user_or_raise().id
 
     @property
     def login(self) -> str:
-        self._raise_if_user_unauthorized()
-        return self.user_data.login
+        return self._get_authorized_user_or_raise().login
 
     @property
     def role(self) -> db.Role:
-        self._raise_if_user_unauthorized()
-        return self.user_data.role
+        return self._get_authorized_user_or_raise().user_data.role
 
-    def _raise_if_user_unauthorized(self) -> None:
+    def _get_authorized_user_or_raise(self) -> SystemUserModel:
         if self.user_data is None:
             raise UnauthorizedUserError("User is not authorized!")
+        return self.user_data
 
     def __unicode__(self) -> str:
         if self.user_data is not None:
