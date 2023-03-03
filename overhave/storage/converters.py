@@ -35,18 +35,6 @@ class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
     password: Optional[SecretStr]
     role: Role
 
-    @property
-    def is_authenticated(self) -> bool:
-        return True
-
-    @property
-    def is_active(self) -> bool:
-        return True
-
-    @property
-    def is_anonymous(self) -> bool:
-        return False
-
     def get_id(self) -> int:
         return self.id
 
