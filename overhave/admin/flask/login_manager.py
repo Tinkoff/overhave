@@ -33,17 +33,17 @@ class AdminPanelUser(BaseModel):
         return self.user_data is None
 
     def get_id(self) -> int:
-        self._raise_unauthorized_if_none()
+        self._raise_if_user_unauthorized()
         return self.user_data.id
 
     @property
     def login(self) -> str:
-        self._raise_unauthorized_if_none()
+        self._raise_if_user_unauthorized()
         return self.user_data.login
 
     @property
     def role(self) -> db.Role:
-        self._raise_unauthorized_if_none()
+        self._raise_if_user_unauthorized()
         return self.user_data.role
 
     def _raise_if_user_unauthorized(self) -> None:
