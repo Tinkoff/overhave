@@ -46,7 +46,7 @@ class AdminPanelUser(BaseModel):
         self._raise_unauthorized_if_none()
         return self.user_data.role
 
-    def _raise_unauthorized_if_none(self):
+    def _raise_if_user_unauthorized(self) -> None:
         if self.user_data is None:
             raise UnauthorizedUserError("User is not authorized!")
 
