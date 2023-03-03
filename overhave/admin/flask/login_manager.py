@@ -41,7 +41,7 @@ class AdminPanelUser(BaseModel):
 
     @property
     def role(self) -> db.Role:
-        return self._get_authorized_user_or_raise().user_data.role
+        return self._get_authorized_user_or_raise().role
 
     def _get_authorized_user_or_raise(self) -> SystemUserModel:
         if self.user_data is None:
