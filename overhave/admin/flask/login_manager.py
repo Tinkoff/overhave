@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class UnauthorizedUserError(Exception):
-    """UnauthorizedUserError."""
-
-    pass
+    """Raises when user is not authorized and trying to get user fields such as role or login."""
 
 
 class AdminPanelUser(BaseModel):
@@ -35,21 +33,22 @@ class AdminPanelUser(BaseModel):
         return self.user_data is None
 
     def get_id(self) -> int:
-        if self.user_data is None:
-            raise UnauthorizedUserError("User is not authorized!")
+        self._raise_unauthorized_if_none()
         return self.user_data.id
 
     @property
     def login(self) -> str:
-        if self.user_data is None:
-            raise UnauthorizedUserError("User is not authorized!")
+        self._raise_unauthorized_if_none()
         return self.user_data.login
 
     @property
     def role(self) -> db.Role:
+        self._raise_unauthorized_if_none()
+        return self.user_data.role
+
+    def _raise_unauthorized_if_none(self):
         if self.user_data is None:
             raise UnauthorizedUserError("User is not authorized!")
-        return self.user_data.role
 
     def __unicode__(self) -> str:
         if self.user_data is not None:
