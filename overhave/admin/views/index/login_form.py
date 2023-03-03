@@ -8,7 +8,6 @@ from wtforms import PasswordField, StringField, validators
 
 from overhave.admin.flask.login_manager import AdminPanelUser
 from overhave.entities import IAdminAuthorizationManager
-from overhave.storage import SystemUserModel
 
 logger = logging.getLogger(__name__)
 
