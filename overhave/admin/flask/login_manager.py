@@ -1,5 +1,4 @@
 import logging
-from typing import cast
 
 from flask import redirect
 from flask_login import LoginManager
