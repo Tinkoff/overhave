@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class UnauthorizedUserError(Exception):
-    """UnauthorizedUserError"""
+    """UnauthorizedUserError."""
 
     pass
 
 
 class AdminPanelUser(BaseModel):
-    """SystemUserModel wrapper for flask_login"""
+    """SystemUserModel wrapper for flask_login."""
 
     user_data: SystemUserModel | None
 
