@@ -9,10 +9,13 @@ from faker import Faker
 from flask.testing import FlaskClient
 
 from overhave import OverhaveAdminApp, overhave_app
+from overhave.admin.flask.login_manager import AdminPanelUser
+from overhave.admin.views.index.login_form import LoginForm
 from overhave.base_settings import DataBaseSettings
 from overhave.factory import IAdminFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
+from overhave.storage import SystemUserModel
 
 
 @pytest.fixture()
@@ -70,3 +73,11 @@ def test_client(test_app: OverhaveAdminApp) -> FlaskClient:
 
     os.close(db_fd)
     os.unlink(test_app.config["DATABASE"])
+
+
+@pytest.fixture()
+def test_authorized_user(test_client: FlaskClient, test_system_user: SystemUserModel) -> SystemUserModel:
+    LoginForm.validate_on_submit = lambda self: True
+    LoginForm.get_user = lambda self: AdminPanelUser(user_data=test_system_user)
+    test_client.post("/login")
+    return test_system_user
