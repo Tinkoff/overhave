@@ -56,11 +56,8 @@
     <link rel="stylesheet" href="https://ace.c9.io/api/resources/csses/ace_api.css">
     <script>
         function contains(target, pattern){
-            var value = 0;
-            pattern.forEach(function(word) {
-              value = value + target.includes(word);
-            });
-            return (value === 1)
+            var value = pattern.reduce((acc, curr) => acc + target.includes(curr), 0)
+            return value === 1
         }
         function with_double_indent(text) {
             return "\n\n".concat(text)
@@ -69,11 +66,7 @@
             return "\n  ".concat(text)
         }
         function join_text(arr){
-            var value = "";
-            arr.forEach(function (text) {
-                value = value.concat(text);
-            });
-            return value
+            return arr.reduce((acc, curr) => acc + curr, "")
         }
         var scenario_prefixes = ['Scenario:', 'Сценарий:'];
         var scenario_outline_prefixes = ['Scenario Outline:', 'Структура сценария:'];
@@ -127,18 +120,12 @@
         function renderSteps() {
             actual_feature_type = $('#s2id_feature_type > a > span').text().toLowerCase();
             if (actual_feature_type.length !== 0){
-                // TODO
-                steps_container_elements = document.querySelectorAll('[id^="steps_container_"]');
-                for (let steps_container of steps_container_elements){
-                    element = $("#".concat(steps_container.id));
-                    search_result = steps_container.id.search(actual_feature_type);
-                    if (search_result === -1) {
-                        element.hide();
-                    }
-                    else {
-                        element.show();
-                    }
-                }
+                $('.steps_container').each(function (index) {
+                    if (this.id.search(actual_feature_type) === -1)
+                        $(this).hide();
+                    else 
+                        $(this).show();
+                });
             }
         }
         function observeStepsRendering() {
@@ -229,7 +216,7 @@
         </div>
         <div class="col-md-4" id="steps_container">
             {% for feature_type in bdd_fixtures %}
-                <div id="steps_container_{{ feature_type }}" style="display: none;">
+                <div id="steps_container_{{ feature_type }}" class="steps_container" style="display: none;">
                     {{ render_steps_container(feature_type) }}
                 </div>
             {% endfor %}
@@ -244,11 +231,10 @@
 {% endmacro %}
 
 {% macro render_fixtures_table(title, step_type, feature_type) %}
-    <!-- TODO -->
     <table style="width:100%;">
         <tbody>
         <tr onclick="$('#{{ feature_type }}_{{ step_type }}_steps').slideToggle('slow');">
-            <th style="width:10%;">
+            <th>
                 <a class="toggle-block">►</a>
             </th>
             <th class="text-center" title="Push for toggle">
