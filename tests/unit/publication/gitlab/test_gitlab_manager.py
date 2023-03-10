@@ -22,10 +22,8 @@ class TestGitlabProjectManager:
         test_gitlab_publisher_with_default_reviewers: GitlabVersionPublisher,
     ) -> None:
         correct_repository = GitlabRepository(project_id=test_repository_id_or_name)
-        assert test_gitlab_publisher_with_default_reviewers._gitlab_publisher_settings.repository == correct_repository
-        assert (
-            test_gitlab_publisher_with_default_reviewers._gitlab_publisher_settings.target_branch == test_target_branch
-        )
+        assert test_gitlab_publisher_with_default_reviewers._git_publisher_settings.repository == correct_repository
+        assert test_gitlab_publisher_with_default_reviewers._git_publisher_settings.target_branch == test_target_branch
 
     def test_gitlab_project_settings_with_default_reviewers(
         self,
@@ -34,7 +32,7 @@ class TestGitlabProjectManager:
         faker: Faker,
     ) -> None:
         assert (
-            test_gitlab_publisher_with_default_reviewers._gitlab_publisher_settings.get_reviewers(faker.word())
+            test_gitlab_publisher_with_default_reviewers._git_publisher_settings.get_reviewers(faker.word())
             == test_default_reviewers
         )
 
@@ -45,6 +43,6 @@ class TestGitlabProjectManager:
         faker: Faker,
     ) -> None:
         for key in test_reviewers_mapping.keys():
-            assert test_gitlab_publisher_with_reviewers_mapping._gitlab_publisher_settings.get_reviewers(key) == list(
+            assert test_gitlab_publisher_with_reviewers_mapping._git_publisher_settings.get_reviewers(key) == list(
                 test_reviewers_mapping[key]
             )

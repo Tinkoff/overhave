@@ -51,8 +51,8 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             draft_storage=draft_storage,
             file_manager=file_manager,
             git_initializer=git_initializer,
+            git_publisher_settings=gitlab_publisher_settings,
         )
-        self._gitlab_publisher_settings = gitlab_publisher_settings
         self._gitlab_client = gitlab_client
         self._tokenizer_client = tokenizer_client
 
@@ -63,12 +63,12 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         if not isinstance(context, PublisherContext):
             return
         merge_request = GitlabMrRequest(
-            project_id=self._gitlab_publisher_settings.repository_id,
+            project_id=self._git_publisher_settings.repository_id,
             title=context.feature.name,
             source_branch=context.target_branch,
-            target_branch=self._gitlab_publisher_settings.target_branch,
+            target_branch=self._git_publisher_settings.target_branch,
             description=self._compile_publication_description(context),
-            reviewer_ids=self._gitlab_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
+            reviewer_ids=self._git_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
         logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
         try:
@@ -76,7 +76,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                 self._gitlab_client._settings.auth_token or self._tokenizer_client.get_token(draft_id=draft_id).token
             )
             response = self._gitlab_client.send_merge_request(
-                merge_request=merge_request, token=token, repository_id=self._gitlab_publisher_settings.repository_id
+                merge_request=merge_request, token=token, repository_id=self._git_publisher_settings.repository_id
             )
             if isinstance(response, ProjectMergeRequest):
                 if response.web_url is None:

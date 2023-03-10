@@ -45,8 +45,8 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             draft_storage=draft_storage,
             file_manager=file_manager,
             git_initializer=git_initializer,
+            git_publisher_settings=stash_publisher_settings,
         )
-        self._stash_publisher_settings = stash_publisher_settings
         self._client = stash_client
 
     def publish_version(self, draft_id: int) -> None:
@@ -59,9 +59,9 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             title=context.feature.name,
             description=self._compile_publication_description(context),
             open=True,
-            fromRef=StashBranch(id=context.target_branch, repository=self._stash_publisher_settings.repository),
-            toRef=self._stash_publisher_settings.target_branch,
-            reviewers=self._stash_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
+            fromRef=StashBranch(id=context.target_branch, repository=self._git_publisher_settings.repository),
+            toRef=self._git_publisher_settings.target_branch,
+            reviewers=self._git_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
         logger.info("Prepared pull-request: %s", pull_request.json(by_alias=True))
         try:

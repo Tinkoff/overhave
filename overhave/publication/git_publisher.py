@@ -42,6 +42,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         draft_storage: IDraftStorage,
         file_manager: FileManager,
         git_initializer: GitRepositoryInitializer,
+        git_publisher_settings: GitPublisherSettings,
     ) -> None:
         super().__init__(
             file_settings=file_settings,
@@ -53,6 +54,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
             file_manager=file_manager,
         )
         self._git_initializer = git_initializer
+        self._git_publisher_settings = git_publisher_settings
 
     def _create_head(self, name: str) -> git.SymbolicReference:
         repo = self._git_initializer.repository
@@ -113,7 +115,10 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
 
     def _push_version(self, draft_id: int) -> Optional[PublisherContext]:
         try:
-            self._git_initializer.pull()
+            if not self._git_publisher_settings.pull_before_creating_mr_enabled:
+                logger.warning("Pulling before creating merge request is disabled!")
+            else:
+                self._git_initializer.pull()
             ctx = self._compile_context(draft_id)
             git_branch = cast(git.Head, self._create_head(name=ctx.target_branch))
             self._create_commit_and_push(context=ctx, target_branch=git_branch)
