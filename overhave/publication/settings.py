@@ -11,6 +11,7 @@ class BaseGitPublisherSettings(BaseOverhavePrefix):
     default_reviewers: List[str] = []
     feature_type_to_reviewers_mapping: Mapping[FeatureTypeName, List[str]] = {}
     default_target_branch_name: str = "master"
+    pull_before_creating_mr_enabled: bool = True
 
 
 class PublicationSettings(BaseOverhavePrefix):
