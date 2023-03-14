@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "3.12.8"
+version = "3.12.9"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",
     "Framework :: Flask",
     "Framework :: Pytest",
@@ -47,7 +48,7 @@ wsgi_intercept = "^1.8"
 redis = "^4.2.0"
 docker = "*"
 sqlalchemy-utc = "^0.14.0"
-httptools = "^0.2.0"
+httptools = "^0.5.0"
 python-dateutil = "^2.8.1"
 alembic = "^1.4.3"
 boto3 = "^1.17.16"
