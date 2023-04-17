@@ -211,7 +211,9 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
 
     @cached_property
     def _step_collector(self) -> StepCollector:
-        return StepCollector(step_prefixes=self.context.language_settings.step_prefixes)
+        return StepCollector(
+            settings=self.context.step_collector_settings, step_prefixes=self.context.language_settings.step_prefixes
+        )
 
     @property
     def step_collector(self) -> StepCollector:

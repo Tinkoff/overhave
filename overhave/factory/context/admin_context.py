@@ -11,7 +11,7 @@ from overhave.entities import (
 )
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings
-from overhave.test_execution import OverhaveTestSettings
+from overhave.test_execution import OverhaveStepCollectorSettings, OverhaveTestSettings
 from overhave.transport import OverhaveLdapClientSettings, OverhaveS3ManagerSettings
 
 
@@ -35,6 +35,7 @@ class OverhaveAdminContext(BaseFactoryContext):
         report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
+        step_collector_settings: Optional[OverhaveStepCollectorSettings] = None,
     ) -> None:
         super().__init__(
             emulation_settings=emulation_settings or OverhaveEmulationSettings(),
@@ -45,6 +46,7 @@ class OverhaveAdminContext(BaseFactoryContext):
             report_manager_settings=report_manager_settings or OverhaveReportManagerSettings(),
             s3_manager_settings=s3_manager_settings or OverhaveS3ManagerSettings(),
             test_settings=test_settings or OverhaveTestSettings(),
+            step_collector_settings=step_collector_settings or OverhaveStepCollectorSettings(),
         )
         self.admin_settings = admin_settings or OverhaveAdminSettings()
         self.auth_settings = auth_settings or OverhaveAuthorizationSettings()

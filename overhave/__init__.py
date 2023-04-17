@@ -44,7 +44,12 @@ from overhave.scenario import FeatureInfo as OverhaveFeatureInfo
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
 from overhave.storage import FeatureTypeName as OverhaveFeatureName
 from overhave.storage import ITestUserStorage, TestUserSpecification, TestUserStorage
-from overhave.test_execution import OverhaveAdminLinkSettings, OverhaveTestSettings
+from overhave.test_execution import (
+    OverhaveAdminLinkSettings,
+    OverhaveStepCollectorSettings,
+    OverhaveTestSettings,
+    public_step,
+)
 from overhave.transport import (
     OverhaveApiAuthenticator,
     OverhaveApiAuthenticatorSettings,
