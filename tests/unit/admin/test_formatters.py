@@ -185,7 +185,7 @@ class TestResultReportFormatter:
         assert result == Markup(
             f"<form action='/testrun/details/?id={test_testrun_id}'>"
             f"<fieldset title='Show details'>"
-            f"<button class='link-button {test_testrun_button_css_class}'>{status}</button>"
+            f"<button class='link-button {test_testrun_button_css_class}'>{status.value}</button>"
             "</fieldset>"
             "</form>"
         )
@@ -217,7 +217,7 @@ class TestResultReportFormatter:
             f"<form action='{get_report_index_link(test_testrun_report)}' method='POST' target='_blank'>"
             f"<input type='hidden' name='run_id' value='{test_testrun_id}' />"
             f"<fieldset title='Go to report'>"
-            f"<button class='link-button {test_testrun_button_css_class}' type='submit'>{status}</button>"
+            f"<button class='link-button {test_testrun_button_css_class}' type='submit'>{status.value}</button>"
             "</fieldset>"
             "</form>"
         )
