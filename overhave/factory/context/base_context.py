@@ -9,7 +9,7 @@ from overhave.entities import (
     OverhaveReportManagerSettings,
 )
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
-from overhave.test_execution import OverhaveTestSettings
+from overhave.test_execution import OverhaveStepCollectorSettings, OverhaveTestSettings
 from overhave.transport import OverhaveS3ManagerSettings
 
 
@@ -35,6 +35,7 @@ class BaseFactoryContext:
         report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
         s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
         test_settings: Optional[OverhaveTestSettings] = None,
+        step_collector_settings: Optional[OverhaveStepCollectorSettings] = None,
     ):
         self._compilation_settings = compilation_settings
         self._parser_settings = parser_settings
@@ -45,6 +46,7 @@ class BaseFactoryContext:
         self._report_manager_settings = report_manager_settings
         self._s3_manager_settings = s3_manager_settings
         self._test_settings = test_settings
+        self._step_collector_settings = step_collector_settings
 
     @staticmethod
     def _ensured_settings(settings: Optional[BaseSettings]) -> BaseSettings:
@@ -87,3 +89,7 @@ class BaseFactoryContext:
     @property
     def test_settings(self) -> OverhaveTestSettings:
         return cast(OverhaveTestSettings, self._ensured_settings(self._test_settings))
+
+    @property
+    def step_collector_settings(self) -> OverhaveStepCollectorSettings:
+        return cast(OverhaveStepCollectorSettings, self._ensured_settings(self._step_collector_settings))

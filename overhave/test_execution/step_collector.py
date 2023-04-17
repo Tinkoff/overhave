@@ -7,7 +7,8 @@ from _pytest.main import Session
 
 from overhave.entities import StepPrefixesModel
 from overhave.storage import FeatureTypeName
-from overhave.test_execution.objects import BddStepModel
+from overhave.test_execution.objects import BddStepModel, is_public_step
+from overhave.test_execution.settings import OverhaveStepCollectorSettings
 
 _PYTESTBDD_FIXTURE_MARK = "pytestbdd_"
 _PYTESTBDD_FIXTURE_TRACE_MARK = "_trace"
@@ -26,26 +27,31 @@ class BddStepWithoutDocsError(BaseStepCollectorException):
 class StepCollector:
     """Class for `pytest-bdd` steps dynamic collection."""
 
-    def __init__(self, step_prefixes: Optional[StepPrefixesModel]) -> None:
+    def __init__(self, settings: OverhaveStepCollectorSettings, step_prefixes: Optional[StepPrefixesModel]) -> None:
+        self._settings = settings
         self._step_prefixes = step_prefixes
         self._steps: Dict[FeatureTypeName, List[BddStepModel]] = {}
 
-    @staticmethod
-    def _is_bdd_step(fixture: FixtureDef[Any]) -> bool:
+    def _is_bdd_step(self, fixture: FixtureDef[Any]) -> bool:
         is_bdd_step = (
             isinstance(fixture.argname, str)
             and fixture.argname.startswith(_PYTESTBDD_FIXTURE_MARK)
             and not fixture.argname.endswith(_PYTESTBDD_FIXTURE_TRACE_MARK)
         )
         logger.debug("Fixture: %s - is_bdd_step=%s", fixture.argname, is_bdd_step)
-        if is_bdd_step and not isinstance(fixture.func._pytest_bdd_step_context.step_func.__doc__, str):  # type: ignore
+        if not is_bdd_step:
+            return False
+        step_func = fixture.func._pytest_bdd_step_context.step_func  # type: ignore[union-attr]
+        if self._settings.hide_non_public_steps and not is_public_step(step_func):
+            logger.debug("Step func: %s is not public! Mark as non bdd step.", step_func)
+            return False
+        if not isinstance(step_func.__doc__, str):
             raise BddStepWithoutDocsError(
                 f"Fixture {fixture} does not have description! Please, set it via docstrings."
             )
-        return is_bdd_step
+        return True
 
-    @classmethod
-    def _get_pytestbdd_step_fixtures(cls, session: Session) -> Tuple[FixtureDef[Any]]:
+    def _get_pytestbdd_step_fixtures(self, session: Session) -> Tuple[FixtureDef[Any]]:
         return cast(
             Tuple[FixtureDef[Any]],
             sorted(
@@ -53,7 +59,7 @@ class StepCollector:
                     fx
                     for fx_list in session._fixturemanager._arg2fixturedefs.values()
                     for fx in fx_list
-                    if cls._is_bdd_step(fx)
+                    if self._is_bdd_step(fx)
                 ),
                 key=attrgetter("func._pytest_bdd_step_context.type"),
                 reverse=True,

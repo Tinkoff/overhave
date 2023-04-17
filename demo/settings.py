@@ -19,6 +19,7 @@ from overhave import (
     OverhavePublicationSettings,
     OverhaveStashClientSettings,
     OverhaveStashPublisherSettings,
+    OverhaveStepCollectorSettings,
 )
 from overhave.extra import RUSSIAN_PREFIXES
 from overhave.publication.gitlab import TokenizerClientSettings
@@ -90,7 +91,8 @@ class OverhaveDemoSettingsGenerator:
     @cached_property
     def admin_context_settings(self) -> Dict[str, BaseSettings]:
         settings: Dict[str, BaseSettings] = dict(
-            admin_settings=OverhaveAdminSettings(consumer_based=not self._threadpool)
+            admin_settings=OverhaveAdminSettings(consumer_based=not self._threadpool),
+            step_collector_settings=OverhaveStepCollectorSettings(hide_non_public_steps=True),
         )
         settings.update(self.default_context_settings)
         return settings

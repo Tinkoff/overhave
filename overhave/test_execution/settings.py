@@ -43,3 +43,9 @@ class OverhaveTestSettings(BaseOverhavePrefix):
     extra_pytest_addoptions: Optional[str]
 
     workers: Optional[int]  # Number of xdist workers, `None` by default
+
+
+class OverhaveStepCollectorSettings(BaseOverhavePrefix):
+    """Settings for StepCollector, which collect BDD steps for Overhave Admin UI."""
+
+    hide_non_public_steps: bool = False
