@@ -86,7 +86,7 @@ check-package:
 	$(VENV)/bin/poetry check
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
 
-check: lint test cov-badge check-package build-docs
+check: lint test cov-badge build-docs check-package
 
 clear:
 	rm -rf ./$(MYPY_CACHE_DIR)
