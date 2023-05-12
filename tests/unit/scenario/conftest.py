@@ -42,6 +42,7 @@ def test_scenario_text(request: FixtureRequest, language_settings: OverhaveLangu
 def test_feature() -> FeatureModel:
     return FeatureModel(
         id=1,
+        created_at=get_current_time(),
         name="feature",
         author="keks",
         type_id=1,

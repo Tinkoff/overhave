@@ -38,7 +38,7 @@ class TestRunStorage(ITestRunStorage):
                 .scalar_subquery()
             )
             feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario_id_query).one()
-            run = db.TestRun(  # type: ignore
+            run = db.TestRun(
                 scenario_id=scenario_id,
                 name=feature.name,
                 status=db.TestRunStatus.STARTED,
@@ -69,7 +69,7 @@ class TestRunStorage(ITestRunStorage):
 
     def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
         with db.create_session() as session:
-            run: Optional[db.TestRun] = session.query(db.TestRun).get(run_id)
+            run = session.get(db.TestRun, run_id)
             if run is not None:
-                return cast(TestRunModel, TestRunModel.from_orm(run))
+                return TestRunModel.from_orm(run)
             return None

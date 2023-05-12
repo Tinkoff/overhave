@@ -45,7 +45,7 @@ def setup_logging(caplog) -> None:
 @pytest.fixture(scope="session")
 def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
     settings = OverhaveDBSettings(db_echo=True)
-    settings.db_url = make_url(f"{settings.db_url}/overhave_{worker_id}")
+    settings.db_url = make_url(f"{settings.db_url.render_as_string(hide_password=False)}/overhave_{worker_id}")
     return settings
 
 
@@ -53,20 +53,22 @@ def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
 def db_context(db_settings: OverhaveDBSettings) -> Iterator[DataBaseContext]:
     from overhave.db import metadata
 
-    if sau.database_exists(db_settings.db_url):
-        sau.drop_database(db_settings.db_url)
-    sau.create_database(db_settings.db_url)
     engine = create_engine(db_settings.db_url, echo=db_settings.db_echo, pool_pre_ping=True)
+
+    if sau.database_exists(engine.url):
+        sau.drop_database(engine.url)
+    sau.create_database(engine.url)
+
     db_context = DataBaseContext(metadata=metadata, engine=engine)
-    db_context.metadata.bind = db_context.engine
+    db_context.metadata.set_bind(db_context.engine)
     yield db_context
-    sau.drop_database(db_settings.db_url)
+    sau.drop_database(engine.url)
 
 
 @pytest.fixture()
 def database(db_context: DataBaseContext) -> Iterator[None]:
-    db_context.metadata.drop_all()
-    db_context.metadata.create_all()
+    db_context.metadata.drop_all(bind=db_context.metadata.bind)
+    db_context.metadata.create_all(bind=db_context.metadata.bind)
     yield
     close_all_sessions()
 

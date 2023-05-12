@@ -2,14 +2,12 @@ import enum
 import logging
 import socket
 from logging.config import DictConfigurator  # type: ignore
-from typing import Any, Dict, Optional
+from typing import Any
 
+import sqlalchemy as sa
+import sqlalchemy.exc
+import sqlalchemy.pool
 from pydantic import BaseSettings, Field, validator
-from sqlalchemy import engine_from_config
-from sqlalchemy.engine import Engine
-from sqlalchemy.engine.url import URL, make_url
-from sqlalchemy.exc import ArgumentError
-from sqlalchemy.pool import SingletonThreadPool
 
 OVERHAVE_ENV_PREFIX = "OVERHAVE_"
 
@@ -21,39 +19,41 @@ class BaseOverhavePrefix(BaseSettings):
         env_prefix = OVERHAVE_ENV_PREFIX
 
 
-class SAUrl(URL):
-    """Custom SQLAlchemy URL for Pydantic BaseSettings validation."""
+class SAUrl(sa.URL):
+    """Custom URL for Pydantic BaseSettings validation."""
 
     @classmethod
     def __get_validators__(cls):  # type: ignore
         yield cls.validate
 
     @classmethod
-    def validate(cls, v: str) -> URL:
+    def validate(cls, v: str) -> sa.URL:
         try:
-            return make_url(v)
-        except ArgumentError as e:
+            return sa.make_url(v)
+        except sqlalchemy.exc.ArgumentError as e:
             raise ValueError from e
 
 
 class DataBaseSettings(BaseOverhavePrefix):
     """Overhave database settings."""
 
-    db_url: SAUrl = Field(SAUrl.validate("postgresql://postgres:postgres@localhost/overhave"))
+    db_url: SAUrl = Field(
+        SAUrl.validate("postgresql://postgres:postgres@localhost/overhave")  # type: ignore[assignment]
+    )
     db_pool_recycle: int = 500
     db_pool_size: int = 6
     db_echo: bool = False
     db_application_name: str = socket.gethostname()
     db_connect_timeout: int = 30
 
-    def create_engine(self) -> Engine:
-        return engine_from_config(
+    def _create_engine(self) -> sa.Engine:
+        return sa.engine_from_config(
             {
                 "url": self.db_url,
                 "pool_recycle": self.db_pool_recycle,
                 "pool_pre_ping": True,
                 "pool_size": self.db_pool_size,
-                "poolclass": SingletonThreadPool,
+                "poolclass": sqlalchemy.pool.SingletonThreadPool,
                 "connect_args": {
                     "connect_timeout": self.db_connect_timeout,
                     "application_name": self.db_application_name,
@@ -62,20 +62,20 @@ class DataBaseSettings(BaseOverhavePrefix):
             prefix="",
         )
 
-    def setup_db(self) -> None:
+    def setup_engine(self) -> None:
         from overhave.db.base import metadata
 
-        metadata.bind = self.create_engine()
+        metadata.set_bind(engine=self._create_engine())
 
 
 class LoggingSettings(BaseOverhavePrefix):
     """Overhave logging settings."""
 
     log_level: str = logging.getLevelName(logging.INFO)
-    log_config: Dict[str, Any] = {}
+    log_config: dict[str, Any] = {}
 
     @validator("log_config", each_item=True)
-    def dict_config_validator(cls, v: Dict[str, Any]) -> Optional[DictConfigurator]:
+    def dict_config_validator(cls, v: dict[str, Any]) -> DictConfigurator | None:
         if not v:
             return None
         return DictConfigurator(v)
@@ -87,7 +87,7 @@ class LoggingSettings(BaseOverhavePrefix):
             logging.basicConfig(level=self.log_level)
 
 
-class AuthorizationStrategy(str, enum.Enum):
+class AuthorizationStrategy(enum.StrEnum):
     """
     Authorization strategies Enum.
 

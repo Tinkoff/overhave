@@ -10,7 +10,7 @@ from allure_commons._allure import StepContext
 from overhave.entities import OverhaveStepContextSettings
 
 
-class _WrapperPosition(str, enum.Enum):
+class _WrapperPosition(enum.StrEnum):
     ABOVE = "above"
     BELOW = "below"
 

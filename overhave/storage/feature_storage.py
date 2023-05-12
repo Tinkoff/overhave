@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Iterable, List, Optional, cast
+from typing import Iterable, cast
 
 import sqlalchemy.orm as so
 from pydantic.tools import parse_obj_as
@@ -29,7 +29,7 @@ class IFeatureStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_feature(feature_id: int) -> Optional[FeatureModel]:
+    def get_feature(feature_id: int) -> FeatureModel | None:
         pass
 
     @staticmethod
@@ -44,14 +44,14 @@ class IFeatureStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_features_by_tag(tag_id: int) -> List[FeatureModel]:
+    def get_features_by_tag(tag_id: int) -> list[FeatureModel]:
         pass
 
 
 def _append_tags_to_feature(session: so.Session, feature: db.Feature, tag_ids: Iterable[int]) -> None:
-    db_tags: List[db.Tags] = []
+    db_tags: list[db.Tags] = []
     for tag_id in tag_ids:
-        db_tag = session.query(db.Tags).get(tag_id)
+        db_tag = session.get(db.Tags, tag_id)
         if db_tag is None:
             raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
         logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
@@ -63,11 +63,11 @@ class FeatureStorage(IFeatureStorage):
     """Class for feature storage."""
 
     @staticmethod
-    def get_feature(feature_id: int) -> Optional[FeatureModel]:
+    def get_feature(feature_id: int) -> FeatureModel | None:
         with db.create_session() as session:
-            feature: Optional[db.Feature] = session.query(db.Feature).get(feature_id)
+            feature = session.get(db.Feature, feature_id)
             if feature is not None:
-                return cast(FeatureModel, FeatureModel.from_orm(feature))
+                return FeatureModel.from_orm(feature)
             return None
 
     @staticmethod
@@ -92,7 +92,7 @@ class FeatureStorage(IFeatureStorage):
     @staticmethod
     def update_feature(model: FeatureModel) -> None:
         with db.create_session() as session:
-            feature: db.Feature = session.query(db.Feature).get(model.id)
+            feature = session.get(db.Feature, model.id)
             if feature is None:
                 raise FeatureNotExistsError(f"Feature with id {model.id} does not exist!")
             feature.name = model.name
@@ -115,7 +115,7 @@ class FeatureStorage(IFeatureStorage):
             _append_tags_to_feature(session=session, feature=feature, tag_ids=tags_to_append)
 
     @staticmethod
-    def get_features_by_tag(tag_id: int) -> List[FeatureModel]:
+    def get_features_by_tag(tag_id: int) -> list[FeatureModel]:
         with db.create_session() as session:
             feature_ids_query = (
                 session.query(db.FeatureTagsAssociationTable)
@@ -124,4 +124,4 @@ class FeatureStorage(IFeatureStorage):
                 .scalar_subquery()
             )
             features = session.query(db.Feature).filter(db.Feature.id.in_(feature_ids_query)).all()
-            return parse_obj_as(List[FeatureModel], features)
+            return parse_obj_as(list[FeatureModel], features)

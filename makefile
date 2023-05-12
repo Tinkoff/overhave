@@ -17,6 +17,8 @@ MYPY_CACHE_DIR = .mypy_cache
 
 ALL = $(CODE) $(DOCS_DIR) tests demo
 
+JOBS ?= 4
+
 pre-init:
 	sudo apt install python$(PYTHON_VERSION) python$(PYTHON_VERSION)-venv python$(PYTHON_VERSION)-dev python$(PYTHON_VERSION)-distutils gcc\
         libsasl2-dev libldap2-dev libssl-dev libpq-dev g++ libgnutls28-dev
@@ -35,12 +37,25 @@ precommit-install:
 test:
 	$(VENV)/bin/poetry run pytest -n auto --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
-lint:
+black:
 	$(VENV)/bin/poetry run black --check $(ALL)
+
+flake8:
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
+
+perflint:
 	$(VENV)/bin/poetry run perflint $(ALL) --disable=W8201,W8202,R8203,W8205
+
+mypy:
 	$(VENV)/bin/poetry run mypy --install-types --non-interactive $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
+
+pytest-lint:
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
+
+lint: black flake8 perflint mypy pytest-lint
+
+parallel-lint:
+	make -j $(JOBS) lint
 
 pretty:
 	$(VENV)/bin/poetry run isort $(ALL)

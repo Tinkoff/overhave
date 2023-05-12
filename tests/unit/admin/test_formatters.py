@@ -109,7 +109,7 @@ class TestDatetimeFormatter:
         result = datetime_formatter(
             view=test_testrun_view,
             context=mocker.MagicMock(),
-            model=TestRun(**{"id": test_testrun_id, column_name: value}),
+            model=TestRun(**{"id": test_testrun_id, column_name: value}),  # type: ignore[arg-type]
             name=column_name,
         )
         assert result == Markup(value.strftime("%d-%m-%Y %H:%M:%S"))
@@ -243,7 +243,7 @@ class TestJsonFormatter:
         result = json_formatter(
             view=test_testuser_view,
             context=mocker.MagicMock(),
-            model=TestUser(**{column_name: value}),
+            model=TestUser(**{column_name: value}),  # type: ignore[arg-type]
             name=column_name,
         )
         assert result == expected

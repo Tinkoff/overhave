@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 @pytest.fixture(scope="module")
 def envs_for_mock(db_settings: OverhaveDBSettings) -> Dict[str, Optional[str]]:
     return {
-        "OVERHAVE_DB_URL": str(db_settings.db_url),
+        "OVERHAVE_DB_URL": db_settings.db_url.render_as_string(hide_password=False),
         "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix(),
     }
 

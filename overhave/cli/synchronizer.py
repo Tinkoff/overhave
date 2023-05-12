@@ -9,7 +9,7 @@ sync_app = typer.Typer(short_help="Run Overhave features synchronization command
 
 
 def _create_synchronizer() -> IOverhaveSynchronizer:
-    DataBaseSettings().setup_db()
+    DataBaseSettings().setup_engine()
     LoggingSettings().setup_logging()
     return get_synchronizer_factory().synchronizer
 

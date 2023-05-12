@@ -1,7 +1,7 @@
 import enum
 
 
-class TestRunStatus(str, enum.Enum):
+class TestRunStatus(enum.StrEnum):
     """Enum for test run statuses."""
 
     __test__ = False
@@ -32,7 +32,7 @@ class TestReportStatus(str, enum.Enum):
         return self in (TestReportStatus.GENERATED, TestReportStatus.SAVED)
 
 
-class EmulationStatus(str, enum.Enum):
+class EmulationStatus(enum.StrEnum):
     """Enum for emulation statuses."""
 
     CREATED = "CREATED"
@@ -45,7 +45,7 @@ class EmulationStatus(str, enum.Enum):
         return self in (EmulationStatus.READY, EmulationStatus.ERROR)
 
 
-class DraftStatus(str, enum.Enum):
+class DraftStatus(enum.StrEnum):
     """Enum for draft statuses."""
 
     REQUESTED = "REQUESTED"

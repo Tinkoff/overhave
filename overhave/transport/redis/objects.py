@@ -6,7 +6,7 @@ from typing import Any, Dict, TypeVar, Union
 from pydantic.main import BaseModel
 
 
-class RedisStream(str, enum.Enum):
+class RedisStream(enum.StrEnum):
     """Enum that declares Redis streams."""
 
     TEST = "test"

@@ -1,5 +1,4 @@
 import abc
-from typing import List, cast
 
 from overhave import db
 from overhave.storage.converters import FeatureTypeModel
@@ -28,7 +27,7 @@ class IFeatureTypeStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_all_feature_types() -> List[FeatureTypeModel]:
+    def get_all_feature_types() -> list[FeatureTypeModel]:
         pass
 
 
@@ -38,21 +37,19 @@ class FeatureTypeStorage(IFeatureTypeStorage):
     @staticmethod
     def get_default_feature_type() -> FeatureTypeModel:
         with db.create_session() as session:
-            feature_type: db.FeatureType = session.query(db.FeatureType).order_by(db.FeatureType.id.asc()).first()
-            return cast(FeatureTypeModel, FeatureTypeModel.from_orm(feature_type))
+            feature_type = session.query(db.FeatureType).order_by(db.FeatureType.id.asc()).first()
+            return FeatureTypeModel.from_orm(feature_type)
 
     @staticmethod
     def get_feature_type_by_name(name: str) -> FeatureTypeModel:
         with db.create_session() as session:
-            feature_type: db.FeatureType = (
-                session.query(db.FeatureType).filter(db.FeatureType.name == name).one_or_none()
-            )
+            feature_type = session.query(db.FeatureType).filter(db.FeatureType.name == name).one_or_none()
             if feature_type is None:
                 raise FeatureTypeNotExistsError(f"Could not find feature type with name='{name}'!")
-            return cast(FeatureTypeModel, FeatureTypeModel.from_orm(feature_type))
+            return FeatureTypeModel.from_orm(feature_type)
 
     @staticmethod
-    def get_all_feature_types() -> List[FeatureTypeModel]:
+    def get_all_feature_types() -> list[FeatureTypeModel]:
         with db.create_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
-            return cast(List[FeatureTypeModel], [FeatureTypeModel.from_orm(x) for x in db_feature_types])
+            return [FeatureTypeModel.from_orm(x) for x in db_feature_types]

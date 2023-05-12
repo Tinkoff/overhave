@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "3.13.0"
+version = "3.13.1"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -32,8 +32,7 @@ overhave-demo = 'demo:overhave_demo'
 overhave = "overhave.pytest_plugin.plugin"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
-sqlalchemy = ">=1.3.23"
+python = ">=3.8,<3.12"
 psycopg2-binary = "^2.8"
 pydantic = ">=1.7"
 tenacity = "*"
@@ -46,17 +45,13 @@ ldap3 = "^2.6"
 wsgi_intercept = "^1.8"
 redis = "^4.2.0"
 docker = "*"
-sqlalchemy-utc = "^0.14.0"
 httptools = "^0.5.0"
 python-dateutil = "^2.8.1"
 alembic = "^1.4.3"
 boto3 = "^1.17.16"
 boto3-type-annotations = "^0.3.1"
-SQLAlchemy-Utils = "^0.38.0"
-Flask = "^2.0.1"
 GitPython = "^3.1.15"
 python-gitlab = "^2.9.0"
-pydantic-sqlalchemy = "^0.0.9"
 fastapi = ">=0.57.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.5"
@@ -66,6 +61,10 @@ walrus = "^0.9.2"
 typer = "^0.7.0"
 flask-login = "^0.6.2"
 flask-wtf = "^1.1.1"
+flask = "^2.3.2"
+sqlalchemy = "^2.0.12"
+sqlalchemy-utils = "^0.41.1"
+sqlalchemy-utc = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8-awesome = "<1.3"
@@ -78,7 +77,6 @@ pytest-deadfixtures = "^2.2.1"
 pytest-random-order = "^1.0.4"
 tox = "^3.24.4"
 twine = "^3.3.0"
-Sphinx = "^4.4.0"
 alchemy-mock = "^0.4.3"
 coverage = {version = "^6.0.1", extras = ["toml"]}
 pytest-mock = "^3.6.1"
@@ -92,7 +90,8 @@ docutils-stubs = "^0.0.22"
 pytest-redis = "^2.4.0"
 perflint = "^0.7.3"
 pytest = "^6.2.5"
-mypy = "^1.2.0"
+sphinx = "^7.0.0"
+mypy = "^1.3.0"
 
 [tool.pytest.ini_options]
 addopts = "-l -v --random-order-bucket=module --random-order-seed=$RANDOM -p no:overhave"
@@ -122,7 +121,7 @@ line_length = 120
 multi_line_output = 3
 
 [tool.black]
-target-version = ['py310']
+target-version = ['py311']
 line-length = 120
 
 [build-system]
@@ -134,7 +133,7 @@ legacy_tox_ini = """
 [tox]
 isolated_build = true
 isolated_build_env = .package
-envlist = py310
+envlist = py311
 [testenv]
 whitelist_externals =
     make

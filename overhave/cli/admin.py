@@ -1,11 +1,12 @@
-from overhave import OverhaveAdminApp, overhave_app
+from overhave import OverhaveAdminApp, db, overhave_app
 from overhave.base_settings import DataBaseSettings, LoggingSettings
 from overhave.cli.group import overhave
 from overhave.factory import get_admin_factory
 
 
 def _get_admin_app() -> OverhaveAdminApp:
-    DataBaseSettings().setup_db()
+    DataBaseSettings().setup_engine()
+    db.current_session.configure(bind=db.metadata.bind)
     LoggingSettings().setup_logging()
     return overhave_app(get_admin_factory())
 

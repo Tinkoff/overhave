@@ -1,5 +1,4 @@
 import abc
-from typing import List, Optional, cast
 
 from overhave import db
 from overhave.storage import TestUserModel, TestUserSpecification
@@ -27,17 +26,17 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_user_by_id(user_id: int) -> Optional[TestUserModel]:
+    def get_test_user_by_id(user_id: int) -> TestUserModel | None:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_user_by_key(key: str) -> Optional[TestUserModel]:
+    def get_test_user_by_key(key: str) -> TestUserModel | None:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
+    def get_test_users(feature_type_id: int, allow_update: bool) -> list[TestUserModel]:
         pass
 
     @staticmethod
@@ -67,30 +66,30 @@ class TestUserStorage(ITestUserStorage):
     """Class for Test User storage."""
 
     @staticmethod
-    def get_test_user_by_id(user_id: int) -> Optional[TestUserModel]:
+    def get_test_user_by_id(user_id: int) -> TestUserModel | None:
         with db.create_session() as session:
-            user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
+            user = session.get(db.TestUser, user_id)
             if user is not None:
-                return cast(TestUserModel, TestUserModel.from_orm(user))
+                return TestUserModel.from_orm(user)
             return None
 
     @staticmethod
-    def get_test_user_by_key(key: str) -> Optional[TestUserModel]:
+    def get_test_user_by_key(key: str) -> TestUserModel | None:
         with db.create_session() as session:
-            user: Optional[db.TestUser] = session.query(db.TestUser).filter(db.TestUser.key == key).one_or_none()
+            user: db.TestUser | None = session.query(db.TestUser).filter(db.TestUser.key == key).one_or_none()
             if user is not None:
-                return cast(TestUserModel, TestUserModel.from_orm(user))
+                return TestUserModel.from_orm(user)
             return None
 
     @staticmethod
-    def get_test_users(feature_type_id: int, allow_update: bool) -> List[TestUserModel]:
+    def get_test_users(feature_type_id: int, allow_update: bool) -> list[TestUserModel]:
         with db.create_session() as session:
-            db_users: List[db.TestUser] = (
+            db_users: list[db.TestUser] = (
                 session.query(db.TestUser)
                 .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update == allow_update)
                 .all()
             )
-            return [cast(TestUserModel, TestUserModel.from_orm(user)) for user in db_users]
+            return [TestUserModel.from_orm(user) for user in db_users]
 
     @staticmethod
     def create_test_user(
@@ -102,7 +101,7 @@ class TestUserStorage(ITestUserStorage):
         allow_update: bool,
     ) -> TestUserModel:
         with db.create_session() as session:
-            test_user = db.TestUser(  # type: ignore
+            test_user = db.TestUser(
                 key=key,
                 name=name,
                 specification=specification,
@@ -113,12 +112,12 @@ class TestUserStorage(ITestUserStorage):
             )
             session.add(test_user)
             session.flush()
-            return cast(TestUserModel, TestUserModel.from_orm(test_user))
+            return TestUserModel.from_orm(test_user)
 
     @staticmethod
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:
         with db.create_session() as session:
-            test_user = session.query(db.TestUser).get(user_id)
+            test_user = session.get(db.TestUser, user_id)
             if test_user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
             if not test_user.allow_update:
@@ -129,7 +128,7 @@ class TestUserStorage(ITestUserStorage):
     @staticmethod
     def delete_test_user(user_id: int) -> None:
         with db.create_session() as session:
-            user: Optional[db.TestUser] = session.query(db.TestUser).get(user_id)
+            user = session.get(db.TestUser, user_id)
             if user is None:
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
             session.delete(user)

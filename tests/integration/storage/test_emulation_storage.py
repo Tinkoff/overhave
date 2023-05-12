@@ -36,9 +36,10 @@ class TestEmulationStorage:
         emulation_run = test_emulation_storage.create_emulation_run(
             emulation_id=test_emulation.id, initiated_by=test_system_user.login
         )
-        requested_emulation_run: db.EmulationRun = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        requested_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
         assert requested_emulation_run.status == EmulationStatus.REQUESTED
         assert requested_emulation_run.emulation_id == test_emulation.id
+        assert isinstance(requested_emulation_run.port, int)
         assert not test_emulation_storage._is_port_in_use(requested_emulation_run.port)
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)

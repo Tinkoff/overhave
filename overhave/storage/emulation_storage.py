@@ -1,7 +1,7 @@
 import abc
 import logging
 import socket
-from typing import List, cast
+from typing import cast
 
 import sqlalchemy.orm as so
 from pydantic.tools import parse_obj_as
@@ -48,7 +48,7 @@ class IEmulationStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_emulation_runs_by_test_user_id(test_user_id: int) -> List[EmulationRunModel]:
+    def get_emulation_runs_by_test_user_id(test_user_id: int) -> list[EmulationRunModel]:
         pass
 
 
@@ -64,12 +64,12 @@ class EmulationStorage(IEmulationStorage):
             emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
             session.add(emulation_run)
             session.flush()
-            return cast(EmulationRunModel, EmulationRunModel.from_orm(emulation_run))
+            return EmulationRunModel.from_orm(emulation_run)
 
     @staticmethod
     def _get_emulation_run(session: so.Session, emulation_run_id: int) -> db.EmulationRun:
-        emulation_run: db.EmulationRun = session.query(db.EmulationRun).get(emulation_run_id)
-        if emulation_run is not None:
+        emulation_run = session.get(db.EmulationRun, emulation_run_id)
+        if isinstance(emulation_run, db.EmulationRun):
             return emulation_run
         raise NotFoundEmulationError(f"Not found emulation run with ID {emulation_run_id}!")
 
@@ -83,7 +83,7 @@ class EmulationStorage(IEmulationStorage):
         )
         allocated_sorted_runs = sorted(
             runs_with_allocated_ports,
-            key=lambda t: t.changed_at,  # type: ignore
+            key=lambda t: t.changed_at,
         )
 
         allocated_ports = {run.port for run in allocated_sorted_runs}
@@ -97,7 +97,7 @@ class EmulationStorage(IEmulationStorage):
                 return port
             logger.debug("All not allocated ports are busy!")
         for run in allocated_sorted_runs:
-            if self._is_port_in_use(run.port):
+            if self._is_port_in_use(cast(int, run.port)):
                 continue
             return cast(int, run.port)
         raise AllPortsAreBusyError("All ports are busy - could not find free port!")
@@ -112,7 +112,7 @@ class EmulationStorage(IEmulationStorage):
             emulation_run.status = db.EmulationStatus.REQUESTED
             emulation_run.port = self._get_next_port(session)
             emulation_run.changed_at = get_current_time()
-            return cast(EmulationRunModel, EmulationRunModel.from_orm(emulation_run))
+            return EmulationRunModel.from_orm(emulation_run)
 
     def set_emulation_run_status(self, emulation_run_id: int, status: db.EmulationStatus) -> None:
         with db.create_session() as session:
@@ -130,13 +130,10 @@ class EmulationStorage(IEmulationStorage):
 
     def get_emulation_run_by_id(self, emulation_run_id: int) -> EmulationRunModel:
         with db.create_session() as session:
-            emulation_run: EmulationRunModel = EmulationRunModel.from_orm(
-                self._get_emulation_run(session, emulation_run_id)
-            )
-            return emulation_run
+            return EmulationRunModel.from_orm(self._get_emulation_run(session, emulation_run_id))
 
     @staticmethod
-    def get_emulation_runs_by_test_user_id(test_user_id: int) -> List[EmulationRunModel]:
+    def get_emulation_runs_by_test_user_id(test_user_id: int) -> list[EmulationRunModel]:
         with db.create_session() as session:
             emulation_ids_query = (
                 session.query(db.Emulation)
@@ -147,4 +144,4 @@ class EmulationStorage(IEmulationStorage):
             emulation_runs = (
                 session.query(db.EmulationRun).filter(db.EmulationRun.emulation_id == emulation_ids_query).all()
             )
-            return parse_obj_as(List[EmulationRunModel], emulation_runs)
+            return parse_obj_as(list[EmulationRunModel], emulation_runs)

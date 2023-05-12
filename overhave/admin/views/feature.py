@@ -3,7 +3,7 @@ import logging
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import flask
 import werkzeug
@@ -56,11 +56,11 @@ class ScenarioInlineModelForm(InlineFormAdmin):
 class FactoryViewUtilsMixin:
     """Mixin for :class:`FeatureView`. Extra methods for working with cached instance of :class:`IAdminFactory`."""
 
-    _task_pattern = re.compile(r"\w+[-]\d+")
+    _task_pattern = re.compile(r"\w+-\d+")
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     @classmethod
-    def _validate_tasks(cls, tasks: List[str]) -> None:
+    def _validate_tasks(cls, tasks: list[str]) -> None:
         for task in tasks:
             if cls._task_pattern.match(task):
                 continue
@@ -84,7 +84,7 @@ class FactoryViewUtilsMixin:
         return path
 
     @property
-    def task_tracker_url(self) -> Optional[str]:
+    def task_tracker_url(self) -> str | None:
         task_tracker_url_value = get_admin_factory().context.project_settings.task_tracker_url
         if task_tracker_url_value is not None:
             return str(task_tracker_url_value)
@@ -95,11 +95,11 @@ class FactoryViewUtilsMixin:
         return get_admin_factory().context.file_settings.feature_suffix
 
     @staticmethod
-    def _get_feature_type_steps(factory: IAdminFactory, feature_type: FeatureTypeName) -> List[BddStepModel]:
+    def _get_feature_type_steps(factory: IAdminFactory, feature_type: FeatureTypeName) -> list[BddStepModel]:
         return factory.step_collector.get_steps(feature_type) or []
 
     @cached_property
-    def get_bdd_steps(self) -> Dict[FeatureTypeName, Dict[StepTypeName, List[BddStepModel]]]:
+    def get_bdd_steps(self) -> dict[FeatureTypeName, dict[StepTypeName, list[BddStepModel]]]:
         factory = get_admin_factory()
         return {
             feature_type: {
@@ -211,7 +211,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
             raise ValidationError("Only feature author or administrator could delete feature!")
 
     @staticmethod
-    def _run_test(data: Dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
+    def _run_test(data: dict[str, Any], rendered: werkzeug.Response) -> werkzeug.Response:
         scenario_id = data.get(f"{_SCENARIO_PREFIX}-id")
         scenario_text = data.get(f"{_SCENARIO_PREFIX}-text")
         if not scenario_id or not scenario_text:

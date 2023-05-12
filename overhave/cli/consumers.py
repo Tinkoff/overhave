@@ -7,7 +7,7 @@ from overhave.transport import RedisStream
 
 
 def _run_consumer(stream: RedisStream) -> None:
-    DataBaseSettings().setup_db()
+    DataBaseSettings().setup_engine()
     LoggingSettings().setup_logging()
     ConsumerFactory(stream=stream).runner.run()
 
