@@ -2,12 +2,9 @@ import logging
 import re
 from typing import Any, cast
 
-import sqlalchemy
 import sqlalchemy as sa
-from sqlalchemy import MetaData
-from sqlalchemy.orm import Mapper, Query
-from sqlalchemy.orm import Session as SessionClass
-from sqlalchemy.orm import as_declarative, declared_attr, scoped_session, sessionmaker
+import sqlalchemy.engine as se
+import sqlalchemy.orm as so
 
 logger = logging.getLogger(__name__)
 
@@ -20,21 +17,21 @@ convention = {
 }
 
 
-class SAMetadata(MetaData):
+class SAMetadata(sa.MetaData):
     """Custom SQLAlchemy MetaData with bounded engine."""
 
     def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
-        self._bind: sqlalchemy.Engine | None = None
+        self._engine: se.Engine | None = None  # SQLAlchemy2.0 - sa.Engine
 
     @property
-    def bind(self) -> sqlalchemy.Engine:
-        if isinstance(self._bind, sqlalchemy.Engine):
-            return self._bind
+    def engine(self) -> se.Engine:  # SQLAlchemy2.0 - sa.Engine
+        if isinstance(self._engine, se.Engine):  # SQLAlchemy2.0 - sa.Engine
+            return self._engine
         raise RuntimeError("MetaData has not got bounded Engine!")
 
-    def set_bind(self, engine: sqlalchemy.Engine) -> None:
-        self._bind = engine
+    def set_engine(self, engine: se.Engine) -> None:  # SQLAlchemy2.0 - sa.Engine
+        self._engine = engine
 
 
 metadata = SAMetadata(naming_convention=convention)
@@ -54,12 +51,11 @@ def _classname_to_tablename(name: str) -> str:
     return "_".join(result)
 
 
-@as_declarative(metadata=metadata)
+@so.as_declarative(metadata=metadata)
 class BaseTable:
     """Base table class with __tablename__."""
 
-    @declared_attr.directive
-    @classmethod
+    @so.declared_attr  # SQLAlchemy2.0 - @so.declared_attr.directive
     def __tablename__(cls) -> str:
         return _classname_to_tablename(cls.__name__)
 
@@ -67,8 +63,7 @@ class BaseTable:
 class PrimaryKeyWithoutDateMixin:
     """Table mixin with declared attribute `id`."""
 
-    @declared_attr.cascading
-    @classmethod
+    @so.declared_attr.cascading
     def id(cls):  # type: ignore[no-untyped-def]
         return sa.Column(f"{getattr(cls, '__tablename__')}_id", sa.Integer(), primary_key=True)
 
@@ -76,30 +71,33 @@ class PrimaryKeyWithoutDateMixin:
 class PrimaryKeyMixin(PrimaryKeyWithoutDateMixin):
     """Table mixin with `id` and `created_at` declared attributes."""
 
-    @declared_attr.cascading
-    @classmethod
+    @so.declared_attr.cascading
     def created_at(cls):  # type: ignore[no-untyped-def]
         return sa.Column(sa.DateTime(timezone=True), nullable=True, server_default=sa.func.now())
 
 
 def _get_query_cls(
-    mapper: tuple[type[BaseTable], ...] | Mapper, session: SessionClass  # type: ignore[type-arg]
-) -> Query[Any]:
+    mapper: tuple[type[BaseTable], ...] | so.Mapper,  # type: ignore[type-arg]
+    session: Any,  # SQLAlchemy2.0 - session: so.SessionClass
+) -> so.Query:  # type: ignore[type-arg]  # SQLAlchemy2.0 - so.Query[Any]
     if mapper:
         m = mapper
         if isinstance(m, tuple):
             m = mapper[0]  # type: ignore[index, assignment]
-        if isinstance(m, Mapper):
+        if isinstance(m, so.Mapper):
             m = m.entity
 
         try:
-            return cast(Query[Any], m.__query_cls__(mapper, session))  # type: ignore[union-attr]
+            return cast(
+                so.Query,  # type: ignore[type-arg]  # SQLAlchemy2.0 - so.Query[Any]
+                m.__query_cls__(mapper, session),  # type: ignore[union-attr]
+            )
         except AttributeError:
             pass
 
-    return Query(mapper, session)  # type: ignore[arg-type]
+    return so.Query(mapper, session)  # type: ignore[arg-type]
 
 
-Session = sessionmaker(query_cls=_get_query_cls)
+Session = so.sessionmaker(query_cls=_get_query_cls)
 
-current_session = scoped_session(Session)
+current_session = so.scoped_session(Session)

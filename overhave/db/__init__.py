@@ -1,5 +1,5 @@
 # flake8: noqa
-from .base import BaseTable, current_session, metadata
+from .base import BaseTable, SAMetadata, current_session, metadata
 from .statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
 from .tables import (
     Draft,

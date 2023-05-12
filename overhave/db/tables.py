@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import allure
 import sqlalchemy as sa
@@ -128,7 +128,7 @@ class TestRun(BaseTable, PrimaryKeyMixin):
     )
 
 
-class DraftQuery(so.Query[Any]):
+class DraftQuery(so.Query):  # type: ignore[type-arg]  # SQLAlchemy2.0 - so.Query[Any]
     """Scenario versions table."""
 
     def as_unique(self, test_run_id: int, published_by: str, status: DraftStatus) -> Draft:

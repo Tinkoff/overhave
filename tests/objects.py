@@ -5,10 +5,12 @@ from unittest import mock
 
 from pydantic import root_validator
 from pydantic.main import BaseModel
-from sqlalchemy import MetaData
+
+# from sqlalchemy import MetaData  # noqa: E800
 from sqlalchemy.engine import Engine
 
 from demo.settings import OverhaveDemoAppLanguage
+from overhave import db
 from overhave.entities import FeatureExtractor, OverhaveFileSettings
 from overhave.storage import FeatureTypeName
 
@@ -23,7 +25,7 @@ PROJECT_WORKDIR = Path(__file__).parent.parent
 class DataBaseContext(NamedTuple):
     """Class for easy database entities management through `PyTest` fixtures."""
 
-    metadata: MetaData
+    metadata: db.SAMetadata
     engine: Engine
 
 

@@ -5,6 +5,7 @@ from logging.config import DictConfigurator  # type: ignore
 from typing import Any
 
 import sqlalchemy as sa
+import sqlalchemy.engine
 import sqlalchemy.exc
 import sqlalchemy.pool
 from pydantic import BaseSettings, Field, validator
@@ -19,7 +20,7 @@ class BaseOverhavePrefix(BaseSettings):
         env_prefix = OVERHAVE_ENV_PREFIX
 
 
-class SAUrl(sa.URL):
+class SAUrl(sqlalchemy.engine.URL):  # SQLAlchemy2.0 - sa.URL
     """Custom URL for Pydantic BaseSettings validation."""
 
     @classmethod
@@ -27,9 +28,9 @@ class SAUrl(sa.URL):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v: str) -> sa.URL:
+    def validate(cls, v: str) -> sqlalchemy.engine.URL:  # SQLAlchemy2.0 - sa.URL
         try:
-            return sa.make_url(v)
+            return sqlalchemy.engine.make_url(v)  # SQLAlchemy2.0 - sa.make_url
         except sqlalchemy.exc.ArgumentError as e:
             raise ValueError from e
 
@@ -46,7 +47,7 @@ class DataBaseSettings(BaseOverhavePrefix):
     db_application_name: str = socket.gethostname()
     db_connect_timeout: int = 30
 
-    def _create_engine(self) -> sa.Engine:
+    def _create_engine(self) -> sqlalchemy.engine.Engine:  # SQLAlchemy2.0 - sa.Engine
         return sa.engine_from_config(
             {
                 "url": self.db_url,
@@ -65,7 +66,7 @@ class DataBaseSettings(BaseOverhavePrefix):
     def setup_engine(self) -> None:
         from overhave.db.base import metadata
 
-        metadata.set_bind(engine=self._create_engine())
+        metadata.set_engine(engine=self._create_engine())
 
 
 class LoggingSettings(BaseOverhavePrefix):

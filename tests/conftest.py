@@ -60,15 +60,15 @@ def db_context(db_settings: OverhaveDBSettings) -> Iterator[DataBaseContext]:
     sau.create_database(engine.url)
 
     db_context = DataBaseContext(metadata=metadata, engine=engine)
-    db_context.metadata.set_bind(db_context.engine)
+    db_context.metadata.set_engine(db_context.engine)
     yield db_context
     sau.drop_database(engine.url)
 
 
 @pytest.fixture()
 def database(db_context: DataBaseContext) -> Iterator[None]:
-    db_context.metadata.drop_all(bind=db_context.metadata.bind)
-    db_context.metadata.create_all(bind=db_context.metadata.bind)
+    db_context.metadata.drop_all(bind=db_context.metadata.engine)
+    db_context.metadata.create_all(bind=db_context.metadata.engine)
     yield
     close_all_sessions()
 

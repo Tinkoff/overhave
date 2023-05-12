@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @contextmanager
 def create_session(**kwargs: Any) -> Iterator[so.Session]:
     """Provide a transactional scope around a series of operations."""
-    new_session = Session(bind=metadata.bind, **kwargs)
+    new_session = Session(bind=metadata.engine, **kwargs)
     try:
         yield new_session
         new_session.commit()

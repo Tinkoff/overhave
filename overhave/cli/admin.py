@@ -6,7 +6,7 @@ from overhave.factory import get_admin_factory
 
 def _get_admin_app() -> OverhaveAdminApp:
     DataBaseSettings().setup_engine()
-    db.current_session.configure(bind=db.metadata.bind)
+    db.current_session.configure(bind=db.metadata.engine)
     LoggingSettings().setup_logging()
     return overhave_app(get_admin_factory())
 
