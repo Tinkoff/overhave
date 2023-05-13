@@ -36,6 +36,7 @@ services:
       - OVERHAVE_DB_URL=${OVERHAVE_DB_URL:-postgresql://postgres:postgres@db/postgres}
       - OVERHAVE_REDIS_URL=${OVERHAVE_REDIS_URL:-redis://redis:6379}
       - OVERHAVE_REDIS_SENTINEL_URLS=${OVERHAVE_REDIS_SENTINEL_URLS:-["redis://redis:6379"]}
+      - PACKAGE_BUILD_DIR=${PACKAGE_BUILD_DIR:-.package/dist}
     depends_on:
       - db
       - redis
