@@ -84,11 +84,7 @@ check-cov-badge:
 
 check-package:
 	$(VENV)/bin/poetry check
-	mkdir $(WORK_DIR)/$(PACKAGE_BUILD_DIR)
 	$(VENV)/bin/poetry build  # to PACKAGE_BUILD_DIR
-	ls -la $(WORK_DIR)
-	ls -la $(WORK_DIR)/$(PACKAGE_BUILD_DIR)
-	ls -la $(WORK_DIR)/.package
 	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(PACKAGE_BUILD_DIR)/*
 
 check: lint test cov-badge check-package build-docs

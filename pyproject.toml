@@ -141,6 +141,7 @@ venv = {toxworkdir}/{[tox]isolated_build_env}
 setenv =
     VENV = {[testenv]venv}
     WORK_DIR = {toxworkdir}
+    PACKAGE_BUILD_DIR = {.package/dist}
 passenv =
     OVERHAVE_DB_URL
     OVERHAVE_REDIS_URL
