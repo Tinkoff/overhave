@@ -111,7 +111,7 @@ class S3Manager:
         remote_buckets = self._get_buckets()
         logger.info("Existing remote s3 buckets: %s", remote_buckets)
         bucket_names = [model.name for model in remote_buckets]
-        for bucket in list(filter(lambda x: x.value not in bucket_names, OverhaveS3Bucket)):
+        for bucket in list(filter(lambda x: x.value not in bucket_names, list(OverhaveS3Bucket))):
             self.create_bucket(bucket.value)
         logger.info("Successfully ensured existence of Overhave service buckets.")
 

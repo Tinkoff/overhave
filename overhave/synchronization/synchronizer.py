@@ -11,6 +11,7 @@ from overhave.scenario import FeatureInfo, NullableFeatureIdError, ScenarioParse
 from overhave.storage import FeatureModel
 from overhave.synchronization.abstract import IOverhaveSynchronizer
 from overhave.synchronization.storage_manager import SynchronizerStorageManager
+from overhave.utils import get_current_time
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             info.last_edited_by = info.author
         feature_model = FeatureModel(
             id=0,
+            created_at=get_current_time(),
             name=info.name,
             author=info.author,
             type_id=feature_type.id,

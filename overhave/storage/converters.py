@@ -4,30 +4,22 @@ from typing import List, NewType, Optional
 import allure
 from pydantic.main import BaseModel
 from pydantic.types import SecretStr
-from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
-from overhave.db import (
-    Draft,
-    DraftStatus,
-    Emulation,
-    EmulationRun,
-    Feature,
-    FeatureType,
-    Role,
-    Scenario,
-    Tags,
-    TestReportStatus,
-    TestRun,
-    TestRunStatus,
-    TestUser,
-    UserRole,
-)
+from overhave import db
+from overhave.db import DraftStatus, Role, TestReportStatus, TestRunStatus
 
 FeatureTypeName = NewType("FeatureTypeName", str)
 TestUserSpecification = NewType("TestUserSpecification", dict[str, str | None])
 
 
-class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
+class _SqlAlchemyOrmModel(BaseModel):
+    """:class:`BaseModel` with enabled `orm_mode`."""
+
+    class Config:
+        orm_mode = True
+
+
+class SystemUserModel(_SqlAlchemyOrmModel):
     """Model for :class:`UserRole`."""
 
     id: int
@@ -42,14 +34,14 @@ class SystemUserModel(sqlalchemy_to_pydantic(UserRole)):  # type: ignore
         return self.login
 
 
-class FeatureTypeModel(sqlalchemy_to_pydantic(FeatureType)):  # type: ignore
+class FeatureTypeModel(_SqlAlchemyOrmModel):
     """Model for :class:`FeatureType` row."""
 
     id: int
     name: FeatureTypeName
 
 
-class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
+class TagModel(_SqlAlchemyOrmModel):
     """Model for :class:`Tags` row."""
 
     id: int
@@ -57,10 +49,11 @@ class TagModel(sqlalchemy_to_pydantic(Tags)):  # type: ignore
     created_by: str
 
 
-class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
+class FeatureModel(_SqlAlchemyOrmModel):
     """Model for :class:`Feature` row."""
 
     id: int
+    created_at: datetime
     name: str
     author: str
     type_id: int
@@ -75,7 +68,7 @@ class FeatureModel(sqlalchemy_to_pydantic(Feature)):  # type: ignore
     feature_tags: List[TagModel]
 
 
-class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
+class ScenarioModel(_SqlAlchemyOrmModel):
     """Model for :class:`Scenario` row."""
 
     id: int
@@ -83,7 +76,7 @@ class ScenarioModel(sqlalchemy_to_pydantic(Scenario)):  # type: ignore
     feature_id: int
 
 
-class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
+class TestRunModel(_SqlAlchemyOrmModel):
     """Model for :class:`TestRun` row."""
 
     __test__ = False
@@ -101,7 +94,7 @@ class TestRunModel(sqlalchemy_to_pydantic(TestRun)):  # type: ignore
     scenario_id: int
 
 
-class DraftModel(sqlalchemy_to_pydantic(Draft)):  # type: ignore
+class DraftModel(_SqlAlchemyOrmModel):
     """Model for :class:`Draft` row."""
 
     id: int
@@ -131,7 +124,7 @@ class PublisherContext(TestExecutorContext):
     target_branch: str
 
 
-class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
+class TestUserModel(_SqlAlchemyOrmModel):
     """Model for :class:`TestUser` row."""
 
     __test__ = False
@@ -148,14 +141,21 @@ class TestUserModel(sqlalchemy_to_pydantic(TestUser)):  # type: ignore
     changed_at: datetime
 
 
-class EmulationModel(sqlalchemy_to_pydantic(Emulation)):  # type: ignore
+class EmulationModel(_SqlAlchemyOrmModel):
     """Model for :class:`Emulation` row."""
 
+    id: int
+    command: str
     test_user: TestUserModel
 
 
-class EmulationRunModel(sqlalchemy_to_pydantic(EmulationRun)):  # type: ignore
+class EmulationRunModel(_SqlAlchemyOrmModel):
     """Model for :class:`EmulationRun` row."""
 
+    id: int
+    emulation_id: int
     changed_at: datetime
+    status: db.EmulationStatus
+    port: int | None
+    initiated_by: str
     emulation: EmulationModel

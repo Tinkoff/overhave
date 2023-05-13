@@ -1,7 +1,7 @@
 import enum
 
 
-class HttpMethod(str, enum.Enum):
+class HttpMethod(enum.StrEnum):
     """HTTP methods enum."""
 
     GET = "get"

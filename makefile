@@ -2,7 +2,7 @@ CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
 MIN_COVERAGE ?= 86.8
-BUILD_DIR ?= dist
+PACKAGE_BUILD_DIR ?= dist
 PYTHON_VERSION ?= 3.10
 
 DOCS_DIR ?= docs
@@ -16,6 +16,8 @@ SPHINXAPIDOC_OPTS = -f -d 3 --ext-autodoc
 MYPY_CACHE_DIR = .mypy_cache
 
 ALL = $(CODE) $(DOCS_DIR) tests demo
+
+JOBS ?= 4
 
 pre-init:
 	sudo apt install python$(PYTHON_VERSION) python$(PYTHON_VERSION)-venv python$(PYTHON_VERSION)-dev python$(PYTHON_VERSION)-distutils gcc\
@@ -35,12 +37,25 @@ precommit-install:
 test:
 	$(VENV)/bin/poetry run pytest -n auto --cov=$(CODE) --cov-fail-under=$(MIN_COVERAGE)
 
-lint:
+black:
 	$(VENV)/bin/poetry run black --check $(ALL)
+
+flake8:
 	$(VENV)/bin/poetry run flake8 --jobs 4 --statistics $(ALL)
+
+perflint:
 	$(VENV)/bin/poetry run perflint $(ALL) --disable=W8201,W8202,R8203,W8205
+
+mypy:
 	$(VENV)/bin/poetry run mypy --install-types --non-interactive $(ALL) --exclude '(conftest|given_steps|then_steps|when_steps).py'
+
+pytest-lint:
 	$(VENV)/bin/poetry run pytest --dead-fixtures --dup-fixtures
+
+lint: black flake8 perflint mypy pytest-lint
+
+parallel-lint:
+	make -j $(JOBS) lint
 
 pretty:
 	$(VENV)/bin/poetry run isort $(ALL)
@@ -69,14 +84,15 @@ check-cov-badge:
 
 check-package:
 	$(VENV)/bin/poetry check
-	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
+	$(VENV)/bin/poetry build  # to PACKAGE_BUILD_DIR
+	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(PACKAGE_BUILD_DIR)/*
 
 check: lint test cov-badge check-package build-docs
 
 clear:
 	rm -rf ./$(MYPY_CACHE_DIR)
 	rm -rf ./.pytest_cache
-	rm -rf ./$(BUILD_DIR)
+	rm -rf ./$(PACKAGE_BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
 	rm ./.coverage*

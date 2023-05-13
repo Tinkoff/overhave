@@ -23,7 +23,7 @@ class TestOverhaveTestExecution:
     ) -> None:
         subprocess_run_mock.assert_called_once()
         with db.create_session() as session:
-            db_test_run = session.query(db.TestRun).get(test_executed_testruntask_id)
+            db_test_run = session.get(db.TestRun, test_executed_testruntask_id)
             assert db_test_run is not None
             test_run: TestRunModel = TestRunModel.from_orm(db_test_run)
         assert test_run.id == test_executed_testruntask_id

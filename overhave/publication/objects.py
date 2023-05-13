@@ -1,7 +1,7 @@
 import enum
 
 
-class PublicationManagerType(str, enum.Enum):
+class PublicationManagerType(enum.StrEnum):
     """Enum that declares remotely manager for publication pull requests."""
 
     GITLAB = "gitlab"

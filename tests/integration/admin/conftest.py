@@ -25,7 +25,7 @@ def patched_app_admin_factory(
     mocked_context: BaseFactoryContext,
     clean_admin_factory: Callable[[], IAdminFactory],
 ) -> IAdminFactory:
-    db_settings.setup_db()
+    db_settings.setup_engine()
     factory = clean_admin_factory()
     factory.set_context(mocked_context)
     return factory

@@ -76,6 +76,7 @@ class TestFeatureStorage:
         new_tag_model = test_tag_storage.get_or_create_tag(value=faker.word(), created_by=new_system_user.login)
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,
+            created_at=get_current_time(),
             name=uuid1().hex,
             author=test_feature_with_tag.author,
             type_id=test_feature_type.id,

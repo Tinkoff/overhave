@@ -25,7 +25,7 @@ from overhave.extra import RUSSIAN_PREFIXES
 from overhave.publication.gitlab import TokenizerClientSettings
 
 
-class OverhaveDemoAppLanguage(str, enum.Enum):
+class OverhaveDemoAppLanguage(enum.StrEnum):
     """Enum for choice of Overhave demo application language."""
 
     RU = "ru"
