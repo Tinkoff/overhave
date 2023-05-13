@@ -2,7 +2,7 @@ CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
 MIN_COVERAGE ?= 86.8
-BUILD_DIR ?= dist
+PACKAGE_BUILD_DIR ?= dist
 PYTHON_VERSION ?= 3.10
 
 DOCS_DIR ?= docs
@@ -83,15 +83,16 @@ check-cov-badge:
 	git diff --exit-code $(COV_BADGE_SVG)  # if failed --> add to commit actual badge
 
 check-package:
+	$(VENV)/bin/poetry build  # to PACKAGE_BUILD_DIR
 	$(VENV)/bin/poetry check
-	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(BUILD_DIR)/*
+	$(VENV)/bin/poetry run twine check $(WORK_DIR)/$(PACKAGE_BUILD_DIR)/*
 
-check: lint test cov-badge build-docs check-package
+check: lint test cov-badge check-package build-docs
 
 clear:
 	rm -rf ./$(MYPY_CACHE_DIR)
 	rm -rf ./.pytest_cache
-	rm -rf ./$(BUILD_DIR)
+	rm -rf ./$(PACKAGE_BUILD_DIR)
 	rm -rf ./$(DOCS_BUILD_DIR)
 	rm -rf ./$(DOCS_REFERENCES_DIR)
 	rm ./.coverage*
