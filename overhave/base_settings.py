@@ -64,9 +64,10 @@ class DataBaseSettings(BaseOverhavePrefix):
         )
 
     def setup_engine(self) -> None:
-        from overhave.db.base import metadata
+        from overhave.db.base import current_session, metadata
 
         metadata.set_engine(engine=self._create_engine())
+        current_session.configure(bind=metadata.engine)
 
 
 class LoggingSettings(BaseOverhavePrefix):
