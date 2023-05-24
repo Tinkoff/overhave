@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 from pathlib import Path
 
 from overhave.scenario.validator.errors import DuplicateFeatureIDError
@@ -9,8 +10,9 @@ logger = logging.getLogger(__name__)
 class FeatureDuplicatedIdValidationMixin:
     """Class for features validation."""
 
-    def __init__(self) -> None:
-        self._feature_id_to_path_mapping: dict[int, list[Path]] = {}
+    @cached_property
+    def _feature_id_to_path_mapping(self) -> dict[int, list[Path]]:
+        return {}
 
     def _save_to_feature_id_to_path_mapping(self, feature_path: Path, feature_id: int | None) -> None:
         if not isinstance(feature_id, int):
