@@ -10,4 +10,4 @@ from .parser import (
     StrictFeatureInfo,
     StrictFeatureParsingError,
 )
-from .validator import FeatureValidator
+from .validator import FeatureValidator, IFeatureValidator
