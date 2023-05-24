@@ -3,7 +3,7 @@ from functools import cached_property
 
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.context import OverhaveSynchronizerContext
-from overhave.scenario import FeatureValidator
+from overhave.scenario import FeatureValidator, IFeatureValidator
 from overhave.synchronization import IOverhaveSynchronizer, OverhaveSynchronizer, SynchronizerStorageManager
 
 
@@ -17,7 +17,7 @@ class ISynchronizerFactory(IOverhaveFactory[OverhaveSynchronizerContext]):
 
     @property
     @abc.abstractmethod
-    def feature_validator(self) -> FeatureValidator:
+    def feature_validator(self) -> IFeatureValidator:
         pass
 
 
@@ -56,5 +56,5 @@ class SynchronizerFactory(BaseOverhaveFactory[OverhaveSynchronizerContext], ISyn
         )
 
     @property
-    def feature_validator(self) -> FeatureValidator:
+    def feature_validator(self) -> IFeatureValidator:
         return self._feature_validator

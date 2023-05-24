@@ -2,7 +2,7 @@ import typer
 
 from overhave.base_settings import DataBaseSettings, LoggingSettings
 from overhave.factory import get_synchronizer_factory
-from overhave.scenario import FeatureValidator
+from overhave.scenario import IFeatureValidator
 from overhave.synchronization import IOverhaveSynchronizer
 
 sync_app = typer.Typer(short_help="Run Overhave features synchronization commands")
@@ -24,7 +24,7 @@ def run(
     _create_synchronizer().synchronize(create_db_features, pull_repository)
 
 
-def _create_validator() -> FeatureValidator:
+def _create_validator() -> IFeatureValidator:
     LoggingSettings().setup_logging()
     return get_synchronizer_factory().feature_validator
 
