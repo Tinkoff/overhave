@@ -19,6 +19,7 @@ from overhave import (
     OverhaveLoggingSettings,
     OverhaveScenarioCompilerSettings,
     OverhaveScenarioParserSettings,
+    db,
     overhave_admin_factory,
     overhave_proxy_manager,
     overhave_synchronizer_factory,
@@ -27,13 +28,7 @@ from overhave import (
 from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
-from tests.objects import (
-    PROJECT_WORKDIR,
-    DataBaseContext,
-    FeatureTestContainer,
-    XDistWorkerValueType,
-    get_test_feature_containers,
-)
+from tests.objects import PROJECT_WORKDIR, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
 @pytest.fixture(autouse=True)
@@ -50,7 +45,7 @@ def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
 
 
 @pytest.fixture(scope="session")
-def db_context(db_settings: OverhaveDBSettings) -> Iterator[DataBaseContext]:
+def db_metadata(db_settings: OverhaveDBSettings) -> Iterator[db.SAMetadata]:
     from overhave.db import metadata
 
     engine = create_engine(db_settings.db_url, echo=db_settings.db_echo, pool_pre_ping=True)
@@ -59,16 +54,15 @@ def db_context(db_settings: OverhaveDBSettings) -> Iterator[DataBaseContext]:
         sau.drop_database(engine.url)
     sau.create_database(engine.url)
 
-    db_context = DataBaseContext(metadata=metadata, engine=engine)
-    db_context.metadata.set_engine(db_context.engine)
-    yield db_context
+    metadata.set_engine(engine)
+    yield metadata
     sau.drop_database(engine.url)
 
 
 @pytest.fixture()
-def database(db_context: DataBaseContext) -> Iterator[None]:
-    db_context.metadata.drop_all(bind=db_context.metadata.engine)
-    db_context.metadata.create_all(bind=db_context.metadata.engine)
+def database(db_metadata: db.SAMetadata) -> Iterator[None]:
+    db_metadata.drop_all(bind=db_metadata.engine)
+    db_metadata.create_all(bind=db_metadata.engine)
     yield
     close_all_sessions()
 

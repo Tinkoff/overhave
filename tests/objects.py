@@ -1,16 +1,12 @@
 from functools import cache
 from pathlib import Path
-from typing import Dict, List, NamedTuple, NewType, Sequence
+from typing import Dict, List, NewType, Sequence
 from unittest import mock
 
 from pydantic import root_validator
 from pydantic.main import BaseModel
 
-# from sqlalchemy import MetaData  # noqa: E800
-from sqlalchemy.engine import Engine
-
 from demo.settings import OverhaveDemoAppLanguage
-from overhave import db
 from overhave.entities import FeatureExtractor, OverhaveFileSettings
 from overhave.storage import FeatureTypeName
 
@@ -20,13 +16,6 @@ XDistWorkerValueType = NewType("XDistWorkerValueType", str)
 XDistMasterWorker = XDistWorkerValueType("master")
 
 PROJECT_WORKDIR = Path(__file__).parent.parent
-
-
-class DataBaseContext(NamedTuple):
-    """Class for easy database entities management through `PyTest` fixtures."""
-
-    metadata: db.SAMetadata
-    engine: Engine
 
 
 @cache
@@ -87,11 +76,11 @@ def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
     feature_containers: List[FeatureTestContainer] = []
     for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():
         for item in value.iterdir():
-            if item.is_file() and not any((item.name.startswith("."), item.name.startswith("_"))):
-                content = item.read_text(encoding="utf-8")
-                container = FeatureTestContainer(  # type: ignore
-                    type=value.name, name=item.name, project_path=item, content=content
-                )
-                feature_containers.append(container)
-            continue
+            if not item.is_file() or any((item.name.startswith("."), item.name.startswith("_"))):
+                continue
+            content = item.read_text(encoding="utf-8")
+            container = FeatureTestContainer(  # type: ignore
+                type=value.name, name=item.name, project_path=item, content=content
+            )
+            feature_containers.append(container)
     return feature_containers
