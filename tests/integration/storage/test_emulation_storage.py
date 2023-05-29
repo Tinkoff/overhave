@@ -5,8 +5,9 @@ from faker import Faker
 
 from overhave import db
 from overhave.db import EmulationStatus
-from overhave.storage import EmulationStorage, SystemUserModel
+from overhave.storage import EmulationRunModel, EmulationStorage, SystemUserModel
 from overhave.storage.emulation_storage import NotFoundEmulationError
+from tests.db_utils import count_queries, create_test_session
 
 
 @pytest.mark.usefixtures("database", "socket_mock")
@@ -14,16 +15,18 @@ class TestEmulationStorage:
     """Integration tests for :class:`EmulationStorage`."""
 
     def test_raise_exception_for_not_existing_id(self, test_emulation_storage: EmulationStorage, faker: Faker) -> None:
-        with pytest.raises(NotFoundEmulationError):
-            test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
+        with count_queries(1):
+            with pytest.raises(NotFoundEmulationError):
+                test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_create_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
     ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
+        with count_queries(4):
+            emulation_run = test_emulation_storage.create_emulation_run(
+                emulation_id=test_emulation.id, initiated_by=test_system_user.login
+            )
         assert emulation_run.status == EmulationStatus.CREATED
         assert emulation_run.emulation_id == test_emulation.id
         assert emulation_run.initiated_by == test_system_user.login
@@ -33,10 +36,12 @@ class TestEmulationStorage:
     def test_get_requested_emulation_run(
         self, test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: db.Emulation
     ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
-        requested_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
+        with count_queries(4):
+            emulation_run = test_emulation_storage.create_emulation_run(
+                emulation_id=test_emulation.id, initiated_by=test_system_user.login
+            )
+        with count_queries(7):
+            requested_emulation_run = test_emulation_storage.get_requested_emulation_run(emulation_run.id)
         assert requested_emulation_run.status == EmulationStatus.REQUESTED
         assert requested_emulation_run.emulation_id == test_emulation.id
         assert isinstance(requested_emulation_run.port, int)
@@ -50,14 +55,19 @@ class TestEmulationStorage:
         test_emulation: db.Emulation,
         faker: Faker,
     ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
+        with count_queries(4):
+            emulation_run = test_emulation_storage.create_emulation_run(
+                emulation_id=test_emulation.id, initiated_by=test_system_user.login
+            )
         assert emulation_run.status == EmulationStatus.CREATED
-        test_emulation_storage.set_error_emulation_run(
-            emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
-        )
-        emulation_run = test_emulation_storage.get_emulation_run_by_id(emulation_run.id)
+        with count_queries(2):
+            test_emulation_storage.set_error_emulation_run(
+                emulation_run_id=emulation_run.id, traceback=cast(str, faker.sentence())
+            )
+        with create_test_session() as session:
+            emulation_run = EmulationRunModel.from_orm(
+                test_emulation_storage._get_emulation_run(session, emulation_run.id)
+            )
         assert emulation_run.status == EmulationStatus.ERROR
         assert emulation_run.port is None
 
@@ -73,43 +83,25 @@ class TestEmulationStorage:
         test_emulation: db.Emulation,
         emulation_status: EmulationStatus,
     ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
-        test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
-        emulation_run = test_emulation_storage.get_emulation_run_by_id(emulation_run.id)
+        with count_queries(4):
+            emulation_run = test_emulation_storage.create_emulation_run(
+                emulation_id=test_emulation.id, initiated_by=test_system_user.login
+            )
+        with count_queries(1):
+            test_emulation_storage.set_emulation_run_status(emulation_run.id, emulation_status)
+        with create_test_session() as session:
+            emulation_run = EmulationRunModel.from_orm(
+                test_emulation_storage._get_emulation_run(session, emulation_run.id)
+            )
         assert emulation_run.status == emulation_status
-
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
-    def test_get_emulation_run_by_incorrect_id(
-        self,
-        test_emulation_storage: EmulationStorage,
-        test_system_user: SystemUserModel,
-        test_emulation: db.Emulation,
-        faker: Faker,
-    ) -> None:
-        with pytest.raises(NotFoundEmulationError):
-            test_emulation_storage.get_emulation_run_by_id(faker.pyint())
-
-    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
-    def test_get_emulation_run_by_id(
-        self,
-        test_emulation_storage: EmulationStorage,
-        test_system_user: SystemUserModel,
-        test_emulation: db.Emulation,
-        faker: Faker,
-    ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
-        assert test_emulation_storage.get_emulation_run_by_id(test_emulation.id) == emulation_run
 
     def test_get_emulation_run_by_test_user_id_empty(
         self,
         test_emulation_storage: EmulationStorage,
         faker: Faker,
     ) -> None:
-        filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=faker.random_int())
+        with count_queries(1):
+            filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=faker.random_int())
         assert not filtered_runs
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
@@ -120,9 +112,11 @@ class TestEmulationStorage:
         test_emulation: db.Emulation,
         faker: Faker,
     ) -> None:
-        emulation_run = test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
-        filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=test_system_user.id)
+        with count_queries(4):
+            emulation_run = test_emulation_storage.create_emulation_run(
+                emulation_id=test_emulation.id, initiated_by=test_system_user.login
+            )
+        with count_queries(4):
+            filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=test_system_user.id)
         assert len(filtered_runs) == 1
         assert filtered_runs[0] == emulation_run

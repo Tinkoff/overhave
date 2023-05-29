@@ -3,6 +3,7 @@ import logging
 import socket
 from typing import cast
 
+import sqlalchemy as sa
 import sqlalchemy.orm as so
 from pydantic.tools import parse_obj_as
 
@@ -116,10 +117,11 @@ class EmulationStorage(IEmulationStorage):
 
     def set_emulation_run_status(self, emulation_run_id: int, status: db.EmulationStatus) -> None:
         with db.create_session() as session:
-            emulation_run = self._get_emulation_run(session, emulation_run_id)
-            if emulation_run.status != status:
-                emulation_run.status = status
-                emulation_run.changed_at = get_current_time()
+            session.execute(
+                sa.update(db.EmulationRun)
+                .where(db.EmulationRun.id == emulation_run_id)
+                .values(status=status, changed_at=get_current_time())
+            )
 
     def set_error_emulation_run(self, emulation_run_id: int, traceback: str) -> None:
         with db.create_session() as session:
@@ -127,10 +129,6 @@ class EmulationStorage(IEmulationStorage):
             emulation_run.status = db.EmulationStatus.ERROR
             emulation_run.traceback = traceback
             emulation_run.changed_at = get_current_time()
-
-    def get_emulation_run_by_id(self, emulation_run_id: int) -> EmulationRunModel:
-        with db.create_session() as session:
-            return EmulationRunModel.from_orm(self._get_emulation_run(session, emulation_run_id))
 
     @staticmethod
     def get_emulation_runs_by_test_user_id(test_user_id: int) -> list[EmulationRunModel]:

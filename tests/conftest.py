@@ -1,5 +1,6 @@
 import logging
 import os
+from contextlib import ExitStack
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
@@ -7,11 +8,12 @@ from unittest import mock
 
 import py
 import pytest
+import sqlalchemy as sa
+import sqlalchemy.orm as so
 import sqlalchemy_utils as sau
 from _pytest.python import Metafunc
 from pytest_mock import MockerFixture
-from sqlalchemy.engine import create_engine, make_url
-from sqlalchemy.orm import close_all_sessions
+from sqlalchemy import event
 
 from overhave import (
     OverhaveAuthorizationStrategy,
@@ -28,6 +30,7 @@ from overhave import (
 from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
+from tests.db_utils import BEFORE_CURSOR_EXECUTE_EVENT_NAME, THREAD_LOCALS, validate_db_session
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
 
 
@@ -40,7 +43,7 @@ def setup_logging(caplog) -> None:
 @pytest.fixture(scope="session")
 def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
     settings = OverhaveDBSettings(db_echo=True)
-    settings.db_url = make_url(f"{settings.db_url.render_as_string(hide_password=False)}/overhave_{worker_id}")
+    settings.db_url = sa.make_url(f"{settings.db_url.render_as_string(hide_password=False)}/overhave_{worker_id}")
     return settings
 
 
@@ -48,7 +51,7 @@ def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
 def db_metadata(db_settings: OverhaveDBSettings) -> Iterator[db.SAMetadata]:
     from overhave.db import metadata
 
-    engine = create_engine(db_settings.db_url, echo=db_settings.db_echo, pool_pre_ping=True)
+    engine = sa.create_engine(db_settings.db_url, echo=db_settings.db_echo, pool_pre_ping=True)
 
     if sau.database_exists(engine.url):
         sau.drop_database(engine.url)
@@ -59,12 +62,23 @@ def db_metadata(db_settings: OverhaveDBSettings) -> Iterator[db.SAMetadata]:
     sau.drop_database(engine.url)
 
 
+@pytest.fixture(scope="module")
+def use_sql_counter() -> Iterator[None]:
+    THREAD_LOCALS.need_sql_counter = True
+    yield
+    THREAD_LOCALS.need_sql_counter = False
+
+
 @pytest.fixture()
-def database(db_metadata: db.SAMetadata) -> Iterator[None]:
+def database(use_sql_counter: None, db_metadata: db.SAMetadata) -> Iterator[None]:
     db_metadata.drop_all(bind=db_metadata.engine)
     db_metadata.create_all(bind=db_metadata.engine)
-    yield
-    close_all_sessions()
+
+    with ExitStack():
+        event.listen(sa.Engine, BEFORE_CURSOR_EXECUTE_EVENT_NAME, validate_db_session)
+        yield
+        event.remove(sa.Engine, BEFORE_CURSOR_EXECUTE_EVENT_NAME, validate_db_session)
+    so.close_all_sessions()
 
 
 @pytest.fixture(scope="module")
@@ -155,6 +169,6 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def flask_scaffold_findpackagepath_mock() -> None:
+def flask_scaffold_findpackagepath_mock() -> Iterator[None]:
     with mock.patch("flask.scaffold._find_package_path", return_value=PROJECT_WORKDIR.as_posix()):
         yield

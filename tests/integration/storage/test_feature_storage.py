@@ -14,6 +14,7 @@ from overhave.storage import (
     TagModel,
 )
 from overhave.utils import get_current_time
+from tests.db_utils import count_queries
 
 
 def _check_base_feature_attrs(test_model: FeatureModel, validation_model: FeatureModel) -> None:
@@ -43,7 +44,8 @@ class TestFeatureStorage:
     def test_get_feature(
         self, test_feature_storage: FeatureStorage, test_feature_type: FeatureTypeModel, test_feature: FeatureModel
     ) -> None:
-        feature_model = test_feature_storage.get_feature(test_feature.id)
+        with count_queries(3):
+            feature_model = test_feature_storage.get_feature(test_feature.id)
         assert feature_model is not None
         assert feature_model.id == test_feature.id
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
@@ -54,8 +56,10 @@ class TestFeatureStorage:
     ) -> None:
         test_feature.name = uuid1().hex
         test_feature.file_path = uuid1().hex
-        feature_id = test_feature_storage.create_feature(model=test_feature)
-        feature_model = test_feature_storage.get_feature(feature_id)
+        with count_queries(1):
+            feature_id = test_feature_storage.create_feature(model=test_feature)
+        with count_queries(3):
+            feature_model = test_feature_storage.get_feature(feature_id)
         assert feature_model is not None
         assert feature_model.id == feature_id
         _check_base_feature_attrs(test_model=feature_model, validation_model=test_feature)
@@ -72,8 +76,10 @@ class TestFeatureStorage:
         updated_severity: allure.severity_level,
         faker: Faker,
     ) -> None:
-        new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
-        new_tag_model = test_tag_storage.get_or_create_tag(value=faker.word(), created_by=new_system_user.login)
+        with count_queries(1):
+            new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
+        with count_queries(2):
+            new_tag_model = test_tag_storage.get_or_create_tag(value=faker.word(), created_by=new_system_user.login)
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,
             created_at=get_current_time(),
@@ -89,15 +95,18 @@ class TestFeatureStorage:
             feature_tags=[new_tag_model],
             severity=updated_severity,
         )
-        test_feature_storage.update_feature(model=new_feature_model)
-        updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)
+        with count_queries(6):
+            test_feature_storage.update_feature(model=new_feature_model)
+        with count_queries(3):
+            updated_feature_model = test_feature_storage.get_feature(new_feature_model.id)
         assert updated_feature_model is not None
         assert updated_feature_model.id == new_feature_model.id
         _check_base_feature_attrs(test_model=updated_feature_model, validation_model=new_feature_model)
         _check_base_feature_type_attrs(
             test_model=updated_feature_model.feature_type, validation_model=test_feature_type
         )
-        test_feature_storage.get_features_by_tag(new_tag_model.id)
+        with count_queries(3):
+            test_feature_storage.get_features_by_tag(new_tag_model.id)
 
     def test_get_feature_by_tag(
         self,
@@ -106,6 +115,7 @@ class TestFeatureStorage:
         test_feature_with_tag: FeatureModel,
         faker: Faker,
     ) -> None:
-        found_features = test_feature_storage.get_features_by_tag(test_tag.id)
+        with count_queries(3):
+            found_features = test_feature_storage.get_features_by_tag(test_tag.id)
         assert len(found_features) == 1
         assert found_features[0] == test_feature_with_tag
