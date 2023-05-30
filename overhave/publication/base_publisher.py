@@ -1,4 +1,5 @@
 import abc
+import datetime
 
 from overhave.db import DraftStatus
 from overhave.entities import OverhaveFileSettings
@@ -91,17 +92,11 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
 
     def _save_as_duplicate(self, context: PublisherContext) -> None:
         previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
-        if previous_draft.pr_url is None:
-            raise NullablePullRequestUrlError(
-                "Previous draft with id=%s has not got pull-request URL!", previous_draft.id
-            )
-        if previous_draft.published_at is None:
-            raise RuntimeError(f"Somebody has published this scenario at {previous_draft.published_at}")
 
         self._draft_storage.save_response(
             draft_id=context.draft.id,
             pr_url=context.draft.pr_url or previous_draft.pr_url,
-            published_at=previous_draft.published_at,
+            published_at=previous_draft.published_at or datetime.datetime.now(),
             status=DraftStatus.DUPLICATE,
             traceback=context.draft.traceback,
         )
