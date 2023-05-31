@@ -47,7 +47,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     )
     type_id: int = sa.Column(sa.Integer(), sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     file_path: str = sa.Column(sa.String(), doc="Feature file path", nullable=False, unique=True)
-    task: List[str] = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=False)
+    task: List[str] | None = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=True)
     last_edited_by: str = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
     last_edited_at: datetime.datetime = sa.Column(
         sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
@@ -71,7 +71,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
         author: str,
         type_id: int,
         file_path: str,
-        task: List[str],
+        task: List[str] | None,
         severity: allure.severity_level,
         last_edited_at: datetime.datetime,
     ) -> None:
