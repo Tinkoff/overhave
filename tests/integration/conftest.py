@@ -259,6 +259,7 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 def test_emulation_run(
     test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: EmulationModel
 ) -> EmulationRun:
-    return test_emulation_storage.create_emulation_run(
-        emulation_id=test_emulation.id, initiated_by=test_system_user.login
-    )
+    with create_test_session():
+        return test_emulation_storage.create_emulation_run(
+            emulation_id=test_emulation.id, initiated_by=test_system_user.login
+        )

@@ -1,5 +1,7 @@
 import abc
-from typing import Optional, cast
+from typing import Any, Optional, cast
+
+import sqlalchemy as sa
 
 from overhave import db
 from overhave.storage.converters import TestRunModel
@@ -31,16 +33,10 @@ class TestRunStorage(ITestRunStorage):
 
     def create_test_run(self, scenario_id: int, executed_by: str) -> int:
         with db.create_session() as session:
-            scenario_id_query = (
-                session.query(db.Scenario)
-                .with_entities(db.Scenario.feature_id)
-                .filter(db.Scenario.id == scenario_id)
-                .scalar_subquery()
-            )
-            feature: db.Feature = session.query(db.Feature).filter(db.Feature.id == scenario_id_query).one()
+            scenario: db.Scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
             run = db.TestRun(
                 scenario_id=scenario_id,
-                name=feature.name,
+                name=scenario.feature.name,
                 status=db.TestRunStatus.STARTED,
                 report_status=db.TestReportStatus.EMPTY,
                 executed_by=executed_by,
@@ -51,21 +47,23 @@ class TestRunStorage(ITestRunStorage):
 
     def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
         with db.create_session() as session:
-            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
-            run.status = status
+            values: dict[str, Any] = {"status": status}
             if status == db.TestRunStatus.RUNNING:
-                run.start = get_current_time()
+                values["start"] = get_current_time()
             if status.finished:
-                run.end = get_current_time()
+                values["end"] = get_current_time()
             if isinstance(traceback, str):
-                run.traceback = traceback
+                values["traceback"] = traceback
+
+            session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
     def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
         with db.create_session() as session:
-            run: db.TestRun = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
-            run.report_status = status
+            values: dict[str, Any] = {"report_status": status}
             if isinstance(report, str):
-                run.report = report
+                values["report"] = report
+
+            session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
     def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
         with db.create_session() as session:

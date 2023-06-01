@@ -12,6 +12,7 @@ from overhave.storage import AuthStorage, SystemUserModel, SystemUserStorage, Te
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
 from overhave.transport.http.base_client import BearerAuth
+from tests.db_utils import create_test_session
 
 
 @pytest.fixture(scope="module")
@@ -40,9 +41,10 @@ def service_system_user(
     database,
     faker: Faker,
 ) -> SystemUserModel:
-    return test_system_user_storage.create_user(
-        login=f"{faker.word()}.{faker.word()}", password=SecretStr(faker.word()), role=db.Role.admin
-    )
+    with create_test_session():
+        return test_system_user_storage.create_user(
+            login=f"{faker.word()}.{faker.word()}", password=SecretStr(faker.word()), role=db.Role.admin
+        )
 
 
 @pytest.fixture()
