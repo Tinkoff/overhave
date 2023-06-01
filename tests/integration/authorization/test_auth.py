@@ -95,7 +95,9 @@ class TestLdapAuthManager:
         with create_test_session():
             test_system_user_storage.create_user(login=test_username, role=user_role)
         with count_queries(1):
-            user = test_ldap_auth_manager.authorize_user(username=test_username, password=SecretStr(None))  # type: ignore
+            user = test_ldap_auth_manager.authorize_user(
+                username=test_username, password=SecretStr(None)  # type: ignore
+            )
         assert user is not None
         assert user.login == test_username
         assert user.password is None  # LDAP auth does not require password
