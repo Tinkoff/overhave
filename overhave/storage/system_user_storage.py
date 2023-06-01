@@ -1,17 +1,10 @@
 import abc
 
+import sqlalchemy as sa
 from pydantic import SecretStr
 
 from overhave import db
 from overhave.storage.converters import SystemUserModel
-
-
-class BaseSystemStorageException(Exception):
-    """Base exception for :class:`SystemUserStorage`."""
-
-
-class SystemUserNotFoundError(Exception):
-    """Error for situation without user with given id."""
 
 
 class ISystemUserStorage(abc.ABC):
@@ -74,7 +67,4 @@ class SystemUserStorage(ISystemUserStorage):
     @staticmethod
     def update_user_role(user_model: SystemUserModel) -> None:
         with db.create_session() as session:
-            db_user = session.get(db.UserRole, user_model.id)
-            if db_user is None:
-                raise SystemUserNotFoundError(f"User with id {user_model.id} was not found!")
-            db_user.role = user_model.role
+            session.execute(sa.update(db.UserRole).where(db.UserRole.id == user_model.id).values(role=user_model.role))

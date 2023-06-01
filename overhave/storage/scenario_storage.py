@@ -1,16 +1,10 @@
 import abc
 from typing import cast
 
+import sqlalchemy as sa
+
 from overhave import db
 from overhave.storage.converters import ScenarioModel
-
-
-class BaseScenarioStorageException(Exception):
-    """Base exception for :class:`ScenarioStorage`."""
-
-
-class ScenarioNotExistsError(BaseScenarioStorageException):
-    """Exception for situation without scenario."""
 
 
 class IScenarioStorage(abc.ABC):
@@ -57,10 +51,7 @@ class ScenarioStorage(IScenarioStorage):
     @staticmethod
     def update_scenario(model: ScenarioModel) -> None:
         with db.create_session() as session:
-            scenario = session.get(db.Scenario, model.id)
-            if scenario is None:
-                raise ScenarioNotExistsError(f"Scenario with id={model.id} does not exist!")
-            scenario.text = model.text
+            session.execute(sa.update(db.Scenario).where(db.Scenario.id == model.id).values(text=model.text))
 
     @staticmethod
     def create_scenario(model: ScenarioModel) -> int:

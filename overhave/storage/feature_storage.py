@@ -102,7 +102,7 @@ class FeatureStorage(IFeatureStorage):
                     released=True,
                 )
             )
-            feature = session.scalar(sa.select(db.Feature).where(db.Feature.id == model.id))
+            feature = session.query(db.Feature).filter(db.Feature.id == model.id).one()
             existing_tags = {tag.id for tag in feature.feature_tags}
             model_tags = {tag.id for tag in model.feature_tags}
             tags_to_delete = existing_tags.difference(model_tags)
