@@ -177,6 +177,7 @@ def test_features(
                 file_path=f"{faker.word()}/{faker.word()}",
                 severity=test_severity,
                 last_edited_at=get_current_time(),
+                last_edited_by=test_system_user.login,
             )
             session.add(feature)
             session.flush()

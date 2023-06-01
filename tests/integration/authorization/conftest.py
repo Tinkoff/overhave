@@ -13,6 +13,7 @@ from overhave.entities import (
 )
 from overhave.storage import SystemUserGroupStorage, SystemUserStorage
 from overhave.transport import LDAPAuthenticator
+from tests.db_utils import create_test_session
 
 
 @pytest.fixture()
@@ -56,12 +57,14 @@ def test_ldap_auth_manager(
 
 @pytest.fixture()
 def test_default_auth_manager(test_system_user_storage: SystemUserStorage) -> DefaultAdminAuthorizationManager:
-    return DefaultAdminAuthorizationManager(system_user_storage=test_system_user_storage)
+    with create_test_session():
+        return DefaultAdminAuthorizationManager(system_user_storage=test_system_user_storage)
 
 
 @pytest.fixture()
 def test_simple_auth_manager(test_system_user_storage: SystemUserStorage) -> SimpleAdminAuthorizationManager:
-    return SimpleAdminAuthorizationManager(system_user_storage=test_system_user_storage)
+    with create_test_session():
+        return SimpleAdminAuthorizationManager(system_user_storage=test_system_user_storage)
 
 
 @pytest.fixture()
