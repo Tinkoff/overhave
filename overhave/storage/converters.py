@@ -59,7 +59,7 @@ class FeatureModel(_SqlAlchemyOrmModel):
     type_id: int
     last_edited_by: str
     last_edited_at: datetime
-    task: List[str]
+    task: List[str] | None
     file_path: str
     released: bool
     severity: allure.severity_level

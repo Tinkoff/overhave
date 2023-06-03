@@ -30,7 +30,7 @@ class IDraftStorage(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def save_response(
-        draft_id: int, pr_url: str, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
+        draft_id: int, pr_url: str | None, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
     ) -> None:
         pass
 
@@ -96,7 +96,7 @@ class DraftStorage(IDraftStorage):
 
     @staticmethod
     def save_response(
-        draft_id: int, pr_url: str, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
+        draft_id: int, pr_url: str | None, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
     ) -> None:
         with db.create_session() as session:
             draft = session.get(db.Draft, draft_id)
