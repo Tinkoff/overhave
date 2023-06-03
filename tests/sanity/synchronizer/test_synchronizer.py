@@ -8,10 +8,11 @@ from overhave import db
 from overhave.scenario import FeatureNameParsingError
 from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import FeatureInfoUserNotFoundError, OverhaveSynchronizer
+from tests.db_utils import count_queries, create_test_session
 
 
 def _check_db_no_features() -> None:
-    with db.create_session() as session:
+    with create_test_session() as session:
         features = session.query(db.Feature).all()
         assert not features
 
@@ -47,8 +48,9 @@ class TestOverhaveSynchronizer:
         test_db_feature_types: List[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
-        with pytest.raises(FeatureInfoUserNotFoundError):
-            test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+        with count_queries(2):
+            with pytest.raises(FeatureInfoUserNotFoundError):
+                test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("create_db_features", [True])
@@ -61,7 +63,7 @@ class TestOverhaveSynchronizer:
         create_db_features: bool,
     ) -> None:
         test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
-        with db.create_session() as session:
+        with create_test_session() as session:
             features = session.query(db.Feature).all()
             assert len(features) == 3
 
@@ -75,9 +77,11 @@ class TestOverhaveSynchronizer:
         test_db_feature_types: List[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
-        test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
-        with pytest.raises(sqlalchemy.exc.IntegrityError):
+        with count_queries(31):
             test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+        with count_queries(7):
+            with pytest.raises(sqlalchemy.exc.IntegrityError):
+                test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
 
     @pytest.mark.parametrize("test_demo_language", [OverhaveDemoAppLanguage.RU], indirect=True)
     @pytest.mark.parametrize("test_system_user_login", ["user"], indirect=True)
@@ -87,5 +91,6 @@ class TestOverhaveSynchronizer:
         test_db_user: SystemUserModel,
         test_db_feature_types: List[FeatureTypeModel],
     ) -> None:
-        test_resolved_synchronizer.synchronize(create_db_features=True)
+        with create_test_session():
+            test_resolved_synchronizer.synchronize(create_db_features=True)
         test_resolved_synchronizer.synchronize(create_db_features=False)

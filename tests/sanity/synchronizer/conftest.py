@@ -11,6 +11,7 @@ from overhave.factory import ISynchronizerFactory
 from overhave.scenario import FeatureValidator
 from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import IOverhaveSynchronizer
+from tests.db_utils import create_test_session
 from tests.objects import get_test_feature_containers
 
 
@@ -22,7 +23,7 @@ def clean_synchronizer_factory() -> Callable[[], ISynchronizerFactory]:
 
 @pytest.fixture()
 def prepared_admin_user(database: None) -> SystemUserModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_user = db.UserRole(login="admin", password="admin", role=db.Role.admin)
         session.add(db_user)
         session.flush()
@@ -62,7 +63,7 @@ def test_resolved_validator(
 @pytest.fixture()
 def test_db_feature_types(database: None) -> List[FeatureTypeModel]:
     feature_types = [feature.type for feature in get_test_feature_containers()]
-    with db.create_session() as session:
+    with create_test_session() as session:
         session.add_all((db.FeatureType(name=feature_type) for feature_type in feature_types))
         session.flush()
         db_feature_types = session.query(db.FeatureType).all()

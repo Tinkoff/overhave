@@ -9,6 +9,7 @@ from flask.testing import FlaskClient
 
 from overhave import OverhaveAdminApp
 from overhave.admin.views.formatters.helpers import get_report_index_link
+from tests.db_utils import count_queries
 
 
 class TestAppCommon:
@@ -76,7 +77,8 @@ class TestAppReport:
     def test_app_post_report_notexists(
         self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
     ) -> None:
-        response = test_client.post(get_report_index_link(test_report_without_index.name), data=data)
+        with count_queries(1):
+            response = test_client.post(get_report_index_link(test_report_without_index.name), data=data)
         assert response.status_code == HTTPStatus.NOT_FOUND
 
     def test_app_post_report(self, test_client: FlaskClient, test_report_with_index: Path, faker: Faker) -> None:

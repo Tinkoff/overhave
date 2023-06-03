@@ -13,6 +13,7 @@ from overhave.factory import ITestExecutionFactory
 from overhave.pytest_plugin import IProxyManager, ProxyManager
 from overhave.storage import TestRunModel
 from overhave.transport import RedisConsumerRunner, TestRunData, TestRunTask
+from tests.db_utils import count_queries
 
 
 @pytest.fixture()
@@ -22,16 +23,16 @@ def redisconsumer_run_mock() -> mock.MagicMock:
 
 
 @pytest.fixture()
-def run_test_process_result(request: FixtureRequest) -> int:
+def run_test_process_return_code(request: FixtureRequest) -> int:
     if hasattr(request, "param"):
         return cast(int, request.param)
     raise NotImplementedError
 
 
 @pytest.fixture()
-def subprocess_run_mock(run_test_process_result: int) -> mock.MagicMock:
+def subprocess_run_mock(run_test_process_return_code) -> mock.MagicMock:
     returncode_mock = mock.MagicMock()
-    returncode_mock.returncode = run_test_process_result
+    returncode_mock.returncode = run_test_process_return_code
     with mock.patch("subprocess.run", return_value=returncode_mock) as mocked_subprocess_run:
         yield mocked_subprocess_run
 
@@ -67,5 +68,6 @@ def test_executed_testruntask_id(
     test_resolved_testexecution_proxy_manager: IProxyManager,
     test_testruntask: TestRunTask,
 ) -> int:
-    test_resolved_testexecution_proxy_manager.factory.process_task(test_testruntask)
+    with count_queries(8):
+        test_resolved_testexecution_proxy_manager.factory.process_task(test_testruntask)
     return test_testruntask.data.test_run_id

@@ -16,6 +16,7 @@ from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
 from overhave.factory import IAdminFactory, ISynchronizerFactory
 from overhave.pytest_plugin import IProxyManager
 from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
+from tests.db_utils import count_queries, create_test_session
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ def test_system_user_login(request: FixtureRequest, faker: Faker) -> str:
 
 @pytest.fixture()
 def test_db_user(database: None, test_system_user_login: str) -> SystemUserModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_user = db.UserRole(login=test_system_user_login, password="test_password", role=db.Role.user)
         session.add(db_user)
         session.flush()
@@ -57,21 +58,21 @@ def test_db_user(database: None, test_system_user_login: str) -> SystemUserModel
 
 @pytest.fixture()
 def test_db_feature(test_feature_container: FeatureTestContainer, test_db_user: SystemUserModel) -> FeatureModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_feature = session.query(db.Feature).filter(db.Feature.file_path == test_feature_container.file_path).one()
         return FeatureModel.from_orm(db_feature)
 
 
 @pytest.fixture()
 def test_db_scenario(test_db_feature: FeatureModel, test_db_user: SystemUserModel) -> ScenarioModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_scenario = session.query(db.Scenario).filter(db.Scenario.feature_id == test_db_feature.id).one()
         return ScenarioModel.from_orm(db_scenario)
 
 
 @pytest.fixture()
 def test_db_test_run(test_db_scenario: ScenarioModel) -> TestRunModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_test_run: Optional[db.TestRun] = (  # noqa: ECE001
             session.query(db.TestRun)
             .filter(db.TestRun.scenario_id == test_db_scenario.id)
@@ -137,7 +138,8 @@ def test_resolved_admin_proxy_manager(
     test_demo_settings_generator: OverhaveDemoSettingsGenerator,
 ) -> IProxyManager:
     chdir(PROJECT_WORKDIR)
-    _run_demo_admin(settings_generator=test_demo_settings_generator)
+    with create_test_session():
+        _run_demo_admin(settings_generator=test_demo_settings_generator)
     return test_proxy_manager
 
 
@@ -197,4 +199,5 @@ def test_featureview_runtest_result(
     flask_currentuser_mock: mock.MagicMock,
     runtest_data: Dict[str, Any],
 ) -> werkzeug.Response:
-    return FeatureView._run_test(data=runtest_data, rendered=test_rendered_featureview)
+    with count_queries(4):
+        return FeatureView._run_test(data=runtest_data, rendered=test_rendered_featureview)

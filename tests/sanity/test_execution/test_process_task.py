@@ -6,6 +6,7 @@ import pytest
 from demo.settings import OverhaveDemoAppLanguage
 from overhave import db
 from overhave.storage import TestRunModel
+from tests.db_utils import create_test_session
 
 
 @pytest.mark.usefixtures("database")
@@ -14,7 +15,7 @@ class TestOverhaveTestExecution:
     """Sanity tests for application test run."""
 
     @pytest.mark.parametrize(
-        ("run_test_process_result", "report_status"),
+        ("run_test_process_return_code", "report_status"),
         [(0, db.TestReportStatus.GENERATED), (1, db.TestReportStatus.GENERATION_FAILED)],
         indirect=True,
     )
@@ -22,9 +23,8 @@ class TestOverhaveTestExecution:
         self, test_executed_testruntask_id: int, subprocess_run_mock: mock.MagicMock, report_status: db.TestReportStatus
     ) -> None:
         subprocess_run_mock.assert_called_once()
-        with db.create_session() as session:
-            db_test_run = session.get(db.TestRun, test_executed_testruntask_id)
-            assert db_test_run is not None
+        with create_test_session() as session:
+            db_test_run = session.query(db.TestRun).filter(db.TestRun.id == test_executed_testruntask_id).one()
             test_run: TestRunModel = TestRunModel.from_orm(db_test_run)
         assert test_run.id == test_executed_testruntask_id
         assert isinstance(test_run.created_at, datetime)
