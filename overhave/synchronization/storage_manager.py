@@ -77,7 +77,7 @@ class SynchronizerStorageManager:
         return self._feature_type_storage.get_feature_type_by_name(feature_type)
 
     def ensure_users_exist(self, info: StrictFeatureInfo) -> None:
-        for user in (x for x in {info.author, info.last_edited_by} if x):
+        for user in {info.author, info.last_edited_by}:
             if self._system_user_storage.get_user_by_credits(login=user) is not None:
                 continue
             raise FeatureInfoUserNotFoundError(f"Could not find user with login={user}!")

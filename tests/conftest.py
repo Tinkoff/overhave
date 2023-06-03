@@ -11,6 +11,8 @@ import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 import sqlalchemy_utils as sau
+from _pytest.fixtures import FixtureRequest
+from _pytest.logging import LogCaptureFixture
 from _pytest.python import Metafunc
 from pytest_mock import MockerFixture
 from sqlalchemy import event
@@ -35,7 +37,8 @@ from tests.objects import PROJECT_WORKDIR, FeatureTestContainer, XDistWorkerValu
 
 
 @pytest.fixture(autouse=True)
-def setup_logging(caplog) -> None:
+def setup_logging(caplog: LogCaptureFixture, request: FixtureRequest) -> None:
+    THREAD_LOCALS.fixture_request = request
     caplog.set_level(logging.DEBUG)
     OverhaveLoggingSettings().setup_logging()
 

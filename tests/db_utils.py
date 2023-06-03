@@ -1,11 +1,13 @@
 import ctypes
+import logging
 import operator
 import threading
-from contextlib import contextmanager, nullcontext
+from contextlib import contextmanager
 from typing import Any, Callable, Iterable, Iterator
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
+from _pytest.fixtures import FixtureRequest
 from sqlalchemy import event
 
 from overhave import db
@@ -17,6 +19,12 @@ AFTER_CURSOR_EXECUTE_EVENT_NAME = "after_cursor_execute"
 
 class _ThreadLocals(threading.local):
     need_sql_counter: bool = False
+    fixture_request: FixtureRequest | None = None
+
+    def get_fixture_request(self) -> FixtureRequest:
+        if self.fixture_request is None:
+            raise RuntimeError("fixture_request has not been set!")
+        return self.fixture_request
 
 
 THREAD_LOCALS = _ThreadLocals()
@@ -83,8 +91,12 @@ def count_queries(
     expected_count: int,
     comparator: Callable[[int, int], bool] = operator.eq,
 ) -> Iterator[None]:
+    request = THREAD_LOCALS.get_fixture_request()
+    log_capture = request.getfixturevalue("caplog")
+    log_capture._item = request.node
+    log_capture = log_capture.at_level(logging.INFO, logger="sqlalchemy.engine")
     with SQLCounter() as sql_counter:
-        with nullcontext():
+        with log_capture:
             yield
     assert comparator(sql_counter.counter, expected_count), (sql_counter.counter, expected_count)
 

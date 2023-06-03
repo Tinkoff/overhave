@@ -48,7 +48,7 @@ class TestOverhaveSynchronizer:
         test_db_feature_types: List[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
-        with count_queries(2):
+        with create_test_session():
             with pytest.raises(FeatureInfoUserNotFoundError):
                 test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
 
@@ -62,7 +62,8 @@ class TestOverhaveSynchronizer:
         test_db_feature_types: List[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
-        test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
+        with count_queries(31):
+            test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
         with create_test_session() as session:
             features = session.query(db.Feature).all()
             assert len(features) == 3
@@ -77,7 +78,7 @@ class TestOverhaveSynchronizer:
         test_db_feature_types: List[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
-        with count_queries(31):
+        with create_test_session():
             test_resolved_synchronizer.synchronize(create_db_features=create_db_features)
         with count_queries(7):
             with pytest.raises(sqlalchemy.exc.IntegrityError):

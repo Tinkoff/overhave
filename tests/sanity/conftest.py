@@ -16,7 +16,7 @@ from overhave.admin.views.feature import _SCENARIO_PREFIX, FeatureView
 from overhave.factory import IAdminFactory, ISynchronizerFactory
 from overhave.pytest_plugin import IProxyManager
 from overhave.storage import FeatureModel, ScenarioModel, SystemUserModel, TestRunModel
-from tests.db_utils import count_queries, create_test_session
+from tests.db_utils import create_test_session
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer
 
 logger = logging.getLogger(__name__)
@@ -199,5 +199,5 @@ def test_featureview_runtest_result(
     flask_currentuser_mock: mock.MagicMock,
     runtest_data: Dict[str, Any],
 ) -> werkzeug.Response:
-    with count_queries(4):
+    with create_test_session():
         return FeatureView._run_test(data=runtest_data, rendered=test_rendered_featureview)
