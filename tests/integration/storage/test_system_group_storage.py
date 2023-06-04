@@ -3,6 +3,7 @@ from faker import Faker
 
 from overhave import db
 from overhave.storage import SystemUserGroupStorage
+from tests.db_utils import count_queries, create_test_session
 
 
 @pytest.mark.usefixtures("database")
@@ -11,9 +12,11 @@ class TestSystemGroupStorage:
 
     def test_has_any_group_true(self, test_system_user_group_storage: SystemUserGroupStorage, faker: Faker) -> None:
         group = faker.word()
-        with db.create_session() as session:
+        with create_test_session() as session:
             session.add(db.GroupRole(group=group))
-        assert test_system_user_group_storage.has_any_group([group])
+        with count_queries(1):
+            assert test_system_user_group_storage.has_any_group([group])
 
     def test_has_any_group_false(self, test_system_user_group_storage: SystemUserGroupStorage, faker: Faker) -> None:
-        assert not test_system_user_group_storage.has_any_group([faker.word()])
+        with count_queries(1):
+            assert not test_system_user_group_storage.has_any_group([faker.word()])

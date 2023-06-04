@@ -10,6 +10,7 @@ from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
 from overhave.storage import FeatureModel, ScenarioModel, TagModel, TestRunModel, TestRunStorage
 from overhave.transport.http import BearerAuth
+from tests.db_utils import create_test_session
 from tests.integration.api.conftest import validate_content_null
 
 
@@ -86,7 +87,8 @@ class TestTestRunAPI:
         test_api_bearer_auth: BearerAuth,
         test_created_test_run_id: int,
     ) -> None:
-        test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.RUNNING)
+        with create_test_session():
+            test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.RUNNING)
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
@@ -105,8 +107,11 @@ class TestTestRunAPI:
         test_created_test_run_id: int,
         test_report: Optional[str],
     ) -> None:
-        test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.SUCCESS)
-        test_run_storage.set_report(run_id=test_created_test_run_id, status=TestReportStatus.SAVED, report=test_report)
+        with create_test_session():
+            test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.SUCCESS)
+            test_run_storage.set_report(
+                run_id=test_created_test_run_id, status=TestReportStatus.SAVED, report=test_report
+            )
 
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200

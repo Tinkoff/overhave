@@ -5,6 +5,7 @@ from flask.testing import FlaskClient
 
 from overhave import db
 from overhave.storage import SystemUserModel
+from tests.db_utils import create_test_session
 
 
 @pytest.mark.usefixtures("database")
@@ -13,13 +14,15 @@ class TestAccessView:
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin], indirect=True)
     def test_get_access_view_admin(self, test_client: FlaskClient, test_authorized_user: SystemUserModel) -> None:
-        response = test_client.get("/userrole/")
+        with create_test_session():
+            response = test_client.get("/userrole/")
         assert response.status_code == HTTPStatus.OK
         assert "Access - Users - Overhave" in response.data.decode("utf-8"), "Can't find Access button"
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_access_view_user(self, test_client: FlaskClient, test_authorized_user: SystemUserModel) -> None:
-        response = test_client.get("/userrole/")
+        with create_test_session():
+            response = test_client.get("/userrole/")
         assert response.status_code == HTTPStatus.FOUND
         assert 'You should be redirected automatically to the target URL: <a href="/">/</a>' in response.data.decode(
             "utf-8"

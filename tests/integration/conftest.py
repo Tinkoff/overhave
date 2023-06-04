@@ -26,6 +26,7 @@ from overhave.storage import (
     TestUserStorage,
 )
 from overhave.utils import get_current_time
+from tests.db_utils import create_test_session
 
 
 @pytest.fixture(scope="module")
@@ -60,7 +61,7 @@ def test_emulation_storage() -> EmulationStorage:
 
 @pytest.fixture()
 def test_feature_type(database: None, faker: Faker) -> FeatureTypeModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         feature_type = db.FeatureType(name=cast(str, faker.word()))
         session.add(feature_type)
         session.flush()
@@ -78,9 +79,10 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 def test_system_user(
     test_system_user_storage: SystemUserStorage, database: None, faker: Faker, test_user_role: db.Role
 ) -> SystemUserModel:
-    return test_system_user_storage.create_user(
-        login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
-    )
+    with create_test_session():
+        return test_system_user_storage.create_user(
+            login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
+        )
 
 
 @pytest.fixture()
@@ -103,7 +105,7 @@ def test_testuser(
     test_specification: TestUserSpecification,
     testuser_allow_update: bool,
 ) -> TestUserModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         test_user = db.TestUser(
             feature_type_id=test_feature_type.id,
             key=cast(str, faker.word()),
@@ -119,7 +121,7 @@ def test_testuser(
 
 @pytest.fixture()
 def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
         session.add(tag)
         session.flush()
@@ -140,7 +142,7 @@ def test_feature(
     test_severity: allure.severity_level,
     faker: Faker,
 ) -> FeatureModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         feature = db.Feature(
             name=faker.word(),
             author=test_system_user.login,
@@ -149,6 +151,7 @@ def test_feature(
             file_path=f"{faker.word()}/{faker.word()}",
             severity=test_severity,
             last_edited_at=get_current_time(),
+            last_edited_by=test_system_user.login,
         )
         session.add(feature)
         session.flush()
@@ -164,7 +167,7 @@ def test_features(
     num_features: int = 2,
 ) -> list[FeatureModel]:
     features = []
-    with db.create_session() as session:
+    with create_test_session() as session:
         for x in range(num_features):
             feature = db.Feature(
                 name=faker.word(),
@@ -174,6 +177,7 @@ def test_features(
                 file_path=f"{faker.word()}/{faker.word()}",
                 severity=test_severity,
                 last_edited_at=get_current_time(),
+                last_edited_by=test_system_user.login,
             )
             session.add(feature)
             session.flush()
@@ -183,7 +187,7 @@ def test_features(
 
 @pytest.fixture()
 def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> FeatureModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
         feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
         feature.feature_tags.append(tag)
@@ -194,7 +198,7 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
 @pytest.fixture()
 def test_features_with_tag(test_features: list[FeatureModel], test_tag: TagModel) -> list[FeatureModel]:
     features = []
-    with db.create_session() as session:
+    with create_test_session() as session:
         tag = session.query(db.Tags).filter(db.Tags.id == test_tag.id).one()
         for test_feature in test_features:
             feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
@@ -208,12 +212,13 @@ def test_features_with_tag(test_features: list[FeatureModel], test_tag: TagModel
 def test_created_test_run_id(
     test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
-    return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+    with create_test_session():
+        return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture()
 def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
         session.add(db_scenario)
         session.flush()
@@ -223,7 +228,7 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
 @pytest.fixture()
 def test_scenarios(test_features: list[FeatureModel], faker: Faker) -> list[ScenarioModel]:
     scenarios = []
-    with db.create_session() as session:
+    with create_test_session() as session:
         for test_feature in test_features:
             db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
             session.add(db_scenario)
@@ -239,7 +244,7 @@ def test_report() -> str:
 
 @pytest.fixture()
 def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
-    with db.create_session() as session:
+    with create_test_session() as session:
         emulation = db.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
@@ -255,6 +260,7 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 def test_emulation_run(
     test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: EmulationModel
 ) -> EmulationRun:
-    return test_emulation_storage.create_emulation_run(
-        emulation_id=test_emulation.id, initiated_by=test_system_user.login
-    )
+    with create_test_session():
+        return test_emulation_storage.create_emulation_run(
+            emulation_id=test_emulation.id, initiated_by=test_system_user.login
+        )

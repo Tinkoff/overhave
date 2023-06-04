@@ -2,6 +2,7 @@ import abc
 from datetime import datetime
 from typing import cast
 
+import sqlalchemy as sa
 from pydantic import parse_obj_as
 
 from overhave import db
@@ -128,9 +129,7 @@ class DraftStorage(IDraftStorage):
 
     def set_draft_status(self, draft_id: int, status: db.DraftStatus, traceback: str | None = None) -> None:
         with db.create_session() as session:
-            draft = session.get(db.Draft, draft_id)
-            if draft is None:
-                raise DraftNotFoundError(f"Draft with id={draft_id} not found!")
-            draft.status = status
+            query = sa.update(db.Draft).where(db.Draft.id == draft_id).values(status=status)
             if isinstance(traceback, str):
-                draft.traceback = traceback
+                query = query.values(traceback=traceback)
+            session.execute(query)

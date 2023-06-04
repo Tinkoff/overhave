@@ -2,6 +2,7 @@ import abc
 import logging
 from typing import Iterable, cast
 
+import sqlalchemy as sa
 import sqlalchemy.orm as so
 from pydantic.tools import parse_obj_as
 
@@ -14,10 +15,6 @@ logger = logging.getLogger(__name__)
 
 class BaseFeatureStorageException(Exception):
     """Base exception for :class:`FeatureStorage`."""
-
-
-class FeatureNotExistsError(BaseFeatureStorageException):
-    """Error for situation when feature not found."""
 
 
 class FeatureTagNotExistsError(BaseFeatureStorageException):
@@ -80,10 +77,10 @@ class FeatureStorage(IFeatureStorage):
                 file_path=model.file_path,
                 task=model.task,
                 severity=model.severity,
-                last_edited_at=get_current_time(),
+                last_edited_by=model.last_edited_by,
+                last_edited_at=model.last_edited_at,
+                released=model.released,
             )
-            feature.last_edited_at = model.last_edited_at
-            feature.released = model.released
             _append_tags_to_feature(session=session, feature=feature, tag_ids=(tag.id for tag in model.feature_tags))
             session.add(feature)
             session.flush()
@@ -92,18 +89,20 @@ class FeatureStorage(IFeatureStorage):
     @staticmethod
     def update_feature(model: FeatureModel) -> None:
         with db.create_session() as session:
-            feature = session.get(db.Feature, model.id)
-            if feature is None:
-                raise FeatureNotExistsError(f"Feature with id {model.id} does not exist!")
-            feature.name = model.name
-            feature.file_path = model.file_path
-            feature.task = model.task
-            feature.severity = model.severity
-            feature.last_edited_by = model.last_edited_by
-            feature.last_edited_at = get_current_time()
-            feature.released = True
-            session.flush()
-
+            session.execute(
+                sa.update(db.Feature)
+                .where(db.Feature.id == model.id)
+                .values(
+                    name=model.name,
+                    file_path=model.file_path,
+                    task=model.task,
+                    severity=model.severity,
+                    last_edited_by=model.last_edited_by,
+                    last_edited_at=get_current_time(),
+                    released=True,
+                )
+            )
+            feature = session.query(db.Feature).filter(db.Feature.id == model.id).one()
             existing_tags = {tag.id for tag in feature.feature_tags}
             model_tags = {tag.id for tag in model.feature_tags}
             tags_to_delete = existing_tags.difference(model_tags)

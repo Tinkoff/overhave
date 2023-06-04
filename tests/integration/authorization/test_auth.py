@@ -11,10 +11,11 @@ from overhave.entities import (
     SimpleAdminAuthorizationManager,
 )
 from overhave.storage import SystemUserStorage
+from tests.db_utils import count_queries, create_test_session
 
 
 def _create_user_groups(db_groups: Sequence[str]) -> None:
-    with db.create_session() as session:
+    with create_test_session() as session:
         for group in db_groups:
             session.add(db.GroupRole(group=group))
 
@@ -41,7 +42,8 @@ class TestLdapAuthManager:
         test_password: SecretStr,
     ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = ["not_supplied_group"]
-        assert test_ldap_auth_manager.authorize_user(username=test_username, password=test_password) is None
+        with count_queries(2):
+            assert test_ldap_auth_manager.authorize_user(username=test_username, password=test_password) is None
 
     def test_authorize_user_no_user_has_group(
         self,
@@ -53,8 +55,8 @@ class TestLdapAuthManager:
     ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = test_db_groups
         _create_user_groups(test_db_groups)
-
-        user = test_ldap_auth_manager.authorize_user(username=test_username, password=test_password)
+        with count_queries(3):
+            user = test_ldap_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None
         assert user.login == test_username
         assert user.password is None  # LDAP auth does not require password
@@ -72,8 +74,8 @@ class TestLdapAuthManager:
         db_groups = [test_admin_group] + test_db_groups
         mocked_ldap_authenticator.get_user_groups.return_value = db_groups
         _create_user_groups(db_groups)
-
-        user = test_ldap_auth_manager.authorize_user(username=test_username, password=test_password)
+        with count_queries(4):
+            user = test_ldap_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None
         assert user.login == test_username
         assert user.password is None  # LDAP auth does not require password
@@ -90,8 +92,12 @@ class TestLdapAuthManager:
         user_role: db.Role,
     ) -> None:
         mocked_ldap_authenticator.get_user_groups.return_value = test_db_groups
-        test_system_user_storage.create_user(login=test_username, role=user_role)
-        user = test_ldap_auth_manager.authorize_user(username=test_username, password=SecretStr(None))  # type: ignore
+        with create_test_session():
+            test_system_user_storage.create_user(login=test_username, role=user_role)
+        with count_queries(1):
+            user = test_ldap_auth_manager.authorize_user(
+                username=test_username, password=SecretStr(None)  # type: ignore
+            )
         assert user is not None
         assert user.login == test_username
         assert user.password is None  # LDAP auth does not require password
@@ -108,7 +114,8 @@ class TestDefaultAuthManager:
         test_username: str,
         test_password: SecretStr,
     ) -> None:
-        assert test_default_auth_manager.authorize_user(username=test_username, password=test_password) is None
+        with count_queries(1):
+            assert test_default_auth_manager.authorize_user(username=test_username, password=test_password) is None
 
     @pytest.mark.parametrize("user_role", list(db.Role))
     def test_authorize_user_has_user(
@@ -119,8 +126,10 @@ class TestDefaultAuthManager:
         test_password: SecretStr,
         user_role: db.Role,
     ) -> None:
-        test_system_user_storage.create_user(login=test_username, password=test_password, role=user_role)
-        user = test_default_auth_manager.authorize_user(username=test_username, password=test_password)
+        with create_test_session():
+            test_system_user_storage.create_user(login=test_username, password=test_password, role=user_role)
+        with count_queries(1):
+            user = test_default_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None
         assert user.login == test_username
         assert user.password is not None
@@ -138,7 +147,8 @@ class TestSimpleAuthManager:
         test_username: str,
         test_password: SecretStr,
     ) -> None:
-        user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
+        with count_queries(2):
+            user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None
         assert user.login == test_username
         assert user.password is not None
@@ -154,8 +164,10 @@ class TestSimpleAuthManager:
         test_password: SecretStr,
         user_role: db.Role,
     ) -> None:
-        test_system_user_storage.create_user(login=test_username, password=test_password, role=user_role)
-        user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
+        with create_test_session():
+            test_system_user_storage.create_user(login=test_username, password=test_password, role=user_role)
+        with count_queries(1):
+            user = test_simple_auth_manager.authorize_user(username=test_username, password=test_password)
         assert user is not None
         assert user.login == test_username
         assert user.password is not None
@@ -169,9 +181,10 @@ class TestSimpleAuthManager:
         test_username: str,
         test_password: SecretStr,
     ) -> None:
-        test_system_user_storage.create_user(login=test_username, password=test_password)
+        with create_test_session():
+            test_system_user_storage.create_user(login=test_username, password=test_password)
         incorrect_password_field = MagicMock()
         incorrect_password_field.data = "incorrect_password"
-        assert (
-            test_simple_auth_manager.authorize_user(username=test_username, password=incorrect_password_field) is None
-        )
+        with count_queries(1):
+            user = test_simple_auth_manager.authorize_user(username=test_username, password=incorrect_password_field)
+        assert user is None

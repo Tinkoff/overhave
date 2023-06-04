@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "3.14.4"
+version = "3.15.0"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -14,9 +14,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Software Development :: Testing",
     "Topic :: Software Development :: Testing :: BDD",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",

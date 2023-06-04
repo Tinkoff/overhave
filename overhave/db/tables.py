@@ -65,25 +65,6 @@ class Feature(BaseTable, PrimaryKeyMixin):
         Tags, uselist=True, order_by=Tags.value, secondary="feature_tags_association_table"
     )
 
-    def __init__(
-        self,
-        name: str,
-        author: str,
-        type_id: int,
-        file_path: str,
-        task: List[str] | None,
-        severity: allure.severity_level,
-        last_edited_at: datetime.datetime,
-    ) -> None:
-        self.name = name
-        self.author = author
-        self.type_id = type_id
-        self.file_path = file_path
-        self.task = task
-        self.last_edited_by = author
-        self.severity = severity
-        self.last_edited_at = last_edited_at
-
 
 class FeatureTagsAssociationTable(BaseTable, PrimaryKeyWithoutDateMixin):
     """Association table between features and tags."""

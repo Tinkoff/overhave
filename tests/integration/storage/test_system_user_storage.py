@@ -6,6 +6,7 @@ from pydantic import SecretStr
 
 from overhave import db
 from overhave.storage import SystemUserModel, SystemUserStorage
+from tests.db_utils import count_queries
 
 
 @pytest.mark.usefixtures("database")
@@ -16,14 +17,16 @@ class TestSystemUserStorage:
     def test_get_existing_user(
         self, test_system_user_storage: SystemUserStorage, test_system_user: SystemUserModel
     ) -> None:
-        user = test_system_user_storage.get_user(test_system_user.id)
+        with count_queries(1):
+            user = test_system_user_storage.get_user(test_system_user.id)
         assert user is not None
         assert user == test_system_user
 
     def test_get_not_existing_user(
         self, test_system_user_storage: SystemUserStorage, test_system_user: SystemUserModel
     ) -> None:
-        user = test_system_user_storage.get_user(test_system_user.id + 1)
+        with count_queries(1):
+            user = test_system_user_storage.get_user(test_system_user.id + 1)
         assert user is None
 
     @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])
@@ -34,10 +37,14 @@ class TestSystemUserStorage:
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:
-        created_user = test_system_user_storage.create_user(
-            login=faker.word(), password=test_system_user_password, role=test_user_role
-        )
-        user = test_system_user_storage.get_user_by_credits(login=created_user.login, password=created_user.password)
+        with count_queries(1):
+            created_user = test_system_user_storage.create_user(
+                login=faker.word(), password=test_system_user_password, role=test_user_role
+            )
+        with count_queries(1):
+            user = test_system_user_storage.get_user_by_credits(
+                login=created_user.login, password=created_user.password
+            )
         assert user is not None
         assert user == created_user
 
@@ -49,9 +56,11 @@ class TestSystemUserStorage:
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:
-        assert (
-            test_system_user_storage.get_user_by_credits(login=faker.word(), password=test_system_user_password) is None
-        )
+        with count_queries(1):
+            assert (
+                test_system_user_storage.get_user_by_credits(login=faker.word(), password=test_system_user_password)
+                is None
+            )
 
     @pytest.mark.parametrize("test_new_user_role", list(db.Role))
     def test_update_user_role(
@@ -61,7 +70,9 @@ class TestSystemUserStorage:
         test_new_user_role: db.Role,
     ) -> None:
         test_system_user.role = test_new_user_role
-        test_system_user_storage.update_user_role(test_system_user)
-        user = test_system_user_storage.get_user(test_system_user.id)
+        with count_queries(1):
+            test_system_user_storage.update_user_role(test_system_user)
+        with count_queries(1):
+            user = test_system_user_storage.get_user(test_system_user.id)
         assert user is not None
         assert user == test_system_user

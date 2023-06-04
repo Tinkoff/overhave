@@ -8,6 +8,7 @@ from overhave import db
 from overhave.factory import AdminFactory
 from overhave.pytest_plugin import IProxyManager
 from overhave.storage import FeatureTypeModel, FeatureTypeName
+from tests.db_utils import create_test_session
 
 
 class TestOverhaveRunAdminClean:
@@ -50,7 +51,7 @@ class TestOverhaveRunAdmin:
         test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
         feature_type_models: List[FeatureTypeModel] = []
-        with db.create_session() as session:
+        with create_test_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
             feature_type_models.extend([FeatureTypeModel.from_orm(feature_type) for feature_type in db_feature_types])
         assert len(feature_type_models) == len(test_feature_types)

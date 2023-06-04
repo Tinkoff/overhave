@@ -70,29 +70,33 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             raise NullableInfoFeatureTypeError("Could not create feature without feature type!")
         if info.author is None:
             raise NullableInfoAuthorError("Could not create feature without author!")
-        self._storage_manager.ensure_users_exist(info)  # type: ignore
-        feature_tags = self._storage_manager.get_feature_tags(info=info)  # type: ignore
-        feature_type = self._storage_manager.get_feature_type(info.type)
         if info.last_edited_by is None:
             info.last_edited_by = info.author
+
+        info.id = 0  # just for model manipulations
+        strict_info = StrictFeatureInfo(**info.dict())
+        self._storage_manager.ensure_users_exist(strict_info)
+        feature_tags = self._storage_manager.get_feature_tags(strict_info)
+        feature_type = self._storage_manager.get_feature_type(strict_info.type)
+
         feature_model = FeatureModel(
-            id=0,
+            id=strict_info.id,
             created_at=get_current_time(),
-            name=info.name,
-            author=info.author,
+            name=strict_info.name,
+            author=strict_info.author,
             type_id=feature_type.id,
-            last_edited_by=info.last_edited_by,
-            last_edited_at=info.last_edited_at,
-            task=info.tasks or [],
+            last_edited_by=strict_info.last_edited_by,
+            last_edited_at=strict_info.last_edited_at,
+            task=strict_info.tasks or [],
             file_path=file.relative_to(
                 self._feature_extractor.feature_type_to_dir_mapping[feature_type.name]
             ).as_posix(),
             released=True,
             feature_type=feature_type,
             feature_tags=feature_tags,
-            severity=info.severity or allure.severity_level.NORMAL,
+            severity=strict_info.severity or allure.severity_level.NORMAL,
         )
-        self._storage_manager.create_db_feature(model=feature_model, scenario=info.scenarios)  # type: ignore
+        self._storage_manager.create_db_feature(model=feature_model, scenario=strict_info.scenarios)
         logger.info("Feature with ID=%s has been created successfully.", feature_model.id)
 
     def synchronize(self, create_db_features: bool = False, pull_repository: bool = False) -> None:  # noqa: C901

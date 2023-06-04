@@ -6,6 +6,7 @@ import pytest
 from overhave import db
 from overhave.db import TestReportStatus, TestRunStatus
 from overhave.storage import FeatureModel, ScenarioModel, TestRunModel, TestRunStorage
+from tests.db_utils import count_queries
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -16,7 +17,8 @@ class TestTestRunStorage:
     def test_create_test_run(
         self, test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
     ) -> None:
-        test_run = test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+        with count_queries(3):
+            test_run = test_run_storage.create_test_run(test_scenario.id, test_feature.author)
         assert isinstance(test_run, int)
 
     @pytest.mark.parametrize(
@@ -32,8 +34,10 @@ class TestTestRunStorage:
     def test_set_run_status(
         self, test_run_storage: TestRunStorage, run_status: TestRunStatus, test_created_test_run_id: int
     ) -> None:
-        test_run_storage.set_run_status(test_created_test_run_id, run_status)
-        test_run = test_run_storage.get_test_run(test_created_test_run_id)
+        with count_queries(1):
+            test_run_storage.set_run_status(test_created_test_run_id, run_status)
+        with count_queries(1):
+            test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
         assert test_run.status == run_status
 
@@ -53,10 +57,13 @@ class TestTestRunStorage:
         test_report: Optional[str],
         test_created_test_run_id: int,
     ) -> None:
-        test_run = test_run_storage.get_test_run(test_created_test_run_id)
+        with count_queries(1):
+            test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
-        test_run_storage.set_report(run_id=test_created_test_run_id, status=report_status, report=test_report)
-        updated_test_run = test_run_storage.get_test_run(test_created_test_run_id)
+        with count_queries(1):
+            test_run_storage.set_report(run_id=test_created_test_run_id, status=report_status, report=test_report)
+        with count_queries(1):
+            updated_test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(updated_test_run, TestRunModel)
         assert updated_test_run.report_status == report_status
         assert updated_test_run.report == test_report
@@ -64,7 +71,8 @@ class TestTestRunStorage:
     def test_get_test_run(
         self, test_run_storage: TestRunStorage, test_feature: FeatureModel, test_created_test_run_id: int
     ) -> None:
-        test_run = test_run_storage.get_test_run(test_created_test_run_id)
+        with count_queries(1):
+            test_run = test_run_storage.get_test_run(test_created_test_run_id)
         assert isinstance(test_run, TestRunModel)
         assert test_run.id == test_created_test_run_id
         assert test_run.status == TestRunStatus.STARTED
