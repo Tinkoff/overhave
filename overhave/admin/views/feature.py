@@ -17,7 +17,6 @@ from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
-from overhave.entities import OverhaveAdminSettings
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import FeatureTypeName
@@ -262,7 +261,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
 
     def get_create_form(self) -> Callable[..., Form]:
         form_create = super().get_create_form()
-        admin_settings = OverhaveAdminSettings()
+        admin_settings = get_admin_factory().context.admin_settings
         if not admin_settings.strict_feature_tasks:
             form_create.task.kwargs["validators"] = []
         return cast(Callable[..., Form], form_create)
