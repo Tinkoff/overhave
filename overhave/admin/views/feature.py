@@ -3,7 +3,7 @@ import logging
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, cast
 
 import flask
 import werkzeug
@@ -12,7 +12,7 @@ from flask_admin.model import InlineFormAdmin
 from flask_login import current_user
 from markupsafe import Markup
 from pytest_bdd.types import STEP_TYPES
-from wtforms import Field, TextAreaField, ValidationError
+from wtforms import Field, Form, TextAreaField, ValidationError
 from wtforms.widgets import HiddenInput
 
 from overhave import db
@@ -60,9 +60,7 @@ class FactoryViewUtilsMixin:
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     @classmethod
-    def _validate_tasks(cls, tasks: list[str] | None) -> None:
-        if tasks is None:
-            return
+    def _validate_tasks(cls, tasks: list[str]) -> None:
         for task in tasks:
             if cls._task_pattern.match(task):
                 continue
@@ -260,3 +258,10 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         mutable_data["file_path"] = self._make_file_path(data["file_path"])
 
         return self._run_test(data, rendered)
+
+    def get_create_form(self) -> Callable[..., Form]:
+        form_create = super().get_create_form()
+        admin_settings = get_admin_factory().context.admin_settings
+        if not admin_settings.strict_feature_tasks:
+            form_create.task.kwargs["validators"] = []
+        return cast(Callable[..., Form], form_create)

@@ -9,7 +9,7 @@ from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import TestExecutorContext
 
 
-def generate_task_info(tasks: List[str] | None, header: Optional[str]) -> str:
+def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
     if tasks and header is not None:
         return f"{header}: {', '.join(tasks)}"
     return ""
