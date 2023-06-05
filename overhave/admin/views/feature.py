@@ -60,9 +60,7 @@ class FactoryViewUtilsMixin:
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     @classmethod
-    def _validate_tasks(cls, tasks: list[str] | None) -> None:
-        if tasks is None:
-            return
+    def _validate_tasks(cls, tasks: list[str]) -> None:
         for task in tasks:
             if cls._task_pattern.match(task):
                 continue
