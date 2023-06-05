@@ -26,6 +26,9 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     # Threadpool size for admin service
     threadpool_process_num: int = 5
 
+    # Force filling the tasks field in feature creation
+    strict_feature_tasks: bool = False
+
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""

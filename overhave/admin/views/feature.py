@@ -3,7 +3,7 @@ import logging
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, cast
 
 import flask
 import werkzeug
@@ -12,11 +12,12 @@ from flask_admin.model import InlineFormAdmin
 from flask_login import current_user
 from markupsafe import Markup
 from pytest_bdd.types import STEP_TYPES
-from wtforms import Field, TextAreaField, ValidationError
+from wtforms import Field, Form, TextAreaField, ValidationError
 from wtforms.widgets import HiddenInput
 
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
+from overhave.entities import OverhaveAdminSettings
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import FeatureTypeName
@@ -258,3 +259,10 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         mutable_data["file_path"] = self._make_file_path(data["file_path"])
 
         return self._run_test(data, rendered)
+
+    def get_create_form(self) -> Callable[..., Form]:
+        form_create = super().get_create_form()
+        admin_settings = OverhaveAdminSettings()
+        if not admin_settings.strict_feature_tasks:
+            form_create.task.kwargs["validators"] = []
+        return cast(Callable[..., Form], form_create)
