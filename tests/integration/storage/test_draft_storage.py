@@ -20,7 +20,7 @@ class TestDraftStorage:
     def test_get_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
         with count_queries(1):
             with db.create_session() as session:
-                draft_model = test_draft_storage.get_draft_model(session=session, draft_id=test_draft.id)
+                draft_model = test_draft_storage.draft_model_by_id(session=session, draft_id=test_draft.id)
         assert draft_model.id == test_draft.id
         assert draft_model.published_by == test_draft.published_by
         assert draft_model.pr_url == test_draft.pr_url

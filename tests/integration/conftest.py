@@ -213,7 +213,7 @@ def test_created_test_run_id(
     test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
 ) -> int:
     with create_test_session():
-        return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
+        return test_run_storage.create_testrun(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture()

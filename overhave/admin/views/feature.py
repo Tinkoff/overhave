@@ -218,11 +218,9 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
             flask.flash("Scenario information not requested.", category="error")
             return rendered
         factory = get_admin_factory()
-        scenario = factory.scenario_storage.get_scenario(int(scenario_id))
-        if scenario is None:
-            flask.flash("Scenario does not exist, so could not run test.", category="error")
-            return rendered
-        test_run_id = factory.test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=current_user.login)
+        with db.create_session() as session:
+            scenario = factory.scenario_storage.scenario_model_by_id(session=session, scenario_id=int(scenario_id))
+        test_run_id = factory.test_run_storage.create_testrun(scenario_id=scenario.id, executed_by=current_user.login)
         if not factory.context.admin_settings.consumer_based:
             proxy_manager = get_proxy_manager()
             test_execution_factory = get_test_execution_factory()

@@ -48,7 +48,7 @@ class SynchronizerStorageManager:
         self._system_user_storage = system_user_storage
 
     def get_feature(self, feature_id: int) -> FeatureModel | None:
-        return self._feature_storage.get_feature(feature_id)
+        return self._feature_storage.get_feature_model(feature_id)
 
     def get_last_change_time(self, model: FeatureModel) -> datetime:
         draft_models = self._draft_storage.get_drafts_by_feature_id(model.id)

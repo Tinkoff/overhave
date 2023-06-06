@@ -15,7 +15,7 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_draft_model(session: so.Session, draft_id: int) -> DraftModel:
+    def draft_model_by_id(session: so.Session, draft_id: int) -> DraftModel:
         pass
 
     @staticmethod
@@ -69,7 +69,7 @@ class DraftStorage(IDraftStorage):
     """Class for scenario versions storage."""
 
     @staticmethod
-    def get_draft_model(session: so.Session, draft_id: int) -> DraftModel:
+    def draft_model_by_id(session: so.Session, draft_id: int) -> DraftModel:
         draft = session.query(db.Draft).filter(db.Draft.id == draft_id).one()
         return DraftModel.from_orm(draft)
 

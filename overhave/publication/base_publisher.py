@@ -10,26 +10,6 @@ from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, I
 from overhave.transport import PublicationTask
 
 
-class BaseVersionPublisherException(Exception):
-    """Base exception for :class:`BaseVersionPublisher`."""
-
-
-class FeatureNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Feature."""
-
-
-class TestRunNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing TestRun."""
-
-
-class ScenarioNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Scenario."""
-
-
-class NullablePullRequestUrlError(BaseVersionPublisherException):
-    """Exception for nullable merge-request in selected Draft."""
-
-
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
     """Class for feature version's pull requests management relative to Atlassian Stash API."""
 
@@ -56,22 +36,22 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
         with db.create_session() as session:
-            draft_model = self._draft_storage.get_draft_model(session=session, draft_id=draft_id)
-        test_run = self._test_run_storage.get_test_run(draft_model.test_run_id)
-        if not test_run:
-            raise TestRunNotExistsError(f"TestRun with id={draft_model.test_run_id} does not exist!")
-        feature = self._feature_storage.get_feature(draft_model.feature_id)
-        if not feature:
-            raise FeatureNotExistsError(f"Feature with id={draft_model.feature_id} does not exist!")
-        scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
-        if not scenario:
-            raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
+            draft_model = self._draft_storage.draft_model_by_id(session=session, draft_id=draft_id)
+            test_run_model = self._test_run_storage.testrun_model_by_id(
+                session=session, run_id=draft_model.test_run_id
+            )
+            feature_model = self._feature_storage.feature_model_by_id(
+                session=session, feature_id=draft_model.feature_id
+            )
+            scenario_model = self._scenario_storage.scenario_model_by_id(
+                session=session, scenario_id=test_run_model.scenario_id
+            )
         return PublisherContext(
-            feature=feature,
-            scenario=scenario,
-            test_run=test_run,
+            feature=feature_model,
+            scenario=scenario_model,
+            test_run=test_run_model,
             draft=draft_model,
-            target_branch=f"bdd-feature-{feature.id}",
+            target_branch=f"bdd-feature-{feature_model.id}",
         )
 
     def _compile_publication_description(self, context: PublisherContext) -> str:
