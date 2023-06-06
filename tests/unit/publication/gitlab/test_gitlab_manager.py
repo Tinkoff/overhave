@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence
+from typing import Mapping, Sequence
 
 import pytest
 from faker import Faker
@@ -38,7 +38,7 @@ class TestGitlabProjectManager:
 
     def test_gitlab_project_settings_with_reviewers_mapping(
         self,
-        test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
+        test_reviewers_mapping: Mapping[FeatureTypeName, list[str]],
         test_gitlab_publisher_with_reviewers_mapping: GitlabVersionPublisher,
         faker: Faker,
     ) -> None:

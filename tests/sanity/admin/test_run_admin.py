@@ -1,4 +1,4 @@
-from typing import List, Tuple, cast
+from typing import cast
 from unittest import mock
 
 import pytest
@@ -40,17 +40,17 @@ class TestOverhaveRunAdmin:
 
     def test_extractor_collect_feature_types(
         self,
-        test_feature_types: Tuple[str, ...],
+        test_feature_types: tuple[str, ...],
         test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
         assert set(test_resolved_admin_proxy_manager.factory.feature_extractor.feature_types) == set(test_feature_types)
 
     def test_db_feature_types_exists(
         self,
-        test_feature_types: Tuple[str, ...],
+        test_feature_types: tuple[str, ...],
         test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
-        feature_type_models: List[FeatureTypeModel] = []
+        feature_type_models: list[FeatureTypeModel] = []
         with create_test_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
             feature_type_models.extend([FeatureTypeModel.from_orm(feature_type) for feature_type in db_feature_types])
@@ -59,7 +59,7 @@ class TestOverhaveRunAdmin:
 
     def test_plugin_resolver_collect_plugins(
         self,
-        test_feature_types: Tuple[str, ...],
+        test_feature_types: tuple[str, ...],
         test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
         for feature_type in test_feature_types:
@@ -72,7 +72,7 @@ class TestOverhaveRunAdmin:
 
     def test_injector_collect_steps(
         self,
-        test_feature_types: Tuple[str, ...],
+        test_feature_types: tuple[str, ...],
         test_resolved_admin_proxy_manager: IProxyManager,
     ) -> None:
         from pytest_bdd.parser import STEP_PREFIXES

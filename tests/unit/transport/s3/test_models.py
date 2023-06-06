@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from pydantic.tools import parse_obj_as
 
@@ -29,24 +29,24 @@ class TestBoto3Models:
         assert len(model) == 1
         assert model[0].dict(by_alias=True) == item
 
-    def test_object_list(self, test_object_dict: Dict[str, Any]) -> None:
+    def test_object_list(self, test_object_dict: dict[str, Any]) -> None:
         model = parse_obj_as(list[ObjectModel], [test_object_dict])
         assert len(model) == 1
         assert model[0].dict(by_alias=True) == test_object_dict
 
-    def test_object_model(self, test_object_dict: Dict[str, Any]) -> None:
+    def test_object_model(self, test_object_dict: dict[str, Any]) -> None:
         model = ObjectModel.parse_obj(test_object_dict)
         assert model.name == test_object_dict["Key"]
         assert model.modified_at == test_object_dict["LastModified"]
         assert model.etag == test_object_dict["ETag"]
         assert model.owner == OwnerModel.parse_obj(test_object_dict["Owner"])
 
-    def test_owner_model(self, test_object_owner: Dict[str, str]) -> None:
+    def test_owner_model(self, test_object_owner: dict[str, str]) -> None:
         model = OwnerModel.parse_obj(test_object_owner)
         assert model.name == test_object_owner["DisplayName"]
         assert model.owner_id == test_object_owner["ID"]
 
-    def test_objects_deletion_list(self, test_deletion_result: Dict[str, Any]) -> None:
+    def test_objects_deletion_list(self, test_deletion_result: dict[str, Any]) -> None:
         model = DeletionResultModel.parse_obj(test_deletion_result)
         assert model.deleted
         assert not model.errors

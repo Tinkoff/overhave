@@ -1,5 +1,3 @@
-from typing import Optional
-
 import httpx
 import pytest
 from faker import Faker
@@ -12,7 +10,7 @@ from overhave.test_execution.settings import EmptyOverhaveAdminURLError
 class TestAdminLinkSettingsDisabled:
     """Unit tests for :class:`OverhaveAdminLinkSettings` (disabled)."""
 
-    def test_disabled(self, admin_url: Optional[str], faker: Faker) -> None:
+    def test_disabled(self, admin_url: str | None, faker: Faker) -> None:
         settings = OverhaveAdminLinkSettings(admin_url=admin_url)
         assert not settings.enabled
         with pytest.raises(EmptyOverhaveAdminURLError):

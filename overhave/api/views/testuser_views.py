@@ -1,6 +1,5 @@
 import logging
 from http import HTTPStatus
-from typing import List, Optional
 
 import fastapi
 
@@ -40,8 +39,8 @@ def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserSto
 
 
 def get_test_user_handler(
-    user_id: Optional[int] = None,
-    user_key: Optional[str] = None,
+    user_id: int | None = None,
+    user_key: str | None = None,
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
 ) -> TestUserModel:
     if user_id is not None:
@@ -70,7 +69,7 @@ def test_user_list_handler(
     allow_update: bool,
     feature_type_storage: IFeatureTypeStorage = fastapi.Depends(get_feature_type_storage),
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
-) -> List[TestUserModel]:
+) -> list[TestUserModel]:
     logger.info(
         "Getting %s list with feature_type=%s and allow_update=%s ...",
         TestUserModel.__name__,

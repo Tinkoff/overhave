@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from pathlib import Path
-from typing import Dict, Optional
 from uuid import uuid1
 
 import pytest
@@ -68,14 +67,14 @@ class TestAppReport:
 
     @pytest.mark.parametrize("data", [None])
     def test_app_post_report_without_run_id(
-        self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
+        self, test_client: FlaskClient, test_report_without_index: Path, data: dict[str, str] | None
     ) -> None:
         response = test_client.post(get_report_index_link(test_report_without_index.name), data=data)
         assert response.status_code == HTTPStatus.BAD_REQUEST
 
     @pytest.mark.parametrize("data", [{"run_id": "123"}])
     def test_app_post_report_notexists(
-        self, test_client: FlaskClient, test_report_without_index: Path, data: Optional[Dict[str, str]]
+        self, test_client: FlaskClient, test_report_without_index: Path, data: dict[str, str] | None
     ) -> None:
         with count_queries(1):
             response = test_client.post(get_report_index_link(test_report_without_index.name), data=data)

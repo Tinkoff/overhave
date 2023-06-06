@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 
 from _pytest.nodes import Item
 from pytest_bdd.parser import Scenario
@@ -22,7 +22,7 @@ def set_feature_info_for_item(item: Item, scenario_parser: ScenarioParser) -> No
 
 
 def get_feature_info_from_item(item: Item) -> FeatureInfo:
-    feature_info: Optional[FeatureInfo] = getattr(item, "feature_info")
+    feature_info: FeatureInfo | None = getattr(item, "feature_info")
     if feature_info is None:
         raise AttributeError(f"Item {item} has not got attr 'feature_info'!")
     return feature_info

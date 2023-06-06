@@ -1,18 +1,16 @@
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information -----------------------------------------------------
-from typing import List
-
 project = "Overhave"
-copyright = "2022, TCS group, Inc."
+copyright = "2023, TCS group, Inc."
 author = "Vladislav Mukhamatnurov <livestreamepidemz@yandex.ru>"
 
 # -- General configuration ---------------------------------------------------
 extensions = ["sphinx.ext.todo", "sphinx.ext.viewcode", "sphinx.ext.autodoc"]
-templates_path: List[str] = []
-exclude_patterns: List[str] = []
+templates_path: list[str] = []
+exclude_patterns: list[str] = []
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "pyramid"
-html_static_path: List[str] = []
+html_static_path: list[str] = []
 pygments_style = "sphinx"

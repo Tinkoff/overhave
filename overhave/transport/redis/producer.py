@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Type
 
 import redis
 
@@ -19,7 +18,7 @@ class RedisProducer(RedisTemplate):
     def __init__(
         self,
         settings: BaseRedisSettings,
-        mapping: Dict[Type[BaseRedisTask], RedisStream],
+        mapping: dict[type[BaseRedisTask], RedisStream],
     ):
         super().__init__(settings)
         self._streams = {task: self._database.Stream(stream.value) for task, stream in mapping.items()}

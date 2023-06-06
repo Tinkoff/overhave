@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import Extra, Field, root_validator
 from pydantic.main import BaseModel
@@ -37,14 +37,14 @@ class BaseObjectToDeletionModel(BaseModel):
     """Base model for boto3 client object deletion result."""
 
     name: str = Field(alias="Key")
-    etag: Optional[str] = Field(alias="VersionId")
+    etag: str | None = Field(alias="VersionId")
 
 
 class DeletedObjectModel(BaseObjectToDeletionModel):
     """Model for boto3 client deleted object."""
 
-    marker: Optional[bool] = Field(alias="DeleteMarker")
-    marker_id: Optional[bool] = Field(alias="DeleteMarkerVersionId")
+    marker: bool | None = Field(alias="DeleteMarker")
+    marker_id: bool | None = Field(alias="DeleteMarkerVersionId")
 
 
 class NotDeletedObjectModel(BaseObjectToDeletionModel):
@@ -57,12 +57,12 @@ class NotDeletedObjectModel(BaseObjectToDeletionModel):
 class DeletionResultModel(BaseModel):
     """Model for boto3 client objects deletion result."""
 
-    deleted: Optional[List[DeletedObjectModel]] = Field(alias="Deleted")
-    errors: Optional[List[NotDeletedObjectModel]] = Field(alias="Errors")
-    requester: Optional[str] = Field(alias="RequestCharged")
+    deleted: list[DeletedObjectModel] | None = Field(alias="Deleted")
+    errors: list[NotDeletedObjectModel] | None = Field(alias="Errors")
+    requester: str | None = Field(alias="RequestCharged")
 
     @root_validator(pre=True)
-    def validate_results(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_results(cls, values: dict[str, Any]) -> dict[str, Any]:
         deleted = values.get("Deleted")
         errors = values.get("Errors")
         if deleted is None and errors is None:

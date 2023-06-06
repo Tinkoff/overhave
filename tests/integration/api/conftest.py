@@ -1,4 +1,3 @@
-from typing import Dict, Optional
 from unittest import mock
 
 import httpx
@@ -16,7 +15,7 @@ from tests.db_utils import create_test_session
 
 
 @pytest.fixture(scope="module")
-def envs_for_mock() -> Dict[str, Optional[str]]:
+def envs_for_mock() -> dict[str, str | None]:
     return {
         "OVERHAVE_API_AUTH_SECRET_KEY": "123",
         "OVERHAVE_FEATURES_DIR": "/features",

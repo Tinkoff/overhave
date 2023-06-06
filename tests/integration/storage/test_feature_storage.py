@@ -79,7 +79,9 @@ class TestFeatureStorage:
         with count_queries(1):
             new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
         with count_queries(2):
-            new_tag_model = test_tag_storage.get_or_create_tag(value=faker.word(), created_by=new_system_user.login)
+            new_tag_model = test_tag_storage.get_or_create_tag(
+                value=faker.word() + faker.word(), created_by=new_system_user.login
+            )
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,
             created_at=get_current_time(),

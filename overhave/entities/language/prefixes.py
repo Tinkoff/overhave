@@ -1,5 +1,3 @@
-from typing import List, Optional, Tuple
-
 from pydantic.main import BaseModel
 from pytest_bdd import types as default_types
 from pytest_bdd.parser import STEP_PREFIXES
@@ -19,7 +17,7 @@ class StepPrefixesModel(BaseModel):
     AND: str
     BUT: str
 
-    def extend_defaults(self) -> List[Tuple[str, Optional[str]]]:
+    def extend_defaults(self) -> list[tuple[str, str | None]]:
         """Extend default STEP_PREFIXES from pytest_bdd."""
         STEP_PREFIXES.append((self.FEATURE, default_types.FEATURE))
         STEP_PREFIXES.append((self.SCENARIO_OUTLINE, default_types.SCENARIO_OUTLINE))

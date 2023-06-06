@@ -2,7 +2,6 @@ import logging
 import subprocess  # noqa: S404
 from os import makedirs
 from pathlib import Path
-from typing import Optional
 from uuid import uuid1
 
 from overhave.db import TestReportStatus
@@ -32,7 +31,7 @@ class ReportManager:
         self._archive_manager = archive_manager
         self._s3_manager = s3_manager
 
-    def _generate_report(self, alluredir: Path, report_dir: Path) -> Optional[int]:
+    def _generate_report(self, alluredir: Path, report_dir: Path) -> int | None:
         generation_cmd = (
             self._settings.allure_cmdline,
             "generate",

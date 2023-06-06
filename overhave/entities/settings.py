@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Sequence
 
 import httpx
 from flask_admin.contrib.sqla import ModelView
@@ -14,10 +14,10 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     """Settings for Overhave Flask Admin customization."""
 
     # Path to custom index template. By default, contains Overhave project info.
-    index_template_path: Optional[Path]
+    index_template_path: Path | None
 
     # Custom SQLAlchemy ModelViews for Overhave admin panel
-    custom_views: Optional[Sequence[ModelView]]
+    custom_views: Sequence[ModelView] | None
 
     # Enable testing with test execution consumer, based on Redis tasks. Enabled by default.
     # When disabled - all test runs will be executed with :class:`Threadpool`.
@@ -33,7 +33,7 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""
 
-    step_prefixes: Optional[StepPrefixesModel]
+    step_prefixes: StepPrefixesModel | None
 
 
 class OverhaveFileSettings(BaseOverhavePrefix):
@@ -46,7 +46,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     work_dir: Path = Path.cwd()
 
     # Root project directory with features, fixtures and steps packages
-    root_dir: Optional[Path]
+    root_dir: Path | None
 
     # Base directory for feature files, by default - root_dir / 'features'
     features_dir: Path
@@ -66,7 +66,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     tmp_dir: Path = Path("/tmp/overhave")  # noqa: S108
 
     @root_validator(pre=True)
-    def validate_dirs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_dirs(cls, values: dict[str, Any]) -> dict[str, Any]:
         root_dir = values.get("root_dir")
         if root_dir:
             for directory in ("features_dir", "fixtures_dir", "steps_dir"):
@@ -76,7 +76,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
         return values
 
     @validator("steps_dir")
-    def validate_nesting(cls, v: Path, values: Dict[str, Any]) -> Path:
+    def validate_nesting(cls, v: Path, values: dict[str, Any]) -> Path:
         validate_steps_dir = values["validate_steps_dir"]
         if validate_steps_dir:
             work_dir: Path = values["work_dir"]
@@ -121,36 +121,36 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     emulation_prefix: str = "--permit-write --once --address {address} --port {port} --timeout {timeout}"
 
     # Specific terminal tool startup command with relative `feature_type`, for example: `myapp {feature_type}`
-    emulation_base_cmd: Optional[str]
+    emulation_base_cmd: str | None
     # Terminal tool command postfix with specified user `name` and `model`, for example: `--name={name} --model={model}`
     # If it is no need in use - may be optional.
-    emulation_postfix: Optional[str]
+    emulation_postfix: str | None
 
     # Optional additional terminal tool usage description
-    emulation_desc_link: Optional[str]
+    emulation_desc_link: str | None
 
     emulation_bind_ip: str = "0.0.0.0"  # noqa: S104
     # Ports for emulation binding. Expects as string with format `["port1", "port2", ...]`
-    emulation_ports: List[int] = [8080]
+    emulation_ports: list[int] = [8080]
 
     # As a real service, should be used follow path: `http://my-service.domain/mount`
     # where `emulation_service_url` = `http://my-service.domain` - URL for service,
     # and `emulation_service_mount` = `mount` - mount point for service redirection.
     # If `emulation_service_mount` is `None` - this is localhost debug.
     emulation_service_url: httpx.URL = httpx.URL("http://localhost")
-    emulation_service_mount: Optional[str]
+    emulation_service_mount: str | None
 
     # Wait until emulation become served
     emulation_wait_timeout: timedelta = timedelta(seconds=300)
 
     @validator("emulation_service_url", pre=True)
-    def validate_url(cls, v: Union[str, httpx.URL]) -> httpx.URL:
+    def validate_url(cls, v: str | httpx.URL) -> httpx.URL:
         if isinstance(v, str):
             return httpx.URL(v)
         return v
 
     @validator("emulation_ports", pre=True)
-    def validate_ports(cls, v: Union[List[int], str]) -> List[int]:
+    def validate_ports(cls, v: list[int] | str) -> list[int]:
         if isinstance(v, str):
             return [int(x.strip()) for x in v.split(",")]
         return v

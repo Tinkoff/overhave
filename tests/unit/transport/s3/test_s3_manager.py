@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 
 import botocore.exceptions
@@ -80,7 +80,7 @@ class TestInitializedS3Manager:
 
     def test_get_bucket_objects(
         self,
-        test_object_dict: Dict[str, Any],
+        test_object_dict: dict[str, Any],
         mocked_boto3_client: mock.MagicMock,
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,
@@ -116,7 +116,7 @@ class TestInitializedS3Manager:
 
     def test_delete_files(
         self,
-        test_object_dict: Dict[str, Any],
+        test_object_dict: dict[str, Any],
         mocked_boto3_client: mock.MagicMock,
         test_s3_manager_settings: OverhaveS3ManagerSettings,
         test_initialized_s3_manager: S3Manager,

@@ -48,7 +48,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
     flask_app.config["FILES_DIR"] = files_dir
 
     @flask_app.teardown_request
-    def remove_session(exception: typing.Optional[BaseException]) -> None:
+    def remove_session(exception: BaseException | None) -> None:
         db.current_session.remove()
 
     @flask_app.route("/reports/<path:request>", methods=["GET", "POST"])

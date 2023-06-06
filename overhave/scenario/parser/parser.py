@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import datetime
 from functools import cached_property
-from typing import List, Optional, Sequence, Union
+from typing import Sequence
 
 import allure
 from pytest_bdd import types as default_types
@@ -55,7 +55,7 @@ class ScenarioParser(PrefixMixin):
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
         feature_extractor: IFeatureExtractor,
-        tasks_keyword: Optional[str],
+        tasks_keyword: str | None,
     ) -> None:
         self._parser_settings = parser_settings
         self._compilation_settings = compilation_settings
@@ -67,7 +67,7 @@ class ScenarioParser(PrefixMixin):
         self._parser_settings.parser_strict_mode = mode
 
     @cached_property
-    def _feature_prefixes(self) -> List[str]:
+    def _feature_prefixes(self) -> list[str]:
         prefixes = [self._as_prefix(default_types.FEATURE)]
         if self._language_settings.step_prefixes is not None:
             prefixes.append(self._as_prefix(self._language_settings.step_prefixes.FEATURE))
@@ -75,7 +75,7 @@ class ScenarioParser(PrefixMixin):
         return prefixes
 
     @cached_property
-    def _task_prefix(self) -> Optional[str]:
+    def _task_prefix(self) -> str | None:
         if isinstance(self._tasks_keyword, str):
             return self._as_prefix(self._tasks_keyword)
         return None
@@ -91,7 +91,7 @@ class ScenarioParser(PrefixMixin):
             )
         return name_parts[-1].strip()
 
-    def _get_tags(self, tags_line: str) -> List[str]:
+    def _get_tags(self, tags_line: str) -> list[str]:
         return [tag.strip() for tag in tags_line.split(self._compilation_settings.tag_prefix) if tag]
 
     def _get_feature_type(self, tags: Sequence[str]) -> FeatureTypeName:
@@ -103,7 +103,7 @@ class ScenarioParser(PrefixMixin):
             f"Could not get feature type from tags {tags}!",
         )
 
-    def _get_severity_tag(self, tags: Sequence[str]) -> Optional[str]:
+    def _get_severity_tag(self, tags: Sequence[str]) -> str | None:
         for tag in reversed(tags):
             if self._compilation_settings.severity_keyword not in tag:
                 continue
@@ -117,7 +117,7 @@ class ScenarioParser(PrefixMixin):
             return result.group(0).removeprefix(left_pointer).removesuffix(right_pointer).strip()
         raise AdditionalInfoParsingError("Could not parse additional info from '%s'!", additional_line)
 
-    def _get_task_info(self, task_line: str) -> List[str]:
+    def _get_task_info(self, task_line: str) -> list[str]:
         tasks = []
         if self._task_prefix is not None:
             tasks.extend(task_line.removeprefix(self._task_prefix).split(","))
@@ -178,7 +178,7 @@ class ScenarioParser(PrefixMixin):
             raise FeatureNameParsingError(f"Could not parse feature name from header:\n{header}")
         return feature_info
 
-    def parse(self, feature_txt: str) -> Union[FeatureInfo, StrictFeatureInfo]:
+    def parse(self, feature_txt: str) -> FeatureInfo | StrictFeatureInfo:
         blocks_delimiter = "\n\n"
         indent = "  "
         indent_substitute = "__"

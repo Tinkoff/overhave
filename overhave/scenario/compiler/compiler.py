@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import allure
 from pytest_bdd import types as default_types
 
@@ -9,13 +7,13 @@ from overhave.scenario.prefix_mixin import PrefixMixin
 from overhave.storage import TestExecutorContext
 
 
-def generate_task_info(tasks: List[str], header: Optional[str]) -> str:
+def generate_task_info(tasks: list[str], header: str | None) -> str:
     if tasks and header is not None:
         return f"{header}: {', '.join(tasks)}"
     return ""
 
 
-def generate_tags_list(context: TestExecutorContext) -> Optional[List[str]]:
+def generate_tags_list(context: TestExecutorContext) -> list[str] | None:
     if feature_tags := [i.value for i in context.feature.feature_tags]:
         return feature_tags
     return None
@@ -36,7 +34,7 @@ class ScenarioCompiler(PrefixMixin):
         self,
         compilation_settings: OverhaveScenarioCompilerSettings,
         language_settings: OverhaveLanguageSettings,
-        tasks_keyword: Optional[str],
+        tasks_keyword: str | None,
     ):
         self._compilation_settings = compilation_settings
         self._language_settings = language_settings
@@ -47,7 +45,7 @@ class ScenarioCompiler(PrefixMixin):
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
 
-    def _get_additional_tags(self, scenario_text: str, tags: Optional[List[str]]) -> str:
+    def _get_additional_tags(self, scenario_text: str, tags: list[str] | None) -> str:
         if f"{self._compilation_settings.tag_prefix}{tags}" in scenario_text:
             return ""
         if tags is not None:
@@ -58,8 +56,8 @@ class ScenarioCompiler(PrefixMixin):
     def _get_severity_tag(self, severity: allure.severity_level) -> str:
         return f"{self._compilation_settings.severity_prefix}{severity.value}"
 
-    def _get_feature_prefix_if_specified(self, scenario_text: str) -> Optional[str]:
-        keywords: List[str] = [default_types.FEATURE]
+    def _get_feature_prefix_if_specified(self, scenario_text: str) -> str | None:
+        keywords: list[str] = [default_types.FEATURE]
         if self._language_settings.step_prefixes is not None:
             keywords.append(self._language_settings.step_prefixes.FEATURE)
 

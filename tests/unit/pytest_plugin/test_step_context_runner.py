@@ -1,5 +1,4 @@
 from logging import Logger
-from typing import Optional
 from unittest import mock
 
 import pytest
@@ -30,20 +29,20 @@ class TestStepContextRunner:
             assert isinstance(test_step_context_runner._logger, mock.MagicMock)
 
     @pytest.mark.parametrize("exception", [None, Exception])
-    def test_stop_failed(self, test_step_context_runner: StepContextRunner, exception: Optional[BaseException]) -> None:
+    def test_stop_failed(self, test_step_context_runner: StepContextRunner, exception: BaseException | None) -> None:
         with pytest.raises(StepContextNotDefinedError):
             test_step_context_runner.stop(exception)
 
     @pytest.mark.parametrize("exception", [None, Exception])
     def test_stop(
-        self, test_step_context_runner: StepContextRunner, faker: Faker, exception: Optional[BaseException]
+        self, test_step_context_runner: StepContextRunner, faker: Faker, exception: BaseException | None
     ) -> None:
         test_step_context_runner.set_title(faker.word())
         test_step_context_runner.stop(exception)
 
     @pytest.mark.parametrize("exception", [None, Exception])
     def test_start_and_stop(
-        self, test_step_context_runner: StepContextRunner, faker: Faker, exception: Optional[BaseException]
+        self, test_step_context_runner: StepContextRunner, faker: Faker, exception: BaseException | None
     ) -> None:
         test_step_context_runner.set_title(faker.word())
         test_step_context_runner.start()

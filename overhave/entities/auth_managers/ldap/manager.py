@@ -1,6 +1,5 @@
 import logging
 from pprint import pformat
-from typing import List, Optional
 
 from pydantic import SecretStr
 
@@ -37,13 +36,13 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
         self._system_user_group_storage = system_user_group_storage
         self._ldap_authenticator = ldap_authenticator
 
-    def _reassign_role_if_neccessary(self, user: SystemUserModel, user_groups: List[str]) -> None:
+    def _reassign_role_if_neccessary(self, user: SystemUserModel, user_groups: list[str]) -> None:
         if self._settings.ldap_admin_group not in user_groups:
             return
         user.role = Role.admin
         self._system_user_storage.update_user_role(user_model=user)
 
-    def authorize_user(self, username: str, password: SecretStr) -> Optional[SystemUserModel]:
+    def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         logger.debug("Try to authorize user '%s'...", username)
         user_groups = self._ldap_authenticator.get_user_groups(username, password)
         if not user_groups:

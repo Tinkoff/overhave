@@ -1,12 +1,12 @@
 import abc
 from functools import cache, cached_property
-from typing import Optional, Union
+from typing import Union
 
 from overhave.factory import IAdminFactory, ITestExecutionFactory
 from overhave.pytest_plugin.config_injector import ConfigInjector
 from overhave.pytest_plugin.plugin_resolver import IPluginResolver, PluginResolver
 
-AnyProxyFactory = Union[IAdminFactory, ITestExecutionFactory]
+AnyProxyFactory = Union[IAdminFactory | ITestExecutionFactory]
 
 
 class IProxyManager(abc.ABC):
@@ -75,7 +75,7 @@ class ProxyManager(IProxyManager):
     """Manager for application factory resolution and usage, based on proxy-object pattern."""
 
     def __init__(self) -> None:
-        self._factory: Optional[AnyProxyFactory] = None
+        self._factory: AnyProxyFactory | None = None
         self._pytest_patched = False
         self._collection_prepared = False
 

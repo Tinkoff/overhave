@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 
 class BaseFileExtractor:
@@ -22,7 +21,7 @@ class BaseFileExtractor:
             )
         )
 
-    def _extract_recursively(self, folder: Path) -> List[Path]:
+    def _extract_recursively(self, folder: Path) -> list[Path]:
         files = []
         for path in folder.iterdir():
             if self._check_dir_compliance(path):

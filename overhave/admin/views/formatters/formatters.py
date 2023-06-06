@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import allure
 import httpx
@@ -36,7 +36,7 @@ def datetime_formatter(view: ModelView, context: Any, model: db.BaseTable, value
 
 
 @safe_formatter(type=list, supported_models=(db.Feature,))
-def task_formatter(view: ModelView, context: Any, model: db.Feature, value: List[str]) -> Markup:
+def task_formatter(view: ModelView, context: Any, model: db.Feature, value: list[str]) -> Markup:
     task_tracker_url = getattr(view, "task_tracker_url")
     if not task_tracker_url:
         return Markup(", ".join(value))
@@ -78,7 +78,7 @@ def result_report_formatter(view: ModelView, context: Any, model: db.TestRun, va
 
 
 @safe_formatter(type=dict, supported_models=(db.TestUser,))
-def json_formatter(view: ModelView, context: Any, model: db.BaseTable, value: Dict[str, Optional[str]]) -> Markup:
+def json_formatter(view: ModelView, context: Any, model: db.BaseTable, value: dict[str, str | None]) -> Markup:
     info = ""
     for k, v in list(filter(lambda x: x, value.items())):
         info += f"<b>{k}</b>:&nbsp;&nbsp;{v}<br>"

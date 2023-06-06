@@ -1,6 +1,5 @@
 import logging
 from http import HTTPStatus
-from typing import List
 
 import fastapi
 
@@ -26,6 +25,6 @@ def tags_item_handler(
 def tags_list_handler(
     value: str,
     feature_tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
-) -> List[TagModel]:
+) -> list[TagModel]:
     logger.info("Getting %s list like value='%s...'", TagModel.__name__, value)
     return feature_tag_storage.get_tags_like_value(value)

@@ -1,5 +1,4 @@
 import abc
-from typing import List
 
 from overhave import db
 from overhave.storage.converters import TagModel
@@ -15,7 +14,7 @@ class IFeatureTagStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_tags_like_value(value: str) -> List[TagModel]:
+    def get_tags_like_value(value: str) -> list[TagModel]:
         pass
 
     @staticmethod
@@ -36,7 +35,7 @@ class FeatureTagStorage(IFeatureTagStorage):
             return None
 
     @staticmethod
-    def get_tags_like_value(value: str) -> List[TagModel]:
+    def get_tags_like_value(value: str) -> list[TagModel]:
         with db.create_session() as session:
             db_tags = session.query(db.Tags).filter(db.Tags.value.like(value)).all()
             return [TagModel.from_orm(tag) for tag in db_tags]

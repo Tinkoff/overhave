@@ -1,4 +1,3 @@
-from typing import Optional
 from unittest import mock
 
 import allure
@@ -93,7 +92,7 @@ def test_executor_ctx(
 def test_scenario_compiler(
     language_settings: OverhaveLanguageSettings,
     test_compilation_settings: OverhaveScenarioCompilerSettings,
-    tasks_keyword: Optional[str],
+    tasks_keyword: str | None,
 ) -> ScenarioCompiler:
     return ScenarioCompiler(
         compilation_settings=test_compilation_settings,
@@ -107,7 +106,7 @@ def test_scenario_parser(
     test_parser_settings: OverhaveScenarioParserSettings,
     test_compilation_settings: OverhaveScenarioCompilerSettings,
     language_settings: OverhaveLanguageSettings,
-    tasks_keyword: Optional[str],
+    tasks_keyword: str | None,
 ) -> ScenarioParser:
     return ScenarioParser(
         parser_settings=test_parser_settings,

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Type
+from typing import Any, Mapping
 
 import httpx
 from pydantic import BaseModel, validator
@@ -26,7 +26,7 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     """
 
     # Fixture content in list format, which would be compiled into formatted string.
-    fixture_content: List[str] = [
+    fixture_content: list[str] = [
         "from pytest_bdd import scenarios",
         "from overhave import overhave_proxy_manager",
         "pytest_plugins = overhave_proxy_manager().plugin_resolver.get_plugins()",
@@ -34,29 +34,29 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     ]
 
     # Task tracker URL
-    task_tracker_url: Optional[httpx.URL]
+    task_tracker_url: httpx.URL | None
     # Behaviour specification keyword for tasks attachment
-    tasks_keyword: Optional[str]
+    tasks_keyword: str | None
 
     # Git project URL
-    git_project_url: Optional[httpx.URL]
+    git_project_url: httpx.URL | None
 
     # Templates are used for creation of test user and system specifications.
     # Keys for specification mapping are still the same - feature types.
-    user_spec_template_mapping: Mapping[str, Type[BaseModel]] = {}
+    user_spec_template_mapping: Mapping[str, type[BaseModel]] = {}
 
     @validator("task_tracker_url", pre=True)
-    def make_tasktracker_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
+    def make_tasktracker_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
     @validator("tasks_keyword")
-    def validate_links_keyword(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
+    def validate_links_keyword(cls, v: str | None, values: dict[str, Any]) -> str | None:
         if isinstance(v, str) and values.get("task_tracker_url") is None:
             raise ValueError("Task tracker URL should be specified in case of links keyword usage!")
         return v
 
     @validator("git_project_url", pre=True)
-    def make_git_project_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
+    def make_git_project_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
     def get_task_link(self, link: str) -> httpx.URL:
