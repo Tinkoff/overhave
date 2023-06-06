@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import cast
 
 import sqlalchemy as sa
+import sqlalchemy.orm as so
 from pydantic import parse_obj_as
 
 from overhave import db
@@ -14,7 +15,7 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_draft(draft_id: int) -> DraftModel | None:
+    def get_draft_model(session: so.Session, draft_id: int) -> DraftModel:
         pass
 
     @staticmethod
@@ -68,12 +69,9 @@ class DraftStorage(IDraftStorage):
     """Class for scenario versions storage."""
 
     @staticmethod
-    def get_draft(draft_id: int) -> DraftModel | None:
-        with db.create_session() as session:
-            draft = session.get(db.Draft, draft_id)
-            if draft is not None:
-                return DraftModel.from_orm(draft)
-            return None
+    def get_draft_model(session: so.Session, draft_id: int) -> DraftModel:
+        draft = session.query(db.Draft).filter(db.Draft.id == draft_id).one()
+        return DraftModel.from_orm(draft)
 
     @staticmethod
     def get_drafts_by_feature_id(feature_id: int) -> list[DraftModel]:

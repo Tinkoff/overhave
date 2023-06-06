@@ -1,6 +1,7 @@
 import abc
 import datetime
 
+from overhave import db
 from overhave.db import DraftStatus
 from overhave.entities import OverhaveFileSettings
 from overhave.publication.abstract_publisher import IVersionPublisher
@@ -15,10 +16,6 @@ class BaseVersionPublisherException(Exception):
 
 class FeatureNotExistsError(BaseVersionPublisherException):
     """Exception for situation with not existing Feature."""
-
-
-class DraftNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Draft."""
 
 
 class TestRunNotExistsError(BaseVersionPublisherException):
@@ -58,15 +55,14 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         self.publish_version(task.data.draft_id)
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
-        draft = self._draft_storage.get_draft(draft_id)
-        if not draft:
-            raise DraftNotExistsError(f"Draft with id={draft_id} does not exist!")
-        test_run = self._test_run_storage.get_test_run(draft.test_run_id)
+        with db.create_session() as session:
+            draft_model = self._draft_storage.get_draft_model(session=session, draft_id=draft_id)
+        test_run = self._test_run_storage.get_test_run(draft_model.test_run_id)
         if not test_run:
-            raise TestRunNotExistsError(f"TestRun with id={draft.test_run_id} does not exist!")
-        feature = self._feature_storage.get_feature(draft.feature_id)
+            raise TestRunNotExistsError(f"TestRun with id={draft_model.test_run_id} does not exist!")
+        feature = self._feature_storage.get_feature(draft_model.feature_id)
         if not feature:
-            raise FeatureNotExistsError(f"Feature with id={draft.feature_id} does not exist!")
+            raise FeatureNotExistsError(f"Feature with id={draft_model.feature_id} does not exist!")
         scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
         if not scenario:
             raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
@@ -74,7 +70,7 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             feature=feature,
             scenario=scenario,
             test_run=test_run,
-            draft=draft,
+            draft=draft_model,
             target_branch=f"bdd-feature-{feature.id}",
         )
 

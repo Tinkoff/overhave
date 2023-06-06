@@ -8,23 +8,19 @@ from overhave import db
 from overhave.db import DraftStatus
 from overhave.storage import DraftModel, DraftStorage, FeatureModel, SystemUserModel, UniqueDraftCreationError
 from overhave.storage.draft_storage import NullableDraftsError
-from tests.db_utils import count_queries
+from tests.db_utils import count_queries, create_test_session
 
 
 @pytest.mark.usefixtures("database")
 class TestDraftStorage:
     """Integration tests for :class:`DraftStorage`."""
 
-    def test_get_none_if_not_existing_id(self, test_draft_storage: DraftStorage, faker: Faker) -> None:
-        with count_queries(1):
-            assert test_draft_storage.get_draft(faker.random_int()) is None
-
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
         with count_queries(1):
-            draft_model = test_draft_storage.get_draft(test_draft.id)
-        assert draft_model is not None
+            with db.create_session() as session:
+                draft_model = test_draft_storage.get_draft_model(session=session, draft_id=test_draft.id)
         assert draft_model.id == test_draft.id
         assert draft_model.published_by == test_draft.published_by
         assert draft_model.pr_url == test_draft.pr_url
@@ -51,12 +47,11 @@ class TestDraftStorage:
                 status=DraftStatus.REQUESTED,
                 traceback=traceback,
             )
-        with count_queries(1):
-            new_test_draft = test_draft_storage.get_draft(test_draft.id)
-        assert new_test_draft is not None
-        assert new_test_draft.pr_url == pr_url
-        assert new_test_draft.status is DraftStatus.REQUESTED
-        assert new_test_draft.traceback == traceback
+        with create_test_session() as session:
+            new_test_draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
+            assert new_test_draft.pr_url == pr_url
+            assert new_test_draft.status is DraftStatus.REQUESTED
+            assert new_test_draft.traceback == traceback
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
@@ -76,11 +71,10 @@ class TestDraftStorage:
     ) -> None:
         with count_queries(1):
             test_draft_storage.set_draft_status(draft_id=test_draft.id, status=draft_status, traceback=traceback)
-        with count_queries(1):
-            draft = test_draft_storage.get_draft(test_draft.id)
-        assert draft is not None
-        assert draft.status is draft_status
-        assert draft.traceback == traceback
+        with create_test_session() as session:
+            draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
+            assert draft.status is draft_status
+            assert draft.traceback == traceback
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
