@@ -259,9 +259,17 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
 
         return self._run_test(data, rendered)
 
-    def get_create_form(self) -> Callable[..., Form]:
-        form_create = super().get_create_form()
+    @staticmethod
+    def _form_remove_validators(form_change: Callable[..., Form]) -> Callable[..., Form]:
         admin_settings = get_admin_factory().context.admin_settings
         if not admin_settings.strict_feature_tasks:
-            form_create.task.kwargs["validators"] = []
-        return cast(Callable[..., Form], form_create)
+            form_change.task.kwargs["validators"] = []  # type: ignore[attr-defined]
+        return form_change
+
+    def get_create_form(self) -> Callable[..., Form]:
+        form_create = cast(Callable[..., Form], super().get_create_form())
+        return self._form_remove_validators(form_change=form_create)
+
+    def get_edit_form(self) -> Callable[..., Form]:
+        form_edit = cast(Callable[..., Form], super().get_edit_form())
+        return self._form_remove_validators(form_change=form_edit)
