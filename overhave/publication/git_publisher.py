@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Generic, Optional, cast
+from typing import Generic, cast
 
 import git
 
@@ -113,7 +113,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         if not changes_pushed:
             raise CommitNotCreatedError("Commit has not been created!")
 
-    def _push_version(self, draft_id: int) -> Optional[PublisherContext]:
+    def _push_version(self, draft_id: int) -> PublisherContext | None:
         try:
             if not self._git_publisher_settings.pull_before_creating_mr_enabled:
                 logger.warning("Pulling before creating merge request is disabled!")

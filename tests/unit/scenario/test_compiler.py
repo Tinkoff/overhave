@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import pytest
 
 from overhave import OverhaveLanguageSettings
@@ -13,17 +11,17 @@ class TestGenerateTaskInfo:
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info(self, tasks: List[str], header: str) -> None:
+    def test_generate_task_info(self, tasks: list[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == f"{header}: {', '.join(tasks)}"
 
     @pytest.mark.parametrize("tasks", [[]])
     @pytest.mark.parametrize("header", ["tasks_header"])
-    def test_generate_task_info_without_tasks(self, tasks: List[str], header: str) -> None:
+    def test_generate_task_info_without_tasks(self, tasks: list[str], header: str) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
     @pytest.mark.parametrize("tasks", [["EX-1", "EX-2"]])
     @pytest.mark.parametrize("header", [None])
-    def test_generate_task_info_without_header(self, tasks: List[str], header: None) -> None:
+    def test_generate_task_info_without_header(self, tasks: list[str], header: None) -> None:
         assert generate_task_info(tasks=tasks, header=header) == ""
 
 
@@ -47,7 +45,7 @@ class TestScenarioCompiler:
 
     def test_compile_scenario_from_correct_text(
         self,
-        tasks_keyword: Optional[str],
+        tasks_keyword: str | None,
         test_scenario_compiler: ScenarioCompiler,
         test_scenario_parser: ScenarioParser,
         test_feature: FeatureModel,

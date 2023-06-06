@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from faker import Faker
 from pydantic import SecretStr
@@ -33,7 +31,7 @@ class TestSystemUserStorage:
     def test_get_existing_user_by_credits(
         self,
         test_system_user_storage: SystemUserStorage,
-        test_system_user_password: Optional[SecretStr],
+        test_system_user_password: SecretStr | None,
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:
@@ -52,7 +50,7 @@ class TestSystemUserStorage:
     def test_get_not_existing_user_by_credits(
         self,
         test_system_user_storage: SystemUserStorage,
-        test_system_user_password: Optional[SecretStr],
+        test_system_user_password: SecretStr | None,
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:

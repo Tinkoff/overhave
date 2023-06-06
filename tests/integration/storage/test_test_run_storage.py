@@ -1,5 +1,3 @@
-from typing import Optional
-
 import allure
 import pytest
 
@@ -54,7 +52,7 @@ class TestTestRunStorage:
         self,
         test_run_storage: TestRunStorage,
         report_status: TestReportStatus,
-        test_report: Optional[str],
+        test_report: str | None,
         test_created_test_run_id: int,
     ) -> None:
         with count_queries(1):

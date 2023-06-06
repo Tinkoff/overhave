@@ -1,6 +1,6 @@
 import re
 from functools import cached_property
-from typing import Mapping, Optional, Pattern, Tuple
+from typing import Mapping, Pattern
 
 import allure_commons.types
 import pytest
@@ -12,7 +12,7 @@ class TagEvaluationResult(BaseModel):
     """Class for tag evaluation result."""
 
     marker: MarkDecorator
-    url: Optional[str]
+    url: str | None
     link_type: str
 
     class Config:
@@ -37,7 +37,7 @@ class OverhaveTagController:
     @cached_property
     def _tag_to_evaluation_result_mapping(
         self,
-    ) -> Mapping[Pattern[str], Tuple[MarkDecorator, allure_commons.types.LinkType]]:
+    ) -> Mapping[Pattern[str], tuple[MarkDecorator, allure_commons.types.LinkType]]:
         return {
             self._get_tag_pattern("disabled"): (
                 pytest.mark.skip,
@@ -57,13 +57,13 @@ class OverhaveTagController:
     def _url_pattern(self) -> Pattern[str]:
         return re.compile(r"(?P<url>\b\w+://[^\s\"\']+\b)")
 
-    def _get_url(self, reason: str) -> Optional[str]:
+    def _get_url(self, reason: str) -> str | None:
         searched = self._url_pattern.search(reason)
         if searched is not None:
             return searched.group("url")
         return None
 
-    def get_suitable_pattern(self, name: str) -> Optional[Pattern[str]]:
+    def get_suitable_pattern(self, name: str) -> Pattern[str] | None:
         for pattern in self._tag_to_evaluation_result_mapping:
             result = pattern.match(name)
             if result is not None:

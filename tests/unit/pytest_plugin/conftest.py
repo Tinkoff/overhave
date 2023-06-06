@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Optional, cast
+from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
 import allure
@@ -65,7 +65,7 @@ def test_severity(request: FixtureRequest) -> allure.severity_level:
 def test_pytest_bdd_item(
     mocked_context: BaseFactoryContext,
     test_pytest_bdd_scenario: Scenario,
-    test_severity: Optional[allure.severity_level],
+    test_severity: allure.severity_level | None,
     faker: Faker,
 ) -> Item:
     item = mock.create_autospec(Item)
@@ -226,9 +226,9 @@ def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest)
 
 
 @pytest.fixture()
-def admin_url(request: FixtureRequest) -> Optional[httpx.URL]:
+def admin_url(request: FixtureRequest) -> httpx.URL | None:
     if hasattr(request, "param"):
-        return cast(Optional[httpx.URL], request.param)
+        return cast(httpx.URL | None, request.param)
     return None
 
 
@@ -237,7 +237,7 @@ def patched_hook_test_execution_factory(
     mocked_context: OverhaveTestExecutionContext,
     clean_test_execution_factory: Callable[[], ITestExecutionFactory],
     severity_prefix: str,
-    admin_url: Optional[httpx.URL],
+    admin_url: httpx.URL | None,
     test_project_settings: OverhaveProjectSettings,
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()

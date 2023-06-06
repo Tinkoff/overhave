@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import sqlalchemy as sa
 
@@ -16,15 +16,15 @@ class ITestRunStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
+    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: str | None = None) -> None:
         pass
 
     @abc.abstractmethod
-    def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
+    def set_report(self, run_id: int, status: db.TestReportStatus, report: str | None = None) -> None:
         pass
 
     @abc.abstractmethod
-    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
+    def get_test_run(self, run_id: int) -> TestRunModel | None:
         pass
 
 
@@ -45,7 +45,7 @@ class TestRunStorage(ITestRunStorage):
             session.flush()
             return cast(int, run.id)
 
-    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
+    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: str | None = None) -> None:
         with db.create_session() as session:
             values: dict[str, Any] = {"status": status}
             if status == db.TestRunStatus.RUNNING:
@@ -57,7 +57,7 @@ class TestRunStorage(ITestRunStorage):
 
             session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
-    def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
+    def set_report(self, run_id: int, status: db.TestReportStatus, report: str | None = None) -> None:
         with db.create_session() as session:
             values: dict[str, Any] = {"report_status": status}
             if isinstance(report, str):
@@ -65,7 +65,7 @@ class TestRunStorage(ITestRunStorage):
 
             session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
-    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
+    def get_test_run(self, run_id: int) -> TestRunModel | None:
         with db.create_session() as session:
             run = session.get(db.TestRun, run_id)
             if run is not None:

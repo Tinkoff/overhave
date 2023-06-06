@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import List, Optional
 
 from overhave.scenario import StrictFeatureInfo
 from overhave.storage import (
@@ -48,7 +47,7 @@ class SynchronizerStorageManager:
         self._draft_storage = draft_storage
         self._system_user_storage = system_user_storage
 
-    def get_feature(self, feature_id: int) -> Optional[FeatureModel]:
+    def get_feature(self, feature_id: int) -> FeatureModel | None:
         return self._feature_storage.get_feature(feature_id)
 
     def get_last_change_time(self, model: FeatureModel) -> datetime:
@@ -65,8 +64,8 @@ class SynchronizerStorageManager:
         logger.info("Feature hasn't got any published version.")
         return model.last_edited_at
 
-    def get_feature_tags(self, info: StrictFeatureInfo) -> List[TagModel]:
-        tags: List[TagModel] = []
+    def get_feature_tags(self, info: StrictFeatureInfo) -> list[TagModel]:
+        tags: list[TagModel] = []
         if info.tags is not None:
             for tag in info.tags:
                 tag_model = self._tag_storage.get_or_create_tag(value=tag, created_by=info.last_edited_by)

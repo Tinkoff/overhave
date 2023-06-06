@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable
 
 import boto3
 import botocore.exceptions
@@ -48,7 +48,7 @@ class EmptyObjectsListError(BaseS3ManagerException):
 
 def _s3_error(msg: str):  # type: ignore
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-        def wrapper(*args: Any, **kwargs: Dict[str, Any]) -> Any:
+        def wrapper(*args: Any, **kwargs: dict[str, Any]) -> Any:
             try:
                 return func(*args, **kwargs)
             except botocore.exceptions.ClientError as e:
@@ -64,7 +64,7 @@ class S3Manager:
 
     def __init__(self, settings: OverhaveS3ManagerSettings):
         self._settings = settings
-        self._client: Optional[Client] = None
+        self._client: Client | None = None
 
     def initialize(self) -> None:
         if not self._settings.enabled:
@@ -116,14 +116,14 @@ class S3Manager:
         logger.info("Successfully ensured existence of Overhave service buckets.")
 
     @_s3_error(msg="Error while getting buckets list!")
-    def _get_buckets(self) -> List[BucketModel]:
+    def _get_buckets(self) -> list[BucketModel]:
         response = self._ensured_client.list_buckets()
-        return parse_obj_as(List[BucketModel], response.get("Buckets"))
+        return parse_obj_as(list[BucketModel], response.get("Buckets"))
 
     @_s3_error(msg="Error while creating bucket!")
     def create_bucket(self, bucket: str) -> None:
         logger.info("Creating bucket %s...", bucket)
-        kwargs: Dict[str, Any] = {"Bucket": bucket}
+        kwargs: dict[str, Any] = {"Bucket": bucket}
         if isinstance(self._settings.region_name, str):
             kwargs["CreateBucketConfiguration"] = {"LocationConstraint": self._settings.region_name}
         self._ensured_client.create_bucket(**kwargs)
@@ -140,13 +140,13 @@ class S3Manager:
             return False
 
     @_s3_error(msg="Error while getting bucket objects list!")
-    def get_bucket_objects(self, bucket: str) -> List[ObjectModel]:
+    def get_bucket_objects(self, bucket: str) -> list[ObjectModel]:
         response = self._ensured_client.list_objects(Bucket=bucket)
         logger.debug("List objects response:\n%s", response)
-        return parse_obj_as(List[ObjectModel], response.get("Contents"))
+        return parse_obj_as(list[ObjectModel], response.get("Contents"))
 
     @_s3_error(msg="Error while deleting bucket objects!")
-    def delete_bucket_objects(self, bucket: str, objects: List[ObjectModel]) -> DeletionResultModel:
+    def delete_bucket_objects(self, bucket: str, objects: list[ObjectModel]) -> DeletionResultModel:
         if not objects:
             raise EmptyObjectsListError("No one object specified for deletion!")
         logger.info("Deleting items %s...", [obj.name for obj in objects])
@@ -188,7 +188,7 @@ class S3Manager:
             logger.exception("Could not download file from s3 cloud!")
             return False
 
-    def create_presigned_url(self, bucket: str, object_name: str, expiration: timedelta) -> Optional[httpx.URL]:
+    def create_presigned_url(self, bucket: str, object_name: str, expiration: timedelta) -> httpx.URL | None:
         try:
             response = self._ensured_client.generate_presigned_url(
                 "get_object", Params={"Bucket": bucket, "Key": object_name}, ExpiresIn=int(expiration.total_seconds())

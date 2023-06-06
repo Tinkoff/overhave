@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Final, List, Optional
+from typing import Final
 
 from pydantic import BaseModel, Field
 
@@ -16,9 +16,9 @@ class GitlabMrRequest(BaseModel):
     id: str = Field(..., alias="project_id")
     source_branch: str
     target_branch: str
-    title: Optional[str]
-    description: Optional[str]
-    reviewer_ids: List[str]
+    title: str | None
+    description: str | None
+    reviewer_ids: list[str]
 
 
 class GitlabMrCreationResponse(BaseModel):
@@ -26,8 +26,8 @@ class GitlabMrCreationResponse(BaseModel):
 
     created_at: datetime
     updated_at: datetime
-    web_url: Optional[str]
-    traceback: Optional[Exception]
+    web_url: str | None
+    traceback: Exception | None
     state: str
 
     class Config:

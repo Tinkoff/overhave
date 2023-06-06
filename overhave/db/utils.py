@@ -1,6 +1,6 @@
 import logging
 from contextlib import contextmanager
-from typing import Any, Iterator, List
+from typing import Any, Iterator
 
 import sqlalchemy.orm as so
 from sqlalchemy.exc import ProgrammingError
@@ -25,7 +25,7 @@ def create_session(**kwargs: Any) -> Iterator[so.Session]:
         new_session.close()
 
 
-def ensure_feature_types_exist(feature_types: List[str]) -> None:
+def ensure_feature_types_exist(feature_types: list[str]) -> None:
     with create_session() as session:
         try:
             for feature_type in feature_types:

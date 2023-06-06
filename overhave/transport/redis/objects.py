@@ -1,7 +1,7 @@
 import abc
 import enum
 import json
-from typing import Any, Dict, TypeVar, Union
+from typing import Any, TypeVar
 
 from pydantic.main import BaseModel
 
@@ -21,7 +21,7 @@ class RedisStream(enum.StrEnum):
 class _IRedisTask(BaseModel, abc.ABC):
     @property
     @abc.abstractmethod
-    def message(self) -> Dict[bytes, bytes]:
+    def message(self) -> dict[bytes, bytes]:
         pass
 
 
@@ -31,7 +31,7 @@ class BaseRedisTask(_IRedisTask):
     data: Any
 
     @property
-    def message(self) -> Dict[bytes, bytes]:
+    def message(self) -> dict[bytes, bytes]:
         return {b"data": self.data.json().encode("utf-8")}
 
 
@@ -76,7 +76,7 @@ class EmulationTask(BaseRedisTask):
 
 
 TRedisTask = TypeVar("TRedisTask", TestRunTask, EmulationTask, PublicationTask, covariant=True)
-AnyRedisTask = Union[TestRunTask, PublicationTask, EmulationTask]
+AnyRedisTask = TestRunTask | PublicationTask | EmulationTask
 
 
 class RedisPendingData(BaseModel):
@@ -91,12 +91,12 @@ class RedisPendingData(BaseModel):
 class RedisUnreadData:
     """Class for unread data from Redis stream."""
 
-    def __init__(self, message_id: bytes, message: Dict[bytes, bytes]) -> None:
+    def __init__(self, message_id: bytes, message: dict[bytes, bytes]) -> None:
         self.message_id = message_id.decode()
         self.message = message
 
     @property
-    def decoded_message(self) -> Dict[str, Any]:
+    def decoded_message(self) -> dict[str, Any]:
         return {key.decode(): json.loads(value.decode("utf-8")) for key, value in self.message.items()}
 
     def __str__(self) -> str:

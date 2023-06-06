@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Final, List, Optional, Union
+from typing import Final
 
 from pydantic import BaseModel, Field, validator
 
@@ -43,7 +43,7 @@ class StashReviewer(BaseModel):
 class StashBasicPrInfo(BaseModel):
     """Model for Stash basic pull-request information."""
 
-    title: Optional[str]
+    title: str | None
     open: bool
 
 
@@ -57,10 +57,10 @@ class StashPrRequest(StashBasicPrInfo):
     target_branch: StashBranch = Field(..., alias="toRef")
     locked: bool = False
     close_source_branch: bool = True
-    reviewers: List[StashReviewer]
+    reviewers: list[StashReviewer]
 
 
-StashLinksType = Dict[str, List[Dict[str, str]]]
+StashLinksType = dict[str, list[dict[str, str]]]
 
 
 class StashPrCreationResponse(StashBasicPrInfo):
@@ -68,9 +68,9 @@ class StashPrCreationResponse(StashBasicPrInfo):
 
     created_date: datetime = Field(..., alias="createdDate")
     updated_date: datetime = Field(..., alias="updatedDate")
-    pull_request_url: Optional[str]
-    traceback: Optional[Exception]
-    links: Optional[StashLinksType]
+    pull_request_url: str | None
+    traceback: Exception | None
+    links: StashLinksType | None
 
     class Config:
         arbitrary_types_allowed = True
@@ -86,7 +86,7 @@ class StashPrCreationResponse(StashBasicPrInfo):
 class StashRequestError(BaseModel):
     """Model for Stash request error."""
 
-    context: Optional[str]
+    context: str | None
     message: str
     exception_name: str = Field(..., alias="exceptionName")
 
@@ -94,7 +94,7 @@ class StashRequestError(BaseModel):
 class StashErrorResponse(BaseModel):
     """Model for Stash error response."""
 
-    errors: List[StashRequestError]
+    errors: list[StashRequestError]
 
     @property
     def duplicate(self) -> bool:
@@ -105,5 +105,5 @@ class StashErrorResponse(BaseModel):
         return False
 
 
-AnyStashResponseModel = Union[StashPrCreationResponse, StashErrorResponse]
+AnyStashResponseModel = StashPrCreationResponse | StashErrorResponse
 STASH_RESPONSE_MODELS: Final = [StashPrCreationResponse, StashErrorResponse]

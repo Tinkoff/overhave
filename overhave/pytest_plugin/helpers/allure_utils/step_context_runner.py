@@ -1,7 +1,7 @@
 import enum
 import logging
 from functools import cached_property
-from typing import Optional, cast
+from typing import cast
 from unittest.mock import MagicMock
 
 import allure
@@ -24,7 +24,7 @@ class StepContextRunner:
 
     def __init__(self, settings: OverhaveStepContextSettings) -> None:
         self._settings = settings
-        self._step: Optional[StepContext] = None
+        self._step: StepContext | None = None
 
     def set_title(self, title: str) -> None:
         self._step = allure.step(title)
@@ -57,7 +57,7 @@ class StepContextRunner:
         self._defined_step.__enter__()
         self._log_step_state(state="started", wrapper_position=_WrapperPosition.ABOVE, symbol="*")
 
-    def stop(self, exception: Optional[BaseException]) -> None:
+    def stop(self, exception: BaseException | None) -> None:
         if isinstance(exception, BaseException):
             self._log_step_state(state="failed", wrapper_position=_WrapperPosition.BELOW, symbol="!")
             self._defined_step.__exit__(exc_type=type(exception), exc_val=exception, exc_tb=exception.__traceback__)

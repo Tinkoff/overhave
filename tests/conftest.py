@@ -3,7 +3,7 @@ import os
 from contextlib import ExitStack
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
+from typing import Any, Callable, Iterator, Sequence, cast
 from unittest import mock
 
 import py
@@ -85,7 +85,7 @@ def database(use_sql_counter: None, db_metadata: db.SAMetadata) -> Iterator[None
 
 
 @pytest.fixture(scope="module")
-def mock_envs(envs_for_mock: Dict[str, Optional[str]], mock_default_value: str) -> Iterator[None]:
+def mock_envs(envs_for_mock: dict[str, str | None], mock_default_value: str) -> Iterator[None]:
     old_values = {key: os.environ.get(key) for key in envs_for_mock}
     try:
         for key in envs_for_mock:
@@ -146,14 +146,14 @@ def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> Base
 
 
 @pytest.fixture(scope="session")
-def step_prefixes_backup() -> List[Tuple[Any]]:
+def step_prefixes_backup() -> list[tuple[Any, ...]]:
     from pytest_bdd.parser import STEP_PREFIXES
 
     return deepcopy(STEP_PREFIXES)
 
 
 @pytest.fixture(autouse=True)
-def step_prefixes_clean(step_prefixes_backup: List[Tuple[Any]]) -> None:
+def step_prefixes_clean(step_prefixes_backup: list[tuple[Any, ...]]) -> None:
     from pytest_bdd.parser import STEP_PREFIXES
 
     STEP_PREFIXES.clear()

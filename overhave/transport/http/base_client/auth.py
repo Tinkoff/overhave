@@ -1,4 +1,4 @@
-from typing import Generator, Union
+from typing import Generator
 
 import httpx
 import requests
@@ -14,7 +14,5 @@ class BearerAuth(httpx.Auth):
         request.headers["Authorization"] = f"Bearer {self.token}"
         yield request
 
-    def __call__(
-        self, request: Union[httpx.Request, requests.PreparedRequest]
-    ) -> Union[httpx.Request, requests.PreparedRequest]:
+    def __call__(self, request: httpx.Request | requests.PreparedRequest) -> httpx.Request | requests.PreparedRequest:
         return next(self.auth_flow(request=request))  # type: ignore

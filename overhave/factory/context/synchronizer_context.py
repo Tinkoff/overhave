@@ -1,5 +1,3 @@
-from typing import Optional
-
 from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import OverhaveProjectSettings, OverhaveScenarioCompilerSettings, OverhaveScenarioParserSettings
@@ -13,11 +11,11 @@ class OverhaveSynchronizerContext(BaseFactoryContext):
 
     def __init__(
         self,
-        file_settings: Optional[OverhaveFileSettings] = None,
-        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
-        parser_settings: Optional[OverhaveScenarioParserSettings] = None,
-        language_settings: Optional[OverhaveLanguageSettings] = None,
-        project_settings: Optional[OverhaveProjectSettings] = None,
+        file_settings: OverhaveFileSettings | None = None,
+        compilation_settings: OverhaveScenarioCompilerSettings | None = None,
+        parser_settings: OverhaveScenarioParserSettings | None = None,
+        language_settings: OverhaveLanguageSettings | None = None,
+        project_settings: OverhaveProjectSettings | None = None,
     ) -> None:
         super().__init__(
             file_settings=file_settings or OverhaveFileSettings(),

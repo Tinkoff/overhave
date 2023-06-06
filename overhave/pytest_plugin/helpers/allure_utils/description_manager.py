@@ -1,5 +1,3 @@
-from typing import List
-
 import allure
 from markupsafe import Markup
 
@@ -11,7 +9,7 @@ class DescriptionManager:
 
     def __init__(self, settings: OverhaveDescriptionManagerSettings):
         self._settings = settings
-        self._description: List[str] = []
+        self._description: list[str] = []
 
     def apply_description(self) -> None:
         if self._description:

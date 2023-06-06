@@ -1,6 +1,6 @@
 from functools import cache
 from pathlib import Path
-from typing import Dict, List, NewType, Sequence
+from typing import NewType, Sequence
 from unittest import mock
 
 from pydantic import root_validator
@@ -47,7 +47,7 @@ class FeatureTestContainer(BaseModel):
     language: OverhaveDemoAppLanguage
 
     @root_validator(pre=True)
-    def make_scenario(cls, values: Dict[str, str]) -> Dict[str, str]:
+    def make_scenario(cls, values: dict[str, str]) -> dict[str, str]:
         name = values.get("name")
         content = values.get("content")
         if not isinstance(name, str) or not isinstance(content, str):
@@ -73,7 +73,7 @@ class FeatureTestContainer(BaseModel):
 
 @cache
 def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
-    feature_containers: List[FeatureTestContainer] = []
+    feature_containers: list[FeatureTestContainer] = []
     for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():
         for item in value.iterdir():
             if not item.is_file() or any((item.name.startswith("."), item.name.startswith("_"))):

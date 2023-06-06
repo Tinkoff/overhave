@@ -1,6 +1,6 @@
 import abc
 from functools import cached_property
-from typing import Generic, Optional, Type, cast
+from typing import Generic, cast
 
 from overhave.entities import (
     ArchiveManager,
@@ -92,10 +92,10 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
 class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     """Base factory for application entities resolution and usage."""
 
-    context_cls: Type[TApplicationContext]
+    context_cls: type[TApplicationContext]
 
     def __init__(self) -> None:
-        self._context: Optional[TApplicationContext] = None
+        self._context: TApplicationContext | None = None
 
     def set_context(self, context: TApplicationContext) -> None:
         self._context = context

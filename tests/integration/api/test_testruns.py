@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 from unittest import mock
 
 import allure
@@ -105,7 +105,7 @@ class TestTestRunAPI:
         test_api_client: TestClient,
         test_api_bearer_auth: BearerAuth,
         test_created_test_run_id: int,
-        test_report: Optional[str],
+        test_report: str | None,
     ) -> None:
         with create_test_session():
             test_run_storage.set_run_status(test_created_test_run_id, TestRunStatus.SUCCESS)

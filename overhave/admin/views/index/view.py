@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import flask
 import ldap
@@ -21,7 +21,7 @@ class OverhaveIndexView(AdminIndexView):
     """View for index."""
 
     def __init__(
-        self, name: str, url: str, auth_manager: IAdminAuthorizationManager, index_template_path: Optional[Path]
+        self, name: str, url: str, auth_manager: IAdminAuthorizationManager, index_template_path: Path | None
     ) -> None:
         super().__init__(
             name=name,

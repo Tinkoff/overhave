@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Optional
 
 import flask
 import werkzeug
@@ -38,7 +37,7 @@ class EmulationView(ModelViewConfigured):
     }
 
     @property
-    def additional_cmd_description(self) -> Optional[str]:
+    def additional_cmd_description(self) -> str | None:
         return get_admin_factory().context.emulation_settings.emulation_desc_link
 
     def on_model_change(self, form: Form, model: db.Emulation, is_created: bool) -> None:
@@ -61,11 +60,11 @@ class EmulationView(ModelViewConfigured):
         return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
 
     @property
-    def description_link(self) -> Optional[str]:
+    def description_link(self) -> str | None:
         return get_admin_factory().context.emulation_settings.emulation_desc_link
 
     @expose("/edit/", methods=("GET", "POST"))
-    def edit_view(self) -> Optional[werkzeug.Response]:
+    def edit_view(self) -> werkzeug.Response | None:
         data = flask.request.form
         logger.debug("Request data:\n%s", json.dumps(data))
 

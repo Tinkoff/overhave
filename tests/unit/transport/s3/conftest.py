@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional, cast
+from typing import Any, cast
 from unittest import mock
 
 import pytest
@@ -38,26 +38,26 @@ def test_s3_manager_settings(
 
 
 @pytest.fixture()
-def test_side_effect(request: FixtureRequest) -> Optional[Exception]:
+def test_side_effect(request: FixtureRequest) -> Exception | None:
     if hasattr(request, "param"):
         return cast(Exception, request.param)
     return None
 
 
 @pytest.fixture()
-def test_exception(request: FixtureRequest) -> Optional[Exception]:
+def test_exception(request: FixtureRequest) -> Exception | None:
     if hasattr(request, "param"):
         return cast(Exception, request.param)
     return None
 
 
 @pytest.fixture(scope="class")
-def test_object_owner() -> Dict[str, str]:
+def test_object_owner() -> dict[str, str]:
     return {"DisplayName": "hello-friend", "ID": "hello-friend"}
 
 
 @pytest.fixture(scope="class")
-def test_object_dict(test_object_owner: Dict[str, str]) -> Dict[str, Any]:
+def test_object_dict(test_object_owner: dict[str, str]) -> dict[str, Any]:
     return {
         "Key": "576003e4-79f4-11eb-a7ed-acde48001122.zip",
         "LastModified": datetime(2021, 2, 28, 18, 37, 40, 219000),
@@ -69,7 +69,7 @@ def test_object_dict(test_object_owner: Dict[str, str]) -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="class")
-def test_deletion_result() -> Dict[str, Any]:
+def test_deletion_result() -> dict[str, Any]:
     return {
         "ResponseMetadata": {
             "RequestId": "tx000000000000002f6d78a-00603f2f05-3380ab-m1-tst",
@@ -91,7 +91,7 @@ def test_deletion_result() -> Dict[str, Any]:
 
 
 @pytest.fixture()
-def mocked_boto3_client(test_object_dict: Dict[str, Any], test_deletion_result: Dict[str, Any]) -> mock.MagicMock:
+def mocked_boto3_client(test_object_dict: dict[str, Any], test_deletion_result: dict[str, Any]) -> mock.MagicMock:
     mocked_client = mock.MagicMock()
     mocked_client.list_buckets.return_value = {"Buckets": []}
     mocked_client.list_objects.return_value = {"Contents": [test_object_dict]}
@@ -101,7 +101,7 @@ def mocked_boto3_client(test_object_dict: Dict[str, Any], test_deletion_result: 
 
 @pytest.fixture()
 def mocked_boto3_client_getter(
-    mocked_boto3_client: mock.MagicMock, test_side_effect: Optional[Exception]
+    mocked_boto3_client: mock.MagicMock, test_side_effect: Exception | None
 ) -> mock.MagicMock:
     with mock.patch("boto3.client", return_value=mocked_boto3_client) as mocked_func:
         if test_side_effect is not None:

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from overhave.entities import OverhaveFileSettings, OverhaveLanguageSettings
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.publication.gitlab import OverhaveGitlabPublisherSettings, TokenizerClientSettings
@@ -17,14 +15,14 @@ class OverhavePublicationContext(BaseFactoryContext):
 
     def __init__(
         self,
-        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
-        file_settings: Optional[OverhaveFileSettings] = None,
-        language_settings: Optional[OverhaveLanguageSettings] = None,
-        project_settings: Optional[OverhaveProjectSettings] = None,
-        client_settings: Optional[HttpSettingsType] = None,
-        publisher_settings: Optional[BaseGitPublisherSettings] = None,
-        publication_settings: Optional[PublicationSettings] = None,
-        tokenizer_client_settings: Optional[TokenizerClientSettings] = None,
+        compilation_settings: OverhaveScenarioCompilerSettings | None = None,
+        file_settings: OverhaveFileSettings | None = None,
+        language_settings: OverhaveLanguageSettings | None = None,
+        project_settings: OverhaveProjectSettings | None = None,
+        client_settings: HttpSettingsType | None = None,
+        publisher_settings: BaseGitPublisherSettings | None = None,
+        publication_settings: PublicationSettings | None = None,
+        tokenizer_client_settings: TokenizerClientSettings | None = None,
     ) -> None:
         super().__init__(
             compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),

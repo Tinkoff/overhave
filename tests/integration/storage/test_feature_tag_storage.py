@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from faker import Faker
 
@@ -8,7 +6,7 @@ from overhave.storage import FeatureTagStorage, SystemUserModel, TagModel
 from tests.db_utils import count_queries
 
 
-def _validate_tag_model(tag: Optional[TagModel], validation_tag: TagModel) -> None:
+def _validate_tag_model(tag: TagModel | None, validation_tag: TagModel) -> None:
     assert tag is not None
     assert tag.id == validation_tag.id
     assert tag.value == validation_tag.value

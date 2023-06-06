@@ -1,5 +1,3 @@
-from typing import Optional
-
 from overhave.entities import (
     OverhaveDescriptionManagerSettings,
     OverhaveFileSettings,
@@ -21,17 +19,17 @@ class OverhaveTestExecutionContext(BaseFactoryContext):
 
     def __init__(
         self,
-        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
-        parser_settings: Optional[OverhaveScenarioParserSettings] = None,
-        description_manager_settings: Optional[OverhaveDescriptionManagerSettings] = None,
-        file_settings: Optional[OverhaveFileSettings] = None,
-        language_settings: Optional[OverhaveLanguageSettings] = None,
-        project_settings: Optional[OverhaveProjectSettings] = None,
-        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
-        s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
-        step_context_settings: Optional[OverhaveStepContextSettings] = None,
-        test_settings: Optional[OverhaveTestSettings] = None,
-        admin_link_settings: Optional[OverhaveAdminLinkSettings] = None,
+        compilation_settings: OverhaveScenarioCompilerSettings | None = None,
+        parser_settings: OverhaveScenarioParserSettings | None = None,
+        description_manager_settings: OverhaveDescriptionManagerSettings | None = None,
+        file_settings: OverhaveFileSettings | None = None,
+        language_settings: OverhaveLanguageSettings | None = None,
+        project_settings: OverhaveProjectSettings | None = None,
+        report_manager_settings: OverhaveReportManagerSettings | None = None,
+        s3_manager_settings: OverhaveS3ManagerSettings | None = None,
+        step_context_settings: OverhaveStepContextSettings | None = None,
+        test_settings: OverhaveTestSettings | None = None,
+        admin_link_settings: OverhaveAdminLinkSettings | None = None,
     ) -> None:
         super().__init__(
             compilation_settings=compilation_settings or OverhaveScenarioCompilerSettings(),

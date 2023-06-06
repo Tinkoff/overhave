@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from pydantic import SecretStr
 
@@ -24,7 +23,7 @@ class SimpleAdminAuthorizationManager(AdminSecretMixin):
     This name will be used for user authority. Each user is unique. Passwords not required.
     """
 
-    def authorize_user(self, username: str, password: SecretStr) -> Optional[SystemUserModel]:
+    def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         user = self._system_user_storage.get_user_by_credits(login=username)
         if user is None:
             user = self._system_user_storage.create_user(login=username, password=password)

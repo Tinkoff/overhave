@@ -1,5 +1,3 @@
-from typing import Dict, Optional, Type, Union
-
 from flask_admin.form import JSONField
 from flask_login import current_user
 from pydantic import BaseModel
@@ -11,7 +9,7 @@ from overhave.factory import get_admin_factory
 from overhave.utils import get_current_time
 
 
-def _make_dict_from_model(model: Type[BaseModel]) -> Dict[str, Union[int, str]]:
+def _make_dict_from_model(model: type[BaseModel]) -> dict[str, int | str]:
     return {key: value.type_.__name__ for key, value in model.__fields__.items()}
 
 
@@ -47,13 +45,13 @@ class TestUserView(ModelViewConfigured):
         "allow_update": "Property of updating allowance through API",
     }
 
-    _feature_type: Optional[str] = None
+    _feature_type: str | None = None
 
     def on_form_prefill(self, form, id) -> None:  # type: ignore  # noqa: A002
         if isinstance(form._obj, db.TestUser):
             self._feature_type = form._obj.feature_type.name
 
-    def get_specification_template(self) -> Optional[Dict[str, Union[int, str]]]:
+    def get_specification_template(self) -> dict[str, int | str] | None:
         factory = get_admin_factory()
         if self._feature_type is None:
             self._feature_type = factory.feature_type_storage.get_default_feature_type().name

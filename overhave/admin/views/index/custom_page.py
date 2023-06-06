@@ -1,5 +1,5 @@
-import typing
 from pathlib import Path
+from typing import Any
 
 from flask_admin.form import BaseForm
 from flask_admin.model.widgets import XEditableWidget
@@ -14,11 +14,11 @@ class CustomPageWidget(XEditableWidget):
     ``self.template_path```.
     """
 
-    def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
-        self.template_path: typing.Optional[Path] = None
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.template_path: Path | None = None
         super().__init__(*args, **kwargs)
 
-    def __call__(self, field: Field, **kwargs: typing.Any) -> Markup:
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
         if self.template_path is not None:
             with self.template_path.open("r") as template:
                 return Markup(template.read())
@@ -44,7 +44,7 @@ class CustomPageForm(BaseForm):
 
     type = CustomPageField()
 
-    def __init__(self, template_path: typing.Optional[Path]):
+    def __init__(self, template_path: Path | None):
         super().__init__()
         self.type.widget.template_path = template_path
         self.type.label = None

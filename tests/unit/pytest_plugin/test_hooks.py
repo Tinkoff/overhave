@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Optional, Type, cast
+from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
 import allure
@@ -143,7 +143,7 @@ class TestPytestBddHooks:
 
     @pytest.mark.parametrize("exception", [Exception])
     def test_pytest_bdd_step_func_lookup_error(
-        self, request: FixtureRequest, test_pytest_bdd_step: Step, exception: Type[BaseException]
+        self, request: FixtureRequest, test_pytest_bdd_step: Step, exception: type[BaseException]
     ) -> None:
         with pytest.raises(StepNotFoundError):
             pytest_bdd_step_func_lookup_error(
@@ -203,7 +203,7 @@ class TestPytestCommonHooks:
         test_pytest_bdd_item: Item,
         test_pytest_bdd_session: Session,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-        tasks_keyword: Optional[str],
+        tasks_keyword: str | None,
     ) -> None:
         patched_hook_test_execution_proxy_manager.factory.context.project_settings.tasks_keyword = tasks_keyword
         pytest_collection_modifyitems(test_pytest_bdd_session)
@@ -302,10 +302,10 @@ class TestPytestCommonHooks:
         test_severity: allure.severity_level,
         link_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
-        task_tracker_url: Optional[str],
-        tasks_keyword: Optional[str],
-        admin_url: Optional[str],
-        git_project_url: Optional[str],
+        task_tracker_url: str | None,
+        tasks_keyword: str | None,
+        admin_url: str | None,
+        git_project_url: str | None,
         faker: Faker,
     ) -> None:
         with mock.patch(

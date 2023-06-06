@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from types import FunctionType
-from typing import Dict, Optional, Sequence
+from typing import Sequence
 
 import allure
 import httpx
@@ -200,7 +200,7 @@ class TestResultReportFormatter:
         column_name: str,
         status: TestRunStatus,
         report_status: TestReportStatus,
-        test_testrun_report: Optional[str],
+        test_testrun_report: str | None,
         test_testrun_button_css_class: str,
     ) -> None:
         result = result_report_formatter(
@@ -233,7 +233,7 @@ class TestJsonFormatter:
         test_testuser_view: TestUserView,
         mocker: MockerFixture,
         column_name: str,
-        value: Dict[str, str],
+        value: dict[str, str],
     ) -> None:
         info = ""
         for k, v in list(filter(lambda x: x, value.items())):

@@ -1,5 +1,3 @@
-from typing import List
-
 import fastapi
 
 from overhave.api.auth import get_authorized_user
@@ -45,7 +43,7 @@ def _get_tags_router() -> fastapi.APIRouter:
     tags_router.add_api_route(
         "/list",
         tags_list_handler,
-        response_model=List[TagModel],
+        response_model=list[TagModel],
         methods=["GET"],
         summary="Get FeatureTags",
         description="Get list of feature tags like `value`",
@@ -59,7 +57,7 @@ def _get_feature_type_router() -> fastapi.APIRouter:
         "/list",
         feature_types_list_handler,
         methods=["GET"],
-        response_model=List[FeatureTypeModel],
+        response_model=list[FeatureTypeModel],
         summary="Get list of FeatureType info",
         description="Get list of feature types",
     )
@@ -72,7 +70,7 @@ def _get_feature_router() -> fastapi.APIRouter:
         "/",
         get_features_handler,
         methods=["GET"],
-        response_model=List[FeatureModel],
+        response_model=list[FeatureModel],
         summary="Get list of Feature info",
         description="Get list of feature info by `tag_id` or `tag_value`",
     )
@@ -115,7 +113,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
         "/list",
         test_user_list_handler,
         methods=["GET"],
-        response_model=List[TestUserModel],
+        response_model=list[TestUserModel],
         summary="Get list of TestUsers",
         description="Get list of test users with given `feature_type` and `allow_update`",
     )
@@ -150,7 +148,7 @@ def _get_emulation_router() -> fastapi.APIRouter:
         "/run/list",
         emulation_run_list_handler,
         methods=["GET"],
-        response_model=List[EmulationRunModel],
+        response_model=list[EmulationRunModel],
         summary="Get list of EmulationRun info",
         description="Get list of EmulationRun info by `test_user_id`",
     )

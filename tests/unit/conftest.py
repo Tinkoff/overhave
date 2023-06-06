@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -42,29 +42,29 @@ def mocked_git_initializer(mocker: MockFixture) -> GitRepositoryInitializer:
 
 
 @pytest.fixture()
-def task_tracker_url(request: FixtureRequest) -> Optional[str]:
+def task_tracker_url(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
+        return cast(str | None, request.param)
     return None
 
 
 @pytest.fixture()
-def tasks_keyword(request: FixtureRequest) -> Optional[str]:
+def tasks_keyword(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
         return cast(str, request.param)
     return None
 
 
 @pytest.fixture()
-def git_project_url(request: FixtureRequest) -> Optional[str]:
+def git_project_url(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
+        return cast(str | None, request.param)
     return None
 
 
 @pytest.fixture()
 def test_project_settings(
-    task_tracker_url: Optional[str], tasks_keyword: Optional[str], git_project_url: Optional[str]
+    task_tracker_url: str | None, tasks_keyword: str | None, git_project_url: str | None
 ) -> OverhaveProjectSettings:
     return OverhaveProjectSettings(
         task_tracker_url=task_tracker_url, tasks_keyword=tasks_keyword, git_project_url=git_project_url

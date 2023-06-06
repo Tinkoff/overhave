@@ -1,6 +1,6 @@
 import logging
 from os import chdir
-from typing import Any, Callable, Dict, Optional, Tuple, cast
+from typing import Any, Callable, cast
 from unittest import mock
 
 import pytest
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
-def envs_for_mock(db_settings: OverhaveDBSettings) -> Dict[str, Optional[str]]:
+def envs_for_mock(db_settings: OverhaveDBSettings) -> dict[str, str | None]:
     return {
         "OVERHAVE_DB_URL": db_settings.db_url.render_as_string(hide_password=False),
         "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix(),
@@ -73,7 +73,7 @@ def test_db_scenario(test_db_feature: FeatureModel, test_db_user: SystemUserMode
 @pytest.fixture()
 def test_db_test_run(test_db_scenario: ScenarioModel) -> TestRunModel:
     with create_test_session() as session:
-        db_test_run: Optional[db.TestRun] = (  # noqa: ECE001
+        db_test_run: db.TestRun | None = (  # noqa: ECE001
             session.query(db.TestRun)
             .filter(db.TestRun.scenario_id == test_db_scenario.id)
             .order_by(db.TestRun.id.desc())
@@ -91,7 +91,7 @@ def flask_run_mock() -> mock.MagicMock:
 
 
 @pytest.fixture(scope="module")
-def test_feature_types() -> Tuple[str, ...]:
+def test_feature_types() -> tuple[str, ...]:
     return "feature_type_1", "feature_type_2", "feature_type_3"
 
 
@@ -106,7 +106,7 @@ def test_synchronizer_factory(clean_synchronizer_factory: Callable[[], ISynchron
 
 
 @pytest.fixture()
-def test_demo_language(request: FixtureRequest) -> Optional[str]:
+def test_demo_language(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
         return cast(OverhaveDemoAppLanguage, request.param)
     raise NotImplementedError
@@ -178,9 +178,9 @@ def flask_currentuser_mock(test_db_user: SystemUserModel) -> mock.MagicMock:
 
 
 @pytest.fixture()
-def runtest_data(test_db_scenario: ScenarioModel, request: FixtureRequest) -> Dict[str, Any]:
+def runtest_data(test_db_scenario: ScenarioModel, request: FixtureRequest) -> dict[str, Any]:
     if hasattr(request, "param"):
-        return cast(Dict[str, Any], request.param)
+        return cast(dict[str, Any], request.param)
     # regular data
     return {
         f"{_SCENARIO_PREFIX}-id": test_db_scenario.id,
@@ -197,7 +197,7 @@ def test_featureview_runtest_result(
     flask_urlfor_handler_mock: mock.MagicMock,
     redisproducer_addtask_mock: mock.MagicMock,
     flask_currentuser_mock: mock.MagicMock,
-    runtest_data: Dict[str, Any],
+    runtest_data: dict[str, Any],
 ) -> werkzeug.Response:
     with create_test_session():
         return FeatureView._run_test(data=runtest_data, rendered=test_rendered_featureview)

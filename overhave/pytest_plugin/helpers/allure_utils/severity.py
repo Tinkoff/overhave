@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import allure
 from _pytest.nodes import Item
@@ -7,7 +7,7 @@ from overhave.pytest_plugin.helpers.parsed_info import get_feature_info_from_ite
 from overhave.scenario import OverhaveScenarioCompilerSettings
 
 
-def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.severity_level]:
+def _get_severity_level_from_tags(item: Item, keyword: str) -> allure.severity_level | None:
     for marker in reversed(item.own_markers):
         if not marker.name.startswith(keyword):
             continue
@@ -16,7 +16,7 @@ def _get_severity_level_from_tags(item: Item, keyword: str) -> Optional[allure.s
     return None
 
 
-def _get_parsed_feature_severity(item: Item, **kwargs: Any) -> Optional[allure.severity_level]:
+def _get_parsed_feature_severity(item: Item, **kwargs: Any) -> allure.severity_level | None:
     return get_feature_info_from_item(item).severity
 
 

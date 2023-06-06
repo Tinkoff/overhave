@@ -1,4 +1,4 @@
-from typing import Callable, List, Mapping, Optional, Sequence, cast
+from typing import Callable, Mapping, Sequence, cast
 
 import pytest
 from faker import Faker
@@ -31,7 +31,7 @@ def test_gitlab_publisher_settings_with_default_reviewers(
 def test_gitlab_project_settings_with_reviewers_mapping(
     test_repository_id_or_name: str,
     test_target_branch: str,
-    test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
+    test_reviewers_mapping: Mapping[FeatureTypeName, list[str]],
 ) -> OverhaveGitlabPublisherSettings:
     return OverhaveGitlabPublisherSettings(
         repository_id=test_repository_id_or_name,
@@ -52,7 +52,7 @@ def mocked_tokenizer_client(mocker: MockFixture) -> TokenizerClient:
 
 @pytest.fixture()
 def test_tokenizer_client_settings_factory(
-    initiator: Optional[str], remote_key: Optional[str], remote_key_name: Optional[str], faker: Faker
+    initiator: str | None, remote_key: str | None, remote_key_name: str | None, faker: Faker
 ) -> Callable[[], TokenizerClientSettings]:
     def get_tokenizer_settings():
         return TokenizerClientSettings(

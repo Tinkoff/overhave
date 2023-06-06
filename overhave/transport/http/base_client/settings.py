@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 import httpx
 from pydantic import BaseSettings, validator
@@ -12,18 +12,18 @@ class BaseHttpClientSettings(BaseSettings):
 
     url: httpx.URL
 
-    default_timeout: Optional[timedelta] = None
+    default_timeout: timedelta | None = None
     connect_timeout: timedelta = timedelta(seconds=1)
     read_timeout: timedelta = timedelta(seconds=5)
-    write_timeout: Optional[timedelta] = None
-    pool_timeout: Optional[timedelta] = None
+    write_timeout: timedelta | None = None
+    pool_timeout: timedelta | None = None
 
     @validator("url", pre=True)
-    def make_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
+    def make_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
     @staticmethod
-    def _as_optional_timeout(timeout: Optional[timedelta]) -> Optional[float]:
+    def _as_optional_timeout(timeout: timedelta | None) -> float | None:
         if timeout is not None:
             return timeout.total_seconds()
         return None

@@ -1,6 +1,5 @@
 import logging
 from functools import cache
-from typing import Dict, Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -29,7 +28,7 @@ def _get_initial_redis_settings() -> OverhaveRedisSettings:
 
 
 @pytest.fixture(scope="module")
-def envs_for_mock() -> Dict[str, Optional[str]]:
+def envs_for_mock() -> dict[str, str | None]:
     return {
         "OVERHAVE_REDIS_DB": f"{_get_initial_redis_settings().db}",
     }

@@ -1,4 +1,4 @@
-from typing import Dict, Union, cast
+from typing import cast
 
 from pydantic.main import BaseModel
 
@@ -20,7 +20,7 @@ class TokenizerRequestParamsModel(BaseModel):
     id: int
     remote_key: str
 
-    def get_request_params(self, remote_key_name: str) -> Dict[str, Union[int, str]]:
+    def get_request_params(self, remote_key_name: str) -> dict[str, int | str]:
         return {"initiator": self.initiator, "id": self.id, remote_key_name: self.remote_key}
 
 

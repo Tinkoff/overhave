@@ -1,6 +1,6 @@
 import logging
 from types import TracebackType
-from typing import Iterator, List, Sequence, Type
+from typing import Iterator, Sequence
 
 import walrus
 
@@ -34,7 +34,7 @@ class RedisConsumer(RedisTemplate):
 
     def _clean_pending(self) -> None:
         pending_messages = self._stream.pending()
-        models: List[RedisPendingData] = [RedisPendingData.parse_obj(msg) for msg in pending_messages]
+        models: list[RedisPendingData] = [RedisPendingData.parse_obj(msg) for msg in pending_messages]
         if models:
             message_ids = [x.message_id for x in models]
             self._stream.claim(*message_ids)
@@ -43,7 +43,7 @@ class RedisConsumer(RedisTemplate):
 
     def _consume(self) -> Sequence[RedisUnreadData]:
         messages = self._stream.read(count=self._settings.read_count, block=self._settings.timeout_milliseconds)
-        objects: List[RedisUnreadData] = []
+        objects: list[RedisUnreadData] = []
         for msg in messages:
             data = RedisUnreadData(*msg)
             logger.debug("Message from redis: %s", data)
@@ -68,5 +68,5 @@ class RedisConsumer(RedisTemplate):
                 logger.exception("Error while trying to consume message from redis!")
             raise StopIteration()
 
-    def __exit__(self, exc_type: Type[Exception], exc_val: Exception, exc_tb: TracebackType) -> None:
+    def __exit__(self, exc_type: type[Exception], exc_val: Exception, exc_tb: TracebackType) -> None:
         pass
