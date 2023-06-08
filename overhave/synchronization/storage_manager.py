@@ -51,16 +51,13 @@ class SynchronizerStorageManager:
         return self._feature_storage.get_feature_model(feature_id)
 
     def get_last_change_time(self, model: FeatureModel) -> datetime:
-        draft_models = self._draft_storage.get_drafts_by_feature_id(model.id)
-        if draft_models:
-            logger.info("Feature has got drafts.")
-            last_published_draft = draft_models[-1]
-            if last_published_draft.published_at is not None:
-                logger.info(
-                    "Last version has been published at %s.",
-                    last_published_draft.published_at.strftime("%d-%m-%Y %H:%M:%S"),
-                )
-                return last_published_draft.published_at
+        last_draft_published_at = self._draft_storage.get_last_published_at_for_feature(model.id)
+        if last_draft_published_at is not None:
+            logger.info(
+                "Last version has been published at %s.",
+                last_draft_published_at.strftime("%d-%m-%Y %H:%M:%S"),
+            )
+            return last_draft_published_at
         logger.info("Feature hasn't got any published version.")
         return model.last_edited_at
 

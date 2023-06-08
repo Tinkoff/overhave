@@ -37,9 +37,7 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
     def _compile_context(self, draft_id: int) -> PublisherContext:
         with db.create_session() as session:
             draft_model = self._draft_storage.draft_model_by_id(session=session, draft_id=draft_id)
-            test_run_model = self._test_run_storage.testrun_model_by_id(
-                session=session, run_id=draft_model.test_run_id
-            )
+            test_run_model = self._test_run_storage.testrun_model_by_id(session=session, run_id=draft_model.test_run_id)
             feature_model = self._feature_storage.feature_model_by_id(
                 session=session, feature_id=draft_model.feature_id
             )

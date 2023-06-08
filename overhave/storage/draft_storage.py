@@ -4,7 +4,6 @@ from typing import cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from pydantic import parse_obj_as
 
 from overhave import db
 from overhave.storage import DraftModel
@@ -20,7 +19,7 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_drafts_by_feature_id(feature_id: int) -> list[DraftModel]:
+    def get_last_published_at_for_feature(feature_id: int) -> datetime | None:
         pass
 
     @staticmethod
@@ -74,10 +73,17 @@ class DraftStorage(IDraftStorage):
         return DraftModel.from_orm(draft)
 
     @staticmethod
-    def get_drafts_by_feature_id(feature_id: int) -> list[DraftModel]:
+    def get_last_published_at_for_feature(feature_id: int) -> datetime | None:
         with db.create_session() as session:
-            drafts = session.query(db.Draft).filter(db.Draft.feature_id == feature_id).all()
-            return parse_obj_as(list[DraftModel], drafts)
+            last_draft_with_published_at = (
+                session.query(db.Draft)
+                .filter(db.Draft.feature_id == feature_id, db.Draft.published_at.isnot(None))
+                .order_by(db.Draft.id.desc())
+                .first()
+            )
+            if last_draft_with_published_at is None:
+                return None
+            return last_draft_with_published_at.published_at
 
     @staticmethod
     def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
