@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Callable, cast
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -11,6 +11,8 @@ from overhave import (
     OverhaveScenarioParserSettings,
 )
 from overhave.entities import FeatureExtractor, GitRepositoryInitializer
+from overhave.factory import IAdminFactory
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import FileManager
 
 
@@ -76,3 +78,12 @@ def test_feature_extractor(request: FixtureRequest) -> FeatureExtractor:
     if hasattr(request, "param"):
         return cast(FeatureExtractor, request.param)
     raise NotImplementedError
+
+
+@pytest.fixture()
+def patched_admin_factory(
+    mocked_context: BaseFactoryContext, clean_admin_factory: Callable[[], IAdminFactory]
+) -> IAdminFactory:
+    factory = clean_admin_factory()
+    factory.set_context(mocked_context)
+    return factory
