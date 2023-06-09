@@ -102,13 +102,11 @@ def count_queries(
 
 
 @contextmanager
-def create_test_session(
-    expire_on_commit: bool = True, session: so.sessionmaker[so.Session] = db.base.Session, **kwargs: Any
-) -> Iterator[so.Session]:
+def create_test_session(expire_on_commit: bool = True, **kwargs: Any) -> Iterator[so.Session]:
     """Provide a transactional scope around a series of operations."""
     initial_state = THREAD_LOCALS.need_sql_counter
     THREAD_LOCALS.need_sql_counter = False
-    new_session = session(expire_on_commit=expire_on_commit, bind=db.metadata.engine, **kwargs)
+    new_session = db.base.Session(expire_on_commit=expire_on_commit, bind=db.metadata.engine, **kwargs)
     try:
         yield new_session
         new_session.commit()

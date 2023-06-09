@@ -58,15 +58,15 @@ def test_draft_storage() -> DraftStorage:
 
 @pytest.fixture()
 def test_draft(
-    faker: Faker, test_feature: FeatureModel, test_created_test_run_id: int, test_system_user: SystemUserModel
+    faker: Faker, test_scenario: ScenarioModel, test_created_test_run_id: int, test_system_user: SystemUserModel
 ) -> DraftModel:
     with create_test_session() as session:
         draft: db.Draft = db.Draft(
-            feature_id=test_feature.id,
+            feature_id=test_scenario.feature_id,
             test_run_id=test_created_test_run_id,
-            text=faker.word(),
+            text=test_scenario.text,
             published_by=test_system_user.login,
-            status=DraftStatus.REQUESTED,
+            status=DraftStatus.CREATED,
         )
         draft.pr_url = faker.word()
         draft.published_at = datetime.datetime.now()

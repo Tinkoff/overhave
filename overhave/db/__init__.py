@@ -3,7 +3,6 @@ from .base import BaseTable, SAMetadata, current_session, metadata
 from .statuses import DraftStatus, EmulationStatus, TestReportStatus, TestRunStatus
 from .tables import (
     Draft,
-    DraftQuery,
     Emulation,
     EmulationRun,
     Feature,

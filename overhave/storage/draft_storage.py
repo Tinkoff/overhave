@@ -1,6 +1,5 @@
 import abc
 from datetime import datetime
-from typing import cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
@@ -22,9 +21,11 @@ class IDraftStorage(abc.ABC):
     def get_last_published_at_for_feature(feature_id: int) -> datetime | None:
         pass
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
+    def get_or_create_draft(
+        cls, session: so.Session, test_run: db.TestRun, published_by: str, status: db.DraftStatus
+    ) -> int:
         pass
 
     @staticmethod
@@ -48,8 +49,8 @@ class BaseDraftStorageException(Exception):
     """Base exception for :class:`DraftStorage`."""
 
 
-class UniqueDraftCreationError(BaseDraftStorageException):
-    """Exception for draft creation error with `as_unique`."""
+class NullableScenarioError(BaseDraftStorageException):
+    """Exception for situation when Scenario text is None."""
 
 
 class DraftNotFoundError(BaseDraftStorageException):
@@ -86,17 +87,36 @@ class DraftStorage(IDraftStorage):
             return last_draft_with_published_at.published_at
 
     @staticmethod
-    def save_draft(test_run_id: int, published_by: str, status: db.DraftStatus) -> int:
-        with db.create_session() as session:
-            try:
-                draft = cast(db.DraftQuery, session.query(db.Draft)).as_unique(
-                    test_run_id=test_run_id, published_by=published_by, status=status
-                )
-            except RuntimeError as e:
-                raise UniqueDraftCreationError("Could not get unique draft!") from e
-            session.add(draft)
-            session.flush()
-            return cast(int, draft.id)
+    def _get_draft_id_by_testrun_id(session: so.Session, test_run_id: int) -> int | None:
+        draft = session.query(db.Draft).filter(db.Draft.test_run_id == test_run_id).one_or_none()
+        if draft is None:
+            return None
+        return draft.id
+
+    @staticmethod
+    def _create_draft(session: so.Session, test_run: db.TestRun, published_by: str, status: db.DraftStatus) -> int:
+        text = test_run.scenario.text
+        if text is None:
+            raise NullableScenarioError(f"TestRun.id={test_run.id} has Scenario without text!")
+        draft = db.Draft(
+            feature_id=test_run.scenario.feature_id,
+            test_run_id=test_run.id,
+            text=text,
+            published_by=published_by,
+            status=status,
+        )
+        session.add(draft)
+        session.flush()
+        return draft.id
+
+    @classmethod
+    def get_or_create_draft(
+        cls, session: so.Session, test_run: db.TestRun, published_by: str, status: db.DraftStatus
+    ) -> int:
+        draft_id = cls._get_draft_id_by_testrun_id(session=session, test_run_id=test_run.id)
+        if draft_id is not None:
+            return draft_id
+        return cls._create_draft(session=session, test_run=test_run, published_by=published_by, status=status)
 
     @staticmethod
     def save_response(

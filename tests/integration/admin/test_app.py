@@ -37,8 +37,9 @@ class TestAppCommon:
         test_pullrequest_id: int,
         test_pullrequest_published_by: str,
     ) -> None:
-        response = test_client.get(f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}")
-        assert response.status_code == HTTPStatus.FOUND
+        with count_queries(1):
+            response = test_client.get(f"/pull_request/{test_pullrequest_id}?published_by={test_pullrequest_published_by}")
+            assert response.status_code == HTTPStatus.FOUND
 
     def test_app_get_emulation_run(
         self,
