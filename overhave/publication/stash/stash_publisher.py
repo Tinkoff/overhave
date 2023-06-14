@@ -75,12 +75,16 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
                 )
                 return
             if isinstance(response, StashErrorResponse) and response.duplicate:
-                self._save_as_duplicate(context)
+                self._draft_storage.save_response_as_duplicate(
+                    draft_id=context.draft.id, feature_id=context.feature.id, traceback=None
+                )
                 return
             logger.error("Gotten error response from Stash: %s", response)
-        except StashHttpClientConflictError:
+        except StashHttpClientConflictError as err:
             logger.exception("Gotten conflict. Try to return last pull-request for Draft with id=%s...", draft_id)
-            self._save_as_duplicate(context)
-        except httpx.HTTPError as e:
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, str(e))
+            self._draft_storage.save_response_as_duplicate(
+                draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
+            )
+        except httpx.HTTPError as err:
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, str(err))
             logger.exception("Got HTTP error while trying to sent pull-request!")

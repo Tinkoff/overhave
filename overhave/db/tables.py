@@ -130,13 +130,6 @@ class Draft(BaseTable, PrimaryKeyMixin):
     def __html__(self) -> str:
         return f'<a href="{url_for("draft.details_view", id=self.id)}">Draft: {self.id}</a>'
 
-    def __init__(self, feature_id: int, test_run_id: int, text: str, published_by: str, status: DraftStatus) -> None:
-        self.feature_id = feature_id
-        self.test_run_id = test_run_id
-        self.text = text
-        self.published_by = published_by
-        self.status = status
-
 
 @su.generic_repr("id", "name", "created_by")
 class TestUser(BaseTable, PrimaryKeyMixin):

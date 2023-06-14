@@ -55,5 +55,5 @@ class DraftStatus(enum.StrEnum):
     DUPLICATE = "DUPLICATE"
 
     @property
-    def success(self) -> bool:
+    def is_succeed(self) -> bool:
         return self in (DraftStatus.CREATED, DraftStatus.DUPLICATE)

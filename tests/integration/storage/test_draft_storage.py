@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import allure
 import pytest
@@ -6,7 +6,8 @@ from faker import Faker
 
 from overhave import db
 from overhave.storage import DraftModel, DraftStorage, FeatureModel, SystemUserModel
-from overhave.storage.draft_storage import NullableDraftsError, NullableScenarioError
+from overhave.storage.draft_storage import DraftNotFoundError, NullableScenarioError
+from overhave.utils import get_current_time
 from tests.db_utils import count_queries, create_test_session
 
 
@@ -97,14 +98,13 @@ class TestDraftStorage:
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_save_response(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
-        pr_url: str = faker.word()
-        published_at: datetime.datetime = datetime.datetime.now()
+        pr_url = faker.word()
         traceback = faker.word()
         with count_queries(3):
             test_draft_storage.save_response(
                 draft_id=test_draft.id,
                 pr_url=pr_url,
-                published_at=published_at,
+                published_at=get_current_time(),
                 status=db.DraftStatus.REQUESTED,
                 traceback=traceback,
             )
@@ -143,44 +143,81 @@ class TestDraftStorage:
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_get_previous_feature_draft_with_error(
-        self, test_draft_storage: DraftStorage, test_draft: DraftModel
+    @pytest.mark.parametrize("traceback", ["trace", None])
+    def test_save_response_as_duplicate_no_draft(
+        self, test_draft_storage: DraftStorage, test_feature: FeatureModel, traceback: str | None, faker: Faker
     ) -> None:
         with count_queries(1):
-            with pytest.raises(NullableDraftsError):
-                test_draft_storage.get_previous_feature_draft(test_draft.feature_id)
+            with pytest.raises(DraftNotFoundError):
+                test_draft_storage.save_response_as_duplicate(
+                    draft_id=faker.random_int(), feature_id=test_feature.id, traceback=traceback
+                )
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_get_previous_draft(
+    @pytest.mark.parametrize("traceback", ["trace", None])
+    @pytest.mark.parametrize(
+        ("first_draft_state", "pr_url", "published_at"),
+        [(db.DraftStatus.CREATED, "pr_url", get_current_time()), (db.DraftStatus.INTERNAL_ERROR, None, None)],
+    )
+    def test_save_response_as_duplicate_with_not_succeed_previous_draft(
         self,
         test_draft_storage: DraftStorage,
-        test_created_test_run_id: int,
-        test_second_created_test_run_id: int,
         test_system_user: SystemUserModel,
         test_feature: FeatureModel,
+        test_created_test_run_id: int,
+        test_second_created_test_run_id: int,
+        traceback: str | None,
+        first_draft_state: db.DraftStatus,
+        pr_url: str | None,
+        published_at: datetime | None,
     ) -> None:
         with create_test_session() as session:
             first_test_run: db.TestRun = (
                 session.query(db.TestRun).filter(db.TestRun.id == test_created_test_run_id).one()
             )
-            test_draft_storage._create_draft(
-                session=session,
-                test_run=first_test_run,
+            first_draft = db.Draft(
+                feature_id=first_test_run.scenario.feature_id,
+                test_run_id=first_test_run.id,
+                text=first_test_run.scenario.text,
                 published_by=test_system_user.login,
-                status=db.DraftStatus.REQUESTED,
+                published_at=published_at,
+                status=first_draft_state,
+                pr_url=pr_url,
             )
+            session.add(first_draft)
+            session.flush()
+            first_draft_id = first_draft.id
+
             second_test_run: db.TestRun = (
                 session.query(db.TestRun).filter(db.TestRun.id == test_second_created_test_run_id).one()
             )
-            test_draft_storage._create_draft(
-                session=session,
-                test_run=second_test_run,
+            second_draft = db.Draft(
+                feature_id=second_test_run.scenario.feature_id,
+                test_run_id=second_test_run.id,
+                text=second_test_run.scenario.text,
                 published_by=test_system_user.login,
-                status=db.DraftStatus.DUPLICATE,
+                status=db.DraftStatus.CREATING,
             )
-        with count_queries(1):
-            draft = test_draft_storage.get_previous_feature_draft(feature_id=test_feature.id)
-        assert draft.status == db.DraftStatus.DUPLICATE
-        assert draft.feature_id == test_feature.id
-        assert draft.test_run_id == test_second_created_test_run_id
+            session.add(second_draft)
+            session.flush()
+            second_draft_id = second_draft.id
+
+        with count_queries(2):
+            test_draft_storage.save_response_as_duplicate(
+                draft_id=second_draft_id, feature_id=test_feature.id, traceback=traceback
+            )
+
+        with create_test_session() as session:
+            first_draft = session.query(db.Draft).filter(db.Draft.id == first_draft_id).one()
+            second_draft = session.query(db.Draft).filter(db.Draft.id == second_draft_id).one()
+            assert second_draft.status == db.DraftStatus.DUPLICATE
+            assert second_draft.feature_id == test_feature.id
+            assert second_draft.test_run_id == test_second_created_test_run_id
+            assert second_draft.traceback == traceback
+            if first_draft_state.is_succeed:
+                assert second_draft.published_at == first_draft.published_at
+                assert second_draft.pr_url == pr_url
+            else:
+                assert second_draft.published_at != first_draft.published_at
+                assert second_draft.pr_url is None

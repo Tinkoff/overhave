@@ -88,13 +88,14 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                     status=DraftStatus.CREATED,
                 )
                 return
-        except (GitlabCreateError, GitlabHttpError) as e:
-            if e.response_code == HTTPStatus.CONFLICT:
-                context.draft.traceback = str(e)
+        except (GitlabCreateError, GitlabHttpError) as err:
+            if err.response_code == HTTPStatus.CONFLICT:
                 logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
-                self._save_as_duplicate(context)
+                self._draft_storage.save_response_as_duplicate(
+                    draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
+                )
                 return
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(e))
-        except httpx.HTTPError as e:
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(e))
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(err))
+        except httpx.HTTPError as err:
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(err))
             logger.exception("Got HTTP error while trying to sent merge-request!")

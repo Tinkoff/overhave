@@ -6,6 +6,7 @@ import sqlalchemy.orm as so
 
 from overhave import db
 from overhave.storage import DraftModel
+from overhave.utils import get_current_time
 
 
 class IDraftStorage(abc.ABC):
@@ -37,7 +38,7 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_previous_feature_draft(feature_id: int) -> DraftModel:
+    def save_response_as_duplicate(draft_id: int, feature_id: int, traceback: str | None) -> None:
         pass
 
     @abc.abstractmethod
@@ -59,10 +60,6 @@ class DraftNotFoundError(BaseDraftStorageException):
 
 class FeatureNotFoundError(BaseDraftStorageException):
     """Exception for situation when feature not found by feature_id from draft."""
-
-
-class NullableDraftsError(BaseDraftStorageException):
-    """Exception for situation with not existing drafts."""
 
 
 class DraftStorage(IDraftStorage):
@@ -134,22 +131,28 @@ class DraftStorage(IDraftStorage):
             feature = session.get(db.Feature, draft.feature_id)
             if feature is None:
                 raise FeatureNotFoundError(f"Feature with id={draft.feature_id} not found!")
-            feature.released = status.success
+            feature.released = status.is_succeed
 
     @staticmethod
-    def get_previous_feature_draft(feature_id: int) -> DraftModel:
+    def save_response_as_duplicate(draft_id: int, feature_id: int, traceback: str | None) -> None:
         with db.create_session() as session:
-            selection_num = 2
-            drafts = (  # noqa: ECE001
+            last_drafts = (
                 session.query(db.Draft)
                 .filter(db.Draft.feature_id == feature_id)
                 .order_by(db.Draft.id.desc())
-                .limit(selection_num)
+                .limit(2)
                 .all()
             )
-            if not drafts or len(drafts) != selection_num:
-                raise NullableDraftsError(f"Haven't got Drafts amount={selection_num} for feature_id={feature_id}!")
-            return DraftModel.from_orm(drafts[0])
+            if not last_drafts:
+                raise DraftNotFoundError("No one draft exists for Feature.id=%s", feature_id)
+            values = dict(status=db.DraftStatus.DUPLICATE, traceback=traceback, published_at=get_current_time())
+
+            # check that previous draft exists and succeed
+            if len(last_drafts) > 1 and last_drafts[1].status.is_succeed:
+                previous_draft = last_drafts[1]
+                values["pr_url"] = previous_draft.pr_url
+                values["published_at"] = previous_draft.published_at
+            session.execute(sa.Update(db.Draft).where(db.Draft.id == draft_id).values(**values))
 
     def set_draft_status(self, draft_id: int, status: db.DraftStatus, traceback: str | None = None) -> None:
         with db.create_session() as session:
