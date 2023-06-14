@@ -54,6 +54,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         self._draft_storage.set_draft_status(draft_id, DraftStatus.CREATING)
         context = self._push_version(draft_id)
         if not isinstance(context, PublisherContext):
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=context)
             return
         pull_request = StashPrRequest(
             title=context.feature.name,
@@ -67,11 +68,10 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         try:
             response = self._client.send_pull_request(pull_request)
             if isinstance(response, StashPrCreationResponse):
-                self._draft_storage.save_response(
+                self._draft_storage.save_response_as_created(
                     draft_id=draft_id,
                     pr_url=response.get_pr_url(),
                     published_at=response.created_date,
-                    status=DraftStatus.CREATED,
                 )
                 return
             if isinstance(response, StashErrorResponse) and response.duplicate:

@@ -97,22 +97,28 @@ class TestDraftStorage:
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    def test_save_response(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
-        pr_url = faker.word()
-        traceback = faker.word()
-        with count_queries(3):
-            test_draft_storage.save_response(
+    @pytest.mark.parametrize(("pr_url", "published_at"), [("pr_url", get_current_time())])
+    def test_save_response(
+        self,
+        test_draft_storage: DraftStorage,
+        test_feature: FeatureModel,
+        test_draft: DraftModel,
+        pr_url: str,
+        published_at: datetime,
+    ) -> None:
+        with count_queries(2):
+            test_draft_storage.save_response_as_created(
                 draft_id=test_draft.id,
                 pr_url=pr_url,
-                published_at=get_current_time(),
-                status=db.DraftStatus.REQUESTED,
-                traceback=traceback,
+                published_at=published_at,
             )
         with create_test_session() as session:
             new_test_draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
             assert new_test_draft.pr_url == pr_url
-            assert new_test_draft.status is db.DraftStatus.REQUESTED
-            assert new_test_draft.traceback == traceback
+            assert new_test_draft.status is db.DraftStatus.CREATED
+            assert new_test_draft.published_at == published_at
+            assert new_test_draft.feature_id == test_feature.id
+            assert new_test_draft.feature.released is True
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)

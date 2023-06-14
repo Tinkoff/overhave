@@ -113,7 +113,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         if not changes_pushed:
             raise CommitNotCreatedError("Commit has not been created!")
 
-    def _push_version(self, draft_id: int) -> PublisherContext | None:
+    def _push_version(self, draft_id: int) -> PublisherContext | str:
         try:
             if not self._git_publisher_settings.pull_before_creating_mr_enabled:
                 logger.warning("Pulling before creating merge request is disabled!")
@@ -123,8 +123,6 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
             git_branch = cast(git.Head, self._create_head(name=ctx.target_branch))
             self._create_commit_and_push(context=ctx, target_branch=git_branch)
             return ctx
-        except GitPullError:
-            logger.exception("Error while trying to pull remote repository!")
-        except (git.GitCommandError, BaseGitVersionPublisherError):
-            logger.exception("Error while trying to push scenario version!")
-        return None
+        except (git.GitCommandError, GitPullError, BaseGitVersionPublisherError) as err:
+            logger.exception("Error while trying to pull or push!")
+            return str(err)

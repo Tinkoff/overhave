@@ -1,10 +1,10 @@
 import logging
-from typing import cast
 
 from gitlab.exceptions import GitlabAuthenticationError
+from gitlab.v4.objects import ProjectMergeRequest
 
 from overhave.transport.http import BaseHttpClient
-from overhave.transport.http.base_client import BaseHttpClientException
+from overhave.transport.http.base_client import BaseHttpClientException, HttpClientValidationError
 from overhave.transport.http.gitlab_client.models import GitlabMrCreationResponse, GitlabMrRequest
 from overhave.transport.http.gitlab_client.settings import OverhaveGitlabClientSettings
 from overhave.transport.http.gitlab_client.utils import get_gitlab_python_client
@@ -14,10 +14,6 @@ logger = logging.getLogger(__name__)
 
 class BaseGitlabHttpClientException(BaseHttpClientException):
     """Base exception for :class:`GitlabHttpClient`."""
-
-
-class GitlabHttpClientConflictError(BaseGitlabHttpClientException):
-    """Exception for situation with `HTTPStatus.CONFLICT` response.status_code."""
 
 
 class GitlabInvalidTokenError(BaseGitlabHttpClientException):
@@ -37,7 +33,10 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
         )
         project = gitlab_python_client.projects.get(repository_id, lazy=True)
         try:
-            return cast(GitlabMrCreationResponse, project.mergerequests.create(merge_request.dict(by_alias=True)))
+            result = project.mergerequests.create(merge_request.dict(by_alias=True))
+            if isinstance(result, ProjectMergeRequest):
+                return GitlabMrCreationResponse(created_at=result.created_at, web_url=result.web_url)
+            raise HttpClientValidationError("Unsupported response: %s", result)
         except GitlabAuthenticationError as e:
             logging.exception("Please verify your token or URL! Maybe they are invalid")
             raise GitlabInvalidTokenError("Please verify your token or URL! Maybe they are invalid") from e

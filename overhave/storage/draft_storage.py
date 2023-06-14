@@ -31,9 +31,7 @@ class IDraftStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def save_response(
-        draft_id: int, pr_url: str | None, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
-    ) -> None:
+    def save_response_as_created(draft_id: int, pr_url: str, published_at: datetime) -> None:
         pass
 
     @staticmethod
@@ -116,22 +114,24 @@ class DraftStorage(IDraftStorage):
         return cls._create_draft(session=session, test_run=test_run, published_by=published_by, status=status)
 
     @staticmethod
-    def save_response(
-        draft_id: int, pr_url: str | None, published_at: datetime, status: db.DraftStatus, traceback: str | None = None
-    ) -> None:
+    def save_response_as_created(draft_id: int, pr_url: str, published_at: datetime) -> None:
         with db.create_session() as session:
-            draft = session.get(db.Draft, draft_id)
-            if draft is None:
-                raise DraftNotFoundError(f"Draft with id={draft_id} not found!")
-            draft.pr_url = pr_url
-            draft.published_at = published_at
-            if traceback is not None:
-                draft.traceback = traceback
-            draft.status = status
-            feature = session.get(db.Feature, draft.feature_id)
-            if feature is None:
-                raise FeatureNotFoundError(f"Feature with id={draft.feature_id} not found!")
-            feature.released = status.is_succeed
+            session.execute(
+                sa.Update(db.Draft)
+                .where(db.Draft.id == draft_id)
+                .values(
+                    pr_url=pr_url,
+                    published_at=published_at,
+                    status=db.DraftStatus.CREATED,
+                )
+            )
+            feature_id_query = (
+                session.query(db.Draft)
+                .with_entities(db.Draft.feature_id)
+                .filter(db.Draft.id == draft_id)
+                .scalar_subquery()
+            )
+            session.execute(sa.Update(db.Feature).where(db.Feature.id == feature_id_query).values(released=True))
 
     @staticmethod
     def save_response_as_duplicate(draft_id: int, feature_id: int, traceback: str | None) -> None:

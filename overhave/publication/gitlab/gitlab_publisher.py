@@ -3,7 +3,6 @@ from http import HTTPStatus
 
 import httpx
 from gitlab import GitlabCreateError, GitlabHttpError
-from gitlab.v4.objects.merge_requests import ProjectMergeRequest
 
 from overhave.db import DraftStatus
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
@@ -15,14 +14,6 @@ from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, I
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
 
 logger = logging.getLogger(__name__)
-
-
-class BaseGitlabVersionPublisherException(Exception):
-    """Base exception for :class:`GitlabVersionPublisher`."""
-
-
-class InvalidWebUrlException(BaseGitlabVersionPublisherException):
-    """Exception for case when web url is None."""
 
 
 class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings]):
@@ -61,6 +52,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         self._draft_storage.set_draft_status(draft_id, DraftStatus.CREATING)
         context = self._push_version(draft_id)
         if not isinstance(context, PublisherContext):
+            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=context)
             return
         merge_request = GitlabMrRequest(
             project_id=self._git_publisher_settings.repository_id,
@@ -78,24 +70,18 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             response = self._gitlab_client.send_merge_request(
                 merge_request=merge_request, token=token, repository_id=self._git_publisher_settings.repository_id
             )
-            if isinstance(response, ProjectMergeRequest):
-                if response.web_url is None:
-                    raise InvalidWebUrlException("Please verify your gitlab url environment! It is invalid!")
-                self._draft_storage.save_response(
-                    draft_id=draft_id,
-                    pr_url=response.web_url,
-                    published_at=response.created_at,
-                    status=DraftStatus.CREATED,
-                )
-                return
-        except (GitlabCreateError, GitlabHttpError) as err:
-            if err.response_code == HTTPStatus.CONFLICT:
+            self._draft_storage.save_response_as_created(
+                draft_id=draft_id,
+                pr_url=response.web_url,
+                published_at=response.created_at,
+            )
+            return
+        except (GitlabCreateError, GitlabHttpError, httpx.HTTPError) as err:
+            if not isinstance(err, httpx.HTTPError) and err.response_code == HTTPStatus.CONFLICT:
                 logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
                 self._draft_storage.save_response_as_duplicate(
                     draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
                 )
                 return
+            logger.exception("Got error while trying to sent merge-request!")
             self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(err))
-        except httpx.HTTPError as err:
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(err))
-            logger.exception("Got HTTP error while trying to sent merge-request!")

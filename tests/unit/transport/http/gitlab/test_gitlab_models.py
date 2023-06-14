@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from pydantic import ValidationError
 
 from overhave.transport import GitlabMrCreationResponse
 
@@ -112,14 +113,10 @@ class TestGitlabHttpClientModels:
         )
 
         assert response.web_url == "http://gitlab.example.com/my-group/my-project/merge_requests/1"
-        assert response.state == "merged"
-        assert response.traceback is None
         assert response.created_at == datetime.datetime(2017, 4, 29, 8, 46, 0, tzinfo=datetime.timezone.utc)
-        assert response.updated_at == datetime.datetime(2017, 4, 29, 8, 46, 0, tzinfo=datetime.timezone.utc)
 
     def test_bullshit_mr_creation_response(self) -> None:
-        response: GitlabMrCreationResponse = GitlabMrCreationResponse.parse_obj(
-            {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
-        )
-        with pytest.raises(RuntimeError):
-            response.get_mr_url
+        with pytest.raises(ValidationError):
+            GitlabMrCreationResponse.parse_obj(
+                {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
+            )

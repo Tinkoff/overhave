@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Final
 
 from pydantic import BaseModel, Field
 
@@ -25,20 +24,4 @@ class GitlabMrCreationResponse(BaseModel):
     """Model for Gitlab merge-request creation response."""
 
     created_at: datetime
-    updated_at: datetime
-    web_url: str | None
-    traceback: Exception | None
-    state: str
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    @property
-    def get_mr_url(self) -> str:
-        if isinstance(self.web_url, str):
-            return self.web_url
-        raise RuntimeError("Could not get merge-request URL from response!")
-
-
-AnyGitlabResponseModel = GitlabMrCreationResponse
-GITLAB_RESPONSE_MODELS: Final = [GitlabMrCreationResponse]
+    web_url: str
