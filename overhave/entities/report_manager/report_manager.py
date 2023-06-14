@@ -87,7 +87,7 @@ class ReportManager:
             logger.warning("Report '%s' does not exist!", report_index.parent.name)
         if not report_index.exists():
             logger.warning("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
-        test_run = self._test_run_storage.get_test_run(run_id)
+        test_run = self._test_run_storage.get_testrun_model(run_id=run_id)
         if test_run is None:
             logger.warning("No one test run with id=%s exists!", run_id)
             return ReportPresenceResolution(exists=False)

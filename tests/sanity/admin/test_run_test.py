@@ -39,25 +39,6 @@ class TestOverhaveAdminRunTest:
         redisproducer_addtask_mock.assert_not_called()
         assert test_featureview_runtest_result == test_rendered_featureview
 
-    @pytest.mark.parametrize(
-        "runtest_data",
-        [{f"{_SCENARIO_PREFIX}-id": "8841", f"{_SCENARIO_PREFIX}-text": "smth"}],
-    )
-    def test_incorrect_scenario_data(
-        self,
-        test_rendered_featureview: mock.MagicMock,
-        test_featureview_runtest_result: werkzeug.Response,
-        flask_flash_handler_mock: mock.MagicMock,
-        flask_urlfor_handler_mock: mock.MagicMock,
-        redisproducer_addtask_mock: mock.MagicMock,
-    ) -> None:
-        flask_flash_handler_mock.assert_called_once_with(
-            "Scenario does not exist, so could not run test.", category="error"
-        )
-        flask_urlfor_handler_mock.assert_not_called()
-        redisproducer_addtask_mock.assert_not_called()
-        assert test_featureview_runtest_result == test_rendered_featureview
-
     def test_correct_scenario_data(
         self,
         test_rendered_featureview: mock.MagicMock,

@@ -14,6 +14,7 @@ from pytest_mock import MockerFixture
 from overhave import db
 from overhave.admin import views
 from overhave.admin.views.formatters.helpers import get_button_class_by_status
+from overhave.factory import IAdminFactory
 from overhave.utils import get_current_time
 
 
@@ -76,7 +77,7 @@ def test_feature_view_mocked(task_tracker_url: str | None, mocker: MockerFixture
 
 
 @pytest.fixture()
-def test_feature_view() -> views.FeatureView:
+def test_feature_view(patched_admin_factory: IAdminFactory) -> views.FeatureView:
     return views.FeatureView(model=db.Feature, session=UnifiedAlchemyMagicMock)
 
 

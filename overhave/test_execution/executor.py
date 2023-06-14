@@ -3,6 +3,7 @@ import logging
 import tempfile
 from pathlib import Path
 
+from overhave import db
 from overhave.db import TestRunStatus
 from overhave.entities import OverhaveFileSettings, ReportManager
 from overhave.scenario import FileManager
@@ -23,22 +24,6 @@ class ITestExecutor(abc.ABC):
     @abc.abstractmethod
     def process_test_task(self, task: TestRunTask) -> None:
         pass
-
-
-class BaseTestExecutionException(Exception):
-    """Base exception for :class:`TestExecutionManager`."""
-
-
-class FeatureNotExistsError(BaseTestExecutionException):
-    """Exception for situation with not existing Feature."""
-
-
-class TestRunNotExistsError(BaseTestExecutionException):
-    """Exception for situation with not existing TestRun."""
-
-
-class ScenarioNotExistsError(BaseTestExecutionException):
-    """Exception for situation with not existing Scenario."""
 
 
 class TestExecutor(ITestExecutor):
@@ -68,19 +53,18 @@ class TestExecutor(ITestExecutor):
                 return self._test_runner.run(fixture_file=fixture_file.name, alluredir=alluredir.as_posix())
 
     def _compile_context(self, test_run_id: int) -> TestExecutorContext:
-        test_run = self._test_run_storage.get_test_run(test_run_id)
-        if test_run is None:
-            raise TestRunNotExistsError(f"TestRun with id={test_run_id} does not exist!")
-        scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
-        if scenario is None:
-            raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
-        feature = self._feature_storage.get_feature(scenario.feature_id)
-        if feature is None:
-            raise FeatureNotExistsError(f"Feature with id={scenario.feature_id} does not exist!")
+        with db.create_session() as session:
+            test_run_model = self._test_run_storage.testrun_model_by_id(session=session, run_id=test_run_id)
+            scenario_model = self._scenario_storage.scenario_model_by_id(
+                session=session, scenario_id=test_run_model.scenario_id
+            )
+            feature_model = self._feature_storage.feature_model_by_id(
+                session=session, feature_id=scenario_model.feature_id
+            )
         return TestExecutorContext(
-            feature=feature,
-            scenario=scenario,
-            test_run=test_run,
+            feature=feature_model,
+            scenario=scenario_model,
+            test_run=test_run_model,
         )
 
     def execute_test(self, test_run_id: int) -> None:

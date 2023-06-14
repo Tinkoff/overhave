@@ -3,7 +3,6 @@ from .api_client import OverhaveApiAuthenticator, OverhaveApiAuthenticatorSettin
 from .base_client import BaseHttpClient, BaseHttpClientSettings, BearerAuth
 from .gitlab_client import (
     GitlabHttpClient,
-    GitlabHttpClientConflictError,
     GitlabMrCreationResponse,
     GitlabMrRequest,
     GitlabRepository,

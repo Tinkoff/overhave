@@ -10,7 +10,6 @@ from overhave import db
 from overhave.admin.flask import FlaskLoginManager, get_flask_admin, get_flask_app
 from overhave.factory import IAdminFactory, get_publication_factory
 from overhave.pytest_plugin import get_proxy_manager
-from overhave.storage import UniqueDraftCreationError
 from overhave.transport import PublicationData, PublicationTask
 
 logger = logging.getLogger(__name__)
@@ -78,16 +77,20 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
         if not isinstance(published_by, str):
             flask.flash("Parameter 'published_by' should be specified for version's creation!", category="error")
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
-        try:
-            draft_id = factory.draft_storage.save_draft(
-                test_run_id=run_id, published_by=published_by, status=db.DraftStatus.REQUESTED
-            )
-        except UniqueDraftCreationError:
-            logger.exception("Error while creation draft!")
-            flask.flash(
-                "Requested publication contains scenario which identical to the previous version!", category="warning"
-            )
+
+        draft_id: int | None = None
+        with db.create_session() as session:
+            test_run = session.get(db.TestRun, run_id)
+            if test_run is not None:
+                draft_id = factory.draft_storage.get_or_create_draft(
+                    session=session, test_run=test_run, published_by=published_by, status=db.DraftStatus.REQUESTED
+                )
+        if draft_id is None:
+            msg = "Not found TestRun.id="
+            logger.exception("%s%s!", msg, run_id)
+            flask.flash(f"{msg}{run_id}", category="error")
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
+
         if not factory.context.admin_settings.consumer_based:
             factory.threadpool.apply_async(get_publication_factory().publisher.publish_version, args=(draft_id,))
         if factory.context.admin_settings.consumer_based and not factory.redis_producer.add_task(

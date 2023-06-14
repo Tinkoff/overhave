@@ -1,5 +1,5 @@
 # flake8: noqa
-from .client import GitlabHttpClient, GitlabHttpClientConflictError
+from .client import GitlabHttpClient
 from .models import GitlabMrCreationResponse, GitlabMrRequest, GitlabRepository
 from .objects import TokenType
 from .settings import OverhaveGitlabClientSettings
