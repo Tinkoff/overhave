@@ -1,11 +1,17 @@
 import abc
+import logging
+
+import git
 
 from overhave import db
-from overhave.entities import OverhaveFileSettings
+from overhave.entities import GitPullError, OverhaveFileSettings
 from overhave.publication.abstract_publisher import IVersionPublisher
+from overhave.publication.errors import BaseGitVersionPublisherError
 from overhave.scenario import FileManager, OverhaveProjectSettings, generate_task_info
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 from overhave.transport import PublicationTask
+
+logger = logging.getLogger(__name__)
 
 
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
@@ -61,3 +67,19 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
                 generate_task_info(tasks=context.feature.task, header=self._project_settings.tasks_keyword),
             )
         )
+
+    @abc.abstractmethod
+    def _prepare_repo(self, context: PublisherContext) -> None:
+        pass
+
+    def _prepare_publisher_context(self, draft_id: int) -> PublisherContext | None:
+        logger.info("Start processing draft_id=%s...", draft_id)
+        self._draft_storage.set_draft_status(draft_id, db.DraftStatus.CREATING)
+        context = self._compile_context(draft_id)
+        try:
+            self._prepare_repo(context)
+            return context
+        except (git.GitCommandError, GitPullError, BaseGitVersionPublisherError) as err:
+            logger.exception("Error while trying to pull or push!")
+            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, traceback=str(err))
+            return None

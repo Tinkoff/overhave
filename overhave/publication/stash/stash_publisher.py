@@ -2,12 +2,12 @@ import logging
 
 import httpx
 
-from overhave.db import DraftStatus
+from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager, OverhaveProjectSettings
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport import (
     StashBranch,
     StashErrorResponse,
@@ -50,11 +50,8 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         self._client = stash_client
 
     def publish_version(self, draft_id: int) -> None:
-        logger.info("Start processing draft_id=%s...", draft_id)
-        self._draft_storage.set_draft_status(draft_id, DraftStatus.CREATING)
-        context = self._push_version(draft_id)
-        if not isinstance(context, PublisherContext):
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=context)
+        context = self._prepare_publisher_context(draft_id)
+        if context is None:
             return
         pull_request = StashPrRequest(
             title=context.feature.name,
@@ -86,5 +83,5 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
                 draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
             )
         except httpx.HTTPError as err:
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, str(err))
+            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, str(err))
             logger.exception("Got HTTP error while trying to sent pull-request!")

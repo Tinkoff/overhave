@@ -4,13 +4,13 @@ from http import HTTPStatus
 import httpx
 from gitlab import GitlabCreateError, GitlabHttpError
 
-from overhave.db import DraftStatus
+from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
 from overhave.scenario import FileManager, OverhaveProjectSettings
-from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
+from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage
 from overhave.transport.http.gitlab_client import GitlabHttpClient, GitlabMrRequest
 
 logger = logging.getLogger(__name__)
@@ -48,11 +48,8 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         self._tokenizer_client = tokenizer_client
 
     def publish_version(self, draft_id: int) -> None:
-        logger.info("Start processing draft_id=%s...", draft_id)
-        self._draft_storage.set_draft_status(draft_id, DraftStatus.CREATING)
-        context = self._push_version(draft_id)
-        if not isinstance(context, PublisherContext):
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=context)
+        context = self._prepare_publisher_context(draft_id)
+        if context is None:
             return
         merge_request = GitlabMrRequest(
             project_id=self._git_publisher_settings.repository_id,
@@ -84,4 +81,4 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                 )
                 return
             logger.exception("Got error while trying to sent merge-request!")
-            self._draft_storage.set_draft_status(draft_id, DraftStatus.INTERNAL_ERROR, traceback=str(err))
+            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, traceback=str(err))
