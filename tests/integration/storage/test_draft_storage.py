@@ -122,33 +122,6 @@ class TestDraftStorage:
 
     @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-    @pytest.mark.parametrize(
-        "draft_status",
-        [
-            db.DraftStatus.REQUESTED,
-            db.DraftStatus.CREATING,
-            db.DraftStatus.CREATED,
-            db.DraftStatus.INTERNAL_ERROR,
-            db.DraftStatus.DUPLICATE,
-        ],
-    )
-    @pytest.mark.parametrize("traceback", [None, "random trace str"])
-    def test_set_draft_status(
-        self,
-        test_draft_storage: DraftStorage,
-        test_draft: DraftModel,
-        draft_status: db.DraftStatus,
-        traceback: str | None,
-    ) -> None:
-        with count_queries(1):
-            test_draft_storage.set_draft_status(draft_id=test_draft.id, status=draft_status, traceback=traceback)
-        with create_test_session() as session:
-            draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
-            assert draft.status is draft_status
-            assert draft.traceback == traceback
-
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
-    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("traceback", ["trace", None])
     def test_save_response_as_duplicate_no_draft(
         self, test_draft_storage: DraftStorage, test_feature: FeatureModel, traceback: str | None, faker: Faker
@@ -227,3 +200,21 @@ class TestDraftStorage:
             else:
                 assert second_draft.published_at != first_draft.published_at
                 assert second_draft.pr_url is None
+
+    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
+    @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
+    @pytest.mark.parametrize("draft_status", list(db.DraftStatus))
+    @pytest.mark.parametrize("traceback", [None, "random trace str"])
+    def test_set_draft_status(
+        self,
+        test_draft_storage: DraftStorage,
+        test_draft: DraftModel,
+        draft_status: db.DraftStatus,
+        traceback: str | None,
+    ) -> None:
+        with count_queries(1):
+            test_draft_storage.set_draft_status(draft_id=test_draft.id, status=draft_status, traceback=traceback)
+        with create_test_session() as session:
+            draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
+            assert draft.status is draft_status
+            assert draft.traceback == traceback

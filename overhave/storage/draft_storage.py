@@ -117,7 +117,7 @@ class DraftStorage(IDraftStorage):
     def save_response_as_created(draft_id: int, pr_url: str, published_at: datetime) -> None:
         with db.create_session() as session:
             session.execute(
-                sa.Update(db.Draft)
+                sa.update(db.Draft)
                 .where(db.Draft.id == draft_id)
                 .values(
                     pr_url=pr_url,
@@ -131,7 +131,7 @@ class DraftStorage(IDraftStorage):
                 .filter(db.Draft.id == draft_id)
                 .scalar_subquery()
             )
-            session.execute(sa.Update(db.Feature).where(db.Feature.id == feature_id_query).values(released=True))
+            session.execute(sa.update(db.Feature).where(db.Feature.id == feature_id_query).values(released=True))
 
     @staticmethod
     def save_response_as_duplicate(draft_id: int, feature_id: int, traceback: str | None) -> None:
@@ -152,11 +152,11 @@ class DraftStorage(IDraftStorage):
                 previous_draft = last_drafts[1]
                 values["pr_url"] = previous_draft.pr_url
                 values["published_at"] = previous_draft.published_at
-            session.execute(sa.Update(db.Draft).where(db.Draft.id == draft_id).values(**values))
+            session.execute(sa.update(db.Draft).where(db.Draft.id == draft_id).values(**values))
 
     def set_draft_status(self, draft_id: int, status: db.DraftStatus, traceback: str | None = None) -> None:
         with db.create_session() as session:
-            query = sa.update(db.Draft).where(db.Draft.id == draft_id).values(status=status)
+            values: dict[str, db.DraftStatus | str | None] = dict(status=status)
             if isinstance(traceback, str):
-                query = query.values(traceback=traceback)
-            session.execute(query)
+                values["traceback"] = traceback
+            session.execute(sa.update(db.Draft).where(db.Draft.id == draft_id).values(**values))
