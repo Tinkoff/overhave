@@ -140,6 +140,6 @@ class EmulationStorage(IEmulationStorage):
                 .scalar_subquery()
             )
             emulation_runs = (
-                session.query(db.EmulationRun).filter(db.EmulationRun.emulation_id == emulation_ids_query).all()
+                session.query(db.EmulationRun).where(db.EmulationRun.emulation_id.in_(emulation_ids_query)).all()
             )
             return parse_obj_as(list[EmulationRunModel], emulation_runs)
