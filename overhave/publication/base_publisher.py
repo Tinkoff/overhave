@@ -38,7 +38,6 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -46,7 +45,6 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         draft_storage: IDraftStorage,
         file_manager: FileManager,
     ) -> None:
-        self._file_settings = file_settings
         self._project_settings = project_settings
         self._feature_storage = feature_storage
         self._scenario_storage = scenario_storage

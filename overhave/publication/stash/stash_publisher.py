@@ -25,7 +25,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -37,7 +36,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         stash_client: StashHttpClient,
     ):
         super().__init__(
-            file_settings=file_settings,
             project_settings=project_settings,
             feature_storage=feature_storage,
             scenario_storage=scenario_storage,

@@ -30,7 +30,6 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -43,7 +42,6 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         tokenizer_client: TokenizerClient,
     ):
         super().__init__(
-            file_settings=file_settings,
             project_settings=project_settings,
             feature_storage=feature_storage,
             scenario_storage=scenario_storage,
