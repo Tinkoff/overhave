@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import List, Optional
 
 from overhave.scenario import StrictFeatureInfo
 from overhave.storage import (
@@ -48,25 +47,22 @@ class SynchronizerStorageManager:
         self._draft_storage = draft_storage
         self._system_user_storage = system_user_storage
 
-    def get_feature(self, feature_id: int) -> Optional[FeatureModel]:
-        return self._feature_storage.get_feature(feature_id)
+    def get_feature(self, feature_id: int) -> FeatureModel | None:
+        return self._feature_storage.get_feature_model(feature_id)
 
     def get_last_change_time(self, model: FeatureModel) -> datetime:
-        draft_models = self._draft_storage.get_drafts_by_feature_id(model.id)
-        if draft_models:
-            logger.info("Feature has got drafts.")
-            last_published_draft = draft_models[-1]
-            if last_published_draft.published_at is not None:
-                logger.info(
-                    "Last version has been published at %s.",
-                    last_published_draft.published_at.strftime("%d-%m-%Y %H:%M:%S"),
-                )
-                return last_published_draft.published_at
+        last_draft_published_at = self._draft_storage.get_last_published_at_for_feature(model.id)
+        if last_draft_published_at is not None:
+            logger.info(
+                "Last version has been published at %s.",
+                last_draft_published_at.strftime("%d-%m-%Y %H:%M:%S"),
+            )
+            return last_draft_published_at
         logger.info("Feature hasn't got any published version.")
         return model.last_edited_at
 
-    def get_feature_tags(self, info: StrictFeatureInfo) -> List[TagModel]:
-        tags: List[TagModel] = []
+    def get_feature_tags(self, info: StrictFeatureInfo) -> list[TagModel]:
+        tags: list[TagModel] = []
         if info.tags is not None:
             for tag in info.tags:
                 tag_model = self._tag_storage.get_or_create_tag(value=tag, created_by=info.last_edited_by)

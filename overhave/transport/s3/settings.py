@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseSettings, root_validator
 
@@ -8,10 +8,10 @@ class OverhaveS3ManagerSettings(BaseSettings):
 
     enabled: bool = False
 
-    url: Optional[str]
-    region_name: Optional[str]
-    access_key: Optional[str]
-    secret_key: Optional[str]
+    url: str | None
+    region_name: str | None
+    access_key: str | None
+    secret_key: str | None
     verify: bool = True
 
     autocreate_buckets: bool = False
@@ -20,7 +20,7 @@ class OverhaveS3ManagerSettings(BaseSettings):
         env_prefix = "OVERHAVE_S3_"
 
     @root_validator
-    def validate_enabling(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_enabling(cls, values: dict[str, Any]) -> dict[str, Any]:
         enabled = values.get("enabled")
         if enabled and not all(
             (

@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence
+from typing import Mapping, Sequence
 
 import pytest
 from faker import Faker
@@ -41,7 +41,7 @@ class TestStashProjectManager:
 
     def test_stash_project_settings_with_reviewers_mapping(
         self,
-        test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
+        test_reviewers_mapping: Mapping[FeatureTypeName, list[str]],
         test_stash_publisher_with_reviewers_mapping: StashVersionPublisher,
         faker: Faker,
     ) -> None:

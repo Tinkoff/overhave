@@ -1,6 +1,6 @@
 import logging
 from operator import attrgetter
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 from _pytest.fixtures import FixtureDef
 from _pytest.main import Session
@@ -27,10 +27,10 @@ class BddStepWithoutDocsError(BaseStepCollectorException):
 class StepCollector:
     """Class for `pytest-bdd` steps dynamic collection."""
 
-    def __init__(self, settings: OverhaveStepCollectorSettings, step_prefixes: Optional[StepPrefixesModel]) -> None:
+    def __init__(self, settings: OverhaveStepCollectorSettings, step_prefixes: StepPrefixesModel | None) -> None:
         self._settings = settings
         self._step_prefixes = step_prefixes
-        self._steps: Dict[FeatureTypeName, List[BddStepModel]] = {}
+        self._steps: dict[FeatureTypeName, list[BddStepModel]] = {}
 
     def _is_bdd_step(self, fixture: FixtureDef[Any]) -> bool:
         is_bdd_step = (
@@ -51,9 +51,9 @@ class StepCollector:
             )
         return True
 
-    def _get_pytestbdd_step_fixtures(self, session: Session) -> Tuple[FixtureDef[Any]]:
+    def _get_pytestbdd_step_fixtures(self, session: Session) -> tuple[FixtureDef[Any], ...]:
         return cast(
-            Tuple[FixtureDef[Any]],
+            tuple[FixtureDef[Any], ...],
             sorted(
                 (
                     fx
@@ -72,7 +72,7 @@ class StepCollector:
             prefix = self._step_prefixes.dict()[step_type.upper()].strip()
         return f"{prefix} {fixture_name}"
 
-    def _compile_step_models(self, steps: Tuple[FixtureDef[Any]]) -> List[BddStepModel]:
+    def _compile_step_models(self, steps: tuple[FixtureDef[Any], ...]) -> list[BddStepModel]:
         return [
             BddStepModel(
                 type=f.func._pytest_bdd_step_context.type,  # type: ignore
@@ -95,5 +95,5 @@ class StepCollector:
             logger.warning("Feature type '%s' does not have any pytest_bdd steps!", feature_type)
         self._steps[feature_type] = bdd_steps
 
-    def get_steps(self, feature_type: FeatureTypeName) -> Optional[List[BddStepModel]]:
+    def get_steps(self, feature_type: FeatureTypeName) -> list[BddStepModel] | None:
         return self._steps.get(feature_type)

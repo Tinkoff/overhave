@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import List, Optional
 
 import ldap
 from ldap.ldapobject import LDAPObject
@@ -16,7 +15,7 @@ class LDAPAuthenticator:
 
     def __init__(self, settings: OverhaveLdapClientSettings) -> None:
         self._settings = settings
-        self._ldap_connection: Optional[LDAPObject] = None
+        self._ldap_connection: LDAPObject | None = None
 
     def _connect(self, login: str, password: SecretStr) -> None:
         ldap_connection = ldap.initialize(self._settings.url)
@@ -26,7 +25,7 @@ class LDAPAuthenticator:
 
         self._ldap_connection = ldap_connection
 
-    def _ask_ad_usergroups(self, login: str) -> List[str]:
+    def _ask_ad_usergroups(self, login: str) -> list[str]:
         result = self._ldap_connection.search_st(  # type: ignore
             base=self._settings.dn,
             scope=ldap.SCOPE_SUBTREE,
@@ -43,7 +42,7 @@ class LDAPAuthenticator:
             for x in list(filter(lambda x: "OU=Security Groups" in x or "OU=Mail Groups" in x, member_of))
         ]
 
-    def get_user_groups(self, login: str, password: SecretStr) -> Optional[List[str]]:
+    def get_user_groups(self, login: str, password: SecretStr) -> list[str] | None:
         try:
             self._connect(login, password)
         except ldap.INVALID_CREDENTIALS:

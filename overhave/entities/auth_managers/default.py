@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from pydantic import SecretStr
 
@@ -15,5 +14,5 @@ class DefaultAdminAuthorizationManager(AdminSecretMixin):
     Manager authorize users with registered credentials.
     """
 
-    def authorize_user(self, username: str, password: SecretStr) -> Optional[SystemUserModel]:
+    def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         return self._system_user_storage.get_user_by_credits(login=username, password=password)

@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from typing import Sequence
 from unittest.mock import MagicMock
 
 import pytest
@@ -67,7 +67,7 @@ class TestLdapAuthManager:
         test_admin_group: str,
         mocked_ldap_authenticator: MagicMock,
         test_ldap_auth_manager: LDAPAdminAuthorizationManager,
-        test_db_groups: List[str],
+        test_db_groups: list[str],
         test_username: str,
         test_password: SecretStr,
     ) -> None:
@@ -87,7 +87,7 @@ class TestLdapAuthManager:
         test_system_user_storage: SystemUserStorage,
         mocked_ldap_authenticator: MagicMock,
         test_ldap_auth_manager: LDAPAdminAuthorizationManager,
-        test_db_groups: List[str],
+        test_db_groups: list[str],
         test_username: str,
         user_role: db.Role,
     ) -> None:

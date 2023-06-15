@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from _pytest.main import Session
 
@@ -21,16 +20,16 @@ class ConfigInjector:
     """Special class to operate with pytest entites, for example get data and patch objects."""
 
     def __init__(self) -> None:
-        self._file_settings: Optional[OverhaveFileSettings] = None
-        self._step_collector: Optional[StepCollector] = None
-        self._test_runner: Optional[PytestRunner] = None
-        self._feature_extractor: Optional[IFeatureExtractor] = None
+        self._file_settings: OverhaveFileSettings | None = None
+        self._step_collector: StepCollector | None = None
+        self._test_runner: PytestRunner | None = None
+        self._feature_extractor: IFeatureExtractor | None = None
 
-        self._current_type: Optional[str] = None
+        self._current_type: str | None = None
         self._initialized = False
 
     @staticmethod
-    def patch_pytestbdd_prefixes(custom_step_prefixes: Optional[StepPrefixesModel]) -> None:
+    def patch_pytestbdd_prefixes(custom_step_prefixes: StepPrefixesModel | None) -> None:
         """Def for patch pytestbdd STEP_PREFIXES."""
         if custom_step_prefixes is not None:
             step_prefixes = custom_step_prefixes.extend_defaults()

@@ -1,36 +1,17 @@
 import abc
-import datetime
+import logging
 
-from overhave.db import DraftStatus
-from overhave.entities import OverhaveFileSettings
+import git
+
+from overhave import db
+from overhave.entities import GitPullError, OverhaveFileSettings
 from overhave.publication.abstract_publisher import IVersionPublisher
+from overhave.publication.errors import BaseGitVersionPublisherError
 from overhave.scenario import FileManager, OverhaveProjectSettings, generate_task_info
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 from overhave.transport import PublicationTask
 
-
-class BaseVersionPublisherException(Exception):
-    """Base exception for :class:`BaseVersionPublisher`."""
-
-
-class FeatureNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Feature."""
-
-
-class DraftNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Draft."""
-
-
-class TestRunNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing TestRun."""
-
-
-class ScenarioNotExistsError(BaseVersionPublisherException):
-    """Exception for situation with not existing Scenario."""
-
-
-class NullablePullRequestUrlError(BaseVersionPublisherException):
-    """Exception for nullable merge-request in selected Draft."""
+logger = logging.getLogger(__name__)
 
 
 class BaseVersionPublisher(IVersionPublisher, abc.ABC):
@@ -56,24 +37,21 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         self.publish_version(task.data.draft_id)
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
-        draft = self._draft_storage.get_draft(draft_id)
-        if not draft:
-            raise DraftNotExistsError(f"Draft with id={draft_id} does not exist!")
-        test_run = self._test_run_storage.get_test_run(draft.test_run_id)
-        if not test_run:
-            raise TestRunNotExistsError(f"TestRun with id={draft.test_run_id} does not exist!")
-        feature = self._feature_storage.get_feature(draft.feature_id)
-        if not feature:
-            raise FeatureNotExistsError(f"Feature with id={draft.feature_id} does not exist!")
-        scenario = self._scenario_storage.get_scenario(test_run.scenario_id)
-        if not scenario:
-            raise ScenarioNotExistsError(f"Scenario with id={test_run.scenario_id} does not exist!")
+        with db.create_session() as session:
+            draft_model = self._draft_storage.draft_model_by_id(session=session, draft_id=draft_id)
+            test_run_model = self._test_run_storage.testrun_model_by_id(session=session, run_id=draft_model.test_run_id)
+            feature_model = self._feature_storage.feature_model_by_id(
+                session=session, feature_id=draft_model.feature_id
+            )
+            scenario_model = self._scenario_storage.scenario_model_by_id(
+                session=session, scenario_id=test_run_model.scenario_id
+            )
         return PublisherContext(
-            feature=feature,
-            scenario=scenario,
-            test_run=test_run,
-            draft=draft,
-            target_branch=f"bdd-feature-{feature.id}",
+            feature=feature_model,
+            scenario=scenario_model,
+            test_run=test_run_model,
+            draft=draft_model,
+            target_branch=f"bdd-feature-{feature_model.id}",
         )
 
     def _compile_publication_description(self, context: PublisherContext) -> str:
@@ -88,13 +66,18 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
             )
         )
 
-    def _save_as_duplicate(self, context: PublisherContext) -> None:
-        previous_draft = self._draft_storage.get_previous_feature_draft(context.feature.id)
+    @abc.abstractmethod
+    def _prepare_repo(self, context: PublisherContext) -> None:
+        pass
 
-        self._draft_storage.save_response(
-            draft_id=context.draft.id,
-            pr_url=context.draft.pr_url or previous_draft.pr_url,
-            published_at=previous_draft.published_at or datetime.datetime.now(),
-            status=DraftStatus.DUPLICATE,
-            traceback=context.draft.traceback,
-        )
+    def _prepare_publisher_context(self, draft_id: int) -> PublisherContext | None:
+        logger.info("Start processing draft_id=%s...", draft_id)
+        self._draft_storage.set_draft_status(draft_id, db.DraftStatus.CREATING)
+        context = self._compile_context(draft_id)
+        try:
+            self._prepare_repo(context)
+            return context
+        except (git.GitCommandError, GitPullError, BaseGitVersionPublisherError) as err:
+            logger.exception("Error while trying to pull or push!")
+            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, traceback=str(err))
+            return None

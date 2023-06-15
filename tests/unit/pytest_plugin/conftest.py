@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Optional, cast
+from typing import Any, Callable, Mapping, cast
 from unittest import mock
 
 import allure
@@ -19,7 +19,7 @@ from overhave import (
     OverhaveStepContextSettings,
     OverhaveTestExecutionContext,
 )
-from overhave.factory import IAdminFactory, ITestExecutionFactory
+from overhave.factory import ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import DescriptionManager, StepContextRunner
 from overhave.pytest_plugin.helpers import OverhaveTagController
@@ -65,7 +65,7 @@ def test_severity(request: FixtureRequest) -> allure.severity_level:
 def test_pytest_bdd_item(
     mocked_context: BaseFactoryContext,
     test_pytest_bdd_scenario: Scenario,
-    test_severity: Optional[allure.severity_level],
+    test_severity: allure.severity_level | None,
     faker: Faker,
 ) -> Item:
     item = mock.create_autospec(Item)
@@ -210,15 +210,6 @@ def test_pytest_bdd_session(test_clean_item: Item, test_pytest_bdd_item: Item, t
 
 
 @pytest.fixture()
-def patched_hook_admin_factory(
-    mocked_context: BaseFactoryContext, clean_admin_factory: Callable[[], IAdminFactory]
-) -> IAdminFactory:
-    factory = clean_admin_factory()
-    factory.set_context(mocked_context)
-    return factory
-
-
-@pytest.fixture()
 def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest) -> str:
     if hasattr(request, "param"):
         return cast(str, request.param)
@@ -226,9 +217,9 @@ def severity_prefix(mocked_context: BaseFactoryContext, request: FixtureRequest)
 
 
 @pytest.fixture()
-def admin_url(request: FixtureRequest) -> Optional[httpx.URL]:
+def admin_url(request: FixtureRequest) -> httpx.URL | None:
     if hasattr(request, "param"):
-        return cast(Optional[httpx.URL], request.param)
+        return cast(httpx.URL | None, request.param)
     return None
 
 
@@ -237,7 +228,7 @@ def patched_hook_test_execution_factory(
     mocked_context: OverhaveTestExecutionContext,
     clean_test_execution_factory: Callable[[], ITestExecutionFactory],
     severity_prefix: str,
-    admin_url: Optional[httpx.URL],
+    admin_url: httpx.URL | None,
     test_project_settings: OverhaveProjectSettings,
 ) -> ITestExecutionFactory:
     factory = clean_test_execution_factory()
@@ -251,10 +242,10 @@ def patched_hook_test_execution_factory(
 
 @pytest.fixture()
 def patched_hook_admin_proxy_manager(
-    clean_proxy_manager: Callable[[], IProxyManager], patched_hook_admin_factory
+    clean_proxy_manager: Callable[[], IProxyManager], patched_admin_factory
 ) -> IProxyManager:
     proxy_manager = clean_proxy_manager()
-    proxy_manager.set_factory(patched_hook_admin_factory)
+    proxy_manager.set_factory(patched_admin_factory)
     return proxy_manager
 
 

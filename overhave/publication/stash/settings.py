@@ -1,5 +1,3 @@
-from typing import List
-
 from overhave.publication.settings import BaseGitPublisherSettings
 from overhave.storage import FeatureTypeName
 from overhave.transport import StashBranch, StashProject, StashRepository, StashReviewer, StashReviewerInfo
@@ -30,7 +28,7 @@ class OverhaveStashPublisherSettings(BaseGitPublisherSettings):
     def target_branch(self) -> StashBranch:
         return StashBranch(id=self.default_target_branch_name, repository=self.repository)
 
-    def get_reviewers(self, feature_type: FeatureTypeName) -> List[StashReviewer]:
+    def get_reviewers(self, feature_type: FeatureTypeName) -> list[StashReviewer]:
         if self.feature_type_to_reviewers_mapping:
             reviewers = self.feature_type_to_reviewers_mapping.get(feature_type)
             if not reviewers:

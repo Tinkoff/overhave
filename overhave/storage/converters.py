@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, NewType, Optional
+from typing import NewType
 
 import allure
 from pydantic.main import BaseModel
@@ -24,7 +24,7 @@ class SystemUserModel(_SqlAlchemyOrmModel):
 
     id: int
     login: str
-    password: Optional[SecretStr]
+    password: SecretStr | None
     role: Role
 
     def get_id(self) -> int:
@@ -59,13 +59,13 @@ class FeatureModel(_SqlAlchemyOrmModel):
     type_id: int
     last_edited_by: str
     last_edited_at: datetime
-    task: List[str] | None
+    task: list[str]
     file_path: str
     released: bool
     severity: allure.severity_level
 
     feature_type: FeatureTypeModel
-    feature_tags: List[TagModel]
+    feature_tags: list[TagModel]
 
 
 class ScenarioModel(_SqlAlchemyOrmModel):
@@ -85,12 +85,12 @@ class TestRunModel(_SqlAlchemyOrmModel):
     created_at: datetime
     name: str
     executed_by: str
-    start: Optional[datetime]
-    end: Optional[datetime]
+    start: datetime | None
+    end: datetime | None
     status: TestRunStatus
     report_status: TestReportStatus
-    report: Optional[str]
-    traceback: Optional[str]
+    report: str | None
+    traceback: str | None
     scenario_id: int
 
 
@@ -100,10 +100,10 @@ class DraftModel(_SqlAlchemyOrmModel):
     id: int
     feature_id: int
     test_run_id: int
-    pr_url: Optional[str]
+    pr_url: str | None
     published_by: str
-    published_at: Optional[datetime]
-    traceback: Optional[str]
+    published_at: datetime | None
+    traceback: str | None
     status: DraftStatus
 
 

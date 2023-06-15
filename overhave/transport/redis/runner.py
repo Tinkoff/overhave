@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Dict, Type
+from typing import Callable
 
 from overhave.transport.redis.consumer import RedisConsumer
 from overhave.transport.redis.objects import AnyRedisTask, RedisContainer, RedisUnreadData
@@ -20,7 +20,7 @@ class RedisConsumerRunner:
     """
 
     def __init__(
-        self, consumer: RedisConsumer, mapping: Dict[Type[AnyRedisTask], Callable[[AnyRedisTask], None]]
+        self, consumer: RedisConsumer, mapping: dict[type[AnyRedisTask], Callable[[AnyRedisTask], None]]
     ) -> None:
         self._consumer = consumer
         self._mapping = mapping

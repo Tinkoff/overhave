@@ -1,7 +1,6 @@
 import abc
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 from overhave.entities import BaseFileExtractor, OverhaveFileSettings
 
@@ -12,7 +11,7 @@ class IPluginResolver(abc.ABC):
     """Abstract class for custom pytest-bdd steps modules resolution."""
 
     @abc.abstractmethod
-    def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:
+    def get_plugins(self, plugin_type: str | None = None) -> list[str]:
         pass
 
 
@@ -25,7 +24,7 @@ class PluginResolver(BaseFileExtractor, IPluginResolver):
         self._plugins = self._resolve_plugins(directory=self._file_settings.steps_dir)
         logger.debug("Available Overhave pytest plugin modules: %s", self._plugins)
 
-    def _resolve_plugins(self, directory: Path) -> Dict[str, List[Path]]:
+    def _resolve_plugins(self, directory: Path) -> dict[str, list[Path]]:
         plugin_folders = [d for d in directory.iterdir() if self._check_dir_compliance(d)]
         plugin_dict = {folder.name: self._extract_recursively(folder) for folder in plugin_folders}
 
@@ -38,7 +37,7 @@ class PluginResolver(BaseFileExtractor, IPluginResolver):
         relative_path = path.relative_to(self._file_settings.work_dir).as_posix()
         return relative_path.replace("/", ".").rstrip(".py")
 
-    def get_plugins(self, plugin_type: Optional[str] = None) -> List[str]:
+    def get_plugins(self, plugin_type: str | None = None) -> list[str]:
         if isinstance(plugin_type, str):
             if self._plugins.get(plugin_type) is None:
                 raise KeyError(f"Specified plugin type '{plugin_type}' does not exist!")
@@ -46,7 +45,7 @@ class PluginResolver(BaseFileExtractor, IPluginResolver):
             logger.debug("Return plugins by plugin_type='%s': %s", plugin_type, plugins)
             return plugins
 
-        joined_modules: Set[str] = set()
+        joined_modules: set[str] = set()
         for key in self._plugins:
             joined_modules.update(set(self.get_plugins(key)))
         modules_list = list(joined_modules)

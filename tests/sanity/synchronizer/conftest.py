@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable
 from unittest import mock
 
 import pytest
@@ -61,7 +61,7 @@ def test_resolved_validator(
 
 
 @pytest.fixture()
-def test_db_feature_types(database: None) -> List[FeatureTypeModel]:
+def test_db_feature_types(database: None) -> list[FeatureTypeModel]:
     feature_types = [feature.type for feature in get_test_feature_containers()]
     with create_test_session() as session:
         session.add_all((db.FeatureType(name=feature_type) for feature_type in feature_types))

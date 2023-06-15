@@ -1,5 +1,3 @@
-from typing import List
-
 import allure
 import pytest
 from faker import Faker
@@ -53,7 +51,7 @@ class TestFeatureAPI:
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()
-        features = parse_obj_as(List[FeatureModel], response.json())
+        features = parse_obj_as(list[FeatureModel], response.json())
         assert features == [test_feature_with_tag]
 
     def test_get_feature_by_not_existing_tag_value(
@@ -85,5 +83,5 @@ class TestFeatureAPI:
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()
-        features = parse_obj_as(List[FeatureModel], response.json())
+        features = parse_obj_as(list[FeatureModel], response.json())
         assert features == [test_feature_with_tag]

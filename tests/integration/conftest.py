@@ -209,20 +209,22 @@ def test_features_with_tag(test_features: list[FeatureModel], test_tag: TagModel
 
 
 @pytest.fixture()
-def test_created_test_run_id(
-    test_run_storage: TestRunStorage, test_scenario: ScenarioModel, test_feature: FeatureModel
-) -> int:
-    with create_test_session():
-        return test_run_storage.create_test_run(test_scenario.id, test_feature.author)
-
-
-@pytest.fixture()
 def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
     with create_test_session() as session:
         db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
         session.add(db_scenario)
         session.flush()
         return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+
+
+@pytest.fixture()
+def test_created_test_run_id(
+    test_run_storage: TestRunStorage,
+    test_feature: FeatureModel,
+    test_scenario: ScenarioModel,
+) -> int:
+    with create_test_session():
+        return test_run_storage.create_testrun(test_scenario.id, test_feature.author)
 
 
 @pytest.fixture()

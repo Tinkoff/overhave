@@ -16,7 +16,7 @@ from .converters import (
     TestUserModel,
     TestUserSpecification,
 )
-from .draft_storage import DraftStorage, IDraftStorage, UniqueDraftCreationError
+from .draft_storage import DraftStorage, IDraftStorage, NullableScenarioError
 from .emulation_storage import EmulationStorage, EmulationStorageError, IEmulationStorage
 from .feature_storage import FeatureStorage, IFeatureStorage
 from .feature_tag_storage import FeatureTagStorage, IFeatureTagStorage

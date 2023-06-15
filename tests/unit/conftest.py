@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Callable, cast
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -11,6 +11,8 @@ from overhave import (
     OverhaveScenarioParserSettings,
 )
 from overhave.entities import FeatureExtractor, GitRepositoryInitializer
+from overhave.factory import IAdminFactory
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import FileManager
 
 
@@ -42,29 +44,29 @@ def mocked_git_initializer(mocker: MockFixture) -> GitRepositoryInitializer:
 
 
 @pytest.fixture()
-def task_tracker_url(request: FixtureRequest) -> Optional[str]:
+def task_tracker_url(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
+        return cast(str | None, request.param)
     return None
 
 
 @pytest.fixture()
-def tasks_keyword(request: FixtureRequest) -> Optional[str]:
+def tasks_keyword(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
         return cast(str, request.param)
     return None
 
 
 @pytest.fixture()
-def git_project_url(request: FixtureRequest) -> Optional[str]:
+def git_project_url(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
+        return cast(str | None, request.param)
     return None
 
 
 @pytest.fixture()
 def test_project_settings(
-    task_tracker_url: Optional[str], tasks_keyword: Optional[str], git_project_url: Optional[str]
+    task_tracker_url: str | None, tasks_keyword: str | None, git_project_url: str | None
 ) -> OverhaveProjectSettings:
     return OverhaveProjectSettings(
         task_tracker_url=task_tracker_url, tasks_keyword=tasks_keyword, git_project_url=git_project_url
@@ -76,3 +78,12 @@ def test_feature_extractor(request: FixtureRequest) -> FeatureExtractor:
     if hasattr(request, "param"):
         return cast(FeatureExtractor, request.param)
     raise NotImplementedError
+
+
+@pytest.fixture()
+def patched_admin_factory(
+    mocked_context: BaseFactoryContext, clean_admin_factory: Callable[[], IAdminFactory]
+) -> IAdminFactory:
+    factory = clean_admin_factory()
+    factory.set_context(mocked_context)
+    return factory

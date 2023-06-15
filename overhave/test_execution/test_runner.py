@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List, Optional
 
 import pytest
 
@@ -9,7 +8,7 @@ from overhave.test_execution.settings import OverhaveTestSettings
 logger = logging.getLogger(__name__)
 
 
-def _extend_cmd_args(cmd: List[str], addoptions: Optional[str]) -> None:
+def _extend_cmd_args(cmd: list[str], addoptions: str | None) -> None:
     if not isinstance(addoptions, str):
         return
     cmd.extend(addoptions.split(" "))

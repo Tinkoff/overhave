@@ -1,6 +1,5 @@
 import logging
-from json import JSONDecodeError
-from typing import Any, Dict, Generic, Mapping, Optional, Union, cast
+from typing import Any, Generic, Mapping, cast
 
 import httpx
 import tenacity
@@ -31,7 +30,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
     def _parse_or_raise(response: httpx.Response, model: ModelMetaclass) -> BaseModel:
         try:
             return cast(BaseModel, model).parse_obj(response.json())
-        except (ValueError, ValidationError, JSONDecodeError) as e:
+        except (ValueError, ValidationError) as e:
             url = getattr(response, "raw_url", response.url)
             raise HttpClientValidationError(f'Response validation error for "{url}"') from e
 
@@ -46,10 +45,10 @@ class BaseHttpClient(Generic[HttpSettingsType]):
         self,
         method: HttpMethod,
         url: httpx.URL,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        data: Optional[Union[str, bytes, Mapping[Any, Any]]] = None,
-        auth: Optional[httpx.Auth] = None,
+        params: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
+        data: str | bytes | Mapping[Any, Any] | None = None,
+        auth: httpx.Auth | None = None,
         raise_for_status: bool = True,
     ) -> httpx.Response:
         response = httpx.request(

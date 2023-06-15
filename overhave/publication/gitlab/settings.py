@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from overhave.publication.settings import BaseGitPublisherSettings
 from overhave.storage import FeatureTypeName
 from overhave.transport.http.gitlab_client import GitlabRepository
@@ -29,9 +27,9 @@ class OverhaveGitlabPublisherSettings(BaseGitPublisherSettings):
     def target_branch(self) -> str:
         return self.default_target_branch_name
 
-    def get_reviewers(self, feature_type: FeatureTypeName) -> List[str]:
+    def get_reviewers(self, feature_type: FeatureTypeName) -> list[str]:
         if self.feature_type_to_reviewers_mapping:
-            reviewers: Optional[List[str]] = self.feature_type_to_reviewers_mapping.get(feature_type)
+            reviewers: list[str] | None = self.feature_type_to_reviewers_mapping.get(feature_type)
             if not reviewers:
                 raise NotSpecifiedFeatureTypeError(
                     f"'{feature_type}' reviewers are not specified in 'feature_type_to_reviewers_mapping' dict!"

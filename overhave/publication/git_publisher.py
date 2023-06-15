@@ -1,32 +1,22 @@
 import abc
 import logging
-from typing import Generic, Optional, cast
+from typing import Generic, cast
 
 import git
 
-from overhave.entities import GitPullError, GitRepositoryInitializer, OverhaveFileSettings
-from overhave.publication.base_publisher import BaseVersionPublisher, BaseVersionPublisherException
+from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.publication.base_publisher import BaseVersionPublisher
+from overhave.publication.errors import (
+    BaseGitVersionPublisherError,
+    CommitNotCreatedError,
+    CurrentBranchEqualToDefaultError,
+    CurrentBranchNotEqualToTargetError,
+)
 from overhave.publication.settings import GitPublisherSettings
 from overhave.scenario import FileManager, OverhaveProjectSettings
 from overhave.storage import IDraftStorage, IFeatureStorage, IScenarioStorage, ITestRunStorage, PublisherContext
 
 logger = logging.getLogger(__name__)
-
-
-class BaseGitVersionPublisherError(BaseVersionPublisherException):
-    """Base exception for git version publisher."""
-
-
-class CurrentBranchEqualToDefaultError(BaseGitVersionPublisherError):
-    """Exception for situation when current branch is equal to default branch."""
-
-
-class CurrentBranchNotEqualToTargetError(BaseGitVersionPublisherError):
-    """Exception for situation when current branch is not equal to target branch."""
-
-
-class CommitNotCreatedError(BaseGitVersionPublisherError):
-    """Exception for situation with not created commit."""
 
 
 class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, abc.ABC):
@@ -111,18 +101,10 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         if not changes_pushed:
             raise CommitNotCreatedError("Commit has not been created!")
 
-    def _push_version(self, draft_id: int) -> Optional[PublisherContext]:
-        try:
-            if not self._git_publisher_settings.pull_before_creating_mr_enabled:
-                logger.warning("Pulling before creating merge request is disabled!")
-            else:
-                self._git_initializer.pull()
-            ctx = self._compile_context(draft_id)
-            git_branch = cast(git.Head, self._create_head(name=ctx.target_branch))
-            self._create_commit_and_push(context=ctx, target_branch=git_branch)
-            return ctx
-        except GitPullError:
-            logger.exception("Error while trying to pull remote repository!")
-        except (git.GitCommandError, BaseGitVersionPublisherError):
-            logger.exception("Error while trying to push scenario version!")
-        return None
+    def _prepare_repo(self, context: PublisherContext) -> None:
+        if not self._git_publisher_settings.pull_before_creating_mr_enabled:
+            logger.warning("Pulling before creating merge request is disabled!")
+        else:
+            self._git_initializer.pull()
+        git_branch = cast(git.Head, self._create_head(name=context.target_branch))
+        self._create_commit_and_push(context=context, target_branch=git_branch)

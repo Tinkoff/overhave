@@ -26,7 +26,11 @@ class IFeatureStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_feature(feature_id: int) -> FeatureModel | None:
+    def feature_model_by_id(session: so.Session, feature_id: int) -> FeatureModel:
+        pass
+
+    @staticmethod
+    def get_feature_model(feature_id: int) -> FeatureModel | None:
         pass
 
     @staticmethod
@@ -60,12 +64,9 @@ class FeatureStorage(IFeatureStorage):
     """Class for feature storage."""
 
     @staticmethod
-    def get_feature(feature_id: int) -> FeatureModel | None:
-        with db.create_session() as session:
-            feature = session.get(db.Feature, feature_id)
-            if feature is not None:
-                return FeatureModel.from_orm(feature)
-            return None
+    def feature_model_by_id(session: so.Session, feature_id: int) -> FeatureModel:
+        feature = session.query(db.Feature).filter(db.Feature.id == feature_id).one()
+        return FeatureModel.from_orm(feature)
 
     @staticmethod
     def create_feature(model: FeatureModel) -> int:
@@ -124,3 +125,11 @@ class FeatureStorage(IFeatureStorage):
             )
             features = session.query(db.Feature).filter(db.Feature.id.in_(feature_ids_query)).all()
             return parse_obj_as(list[FeatureModel], features)
+
+    @staticmethod
+    def get_feature_model(feature_id: int) -> FeatureModel | None:
+        with db.create_session() as session:
+            feature = session.get(db.Feature, feature_id)
+            if feature is not None:
+                return FeatureModel.from_orm(feature)
+            return None

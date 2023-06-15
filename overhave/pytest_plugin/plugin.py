@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 import _pytest
 import allure
@@ -71,7 +71,7 @@ def pytest_bdd_after_step(
     scenario: Scenario,
     step: Step,
     step_func: Callable[[Any], None],
-    step_func_args: Dict[str, Any],
+    step_func_args: dict[str, Any],
 ) -> None:
     runner = get_step_context_runner()
     runner.stop(None)
@@ -83,14 +83,14 @@ def pytest_bdd_step_error(
     scenario: Scenario,
     step: Step,
     step_func: Callable[[Any], None],
-    step_func_args: Dict[str, Any],
+    step_func_args: dict[str, Any],
     exception: BaseException,
 ) -> None:
     runner = get_step_context_runner()
     runner.stop(exception)
 
 
-def pytest_bdd_apply_tag(tag: str, function: Function) -> Optional[bool]:
+def pytest_bdd_apply_tag(tag: str, function: Function) -> bool | None:
     controller = get_tag_controller()
     tag_pattern = controller.get_suitable_pattern(tag)
     if not tag_pattern:
@@ -158,7 +158,7 @@ def pytest_runtest_setup(item: Item) -> None:
     )
 
 
-def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
+def pytest_runtest_teardown(item: Item, nextitem: Item | None) -> None:
     """Hook for description attachment to Allure report."""
     if not get_proxy_manager().has_factory:
         return

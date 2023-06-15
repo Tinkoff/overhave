@@ -1,7 +1,8 @@
 import abc
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import sqlalchemy as sa
+import sqlalchemy.orm as so
 
 from overhave import db
 from overhave.storage.converters import TestRunModel
@@ -12,26 +13,30 @@ class ITestRunStorage(abc.ABC):
     """Abstract class for test runs storage."""
 
     @abc.abstractmethod
-    def create_test_run(self, scenario_id: int, executed_by: str) -> int:
+    def create_testrun(self, scenario_id: int, executed_by: str) -> int:
         pass
 
     @abc.abstractmethod
-    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
+    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: str | None = None) -> None:
         pass
 
     @abc.abstractmethod
-    def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
+    def set_report(self, run_id: int, status: db.TestReportStatus, report: str | None = None) -> None:
         pass
 
     @abc.abstractmethod
-    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
+    def testrun_model_by_id(self, session: so.Session, run_id: int) -> TestRunModel:
+        pass
+
+    @abc.abstractmethod
+    def get_testrun_model(self, run_id: int) -> TestRunModel | None:
         pass
 
 
 class TestRunStorage(ITestRunStorage):
     """Class for test runs storage."""
 
-    def create_test_run(self, scenario_id: int, executed_by: str) -> int:
+    def create_testrun(self, scenario_id: int, executed_by: str) -> int:
         with db.create_session() as session:
             scenario: db.Scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
             run = db.TestRun(
@@ -45,7 +50,7 @@ class TestRunStorage(ITestRunStorage):
             session.flush()
             return cast(int, run.id)
 
-    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: Optional[str] = None) -> None:
+    def set_run_status(self, run_id: int, status: db.TestRunStatus, traceback: str | None = None) -> None:
         with db.create_session() as session:
             values: dict[str, Any] = {"status": status}
             if status == db.TestRunStatus.RUNNING:
@@ -57,7 +62,7 @@ class TestRunStorage(ITestRunStorage):
 
             session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
-    def set_report(self, run_id: int, status: db.TestReportStatus, report: Optional[str] = None) -> None:
+    def set_report(self, run_id: int, status: db.TestReportStatus, report: str | None = None) -> None:
         with db.create_session() as session:
             values: dict[str, Any] = {"report_status": status}
             if isinstance(report, str):
@@ -65,9 +70,13 @@ class TestRunStorage(ITestRunStorage):
 
             session.execute(sa.update(db.TestRun).where(db.TestRun.id == run_id).values(**values))
 
-    def get_test_run(self, run_id: int) -> Optional[TestRunModel]:
+    def testrun_model_by_id(self, session: so.Session, run_id: int) -> TestRunModel:
+        run = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
+        return TestRunModel.from_orm(run)
+
+    def get_testrun_model(self, run_id: int) -> TestRunModel | None:
         with db.create_session() as session:
             run = session.get(db.TestRun, run_id)
-            if run is not None:
-                return TestRunModel.from_orm(run)
-            return None
+            if run is None:
+                return None
+            return TestRunModel.from_orm(run)

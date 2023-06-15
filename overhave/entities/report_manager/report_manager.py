@@ -2,7 +2,6 @@ import logging
 import subprocess  # noqa: S404
 from os import makedirs
 from pathlib import Path
-from typing import Optional
 from uuid import uuid1
 
 from overhave.db import TestReportStatus
@@ -32,7 +31,7 @@ class ReportManager:
         self._archive_manager = archive_manager
         self._s3_manager = s3_manager
 
-    def _generate_report(self, alluredir: Path, report_dir: Path) -> Optional[int]:
+    def _generate_report(self, alluredir: Path, report_dir: Path) -> int | None:
         generation_cmd = (
             self._settings.allure_cmdline,
             "generate",
@@ -88,7 +87,7 @@ class ReportManager:
             logger.warning("Report '%s' does not exist!", report_index.parent.name)
         if not report_index.exists():
             logger.warning("Report '%s' does not contain compiled files for HTML view!", report_index.parent.name)
-        test_run = self._test_run_storage.get_test_run(run_id)
+        test_run = self._test_run_storage.get_testrun_model(run_id=run_id)
         if test_run is None:
             logger.warning("No one test run with id=%s exists!", run_id)
             return ReportPresenceResolution(exists=False)

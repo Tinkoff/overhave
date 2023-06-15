@@ -2,6 +2,7 @@ import abc
 from typing import cast
 
 import sqlalchemy as sa
+import sqlalchemy.orm as so
 
 from overhave import db
 from overhave.storage.converters import ScenarioModel
@@ -12,7 +13,7 @@ class IScenarioStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_scenario(scenario_id: int) -> ScenarioModel | None:
+    def scenario_model_by_id(session: so.Session, scenario_id: int) -> ScenarioModel:
         pass
 
     @staticmethod
@@ -35,12 +36,9 @@ class ScenarioStorage(IScenarioStorage):
     """Class for feature type storage."""
 
     @staticmethod
-    def get_scenario(scenario_id: int) -> ScenarioModel | None:
-        with db.create_session() as session:
-            scenario = session.get(db.Scenario, scenario_id)
-            if scenario is not None:
-                return ScenarioModel.from_orm(scenario)
-            return None
+    def scenario_model_by_id(session: so.Session, scenario_id: int) -> ScenarioModel:
+        scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
+        return ScenarioModel.from_orm(scenario)
 
     @staticmethod
     def get_scenario_by_feature_id(feature_id: int) -> ScenarioModel:

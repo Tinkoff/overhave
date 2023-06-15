@@ -3,7 +3,7 @@ import logging
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, cast
 
 import flask
 import werkzeug
@@ -12,7 +12,7 @@ from flask_admin.model import InlineFormAdmin
 from flask_login import current_user
 from markupsafe import Markup
 from pytest_bdd.types import STEP_TYPES
-from wtforms import Field, TextAreaField, ValidationError
+from wtforms import Field, Form, TextAreaField, ValidationError
 from wtforms.widgets import HiddenInput
 
 from overhave import db
@@ -60,9 +60,7 @@ class FactoryViewUtilsMixin:
     _file_path_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_/\\ ]{8,}")
 
     @classmethod
-    def _validate_tasks(cls, tasks: list[str] | None) -> None:
-        if tasks is None:
-            return
+    def _validate_tasks(cls, tasks: list[str]) -> None:
         for task in tasks:
             if cls._task_pattern.match(task):
                 continue
@@ -220,11 +218,9 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
             flask.flash("Scenario information not requested.", category="error")
             return rendered
         factory = get_admin_factory()
-        scenario = factory.scenario_storage.get_scenario(int(scenario_id))
-        if scenario is None:
-            flask.flash("Scenario does not exist, so could not run test.", category="error")
-            return rendered
-        test_run_id = factory.test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=current_user.login)
+        with db.create_session() as session:
+            scenario = factory.scenario_storage.scenario_model_by_id(session=session, scenario_id=int(scenario_id))
+        test_run_id = factory.test_run_storage.create_testrun(scenario_id=scenario.id, executed_by=current_user.login)
         if not factory.context.admin_settings.consumer_based:
             proxy_manager = get_proxy_manager()
             test_execution_factory = get_test_execution_factory()
@@ -260,3 +256,18 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         mutable_data["file_path"] = self._make_file_path(data["file_path"])
 
         return self._run_test(data, rendered)
+
+    @staticmethod
+    def _form_remove_validators(form_change: Callable[..., Form]) -> Callable[..., Form]:
+        admin_settings = get_admin_factory().context.admin_settings
+        if not admin_settings.strict_feature_tasks:
+            form_change.task.kwargs["validators"] = []  # type: ignore[attr-defined]
+        return form_change
+
+    def get_create_form(self) -> Callable[..., Form]:
+        form_create = cast(Callable[..., Form], super().get_create_form())
+        return self._form_remove_validators(form_change=form_create)
+
+    def get_edit_form(self) -> Callable[..., Form]:
+        form_edit = cast(Callable[..., Form], super().get_edit_form())
+        return self._form_remove_validators(form_change=form_edit)

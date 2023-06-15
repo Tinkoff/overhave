@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 from unittest import mock
 
 import allure
@@ -46,7 +45,7 @@ class TestPluginUtils:
     def test_add_issue_links_to_report_with_correct_tracker_url(
         self,
         test_pytest_bdd_item: Item,
-        task_tracker_url: Optional[str],
+        task_tracker_url: str | None,
         test_project_settings: OverhaveProjectSettings,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:
@@ -60,7 +59,7 @@ class TestPluginUtils:
     @pytest.mark.parametrize("task_tracker_url", [None], indirect=True)
     def test_add_issue_links_to_report_with_empty_tracker_url(
         self,
-        task_tracker_url: Optional[str],
+        task_tracker_url: str | None,
         test_project_settings: OverhaveProjectSettings,
     ) -> None:
         with pytest.raises(EmptyTaskTrackerURLError):
@@ -191,7 +190,7 @@ class TestPluginUtils:
         self,
         mocked_context: BaseFactoryContext,
         test_pytest_bdd_item: Item,
-        test_severity: Optional[allure.severity_level],
+        test_severity: allure.severity_level | None,
         severity_handler_mock: mock.MagicMock,
         patched_hook_test_execution_proxy_manager: IProxyManager,
     ) -> None:

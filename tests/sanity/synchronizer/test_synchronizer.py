@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 import sqlalchemy.exc
 
@@ -45,7 +43,7 @@ class TestOverhaveSynchronizer:
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
         test_db_user: SystemUserModel,
-        test_db_feature_types: List[FeatureTypeModel],
+        test_db_feature_types: list[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
         with create_test_session():
@@ -59,7 +57,7 @@ class TestOverhaveSynchronizer:
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
         test_db_user: SystemUserModel,
-        test_db_feature_types: List[FeatureTypeModel],
+        test_db_feature_types: list[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
         with count_queries(31):
@@ -75,7 +73,7 @@ class TestOverhaveSynchronizer:
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
         test_db_user: SystemUserModel,
-        test_db_feature_types: List[FeatureTypeModel],
+        test_db_feature_types: list[FeatureTypeModel],
         create_db_features: bool,
     ) -> None:
         with create_test_session():
@@ -90,7 +88,7 @@ class TestOverhaveSynchronizer:
         self,
         test_resolved_synchronizer: OverhaveSynchronizer,
         test_db_user: SystemUserModel,
-        test_db_feature_types: List[FeatureTypeModel],
+        test_db_feature_types: list[FeatureTypeModel],
     ) -> None:
         with create_test_session():
             test_resolved_synchronizer.synchronize(create_db_features=True)

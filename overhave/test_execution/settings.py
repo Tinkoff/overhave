@@ -1,5 +1,3 @@
-from typing import Optional
-
 import httpx
 from pydantic import validator
 
@@ -14,13 +12,13 @@ class EmptyOverhaveAdminURLError(ValueError):
 class OverhaveAdminLinkSettings(BaseOverhavePrefix):
     """Settings for dynamic links to Overhave Admin in Allure report."""
 
-    admin_url: Optional[httpx.URL]
+    admin_url: httpx.URL | None
 
     feature_id_filter_path: str = "feature/?flt2_0={feature_id}"
     feature_id_placeholder: str = "Overhave feature #{feature_id}"
 
     @validator("admin_url", pre=True)
-    def make_admin_url(cls, v: Optional[str]) -> Optional[httpx.URL]:
+    def make_admin_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
     @property
@@ -40,9 +38,9 @@ class OverhaveTestSettings(BaseOverhavePrefix):
     """Settings for PytestRunner, which runs scenario tests with specified addoptions."""
 
     default_pytest_addoptions: str = "--disable-warnings"
-    extra_pytest_addoptions: Optional[str]
+    extra_pytest_addoptions: str | None
 
-    workers: Optional[int]  # Number of xdist workers, `None` by default
+    workers: int | None  # Number of xdist workers, `None` by default
 
 
 class OverhaveStepCollectorSettings(BaseOverhavePrefix):

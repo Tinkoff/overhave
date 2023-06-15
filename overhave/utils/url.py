@@ -1,9 +1,7 @@
-from typing import Optional
-
 import httpx
 
 
-def make_url(value: Optional[str]) -> Optional[httpx.URL]:
+def make_url(value: str | None) -> httpx.URL | None:
     if isinstance(value, str):
         return httpx.URL(value)
     return value

@@ -8,7 +8,7 @@ from overhave.admin.views import FeatureView
 
 
 @pytest.mark.parametrize("test_mock_patch_user_directory", ["overhave.admin.views.feature.current_user"], indirect=True)
-class TestFeatueView:
+class TestFeatureView:
     """Unit tests for FeatureView."""
 
     @pytest.mark.parametrize("user_role", [db.Role.admin], indirect=True)

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Iterator
 from unittest import mock
 
 import pytest
@@ -7,7 +7,7 @@ from overhave.transport import LDAPAuthenticator, OverhaveLdapClientSettings
 
 
 @pytest.fixture(scope="module")
-def envs_for_mock() -> Dict[str, Optional[str]]:
+def envs_for_mock() -> dict[str, str | None]:
     return {
         "OVERHAVE_LDAP_URL": "ldap://mydomain.ru",
         "OVERHAVE_LDAP_DOMAIN": "domain\\",

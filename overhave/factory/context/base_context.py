@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 from pydantic import BaseSettings
 
@@ -26,16 +26,16 @@ class BaseFactoryContext:
 
     def __init__(
         self,
-        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
-        parser_settings: Optional[OverhaveScenarioParserSettings] = None,
-        emulation_settings: Optional[OverhaveEmulationSettings] = None,
-        file_settings: Optional[OverhaveFileSettings] = None,
-        language_settings: Optional[OverhaveLanguageSettings] = None,
-        project_settings: Optional[OverhaveProjectSettings] = None,
-        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
-        s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
-        test_settings: Optional[OverhaveTestSettings] = None,
-        step_collector_settings: Optional[OverhaveStepCollectorSettings] = None,
+        compilation_settings: OverhaveScenarioCompilerSettings | None = None,
+        parser_settings: OverhaveScenarioParserSettings | None = None,
+        emulation_settings: OverhaveEmulationSettings | None = None,
+        file_settings: OverhaveFileSettings | None = None,
+        language_settings: OverhaveLanguageSettings | None = None,
+        project_settings: OverhaveProjectSettings | None = None,
+        report_manager_settings: OverhaveReportManagerSettings | None = None,
+        s3_manager_settings: OverhaveS3ManagerSettings | None = None,
+        test_settings: OverhaveTestSettings | None = None,
+        step_collector_settings: OverhaveStepCollectorSettings | None = None,
     ):
         self._compilation_settings = compilation_settings
         self._parser_settings = parser_settings
@@ -49,7 +49,7 @@ class BaseFactoryContext:
         self._step_collector_settings = step_collector_settings
 
     @staticmethod
-    def _ensured_settings(settings: Optional[BaseSettings]) -> BaseSettings:
+    def _ensured_settings(settings: BaseSettings | None) -> BaseSettings:
         if settings is None:
             raise NotDefinedSettingsError(type(settings).__name__)
         return settings

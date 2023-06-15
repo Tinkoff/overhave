@@ -47,7 +47,7 @@ class Feature(BaseTable, PrimaryKeyMixin):
     )
     type_id: int = sa.Column(sa.Integer(), sa.ForeignKey(FeatureType.id), nullable=False, doc="Feature types choice")
     file_path: str = sa.Column(sa.String(), doc="Feature file path", nullable=False, unique=True)
-    task: List[str] | None = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=True)
+    task: List[str] = sa.Column(sa.ARRAY(sa.String()), doc="Feature tasks list", nullable=False)
     last_edited_by: str = sa.Column(sa.String(), doc="Last feature editor login", nullable=False)
     last_edited_at: datetime.datetime = sa.Column(
         sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
@@ -109,39 +109,11 @@ class TestRun(BaseTable, PrimaryKeyMixin):
     )
 
 
-class DraftQuery(so.Query):  # type: ignore[type-arg]  # SQLAlchemy2.0 - so.Query[Any]
-    """Scenario versions table."""
-
-    def as_unique(self, test_run_id: int, published_by: str, status: DraftStatus) -> Draft:
-        with self.session.no_autoflush:
-            run = self.session.get(TestRun, test_run_id)
-            if run is None:
-                raise RuntimeError(f"Unknown test_run_id={test_run_id}!")
-            if run.scenario.text is None:
-                raise RuntimeError(f"Scenario with id={run.scenario} has empty text!")
-            draft = (
-                self.session.query(Draft)
-                .filter(Draft.test_run_id == run.id, Draft.text == run.scenario.text)
-                .one_or_none()
-            )
-        if draft is not None:
-            return draft
-        return Draft(
-            feature_id=run.scenario.feature_id,
-            test_run_id=test_run_id,
-            text=run.scenario.text,
-            published_by=published_by,
-            status=status,
-        )
-
-
 class Draft(BaseTable, PrimaryKeyMixin):
     """Scenario versions table."""
 
-    __query_cls__ = DraftQuery
-
     feature_id: int = sa.Column(sa.Integer(), sa.ForeignKey(Feature.id), nullable=False, index=True)
-    test_run_id: int = sa.Column(sa.Integer(), sa.ForeignKey(TestRun.id), nullable=False)
+    test_run_id: int = sa.Column(sa.Integer(), sa.ForeignKey(TestRun.id), unique=True, nullable=False)
     text: str | None = sa.Column(sa.Text(), doc="Released scenario text")
     pr_url: str | None = sa.Column(sa.String(), doc="Absolute pull-request URL")
     published_by: str = sa.Column(
@@ -155,17 +127,8 @@ class Draft(BaseTable, PrimaryKeyMixin):
         Feature, uselist=False, backref=so.backref("versions", cascade="all, delete-orphan")
     )
 
-    __table_args__ = (sa.UniqueConstraint(test_run_id),)
-
     def __html__(self) -> str:
         return f'<a href="{url_for("draft.details_view", id=self.id)}">Draft: {self.id}</a>'
-
-    def __init__(self, feature_id: int, test_run_id: int, text: str, published_by: str, status: DraftStatus) -> None:
-        self.feature_id = feature_id
-        self.test_run_id = test_run_id
-        self.text = text
-        self.published_by = published_by
-        self.status = status
 
 
 @su.generic_repr("id", "name", "created_by")

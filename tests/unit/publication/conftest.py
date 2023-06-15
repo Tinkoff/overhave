@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence, cast
+from typing import Mapping, Sequence, cast
 
 import pytest
 from faker import Faker
@@ -28,8 +28,8 @@ def test_default_reviewers(faker: Faker) -> Sequence[str]:
 
 
 @pytest.fixture()
-def test_reviewers_mapping(faker: Faker) -> Mapping[FeatureTypeName, List[str]]:
+def test_reviewers_mapping(faker: Faker) -> Mapping[FeatureTypeName, list[str]]:
     return {
-        feature_type: cast(List[str], faker.words(faker.random.randint(1, 10)))
+        feature_type: cast(list[str], faker.words(faker.random.randint(1, 10)))
         for feature_type in get_test_feature_extractor().feature_types
     }

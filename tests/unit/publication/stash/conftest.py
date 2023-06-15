@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence, cast
+from typing import Mapping, Sequence, cast
 
 import pytest
 from pytest_mock import MockFixture
@@ -32,7 +32,7 @@ def test_stash_project_settings_with_reviewers_mapping(
     test_repository_id_or_name: str,
     test_project_key: str,
     test_target_branch: str,
-    test_reviewers_mapping: Mapping[FeatureTypeName, List[str]],
+    test_reviewers_mapping: Mapping[FeatureTypeName, list[str]],
 ) -> OverhaveStashPublisherSettings:
     return OverhaveStashPublisherSettings(
         repository_name=test_repository_id_or_name,

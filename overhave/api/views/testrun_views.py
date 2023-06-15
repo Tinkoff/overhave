@@ -18,7 +18,7 @@ def get_test_run_handler(
     test_run_id: int,
     test_run_storage: TestRunStorage = fastapi.Depends(get_test_run_storage),
 ) -> TestRunModel:
-    test_run = test_run_storage.get_test_run(test_run_id)
+    test_run = test_run_storage.get_testrun_model(test_run_id)
     if test_run is not None:
         return test_run
     raise fastapi.HTTPException(
@@ -43,7 +43,7 @@ def run_tests_by_tag_handler(
     test_run_ids: list[int] = []
     for feature in features:
         scenario = scenario_storage.get_scenario_by_feature_id(feature.id)
-        test_run_id = test_run_storage.create_test_run(scenario_id=scenario.id, executed_by=feature.last_edited_by)
+        test_run_id = test_run_storage.create_testrun(scenario_id=scenario.id, executed_by=feature.last_edited_by)
         redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
         test_run_ids.append(test_run_id)
     return test_run_ids

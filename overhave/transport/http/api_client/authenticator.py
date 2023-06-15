@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from pydantic.types import SecretStr
 
@@ -33,7 +32,7 @@ class OverhaveApiAuthenticator(BaseHttpClient[OverhaveApiAuthenticatorSettings])
         return AuthToken.parse_obj(response.json())
 
     def _get_auth_token(self, username: str, password: SecretStr) -> AuthToken:
-        token: Optional[AuthToken] = self._auth_storage.get_auth_token(username=username)
+        token: AuthToken | None = self._auth_storage.get_auth_token(username=username)
         if token is None:
             token = self._auth_by_credentials(username=username, password=password)
             self._auth_storage.update_auth_token(username=username, new_auth_token=token)

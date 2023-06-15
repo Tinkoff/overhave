@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 from overhave.db import TestReportStatus
@@ -10,7 +8,7 @@ class ReportPresenceResolution(BaseModel):
 
     exists: bool
     s3_enabled: bool = False
-    report_status: Optional[TestReportStatus]
+    report_status: TestReportStatus | None
 
     @property
     def not_ready(self) -> bool:

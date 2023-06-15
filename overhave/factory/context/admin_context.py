@@ -1,5 +1,3 @@
-from typing import Optional
-
 from overhave.base_settings import AuthorizationStrategy, OverhaveAuthorizationSettings
 from overhave.entities import (
     OverhaveAdminSettings,
@@ -23,19 +21,19 @@ class OverhaveAdminContext(BaseFactoryContext):
 
     def __init__(
         self,
-        admin_settings: Optional[OverhaveAdminSettings] = None,
-        auth_settings: Optional[OverhaveAuthorizationSettings] = None,
-        emulation_settings: Optional[OverhaveEmulationSettings] = None,
-        file_settings: Optional[OverhaveFileSettings] = None,
-        language_settings: Optional[OverhaveLanguageSettings] = None,
-        ldap_manager_settings: Optional[OverhaveLdapManagerSettings] = None,
-        ldap_client_settings: Optional[OverhaveLdapClientSettings] = None,
-        project_settings: Optional[OverhaveProjectSettings] = None,
-        compilation_settings: Optional[OverhaveScenarioCompilerSettings] = None,
-        report_manager_settings: Optional[OverhaveReportManagerSettings] = None,
-        s3_manager_settings: Optional[OverhaveS3ManagerSettings] = None,
-        test_settings: Optional[OverhaveTestSettings] = None,
-        step_collector_settings: Optional[OverhaveStepCollectorSettings] = None,
+        admin_settings: OverhaveAdminSettings | None = None,
+        auth_settings: OverhaveAuthorizationSettings | None = None,
+        emulation_settings: OverhaveEmulationSettings | None = None,
+        file_settings: OverhaveFileSettings | None = None,
+        language_settings: OverhaveLanguageSettings | None = None,
+        ldap_manager_settings: OverhaveLdapManagerSettings | None = None,
+        ldap_client_settings: OverhaveLdapClientSettings | None = None,
+        project_settings: OverhaveProjectSettings | None = None,
+        compilation_settings: OverhaveScenarioCompilerSettings | None = None,
+        report_manager_settings: OverhaveReportManagerSettings | None = None,
+        s3_manager_settings: OverhaveS3ManagerSettings | None = None,
+        test_settings: OverhaveTestSettings | None = None,
+        step_collector_settings: OverhaveStepCollectorSettings | None = None,
     ) -> None:
         super().__init__(
             emulation_settings=emulation_settings or OverhaveEmulationSettings(),

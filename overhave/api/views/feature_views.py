@@ -1,6 +1,5 @@
 import logging
 from http import HTTPStatus
-from typing import List, Optional
 
 import fastapi
 
@@ -12,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 def get_features_handler(
-    tag_id: Optional[int] = None,
-    tag_value: Optional[str] = None,
+    tag_id: int | None = None,
+    tag_value: str | None = None,
     feature_storage: IFeatureStorage = fastapi.Depends(get_feature_storage),
     tag_storage: IFeatureTagStorage = fastapi.Depends(get_feature_tag_storage),
-) -> List[FeatureModel]:
+) -> list[FeatureModel]:
     if tag_id is not None:
         logger.info("Getting %s by tag_id=%s...", FeatureModel.__name__, tag_id)
         return feature_storage.get_features_by_tag(tag_id=tag_id)

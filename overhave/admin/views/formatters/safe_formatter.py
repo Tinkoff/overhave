@@ -1,6 +1,6 @@
 import logging
 from types import FunctionType
-from typing import Any, Callable, Sequence, Type, Union
+from typing import Any, Callable, Sequence, Type
 
 from flask_admin.contrib.sqla import ModelView
 from markupsafe import Markup
@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def _default_formatter_result(
-    model: db.BaseTable, name: str, supported_models: Sequence[Type[db.BaseTable]]
-) -> Union[Markup, Any]:
+    model: db.BaseTable, name: str, supported_models: Sequence[type[db.BaseTable]]
+) -> Markup | Any:
     value = getattr(model, name, None)
     if value is None:
         return Markup("")
@@ -22,8 +22,8 @@ def _default_formatter_result(
 
 
 def safe_formatter(type: Type[object], supported_models: Sequence[Type[db.BaseTable]]):  # type: ignore  # noqa: A002
-    def decorator(func: FunctionType) -> Callable[[ModelView, Any, db.BaseTable, str], Union[Markup, Any]]:
-        def wrapper(view: ModelView, context: Any, model: db.BaseTable, name: str) -> Union[Markup, Any]:
+    def decorator(func: FunctionType) -> Callable[[ModelView, Any, db.BaseTable, str], Markup | Any]:
+        def wrapper(view: ModelView, context: Any, model: db.BaseTable, name: str) -> Markup | Any:
             logger.debug("Wrapping function '%s'...", func.__name__)
             result = _default_formatter_result(model=model, name=name, supported_models=supported_models)
             logger.debug("Default formatter result: '%s'", result)

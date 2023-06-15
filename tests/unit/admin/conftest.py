@@ -1,4 +1,4 @@
-from typing import List, Optional, cast
+from typing import cast
 from unittest import mock
 from unittest.mock import patch
 from uuid import uuid1
@@ -14,6 +14,7 @@ from pytest_mock import MockerFixture
 from overhave import db
 from overhave.admin import views
 from overhave.admin.views.formatters.helpers import get_button_class_by_status
+from overhave.factory import IAdminFactory
 from overhave.utils import get_current_time
 
 
@@ -56,7 +57,7 @@ def test_testrun_id(faker: Faker) -> int:
 
 
 @pytest.fixture()
-def test_testrun_report(report_status: db.TestReportStatus, faker: Faker) -> Optional[str]:
+def test_testrun_report(report_status: db.TestReportStatus, faker: Faker) -> str | None:
     if report_status.has_report:
         return uuid1().hex
     return None
@@ -68,7 +69,7 @@ def test_testrun_button_css_class(status: str) -> str:
 
 
 @pytest.fixture()
-def test_feature_view_mocked(task_tracker_url: Optional[str], mocker: MockerFixture) -> views.FeatureView:
+def test_feature_view_mocked(task_tracker_url: str | None, mocker: MockerFixture) -> views.FeatureView:
     mock = mocker.create_autospec(views.FeatureView)
     mock.task_tracker_url = task_tracker_url
     mock.feature_suffix = ".feature"
@@ -76,7 +77,7 @@ def test_feature_view_mocked(task_tracker_url: Optional[str], mocker: MockerFixt
 
 
 @pytest.fixture()
-def test_feature_view() -> views.FeatureView:
+def test_feature_view(patched_admin_factory: IAdminFactory) -> views.FeatureView:
     return views.FeatureView(model=db.Feature, session=UnifiedAlchemyMagicMock)
 
 
@@ -91,7 +92,7 @@ def test_feature_name(faker: Faker) -> str:
 
 
 @pytest.fixture()
-def test_feature_model_task() -> List[str]:
+def test_feature_model_task() -> list[str]:
     return ["KEK-1111"]
 
 
@@ -127,7 +128,7 @@ def test_feature_row(
     test_feature_type_id: int,
     test_feature_filepath: str,
     test_severity: allure.severity_level,
-    test_feature_model_task: List[str],
+    test_feature_model_task: list[str],
 ) -> db.Feature:
     row = db.Feature(
         name=test_feature_name,
@@ -168,9 +169,9 @@ def test_not_mocked_draft_view() -> views.DraftView:
 
 
 @pytest.fixture()
-def test_prurl(request: FixtureRequest) -> Optional[str]:
+def test_prurl(request: FixtureRequest) -> str | None:
     if hasattr(request, "param"):
-        return cast(Optional[str], request.param)
+        return cast(str | None, request.param)
     raise NotImplementedError
 
 
@@ -224,7 +225,7 @@ def current_user_mock(user_role: db.Role, faker: Faker, test_mock_patch_user_dir
 
 
 @pytest.fixture()
-def test_mock_patch_user_directory(request: FixtureRequest) -> List[str]:
+def test_mock_patch_user_directory(request: FixtureRequest) -> list[str]:
     if hasattr(request, "param"):
         return request.param
     raise NotImplementedError

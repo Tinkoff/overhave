@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import Dict, List
 
 from overhave.entities.feature.abstract import IFeatureExtractor
 from overhave.entities.feature.errors import FeatureTypeExtractionError, ScenariosTestFileNotFound
@@ -16,8 +15,8 @@ class FeatureExtractor(IFeatureExtractor):
     def __init__(self, file_settings: OverhaveFileSettings):
         self._file_settings = file_settings
 
-        self._feature_types: List[FeatureTypeName] = []
-        self._feature_type_to_dir_mapping: Dict[FeatureTypeName, Path] = {}
+        self._feature_types: list[FeatureTypeName] = []
+        self._feature_type_to_dir_mapping: dict[FeatureTypeName, Path] = {}
         try:
             self._extract_project_data()
             self._check_pytest_bdd_scenarios_test_files()
@@ -59,9 +58,9 @@ class FeatureExtractor(IFeatureExtractor):
             )
 
     @property
-    def feature_types(self) -> List[FeatureTypeName]:
+    def feature_types(self) -> list[FeatureTypeName]:
         return self._feature_types
 
     @property
-    def feature_type_to_dir_mapping(self) -> Dict[FeatureTypeName, Path]:
+    def feature_type_to_dir_mapping(self) -> dict[FeatureTypeName, Path]:
         return self._feature_type_to_dir_mapping

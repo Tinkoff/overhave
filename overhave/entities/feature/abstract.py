@@ -1,6 +1,5 @@
 import abc
 from pathlib import Path
-from typing import Dict, List
 
 from overhave.storage import FeatureTypeName
 
@@ -10,10 +9,10 @@ class IFeatureExtractor(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def feature_types(self) -> List[FeatureTypeName]:
+    def feature_types(self) -> list[FeatureTypeName]:
         pass
 
     @property
     @abc.abstractmethod
-    def feature_type_to_dir_mapping(self) -> Dict[FeatureTypeName, Path]:
+    def feature_type_to_dir_mapping(self) -> dict[FeatureTypeName, Path]:
         pass

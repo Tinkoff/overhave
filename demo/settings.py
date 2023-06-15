@@ -2,7 +2,6 @@ import enum
 from copy import deepcopy
 from functools import cached_property
 from pathlib import Path
-from typing import Dict
 
 import httpx
 from pydantic import BaseSettings
@@ -64,7 +63,7 @@ class OverhaveDemoSettingsGenerator:
         return self._default_feature_user
 
     @cached_property
-    def default_context_settings(self) -> Dict[str, BaseSettings]:
+    def default_context_settings(self) -> dict[str, BaseSettings]:
         if self._language is OverhaveDemoAppLanguage.RU:
             language_settings = OverhaveLanguageSettings(step_prefixes=RUSSIAN_PREFIXES)
         else:
@@ -80,17 +79,17 @@ class OverhaveDemoSettingsGenerator:
         )
 
     @cached_property
-    def test_execution_settings(self) -> Dict[str, BaseSettings]:
+    def test_execution_settings(self) -> dict[str, BaseSettings]:
         admin_url = httpx.URL(self._admin_host)
         if not admin_url.scheme:
             admin_url = httpx.URL(f"http://{self._admin_host}:{self._admin_port}")
-        settings: Dict[str, BaseSettings] = dict(admin_link_settings=OverhaveAdminLinkSettings(admin_url=admin_url))
+        settings: dict[str, BaseSettings] = dict(admin_link_settings=OverhaveAdminLinkSettings(admin_url=admin_url))
         settings.update(self.default_context_settings)
         return settings
 
     @cached_property
-    def admin_context_settings(self) -> Dict[str, BaseSettings]:
-        settings: Dict[str, BaseSettings] = dict(
+    def admin_context_settings(self) -> dict[str, BaseSettings]:
+        settings: dict[str, BaseSettings] = dict(
             admin_settings=OverhaveAdminSettings(consumer_based=not self._threadpool),
             step_collector_settings=OverhaveStepCollectorSettings(hide_non_public_steps=True),
         )
@@ -98,7 +97,7 @@ class OverhaveDemoSettingsGenerator:
         return settings
 
     @cached_property
-    def publication_context_settings(self) -> Dict[str, BaseSettings]:
+    def publication_context_settings(self) -> dict[str, BaseSettings]:
         settings = deepcopy(self.default_context_settings)
         if OverhavePublicationSettings().publication_manager_type is OverhavePublicationManagerType.GITLAB:
             publication_manager_settings = dict(
