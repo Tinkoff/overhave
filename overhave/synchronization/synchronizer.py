@@ -11,7 +11,7 @@ from overhave.scenario import FeatureInfo, NullableFeatureIdError, ScenarioParse
 from overhave.storage import FeatureModel
 from overhave.synchronization.abstract import IOverhaveSynchronizer
 from overhave.synchronization.storage_manager import SynchronizerStorageManager
-from overhave.utils import get_current_time
+from overhave.utils import ANY_INT, get_current_time
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         if info.last_edited_by is None:
             info.last_edited_by = info.author
 
-        info.id = 0  # just for model manipulations
+        info.id = ANY_INT
         strict_info = StrictFeatureInfo(**info.dict())
         self._storage_manager.ensure_users_exist(strict_info)
         feature_tags = self._storage_manager.get_feature_tags(strict_info)

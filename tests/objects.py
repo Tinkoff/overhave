@@ -1,6 +1,6 @@
 from functools import cache
 from pathlib import Path
-from typing import NewType, Sequence
+from typing import NewType
 from unittest import mock
 
 from pydantic import root_validator
@@ -72,7 +72,7 @@ class FeatureTestContainer(BaseModel):
 
 
 @cache
-def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
+def get_test_feature_containers() -> tuple[FeatureTestContainer, ...]:
     feature_containers: list[FeatureTestContainer] = []
     for value in get_test_feature_extractor().feature_type_to_dir_mapping.values():
         for item in value.iterdir():
@@ -83,4 +83,4 @@ def get_test_feature_containers() -> Sequence[FeatureTestContainer]:
                 type=value.name, name=item.name, project_path=item, content=content
             )
             feature_containers.append(container)
-    return feature_containers
+    return tuple(sorted(feature_containers, key=lambda x: x.name))
