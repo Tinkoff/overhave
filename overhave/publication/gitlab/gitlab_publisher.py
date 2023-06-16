@@ -2,7 +2,7 @@ import logging
 from http import HTTPStatus
 
 import httpx
-from gitlab import GitlabCreateError, GitlabHttpError
+from gitlab import GitlabError
 
 from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
@@ -72,13 +72,14 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                 pr_url=response.web_url,
                 published_at=response.created_at,
             )
-            return
-        except (GitlabCreateError, GitlabHttpError, httpx.HTTPError) as err:
-            if not isinstance(err, httpx.HTTPError) and err.response_code == HTTPStatus.CONFLICT:
-                logger.exception("Gotten conflict. Try to return last merge-request for Draft with id=%s...", draft_id)
+            logger.info("Draft.id=%s successfully sent to GitLab", draft_id)
+        except (GitlabError, httpx.HTTPError) as err:
+            logger.exception("Got error while trying to sent merge-request!")
+            if isinstance(err, GitlabError) and err.response_code == HTTPStatus.CONFLICT:
                 self._draft_storage.save_response_as_duplicate(
                     draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
                 )
                 return
-            logger.exception("Got error while trying to sent merge-request!")
-            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, traceback=str(err))
+            self._draft_storage.set_draft_status(
+                draft_id=draft_id, status=db.DraftStatus.INTERNAL_ERROR, traceback=str(err)
+            )
