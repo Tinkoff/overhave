@@ -1,3 +1,4 @@
+import logging
 from typing import cast
 
 from pydantic.main import BaseModel
@@ -5,6 +6,8 @@ from pydantic.main import BaseModel
 from overhave.publication.gitlab.tokenizer.settings import TokenizerClientSettings
 from overhave.transport.http import BaseHttpClient
 from overhave.transport.http.base_client import HttpMethod
+
+logger = logging.getLogger(__name__)
 
 
 class TokenizerResponse(BaseModel):
@@ -56,4 +59,5 @@ class TokenizerClient(BaseHttpClient[TokenizerClientSettings]):
             self._settings.url,
             params=params_model.get_request_params(self._settings.remote_key_name),
         )
+        logger.debug("Response with token: %s", response)
         return cast(TokenizerResponse, self._parse_or_raise(response, TokenizerResponse))
