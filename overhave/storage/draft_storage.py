@@ -131,7 +131,10 @@ class DraftStorage(IDraftStorage):
                 .filter(db.Draft.id == draft_id)
                 .scalar_subquery()
             )
-            session.execute(sa.update(db.Feature).where(db.Feature.id == feature_id_query).values(released=True))
+            session.execute(
+                sa.update(db.Feature).where(db.Feature.id == feature_id_query).values(released=True),
+                execution_options={"synchronize_session": "fetch"},
+            )
 
     @staticmethod
     def save_response_as_duplicate(draft_id: int, feature_id: int, traceback: str | None) -> None:
