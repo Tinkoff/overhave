@@ -12,26 +12,7 @@ class OverhaveMetricContainer:
 
     def __init__(self, registry: CollectorRegistry):
         self.registry = registry
-        self._init_gunicorn_metrics()
         self._init_product_metrics()
-
-    def _init_gunicorn_metrics(self) -> None:
-        self.gunicorn_tasks = Histogram(
-            "gunicorn_current_tasks", "How many tasks is processed right now", registry=self.registry
-        )
-        self.gunicorn_connections = Histogram(
-            "gunicorn_connections", "How many connection is processed right now", registry=self.registry
-        )
-        self.gunicorn_total_connections = Gauge(
-            "gunicorn_total_connections",
-            "How many tasks is processed by this worker",
-            registry=self.registry,
-        )
-        self.gunicorn_active_threads = Gauge(
-            "gunicorn_active_threads",
-            "How many threads is running on this worker",
-            registry=self.registry,
-        )
 
     def _init_product_metrics(self) -> None:
         self.test_run_tasks = Counter(
