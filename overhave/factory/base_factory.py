@@ -19,6 +19,7 @@ from overhave.storage import (
     FeatureTypeStorage,
     IDraftStorage,
     IEmulationStorage,
+    IFeatureStorage,
     IFeatureTypeStorage,
     IScenarioStorage,
     ISystemUserStorage,
@@ -51,6 +52,11 @@ class IOverhaveFactory(Generic[TApplicationContext], abc.ABC):
     @property
     @abc.abstractmethod
     def emulation_storage(self) -> IEmulationStorage:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def feature_storage(self) -> IFeatureStorage:
         pass
 
     @property
@@ -141,6 +147,10 @@ class BaseOverhaveFactory(IOverhaveFactory[TApplicationContext]):
     @cached_property
     def _feature_storage(self) -> FeatureStorage:
         return FeatureStorage()
+
+    @property
+    def feature_storage(self) -> IFeatureStorage:
+        return self._feature_storage
 
     @cached_property
     def _feature_type_storage(self) -> IFeatureTypeStorage:

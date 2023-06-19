@@ -9,6 +9,7 @@ import werkzeug
 from overhave import db
 from overhave.admin.flask import FlaskLoginManager, get_flask_admin, get_flask_app
 from overhave.factory import IAdminFactory, get_publication_factory
+from overhave.metrics import METRICS
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.transport import PublicationData, PublicationTask
 
@@ -98,6 +99,7 @@ def overhave_app(factory: IAdminFactory) -> OverhaveAdminApp:  # noqa: C901
         ):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return flask.redirect(flask.url_for("testrun.details_view", id=run_id))
+        METRICS.add_publication_task()
         return flask.redirect(flask.url_for("draft.details_view", id=draft_id))
 
     @flask_app.route("/files/<path:file>")

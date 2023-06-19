@@ -6,6 +6,7 @@ from pathlib import Path
 from overhave import db
 from overhave.db import TestRunStatus
 from overhave.entities import OverhaveFileSettings, ReportManager
+from overhave.metrics import METRICS
 from overhave.scenario import FileManager
 from overhave.storage import IFeatureStorage, IScenarioStorage, ITestRunStorage, TestExecutorContext
 from overhave.test_execution.test_runner import PytestRunner
@@ -80,15 +81,18 @@ class TestExecutor(ITestExecutor):
             self._test_run_storage.set_run_status(
                 run_id=test_run_id, status=TestRunStatus.INTERNAL_ERROR, traceback=str(e)
             )
+            METRICS.add_test_run_status(status=TestRunStatus.INTERNAL_ERROR)
             return
 
         logger.debug("Test returncode: %s", test_return_code)
         if test_return_code == 0:
             self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.SUCCESS)
+            METRICS.add_test_run_status(status=TestRunStatus.SUCCESS)
         else:
             self._test_run_storage.set_run_status(
                 run_id=test_run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
             )
+            METRICS.add_test_run_status(status=TestRunStatus.FAILED)
         self._report_manager.create_allure_report(test_run_id=test_run_id, results_dir=results_dir)
 
     def process_test_task(self, task: TestRunTask) -> None:

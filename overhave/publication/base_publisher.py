@@ -5,6 +5,7 @@ import git
 
 from overhave import db
 from overhave.entities import GitPullError, OverhaveFileSettings
+from overhave.metrics import METRICS
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.publication.errors import BaseGitVersionPublisherError
 from overhave.scenario import FileManager, OverhaveProjectSettings, generate_task_info
@@ -36,7 +37,8 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         self._file_manager = file_manager
 
     def process_publish_task(self, task: PublicationTask) -> None:
-        self.publish_version(task.data.draft_id)
+        status = self.publish_version(task.data.draft_id)
+        METRICS.add_publication_task_status(status=status)
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
         with db.create_session() as session:
