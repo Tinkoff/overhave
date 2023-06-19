@@ -31,4 +31,4 @@ class BaseFileExtractor:
             if not self._check_file_compliance(path):
                 continue
             files.append(path)
-        return files
+        return sorted(files, key=lambda x: str(x))
