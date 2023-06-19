@@ -2,6 +2,7 @@ from datetime import datetime
 
 import allure
 import pytest
+import sqlalchemy as sa
 from faker import Faker
 
 from overhave import db
@@ -106,6 +107,10 @@ class TestDraftStorage:
         pr_url: str,
         published_at: datetime,
     ) -> None:
+        with create_test_session() as session:
+            session.execute(
+                sa.update(db.Draft).where(db.Draft.id == test_draft.id).values(status=db.DraftStatus.REQUESTED)
+            )
         with count_queries(2):
             test_draft_storage.save_response_as_created(
                 draft_id=test_draft.id,
