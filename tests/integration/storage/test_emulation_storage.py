@@ -6,18 +6,12 @@ from faker import Faker
 from overhave import db
 from overhave.db import EmulationStatus
 from overhave.storage import EmulationModel, EmulationRunModel, EmulationStorage, SystemUserModel
-from overhave.storage.emulation_storage import NotFoundEmulationError
 from tests.db_utils import count_queries, create_test_session
 
 
 @pytest.mark.usefixtures("database", "socket_mock")
 class TestEmulationStorage:
     """Integration tests for :class:`EmulationStorage`."""
-
-    def test_raise_exception_for_not_existing_id(self, test_emulation_storage: EmulationStorage, faker: Faker) -> None:
-        with count_queries(1):
-            with pytest.raises(NotFoundEmulationError):
-                test_emulation_storage.get_requested_emulation_run(cast(int, faker.random_int()))
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     def test_create_emulation_run(
@@ -57,11 +51,8 @@ class TestEmulationStorage:
         test_emulation_run: EmulationRunModel,
         faker: Faker,
     ) -> None:
-        with create_test_session() as session:
-            emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == test_emulation_run.id).one()
-            assert emulation_run.status == EmulationStatus.CREATED
-
-        with count_queries(2):
+        assert test_emulation_run.status is EmulationStatus.CREATED
+        with count_queries(1):
             test_emulation_storage.set_error_emulation_run(
                 emulation_run_id=test_emulation_run.id, traceback=cast(str, faker.sentence())
             )
@@ -84,10 +75,8 @@ class TestEmulationStorage:
         with count_queries(1):
             test_emulation_storage.set_emulation_run_status(test_emulation_run.id, emulation_status)
         with create_test_session() as session:
-            emulation_run = EmulationRunModel.from_orm(
-                test_emulation_storage._get_emulation_run(session, test_emulation_run.id)
-            )
-        assert emulation_run.status == emulation_status
+            emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == test_emulation_run.id).one()
+            assert emulation_run.status == emulation_status
 
     def test_get_emulation_run_by_test_user_id_empty(
         self,

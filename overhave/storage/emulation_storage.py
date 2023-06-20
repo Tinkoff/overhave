@@ -19,10 +19,6 @@ class EmulationStorageError(Exception):
     """Base Exception for :class:`EmulationStorage`."""
 
 
-class NotFoundEmulationError(EmulationStorageError):
-    """Exception for situation without saved emulation.."""
-
-
 class AllPortsAreBusyError(EmulationStorageError):
     """Exception for situation when all ports are busy."""
 
@@ -58,6 +54,7 @@ class EmulationStorage(IEmulationStorage):
 
     def __init__(self, settings: OverhaveEmulationSettings):
         self._settings = settings
+        self._emulation_ports_len = len(self._settings.emulation_ports)
 
     @staticmethod
     def create_emulation_run(emulation_id: int, initiated_by: str) -> int:
@@ -67,19 +64,12 @@ class EmulationStorage(IEmulationStorage):
             session.flush()
             return emulation_run.id
 
-    @staticmethod
-    def _get_emulation_run(session: so.Session, emulation_run_id: int) -> db.EmulationRun:
-        emulation_run = session.get(db.EmulationRun, emulation_run_id)
-        if isinstance(emulation_run, db.EmulationRun):
-            return emulation_run
-        raise NotFoundEmulationError(f"Not found emulation run with ID {emulation_run_id}!")
-
     def _get_next_port(self, session: so.Session) -> int:
         runs_with_allocated_ports = (  # noqa: ECE001
             session.query(db.EmulationRun)
             .filter(db.EmulationRun.port.isnot(None))
             .order_by(db.EmulationRun.id.desc())
-            .limit(len(self._settings.emulation_ports))
+            .limit(self._emulation_ports_len)
             .all()
         )
         allocated_sorted_runs = sorted(
@@ -109,7 +99,7 @@ class EmulationStorage(IEmulationStorage):
 
     def get_requested_emulation_run(self, emulation_run_id: int) -> EmulationRunModel:
         with db.create_session() as session:
-            emulation_run = self._get_emulation_run(session, emulation_run_id)
+            emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == emulation_run_id).one()
             emulation_run.status = db.EmulationStatus.REQUESTED
             emulation_run.port = self._get_next_port(session)
             emulation_run.changed_at = get_current_time()
@@ -125,10 +115,11 @@ class EmulationStorage(IEmulationStorage):
 
     def set_error_emulation_run(self, emulation_run_id: int, traceback: str) -> None:
         with db.create_session() as session:
-            emulation_run = self._get_emulation_run(session, emulation_run_id)
-            emulation_run.status = db.EmulationStatus.ERROR
-            emulation_run.traceback = traceback
-            emulation_run.changed_at = get_current_time()
+            session.execute(
+                sa.update(db.EmulationRun)
+                .where(db.EmulationRun.id == emulation_run_id)
+                .values(status=db.EmulationStatus.ERROR, changed_at=get_current_time(), traceback=traceback)
+            )
 
     @staticmethod
     def get_emulation_runs_by_test_user_id(test_user_id: int) -> list[EmulationRunModel]:
