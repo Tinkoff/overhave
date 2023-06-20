@@ -43,7 +43,7 @@ class TestMetrics:
         for i in range(call_count):
             container.add_emulation_task(port=port)
         sample = get_sample_from_counter(counter=container.emulation_tasks)
-        assert sample.labels["port"] == port
+        assert sample.labels["port"] == str(port)
         assert sample.value == call_count
 
     @pytest.mark.parametrize("emulation_status", EmulationStatus)
@@ -56,4 +56,4 @@ class TestMetrics:
         sample = get_sample_from_counter(container.emulation_tasks_statuses)
         assert sample.value == 2
         assert sample.labels["status"] == emulation_status
-        assert sample.labels["port"] == port
+        assert sample.labels["port"] == str(port)
