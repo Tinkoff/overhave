@@ -1,6 +1,6 @@
 import logging
 
-from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram
+from prometheus_client import CollectorRegistry, Counter
 
 from overhave.db import DraftStatus, TestRunStatus
 
