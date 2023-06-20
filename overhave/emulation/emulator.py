@@ -92,5 +92,4 @@ class Emulator(ExternalCommandCheckMixin):
         except (EmulationError, EmulationStorageError) as e:
             logger.exception("Could not emulate task %s!", task)
             self._storage.set_error_emulation_run(emulation_run_id=emulation_run_id, traceback=str(e))
-            if emulation_run.port is not None:
-                METRICS.add_emulation_task_status(status=db.EmulationStatus.ERROR, port=emulation_run.port)
+            METRICS.add_emulation_task_status(status=db.EmulationStatus.ERROR, port=None)
