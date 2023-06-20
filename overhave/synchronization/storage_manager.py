@@ -1,6 +1,9 @@
 import logging
 from datetime import datetime
 
+from pydantic import parse_obj_as
+
+from overhave import db
 from overhave.scenario import StrictFeatureInfo
 from overhave.storage import (
     FeatureModel,
@@ -62,12 +65,13 @@ class SynchronizerStorageManager:
         return model.last_edited_at
 
     def get_feature_tags(self, info: StrictFeatureInfo) -> list[TagModel]:
-        tags: list[TagModel] = []
-        if info.tags is not None:
-            for tag in info.tags:
-                tag_model = self._tag_storage.get_or_create_tag(value=tag, created_by=info.last_edited_by)
-                tags.append(tag_model)
-        return tags
+        with db.create_session() as session:
+            db_tags = [
+                self._tag_storage.get_or_create_tag(session=session, value=tag, created_by=info.last_edited_by)
+                for tag in info.tags
+            ]
+            session.flush()
+            return parse_obj_as(list[TagModel], db_tags)
 
     def get_feature_type(self, feature_type: FeatureTypeName) -> FeatureTypeModel:
         return self._feature_type_storage.get_feature_type_by_name(feature_type)

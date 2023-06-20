@@ -23,13 +23,22 @@ class TestFeatureTagStorage:
     ) -> None:
         tag_value = faker.word()
         with count_queries(2):
-            tag_model = test_tag_storage.get_or_create_tag(value=tag_value, created_by=test_system_user.login)
-        assert tag_model.value == tag_value
-        assert tag_model.created_by == test_system_user.login
+            with db.create_session() as session:
+                db_tag = test_tag_storage.get_or_create_tag(
+                    session=session, value=tag_value, created_by=test_system_user.login
+                )
+                session.flush()
+                assert db_tag.value == tag_value
+                assert db_tag.created_by == test_system_user.login
 
     def test_get_tag(self, test_tag_storage: FeatureTagStorage, test_tag: TagModel) -> None:
         with count_queries(1):
-            tag_model = test_tag_storage.get_or_create_tag(value=test_tag.value, created_by=test_tag.created_by)
+            with db.create_session() as session:
+                db_tag = test_tag_storage.get_or_create_tag(
+                    session=session, value=test_tag.value, created_by=test_tag.created_by
+                )
+                session.flush()
+                tag_model = TagModel.from_orm(db_tag)
         _validate_tag_model(tag=tag_model, validation_tag=test_tag)
 
     def test_get_tag_by_value_not_exist(
