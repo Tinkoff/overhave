@@ -32,7 +32,7 @@ class IEmulationStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def create_emulation_run(emulation_id: int, initiated_by: str) -> EmulationRunModel:
+    def create_emulation_run(emulation_id: int, initiated_by: str) -> int:
         pass
 
     @abc.abstractmethod
@@ -60,12 +60,12 @@ class EmulationStorage(IEmulationStorage):
         self._settings = settings
 
     @staticmethod
-    def create_emulation_run(emulation_id: int, initiated_by: str) -> EmulationRunModel:
+    def create_emulation_run(emulation_id: int, initiated_by: str) -> int:
         with db.create_session() as session:
             emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
             session.add(emulation_run)
             session.flush()
-            return EmulationRunModel.from_orm(emulation_run)
+            return emulation_run.id
 
     @staticmethod
     def _get_emulation_run(session: so.Session, emulation_run_id: int) -> db.EmulationRun:

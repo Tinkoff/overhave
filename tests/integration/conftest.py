@@ -8,9 +8,9 @@ from faker import Faker
 from pydantic import SecretStr
 
 from overhave import OverhaveEmulationSettings, db
-from overhave.db import EmulationRun
 from overhave.storage import (
     EmulationModel,
+    EmulationRunModel,
     EmulationStorage,
     FeatureModel,
     FeatureTypeModel,
@@ -259,10 +259,9 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 
 
 @pytest.fixture()
-def test_emulation_run(
-    test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: EmulationModel
-) -> EmulationRun:
-    with create_test_session():
-        return test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
-        )
+def test_emulation_run(test_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
+    with create_test_session() as session:
+        emulation_run = db.EmulationRun(emulation_id=test_emulation.id, initiated_by=test_system_user.login)
+        session.add(emulation_run)
+        session.flush()
+        return EmulationRunModel.from_orm(emulation_run)
