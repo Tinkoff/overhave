@@ -1,7 +1,8 @@
 import abc
+from functools import cached_property
 
 from overhave import db
-from overhave.storage.converters import FeatureTypeModel
+from overhave.storage.converters import FeatureTypeModel, FeatureTypeName
 
 
 class BaseFeatureTypeStorageException(Exception):
@@ -15,9 +16,9 @@ class FeatureTypeNotExistsError(BaseFeatureTypeStorageException):
 class IFeatureTypeStorage(abc.ABC):
     """Abstract class for feature type storage."""
 
-    @staticmethod
     @abc.abstractmethod
-    def get_default_feature_type() -> FeatureTypeModel:
+    @cached_property
+    def default_feature_type_name(self) -> FeatureTypeName:
         pass
 
     @staticmethod
@@ -34,11 +35,18 @@ class IFeatureTypeStorage(abc.ABC):
 class FeatureTypeStorage(IFeatureTypeStorage):
     """Class for feature type storage."""
 
-    @staticmethod
-    def get_default_feature_type() -> FeatureTypeModel:
+    @cached_property
+    def default_feature_type_name(self) -> FeatureTypeName:
         with db.create_session() as session:
-            feature_type = session.query(db.FeatureType).order_by(db.FeatureType.id.asc()).first()
-            return FeatureTypeModel.from_orm(feature_type)
+            row_entities: tuple[FeatureTypeName] | None = (
+                session.query(db.FeatureType)
+                .with_entities(db.FeatureType.name)
+                .order_by(db.FeatureType.id.asc())
+                .first()
+            )
+            if row_entities is None:
+                raise FeatureTypeNotExistsError("No one feature type exists in db.FeatureType table!")
+            return row_entities[0]
 
     @staticmethod
     def get_feature_type_by_name(name: str) -> FeatureTypeModel:

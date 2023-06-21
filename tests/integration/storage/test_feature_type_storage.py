@@ -1,6 +1,6 @@
 import pytest
 
-from overhave.storage import FeatureTypeModel, FeatureTypeStorage
+from overhave.storage import FeatureTypeModel, FeatureTypeNotExistsError, FeatureTypeStorage
 from tests.db_utils import count_queries
 
 
@@ -13,13 +13,17 @@ def _check_base_feature_type_model(test_model: FeatureTypeModel, validation_mode
 class TestFeatureTypeStorage:
     """Integration tests for :class:`FeatureTypeStorage`."""
 
+    def test_get_default_feature_type_not_exists(self, test_feature_type_storage: FeatureTypeStorage) -> None:
+        with count_queries(1):
+            with pytest.raises(FeatureTypeNotExistsError):
+                _ = test_feature_type_storage.default_feature_type_name
+
     def test_get_default_feature_type(
         self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel
     ) -> None:
         with count_queries(1):
-            model = test_feature_type_storage.get_default_feature_type()
-        assert model is not None
-        _check_base_feature_type_model(test_model=model, validation_model=test_feature_type)
+            default_feature_type_name = test_feature_type_storage.default_feature_type_name
+            assert default_feature_type_name == test_feature_type.name
 
     def test_get_exists_feature_type(
         self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel
