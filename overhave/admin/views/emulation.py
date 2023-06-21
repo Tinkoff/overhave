@@ -11,7 +11,8 @@ from wtforms import Form, ValidationError
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_admin_factory
-from overhave.transport import EmulationData, EmulationTask
+from overhave.metrics import METRICS
+from overhave.transport import EmulationData, EmulationTask, RedisStream
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,7 @@ class EmulationView(ModelViewConfigured):
         if not factory.redis_producer.add_task(EmulationTask(data=EmulationData(emulation_run_id=emulation_run_id))):
             flask.flash("Problems with Redis service! EmulationTask has not been sent.", category="error")
             return flask.redirect(flask.url_for("emulation.edit_view", id=emulation_id))
+        METRICS.produce_redis_task(task_type=RedisStream.EMULATION)
         return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run_id))
 
     @property
