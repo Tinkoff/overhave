@@ -81,10 +81,12 @@ class TestFeatureStorage:
     ) -> None:
         with count_queries(1):
             new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
-        with count_queries(2):
-            new_tag_model = test_tag_storage.get_or_create_tag(
-                value=faker.word() + faker.word(), created_by=new_system_user.login
-            )
+        with create_test_session() as session:
+            new_db_tag = db.Tags(value=faker.word() + faker.word(), created_by=new_system_user.login)
+            session.add(new_db_tag)
+            session.flush()
+            new_tag_model = TagModel.from_orm(new_db_tag)
+
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,
             created_at=get_current_time(),

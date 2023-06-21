@@ -62,7 +62,7 @@ class OverhaveMetricContainer:
     def add_publication_task_status(self, status: DraftStatus) -> None:
         self.publication_tasks_statuses.labels(status=status).inc()
 
-    def add_emulation_task(self, port: int) -> None:
+    def add_emulation_task(self, port: int | None) -> None:
         self.emulation_tasks.labels(port=port).inc()
 
     def add_emulation_task_status(self, status: EmulationStatus, port: int | None) -> None:

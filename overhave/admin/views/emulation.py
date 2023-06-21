@@ -52,15 +52,15 @@ class EmulationView(ModelViewConfigured):
     @staticmethod
     def _run_emulation(emulation_id: int) -> werkzeug.Response:
         factory = get_admin_factory()
-        emulation_run = factory.emulation_storage.create_emulation_run(
+        emulation_run_id = factory.emulation_storage.create_emulation_run(
             emulation_id=emulation_id, initiated_by=current_user.login
         )
-        if not factory.redis_producer.add_task(EmulationTask(data=EmulationData(emulation_run_id=emulation_run.id))):
+        if not factory.redis_producer.add_task(EmulationTask(data=EmulationData(emulation_run_id=emulation_run_id))):
             flask.flash("Problems with Redis service! EmulationTask has not been sent.", category="error")
             return flask.redirect(flask.url_for("emulation.edit_view", id=emulation_id))
-        if emulation_run.port is not None:
-            METRICS.add_emulation_task(port=emulation_run.port)
-        return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run.id))
+        port = factory.emulation_storage.get_emulation_run_port(emulation_run_id)
+        METRICS.add_emulation_task(port=port)
+        return flask.redirect(flask.url_for("emulationrun.details_view", id=emulation_run_id))
 
     @property
     def description_link(self) -> str | None:

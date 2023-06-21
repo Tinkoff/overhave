@@ -1,5 +1,7 @@
 import abc
 
+import sqlalchemy.orm as so
+
 from overhave import db
 from overhave.storage.converters import TagModel
 
@@ -19,7 +21,7 @@ class IFeatureTagStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_or_create_tag(value: str, created_by: str) -> TagModel:
+    def get_or_create_tag(session: so.Session, value: str, created_by: str) -> db.Tags:
         pass
 
 
@@ -41,11 +43,9 @@ class FeatureTagStorage(IFeatureTagStorage):
             return [TagModel.from_orm(tag) for tag in db_tags]
 
     @staticmethod
-    def get_or_create_tag(value: str, created_by: str) -> TagModel:
-        with db.create_session() as session:
-            tag = session.query(db.Tags).filter(db.Tags.value == value).one_or_none()
-            if tag is None:
-                tag = db.Tags(value=value, created_by=created_by)
-                session.add(tag)
-                session.flush()
-            return TagModel.from_orm(tag)
+    def get_or_create_tag(session: so.Session, value: str, created_by: str) -> db.Tags:
+        tag = session.query(db.Tags).filter(db.Tags.value == value).one_or_none()
+        if tag is None:
+            tag = db.Tags(value=value, created_by=created_by)
+            session.add(tag)
+        return tag
