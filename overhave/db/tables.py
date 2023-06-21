@@ -179,7 +179,8 @@ class EmulationRun(BaseTable, PrimaryKeyMixin):
         Emulation, uselist=False, backref=so.backref("emulation_runs", cascade="all, delete-orphan")
     )
 
-    def __init__(self, emulation_id: int, initiated_by: str) -> None:
+    def __init__(self, emulation_id: int, initiated_by: str, port: int | None = None) -> None:
         self.emulation_id = emulation_id
         self.status = EmulationStatus.CREATED
         self.initiated_by = initiated_by
+        self.port = port

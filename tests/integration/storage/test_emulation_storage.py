@@ -59,7 +59,6 @@ class TestEmulationStorage:
         with create_test_session() as session:
             emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == test_emulation_run.id).one()
             assert emulation_run.status == EmulationStatus.ERROR
-            assert emulation_run.port is None
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     @pytest.mark.parametrize(
@@ -99,3 +98,13 @@ class TestEmulationStorage:
             filtered_runs = test_emulation_storage.get_emulation_runs_by_test_user_id(test_user_id=test_system_user.id)
         assert len(filtered_runs) == 1
         assert filtered_runs[0] == test_emulation_run
+
+    @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
+    def test_get_emulation_run_port(
+        self,
+        test_emulation_storage: EmulationStorage,
+        test_emulation_run: EmulationRunModel,
+    ) -> None:
+        with count_queries(1):
+            port = test_emulation_storage.get_emulation_run_port(test_emulation_run.id)
+        assert port == 5000

@@ -261,7 +261,7 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 @pytest.fixture()
 def test_emulation_run(test_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
     with create_test_session() as session:
-        emulation_run = db.EmulationRun(emulation_id=test_emulation.id, initiated_by=test_system_user.login)
+        emulation_run = db.EmulationRun(emulation_id=test_emulation.id, initiated_by=test_system_user.login, port=5000)
         session.add(emulation_run)
         session.flush()
         return EmulationRunModel.from_orm(emulation_run)
