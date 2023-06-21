@@ -33,7 +33,7 @@ class TestEmulator:
         emulation_task: EmulationTask,
         mock_subprocess_popen: MagicMock,
     ) -> None:
-        with count_queries(9):
+        with count_queries(8):
             emulator.start_emulation(task=emulation_task)
         with create_test_session() as session:
             emulation_run_db = session.get(db.EmulationRun, emulation_task.data.emulation_run_id)
