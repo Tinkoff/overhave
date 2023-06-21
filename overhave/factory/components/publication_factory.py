@@ -12,7 +12,7 @@ from overhave.publication import (
     StashVersionPublisher,
     TokenizerClient,
 )
-from overhave.transport import GitlabHttpClient, PublicationTask, RedisStream, StashHttpClient
+from overhave.transport import GitlabHttpClient, PublicationTask, StashHttpClient
 
 
 class BasePublicationFactoryException(Exception):
@@ -89,5 +89,5 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         return self._stash_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        METRICS.consume_redis_task(task_type=RedisStream.PUBLICATION)
+        METRICS.consume_publication_task()
         return self.publisher.process_publish_task(task)

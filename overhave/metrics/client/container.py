@@ -56,11 +56,29 @@ class OverhaveMetricContainer:
             registry=self.registry,
         )
 
-    def produce_redis_task(self, task_type: RedisStream) -> None:
+    def _produce_redis_task(self, task_type: RedisStream) -> None:
         self.produced_redis_tasks.labels(task_type=task_type).inc()
 
-    def consume_redis_task(self, task_type: RedisStream) -> None:
+    def _consume_redis_task(self, task_type: RedisStream) -> None:
         self.consumed_redis_tasks.labels(task_type=task_type).inc()
+
+    def produce_test_run_task(self) -> None:
+        self._produce_redis_task(task_type=RedisStream.TEST)
+
+    def produce_emulation_run_task(self) -> None:
+        self._produce_redis_task(task_type=RedisStream.EMULATION)
+
+    def produce_publication_task(self) -> None:
+        self._produce_redis_task(task_type=RedisStream.PUBLICATION)
+
+    def consume_test_run_task(self) -> None:
+        self._consume_redis_task(task_type=RedisStream.TEST)
+
+    def consume_emulation_run_task(self) -> None:
+        self._consume_redis_task(task_type=RedisStream.EMULATION)
+
+    def consume_publication_task(self) -> None:
+        self._consume_redis_task(task_type=RedisStream.PUBLICATION)
 
     def add_test_run_status(self, status: TestRunStatus) -> None:
         self.test_run_tasks_statuses.labels(status=status).inc()

@@ -22,7 +22,7 @@ from overhave.metrics import METRICS
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import FeatureTypeName
 from overhave.test_execution import BddStepModel, StepTypeName
-from overhave.transport import RedisStream, TestRunData, TestRunTask
+from overhave.transport import TestRunData, TestRunTask
 from overhave.utils import get_current_time
 
 logger = logging.getLogger(__name__)
@@ -233,7 +233,7 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         ):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return rendered
-        METRICS.produce_redis_task(RedisStream.TEST)
+        METRICS.produce_test_run_task()
         logger.debug("Redirect to TestRun details view with test_run_id='%s'...", test_run_id)
         return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 

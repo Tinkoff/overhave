@@ -15,43 +15,43 @@ class TestMetrics:
     """Test for overhave metrics."""
 
     def test_produce_test_run_task(self, container: OverhaveMetricContainer) -> None:
-        container.produce_redis_task(task_type=RedisStream.TEST)
-        container.produce_redis_task(task_type=RedisStream.TEST)
+        container.produce_test_run_task()
+        container.produce_test_run_task()
         sample = get_sample_from_counter(container.produced_redis_tasks)
         assert sample.value == 2
         assert sample.labels["task_type"] == RedisStream.TEST
 
     def test_produce_emulation_run_task(self, container: OverhaveMetricContainer) -> None:
-        container.produce_redis_task(task_type=RedisStream.EMULATION)
-        container.produce_redis_task(task_type=RedisStream.EMULATION)
-        container.produce_redis_task(task_type=RedisStream.EMULATION)
+        container.produce_emulation_run_task()
+        container.produce_emulation_run_task()
+        container.produce_emulation_run_task()
         sample = get_sample_from_counter(container.produced_redis_tasks)
         assert sample.value == 3
         assert sample.labels["task_type"] == RedisStream.EMULATION
 
     def test_produce_publication_task(self, container: OverhaveMetricContainer) -> None:
-        container.produce_redis_task(task_type=RedisStream.PUBLICATION)
+        container.produce_publication_task()
         sample = get_sample_from_counter(container.produced_redis_tasks)
         assert sample.value == 1
         assert sample.labels["task_type"] == RedisStream.PUBLICATION
 
     def test_consume_test_run_task(self, container: OverhaveMetricContainer) -> None:
-        container.consume_redis_task(task_type=RedisStream.TEST)
-        container.consume_redis_task(task_type=RedisStream.TEST)
+        container.consume_test_run_task()
+        container.consume_test_run_task()
         sample = get_sample_from_counter(container.consumed_redis_tasks)
         assert sample.value == 2
         assert sample.labels["task_type"] == RedisStream.TEST
 
     def test_consume_emulation_run_task(self, container: OverhaveMetricContainer) -> None:
-        container.consume_redis_task(task_type=RedisStream.EMULATION)
-        container.consume_redis_task(task_type=RedisStream.EMULATION)
-        container.consume_redis_task(task_type=RedisStream.EMULATION)
+        container.consume_emulation_run_task()
+        container.consume_emulation_run_task()
+        container.consume_emulation_run_task()
         sample = get_sample_from_counter(container.consumed_redis_tasks)
         assert sample.value == 3
         assert sample.labels["task_type"] == RedisStream.EMULATION
 
     def test_consume_publication_task(self, container: OverhaveMetricContainer) -> None:
-        container.consume_redis_task(task_type=RedisStream.PUBLICATION)
+        container.consume_publication_task()
         sample = get_sample_from_counter(container.consumed_redis_tasks)
         assert sample.value == 1
         assert sample.labels["task_type"] == RedisStream.PUBLICATION

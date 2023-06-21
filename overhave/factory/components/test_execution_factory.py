@@ -7,7 +7,7 @@ from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveTestExecutionContext
 from overhave.metrics import METRICS
 from overhave.test_execution.executor import ITestExecutor, TestExecutor
-from overhave.transport import RedisStream, TestRunTask
+from overhave.transport import TestRunTask
 
 
 class ITestExecutionFactory(IOverhaveFactory[OverhaveTestExecutionContext], ITaskConsumerFactory[TestRunTask], abc.ABC):
@@ -41,5 +41,5 @@ class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext
         return self._test_executor
 
     def process_task(self, task: TestRunTask) -> None:
-        METRICS.consume_redis_task(task_type=RedisStream.TEST)
+        METRICS.consume_test_run_task()
         return self._test_executor.process_test_task(task)
