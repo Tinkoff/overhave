@@ -55,8 +55,8 @@ def test_run_storage() -> TestRunStorage:
 
 
 @pytest.fixture(scope="module")
-def test_emulation_storage() -> EmulationStorage:
-    return EmulationStorage(OverhaveEmulationSettings())
+def test_emulation_storage(emulation_settings: OverhaveEmulationSettings) -> EmulationStorage:
+    return EmulationStorage(emulation_settings)
 
 
 @pytest.fixture()
@@ -261,7 +261,29 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 @pytest.fixture()
 def test_emulation_run(test_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
     with create_test_session() as session:
-        emulation_run = db.EmulationRun(emulation_id=test_emulation.id, initiated_by=test_system_user.login, port=5000)
+        emulation_run = db.EmulationRun(
+            emulation_id=test_emulation.id,
+            initiated_by=test_system_user.login,
+            port=5000,
+            status=db.EmulationStatus.CREATED,
+        )
         session.add(emulation_run)
         session.flush()
         return EmulationRunModel.from_orm(emulation_run)
+
+
+@pytest.fixture(scope="module")
+def envs_for_mock() -> dict[str, str | None]:
+    return {
+        "OVERHAVE_EMULATION_BASE_CMD": "overhave emulate",
+    }
+
+
+@pytest.fixture(scope="module")
+def mock_default_value() -> str:
+    return ""
+
+
+@pytest.fixture(scope="module")
+def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
+    return OverhaveEmulationSettings()

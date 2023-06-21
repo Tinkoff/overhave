@@ -10,23 +10,6 @@ from overhave.storage import EmulationRunModel, EmulationStorage
 from overhave.transport import EmulationData, EmulationTask
 
 
-@pytest.fixture(scope="module")
-def envs_for_mock() -> dict[str, str | None]:
-    return {
-        "OVERHAVE_EMULATION_BASE_CMD": "overhave emulate",
-    }
-
-
-@pytest.fixture(scope="module")
-def mock_default_value() -> str:
-    return ""
-
-
-@pytest.fixture()
-def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
-    return OverhaveEmulationSettings()
-
-
 @pytest.fixture()
 def emulator(
     test_emulation_storage: EmulationStorage, emulation_settings: OverhaveEmulationSettings, mock_envs: None

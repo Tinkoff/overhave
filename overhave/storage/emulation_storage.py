@@ -40,10 +40,6 @@ class IEmulationStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_emulation_run_port(self, emulation_run_id: int) -> int | None:
-        pass
-
-    @abc.abstractmethod
     def set_error_emulation_run(self, emulation_run_id: int, traceback: str) -> None:
         pass
 
@@ -63,7 +59,9 @@ class EmulationStorage(IEmulationStorage):
     @staticmethod
     def create_emulation_run(emulation_id: int, initiated_by: str) -> int:
         with db.create_session() as session:
-            emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
+            emulation_run = db.EmulationRun(
+                emulation_id=emulation_id, initiated_by=initiated_by, status=db.EmulationStatus.CREATED
+            )
             session.add(emulation_run)
             session.flush()
             return emulation_run.id
@@ -116,13 +114,6 @@ class EmulationStorage(IEmulationStorage):
                 .where(db.EmulationRun.id == emulation_run_id)
                 .values(status=status, changed_at=get_current_time())
             )
-
-    def get_emulation_run_port(self, emulation_run_id: int) -> int | None:
-        with db.create_session() as session:
-            emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == emulation_run_id).one_or_none()
-            if emulation_run is None:
-                return None
-            return emulation_run.port
 
     def set_error_emulation_run(self, emulation_run_id: int, traceback: str) -> None:
         with db.create_session() as session:

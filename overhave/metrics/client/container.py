@@ -12,23 +12,14 @@ class OverhaveMetricContainer:
 
     def __init__(self, registry: CollectorRegistry):
         self.registry = registry
-        self._init_metrics()
+        self._init_test_run_metrics()
+        self._init_publication_metrics()
+        self._init_emulation_metrics()
 
-    def _init_metrics(self) -> None:
+    def _init_test_run_metrics(self) -> None:
         self.test_run_tasks = Counter(
             "test_run_tasks",
             "How many test run tasks is running right now",
-            registry=self.registry,
-        )
-        self.publication_tasks = Counter(
-            "publication_tasks",
-            "How many publication tasks is running right now",
-            registry=self.registry,
-        )
-        self.emulation_tasks = Counter(
-            "emulation_tasks",
-            "How many emulation tasks is running right now",
-            labelnames=("port",),
             registry=self.registry,
         )
         self.test_run_tasks_statuses = Counter(
@@ -37,10 +28,25 @@ class OverhaveMetricContainer:
             labelnames=("status",),
             registry=self.registry,
         )
+
+    def _init_publication_metrics(self) -> None:
+        self.publication_tasks = Counter(
+            "publication_tasks",
+            "How many publication tasks is running right now",
+            registry=self.registry,
+        )
         self.publication_tasks_statuses = Counter(
             "publication_tasks_statuses",
             "Counter for publication run statuses",
             labelnames=("status",),
+            registry=self.registry,
+        )
+
+    def _init_emulation_metrics(self) -> None:
+        self.emulation_tasks = Counter(
+            "emulation_tasks",
+            "How many emulation tasks is running right now",
+            labelnames=("port",),
             registry=self.registry,
         )
         self.emulation_tasks_statuses = Counter(
@@ -62,7 +68,7 @@ class OverhaveMetricContainer:
     def add_publication_task_status(self, status: DraftStatus) -> None:
         self.publication_tasks_statuses.labels(status=status).inc()
 
-    def add_emulation_task(self, port: int | None) -> None:
+    def add_emulation_task(self, port: int | None = None) -> None:
         self.emulation_tasks.labels(port=port).inc()
 
     def add_emulation_task_status(self, status: EmulationStatus, port: int | None) -> None:

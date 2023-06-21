@@ -84,6 +84,7 @@ class Emulator(ExternalCommandCheckMixin):
         emulation_run_id = task.data.emulation_run_id
         try:
             emulation_run = self._storage.get_requested_emulation_run(emulation_run_id)
+            METRICS.add_emulation_task(port=emulation_run.port)
             logger.info("Try to emulate: %s", emulation_run.emulation)
             self._initiate(emulation_run)
             self._storage.set_emulation_run_status(emulation_run_id=emulation_run.id, status=db.EmulationStatus.READY)
