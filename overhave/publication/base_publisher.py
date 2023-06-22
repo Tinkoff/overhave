@@ -38,7 +38,7 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
 
     def process_publish_task(self, task: PublicationTask) -> None:
         status = self.publish_version(task.data.draft_id)
-        METRICS.add_publication_task_status(status=status)
+        METRICS.add_publication_task_status(status=status.value)
 
     def _compile_context(self, draft_id: int) -> PublisherContext:
         with db.create_session() as session:

@@ -10,7 +10,6 @@ from overhave.api.deps import (
     get_test_run_storage,
 )
 from overhave.api.views.tags_views import tags_item_handler
-from overhave.metrics import METRICS
 from overhave.storage import IFeatureStorage, IFeatureTagStorage, IScenarioStorage, TestRunModel, TestRunStorage
 from overhave.transport import RedisProducer, TestRunData, TestRunTask
 
@@ -46,6 +45,5 @@ def run_tests_by_tag_handler(
         scenario = scenario_storage.get_scenario_by_feature_id(feature.id)
         test_run_id = test_run_storage.create_testrun(scenario_id=scenario.id, executed_by=feature.last_edited_by)
         redis_producer.add_task(TestRunTask(data=TestRunData(test_run_id=test_run_id)))
-        METRICS.produce_test_run_task()
         test_run_ids.append(test_run_id)
     return test_run_ids

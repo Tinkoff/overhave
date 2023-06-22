@@ -4,7 +4,6 @@ from functools import cached_property
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhavePublicationContext
-from overhave.metrics import METRICS
 from overhave.publication import (
     GitlabVersionPublisher,
     IVersionPublisher,
@@ -89,5 +88,4 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         return self._stash_publisher
 
     def process_task(self, task: PublicationTask) -> None:
-        METRICS.consume_publication_task()
         return self.publisher.process_publish_task(task)

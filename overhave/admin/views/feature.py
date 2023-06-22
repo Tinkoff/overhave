@@ -18,7 +18,6 @@ from wtforms.widgets import HiddenInput
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import IAdminFactory, get_admin_factory, get_test_execution_factory
-from overhave.metrics import METRICS
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.storage import FeatureTypeName
 from overhave.test_execution import BddStepModel, StepTypeName
@@ -233,7 +232,6 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
         ):
             flask.flash("Problems with Redis service! TestRunTask has not been sent.", category="error")
             return rendered
-        METRICS.produce_test_run_task()
         logger.debug("Redirect to TestRun details view with test_run_id='%s'...", test_run_id)
         return flask.redirect(flask.url_for("testrun.details_view", id=test_run_id))
 

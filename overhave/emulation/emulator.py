@@ -87,8 +87,8 @@ class Emulator(ExternalCommandCheckMixin):
             logger.info("Try to emulate: %s", emulation_run.emulation)
             self._initiate(emulation_run)
             self._storage.set_emulation_run_status(emulation_run_id=emulation_run.id, status=db.EmulationStatus.READY)
-            METRICS.add_emulation_task_status(status=db.EmulationStatus.READY, port=emulation_run.port)
+            METRICS.add_emulation_task_status(status=db.EmulationStatus.READY.value, port=emulation_run.port)
         except (EmulationError, EmulationStorageError) as e:
             logger.exception("Could not emulate task %s!", task)
             self._storage.set_error_emulation_run(emulation_run_id=emulation_run_id, traceback=str(e))
-            METRICS.add_emulation_task_status(status=db.EmulationStatus.ERROR, port=None)
+            METRICS.add_emulation_task_status(status=db.EmulationStatus.ERROR.value, port=None)

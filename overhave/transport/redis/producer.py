@@ -2,6 +2,7 @@ import logging
 
 import redis
 
+from overhave.metrics import METRICS
 from overhave.transport.redis.objects import BaseRedisTask, RedisStream
 from overhave.transport.redis.settings import BaseRedisSettings
 from overhave.transport.redis.template import RedisTemplate
@@ -22,12 +23,14 @@ class RedisProducer(RedisTemplate):
     ):
         super().__init__(settings)
         self._streams = {task: self._database.Stream(stream.value) for task, stream in mapping.items()}
+        self._mapping = mapping
 
     def add_task(self, task: BaseRedisTask) -> bool:
         stream = self._streams[type(task)]
         logger.info("Added Redis task %s", task)
         try:
             stream.add(task.message)
+            METRICS.produce_redis_task(task_type=self._mapping[type(task)].value)
             return True
         except redis.exceptions.ConnectionError:
             logger.exception("Could not add %s to Redis!", type(task).__name__)

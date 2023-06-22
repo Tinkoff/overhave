@@ -5,7 +5,6 @@ from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveTestExecutionContext
-from overhave.metrics import METRICS
 from overhave.test_execution.executor import ITestExecutor, TestExecutor
 from overhave.transport import TestRunTask
 
@@ -41,5 +40,4 @@ class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext
         return self._test_executor
 
     def process_task(self, task: TestRunTask) -> None:
-        METRICS.consume_test_run_task()
         return self._test_executor.process_test_task(task)

@@ -5,7 +5,6 @@ from overhave.emulation import Emulator
 from overhave.factory.base_factory import BaseOverhaveFactory, IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.context import OverhaveEmulationContext
-from overhave.metrics import METRICS
 from overhave.transport import EmulationTask
 
 
@@ -23,5 +22,4 @@ class EmulationFactory(BaseOverhaveFactory[OverhaveEmulationContext], IEmulation
         return Emulator(settings=self.context.emulation_settings, storage=self._emulation_storage)
 
     def process_task(self, task: EmulationTask) -> None:
-        METRICS.consume_emulation_run_task()
         return self._emulator.start_emulation(task)
