@@ -1,10 +1,14 @@
 import pytest
+from faker import Faker
 
+from overhave import db
 from overhave.storage import FeatureTypeModel, FeatureTypeNotExistsError, FeatureTypeStorage
 from tests.db_utils import count_queries
 
 
-def _check_base_feature_type_model(test_model: FeatureTypeModel, validation_model: FeatureTypeModel) -> None:
+def _check_base_feature_type_model(
+    test_model: FeatureTypeModel | db.FeatureType, validation_model: FeatureTypeModel
+) -> None:
     assert test_model.id == validation_model.id
     assert test_model.name == validation_model.name
 
@@ -29,9 +33,17 @@ class TestFeatureTypeStorage:
         self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel
     ) -> None:
         with count_queries(1):
-            model = test_feature_type_storage.get_feature_type_by_name(test_feature_type.name)
-        assert model is not None
-        _check_base_feature_type_model(test_model=model, validation_model=test_feature_type)
+            with db.create_session() as session:
+                feature_type = test_feature_type_storage.feature_type_by_name(
+                    session=session, name=test_feature_type.name
+                )
+                _check_base_feature_type_model(test_model=feature_type, validation_model=test_feature_type)
+
+    def test_get_not_exists_feature_type(self, test_feature_type_storage: FeatureTypeStorage, faker: Faker) -> None:
+        with count_queries(1):
+            with db.create_session() as session:
+                with pytest.raises(FeatureTypeNotExistsError):
+                    test_feature_type_storage.feature_type_by_name(session=session, name=faker.word())
 
     def test_get_all_types_empty(
         self,

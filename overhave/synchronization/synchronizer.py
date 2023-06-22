@@ -6,6 +6,7 @@ from typing import cast
 import allure
 import pytz
 
+from overhave import db
 from overhave.entities import BaseFileExtractor, FeatureExtractor, GitRepositoryInitializer, OverhaveFileSettings
 from overhave.scenario import FeatureInfo, NullableFeatureIdError, ScenarioParser, StrictFeatureInfo
 from overhave.storage import FeatureModel
@@ -54,7 +55,8 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         logger.info("Feature is gonna be updated...")
         self._storage_manager.ensure_users_exist(info)
         model.name = info.name
-        model.feature_tags = self._storage_manager.get_feature_tags(info=info)
+        with db.create_session() as session:
+            model.feature_tags = self._storage_manager.get_feature_tags(session=session, info=info)
         model.severity = info.severity
         model.last_edited_by = info.last_edited_by
         model.last_edited_at = file_ts
@@ -76,8 +78,10 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
         info.id = ANY_INT
         strict_info = StrictFeatureInfo(**info.dict())
         self._storage_manager.ensure_users_exist(strict_info)
-        feature_tags = self._storage_manager.get_feature_tags(strict_info)
-        feature_type = self._storage_manager.get_feature_type(strict_info.type)
+
+        with db.create_session() as session:
+            feature_tags = self._storage_manager.get_feature_tags(session=session, info=strict_info)
+            feature_type = self._storage_manager.feature_type_by_name(session=session, feature_type=strict_info.type)
 
         feature_model = FeatureModel(
             id=strict_info.id,

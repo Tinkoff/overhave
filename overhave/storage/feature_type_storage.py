@@ -1,6 +1,8 @@
 import abc
 from functools import cached_property
 
+import sqlalchemy.orm as so
+
 from overhave import db
 from overhave.storage.converters import FeatureTypeModel, FeatureTypeName
 
@@ -23,7 +25,7 @@ class IFeatureTypeStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_feature_type_by_name(name: str) -> FeatureTypeModel:
+    def feature_type_by_name(session: so.Session, name: FeatureTypeName) -> db.FeatureType:
         pass
 
     @staticmethod
@@ -49,12 +51,11 @@ class FeatureTypeStorage(IFeatureTypeStorage):
             return row_entities[0]
 
     @staticmethod
-    def get_feature_type_by_name(name: str) -> FeatureTypeModel:
-        with db.create_session() as session:
-            feature_type = session.query(db.FeatureType).filter(db.FeatureType.name == name).one_or_none()
-            if feature_type is None:
-                raise FeatureTypeNotExistsError(f"Could not find feature type with name='{name}'!")
-            return FeatureTypeModel.from_orm(feature_type)
+    def feature_type_by_name(session: so.Session, name: FeatureTypeName) -> db.FeatureType:
+        feature_type = session.query(db.FeatureType).filter(db.FeatureType.name == name).one_or_none()
+        if feature_type is None:
+            raise FeatureTypeNotExistsError(f"Could not find feature type with name='{name}'!")
+        return feature_type
 
     @staticmethod
     def get_all_feature_types() -> list[FeatureTypeModel]:

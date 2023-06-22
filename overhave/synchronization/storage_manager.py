@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime
 
+import sqlalchemy.orm as so
 from pydantic import parse_obj_as
 
-from overhave import db
 from overhave.scenario import StrictFeatureInfo
 from overhave.storage import (
     FeatureModel,
@@ -64,17 +64,17 @@ class SynchronizerStorageManager:
         logger.info("Feature hasn't got any published version.")
         return model.last_edited_at
 
-    def get_feature_tags(self, info: StrictFeatureInfo) -> list[TagModel]:
-        with db.create_session() as session:
-            db_tags = [
-                self._tag_storage.get_or_create_tag(session=session, value=tag, created_by=info.last_edited_by)
-                for tag in info.tags
-            ]
-            session.flush()
-            return parse_obj_as(list[TagModel], db_tags)
+    def get_feature_tags(self, session: so.Session, info: StrictFeatureInfo) -> list[TagModel]:
+        db_tags = [
+            self._tag_storage.get_or_create_tag(session=session, value=tag, created_by=info.last_edited_by)
+            for tag in info.tags
+        ]
+        session.flush()
+        return parse_obj_as(list[TagModel], db_tags)
 
-    def get_feature_type(self, feature_type: FeatureTypeName) -> FeatureTypeModel:
-        return self._feature_type_storage.get_feature_type_by_name(feature_type)
+    def feature_type_by_name(self, session: so.Session, feature_type: FeatureTypeName) -> FeatureTypeModel:
+        db_feature_type = self._feature_type_storage.feature_type_by_name(session=session, name=feature_type)
+        return FeatureTypeModel.from_orm(db_feature_type)
 
     def ensure_users_exist(self, info: StrictFeatureInfo) -> None:
         for user in {info.author, info.last_edited_by}:

@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 import fastapi
 
+from overhave import db
 from overhave.api.deps import get_feature_type_storage, get_test_user_storage
 from overhave.storage import (
     FeatureTypeName,
@@ -77,8 +78,11 @@ def test_user_list_handler(
         allow_update,
     )
     try:
-        feature_type_model = feature_type_storage.get_feature_type_by_name(feature_type)
-        return test_user_storage.get_test_users(feature_type_id=feature_type_model.id, allow_update=allow_update)
+        with db.create_session() as session:
+            db_feature_type = feature_type_storage.feature_type_by_name(session=session, name=feature_type)
+            return test_user_storage.get_test_users_by_feature_type_name(
+                session=session, feature_type_id=db_feature_type.id, allow_update=allow_update
+            )
     except FeatureTypeNotExistsError:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=f"FeatureType with name='{feature_type}' does not exist!"
