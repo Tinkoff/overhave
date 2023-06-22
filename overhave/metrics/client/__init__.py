@@ -31,6 +31,7 @@ def create_metric_container() -> BaseOverhaveMetricContainer:
         MetricSettings.Type.TEST: (lambda: TestRunOverhaveMetricContainer(registry)),
         MetricSettings.Type.EMULATION: (lambda: EmulationRunOverhaveMetricContainer(registry)),
         MetricSettings.Type.PUBLICATION: (lambda: PublicationOverhaveMetricContainer(registry)),
+        MetricSettings.Type.ALL: (lambda: AllMetricsContainer(registry)),
     }
     container_getter = mapping[MetricSettings().type]
     return container_getter()

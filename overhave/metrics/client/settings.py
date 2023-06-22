@@ -11,8 +11,9 @@ class MetricSettings(BaseSettings):
         TEST = "TEST"
         EMULATION = "EMULATION"
         PUBLICATION = "PUBLICATION"
+        ALL = "ALL"
 
-    type: Type = Type.COMMON
+    type: Type = Type.ALL
 
     class Config:
         env_prefix = "OVERHAVE_METRIC_CONTAINER_"
