@@ -28,9 +28,9 @@ class IFeatureTypeStorage(abc.ABC):
     def feature_type_by_name(session: so.Session, name: FeatureTypeName) -> db.FeatureType:
         pass
 
-    @staticmethod
     @abc.abstractmethod
-    def get_all_feature_types() -> list[FeatureTypeModel]:
+    @cached_property
+    def all_feature_types(self) -> list[FeatureTypeModel]:
         pass
 
 
@@ -57,8 +57,8 @@ class FeatureTypeStorage(IFeatureTypeStorage):
             raise FeatureTypeNotExistsError(f"Could not find feature type with name='{name}'!")
         return feature_type
 
-    @staticmethod
-    def get_all_feature_types() -> list[FeatureTypeModel]:
+    @cached_property
+    def all_feature_types(self) -> list[FeatureTypeModel]:
         with db.create_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
             return [FeatureTypeModel.from_orm(x) for x in db_feature_types]

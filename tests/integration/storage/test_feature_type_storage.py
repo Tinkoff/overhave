@@ -50,13 +50,12 @@ class TestFeatureTypeStorage:
         test_feature_type_storage: FeatureTypeStorage,
     ) -> None:
         with count_queries(1):
-            models = test_feature_type_storage.get_all_feature_types()
-        assert not models
+            assert not test_feature_type_storage.all_feature_types
 
     def test_get_all_types(
         self, test_feature_type_storage: FeatureTypeStorage, test_feature_type: FeatureTypeModel
     ) -> None:
         with count_queries(1):
-            models = test_feature_type_storage.get_all_feature_types()
+            models = test_feature_type_storage.all_feature_types
         assert len(models) == 1
         assert models[0] == test_feature_type
