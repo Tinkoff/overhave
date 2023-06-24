@@ -4,24 +4,27 @@ from typing import Iterator, Sequence
 
 import walrus
 
-from overhave.metrics import METRICS
+from overhave.metrics import BaseOverhaveMetricContainer
 from overhave.transport.redis.objects import RedisPendingData, RedisStream, RedisUnreadData
 from overhave.transport.redis.settings import BaseRedisSettings
-from overhave.transport.redis.template import RedisTemplate
 
 logger = logging.getLogger(__name__)
 
 
-class RedisConsumer(RedisTemplate):
+class RedisConsumer:
     """Class for consuming tasks from Redis stream ```stream_name```."""
 
     def __init__(
         self,
         settings: BaseRedisSettings,
         stream_name: RedisStream,
+        database: walrus.Database,
+        metric_container: BaseOverhaveMetricContainer,
     ):
-        super().__init__(settings)
+        self._settings = settings
         self._stream_name = stream_name
+        self._database = database
+        self._metric_container = metric_container
 
     @property
     def _consumer_group(self) -> walrus.ConsumerGroup:
@@ -63,7 +66,7 @@ class RedisConsumer(RedisTemplate):
                 messages = self._consume()
                 if messages:
                     logger.debug("Has messages, return them")
-                    METRICS.consume_redis_task(task_type=self._stream_name.value)
+                    self._metric_container.consume_redis_task(task_type=self._stream_name.value)
                     yield messages
                 continue
             except Exception:

@@ -1,8 +1,11 @@
 from functools import cache
 from pathlib import Path
 
+import walrus
+
 from overhave.api.settings import OverhaveApiAuthSettings
 from overhave.entities import OverhaveEmulationSettings
+from overhave.metrics import get_common_metric_container
 from overhave.storage import (
     DraftStorage,
     EmulationStorage,
@@ -24,7 +27,7 @@ from overhave.storage import (
     TestUserStorage,
 )
 from overhave.transport import EmulationTask, PublicationTask, RedisProducer, RedisStream, TestRunTask
-from overhave.transport.redis.deps import get_redis_settings
+from overhave.transport.redis.deps import get_redis_settings, make_redis
 
 
 @cache
@@ -83,6 +86,12 @@ def get_emulation_storage() -> IEmulationStorage:
 
 
 @cache
+def get_redis_database() -> walrus.Database:
+    redis = make_redis(get_redis_settings())
+    return walrus.Database(connection_pool=redis.connection_pool)
+
+
+@cache
 def get_redis_producer() -> RedisProducer:
     return RedisProducer(
         settings=get_redis_settings(),
@@ -91,4 +100,6 @@ def get_redis_producer() -> RedisProducer:
             PublicationTask: RedisStream.PUBLICATION,
             EmulationTask: RedisStream.EMULATION,
         },
+        database=get_redis_database(),
+        metric_container=get_common_metric_container(),
     )

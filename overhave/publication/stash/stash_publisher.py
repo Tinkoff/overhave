@@ -4,6 +4,7 @@ import httpx
 
 from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager, OverhaveProjectSettings
@@ -35,6 +36,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         git_initializer: GitRepositoryInitializer,
         stash_publisher_settings: OverhaveStashPublisherSettings,
         stash_client: StashHttpClient,
+        metric_container: PublicationOverhaveMetricContainer,
     ):
         super().__init__(
             file_settings=file_settings,
@@ -46,6 +48,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             file_manager=file_manager,
             git_initializer=git_initializer,
             git_publisher_settings=stash_publisher_settings,
+            metric_container=metric_container,
         )
         self._client = stash_client
 
