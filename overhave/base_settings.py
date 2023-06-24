@@ -9,6 +9,8 @@ import sqlalchemy.engine
 import sqlalchemy.exc
 import sqlalchemy.pool
 from pydantic import BaseSettings, Field, validator
+from sqlalchemy import Pool
+from sqlalchemy.pool import SingletonThreadPool
 
 OVERHAVE_ENV_PREFIX = "OVERHAVE_"
 
@@ -46,6 +48,7 @@ class DataBaseSettings(BaseOverhavePrefix):
     db_echo: bool = False
     db_application_name: str = socket.gethostname()
     db_connect_timeout: int = 30
+    db_poolclass: type[Pool] = SingletonThreadPool
 
     def _create_engine(self) -> sqlalchemy.engine.Engine:  # SQLAlchemy2.0 - sa.Engine
         return sa.engine_from_config(
@@ -54,7 +57,7 @@ class DataBaseSettings(BaseOverhavePrefix):
                 "pool_recycle": self.db_pool_recycle,
                 "pool_pre_ping": True,
                 "pool_size": self.db_pool_size,
-                "poolclass": sqlalchemy.pool.SingletonThreadPool,
+                "poolclass": self.db_poolclass,
                 "connect_args": {
                     "connect_timeout": self.db_connect_timeout,
                     "application_name": self.db_application_name,

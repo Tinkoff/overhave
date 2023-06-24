@@ -1,3 +1,5 @@
+from typing import cast
+
 from flask_admin.form import JSONField
 from flask_login import current_user
 from pydantic import BaseModel
@@ -6,6 +8,7 @@ from wtforms import Form, ValidationError
 from overhave import db
 from overhave.admin.views.base import ModelViewConfigured
 from overhave.factory import get_admin_factory
+from overhave.storage import FeatureTypeName
 from overhave.utils import get_current_time
 
 
@@ -45,16 +48,17 @@ class TestUserView(ModelViewConfigured):
         "allow_update": "Property of updating allowance through API",
     }
 
-    _feature_type: str | None = None
+    _feature_type: FeatureTypeName | None = None
 
     def on_form_prefill(self, form, id) -> None:  # type: ignore  # noqa: A002
-        if isinstance(form._obj, db.TestUser):
-            self._feature_type = form._obj.feature_type.name
+        if not isinstance(form._obj, db.TestUser):
+            return
+        self._feature_type = cast(FeatureTypeName, form._obj.feature_type.name)
 
     def get_specification_template(self) -> dict[str, int | str] | None:
         factory = get_admin_factory()
         if self._feature_type is None:
-            self._feature_type = factory.feature_type_storage.get_default_feature_type().name
+            self._feature_type: FeatureTypeName = factory.feature_type_storage.default_feature_type_name
         parser = factory.context.project_settings.user_spec_template_mapping.get(self._feature_type)
         if parser is not None:
             return _make_dict_from_model(parser)
@@ -72,7 +76,7 @@ class TestUserView(ModelViewConfigured):
                 raise ValidationError(f"Could not convert specified data into {parser.__name__} model!")
 
     def on_model_change(self, form: Form, model: db.TestUser, is_created: bool) -> None:
-        self._feature_type = model.feature_type.name
+        self._feature_type = cast(FeatureTypeName, model.feature_type.name)
         self._validate_json(model)
         if is_created:
             model.created_by = current_user.login
