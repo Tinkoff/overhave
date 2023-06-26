@@ -7,6 +7,7 @@ from typing import Pattern
 
 from overhave import db
 from overhave.entities.settings import OverhaveEmulationSettings
+from overhave.metrics import EmulationRunOverhaveMetricContainer
 from overhave.storage import EmulationRunModel, EmulationStorageError, IEmulationStorage
 from overhave.transport import EmulationTask
 
@@ -40,9 +41,15 @@ class ExternalCommandCheckMixin:
 class Emulator(ExternalCommandCheckMixin):
     """Class for creation of emulation runs."""
 
-    def __init__(self, settings: OverhaveEmulationSettings, storage: IEmulationStorage):
+    def __init__(
+        self,
+        settings: OverhaveEmulationSettings,
+        storage: IEmulationStorage,
+        metric_container: EmulationRunOverhaveMetricContainer,
+    ):
         self._settings = settings
         self._storage = storage
+        self._metric_container = metric_container
 
     def _initiate(self, emulation_run: EmulationRunModel) -> None:
         if not isinstance(self._settings.emulation_base_cmd, str):
@@ -86,6 +93,10 @@ class Emulator(ExternalCommandCheckMixin):
             logger.info("Try to emulate: %s", emulation_run.emulation)
             self._initiate(emulation_run)
             self._storage.set_emulation_run_status(emulation_run_id=emulation_run.id, status=db.EmulationStatus.READY)
+            self._metric_container.add_emulation_task_status(
+                status=db.EmulationStatus.READY.value, port=emulation_run.port
+            )
         except (EmulationError, EmulationStorageError) as e:
             logger.exception("Could not emulate task %s!", task)
             self._storage.set_error_emulation_run(emulation_run_id=emulation_run_id, traceback=str(e))
+            self._metric_container.add_emulation_task_status(status=db.EmulationStatus.ERROR.value, port=None)

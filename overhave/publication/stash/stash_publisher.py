@@ -4,6 +4,7 @@ import httpx
 
 from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager, OverhaveProjectSettings
@@ -35,6 +36,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         git_initializer: GitRepositoryInitializer,
         stash_publisher_settings: OverhaveStashPublisherSettings,
         stash_client: StashHttpClient,
+        metric_container: PublicationOverhaveMetricContainer,
     ):
         super().__init__(
             file_settings=file_settings,
@@ -46,13 +48,15 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             file_manager=file_manager,
             git_initializer=git_initializer,
             git_publisher_settings=stash_publisher_settings,
+            metric_container=metric_container,
         )
         self._client = stash_client
 
-    def publish_version(self, draft_id: int) -> None:
+    def publish_version(self, draft_id: int) -> db.DraftStatus:
         context = self._prepare_publisher_context(draft_id)
         if context is None:
-            return
+            self._draft_storage.set_draft_status(draft_id=draft_id, status=db.DraftStatus.INTERNAL_ERROR)
+            return db.DraftStatus.INTERNAL_ERROR
         pull_request = StashPrRequest(
             title=context.feature.name,
             description=self._compile_publication_description(context),
@@ -70,18 +74,23 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
                     pr_url=response.get_pr_url(),
                     published_at=response.created_date,
                 )
-                return
+                return db.DraftStatus.CREATED
             if isinstance(response, StashErrorResponse) and response.duplicate:
                 self._draft_storage.save_response_as_duplicate(
                     draft_id=context.draft.id, feature_id=context.feature.id, traceback=None
                 )
-                return
+                return db.DraftStatus.DUPLICATE
+            self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR)
             logger.error("Gotten error response from Stash: %s", response)
+            return db.DraftStatus.INTERNAL_ERROR
+
         except StashHttpClientConflictError as err:
             logger.exception("Gotten conflict. Try to return last pull-request for Draft with id=%s...", draft_id)
             self._draft_storage.save_response_as_duplicate(
                 draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
             )
+            return db.DraftStatus.DUPLICATE
         except httpx.HTTPError as err:
             self._draft_storage.set_draft_status(draft_id, db.DraftStatus.INTERNAL_ERROR, str(err))
             logger.exception("Got HTTP error while trying to sent pull-request!")
+            return db.DraftStatus.INTERNAL_ERROR

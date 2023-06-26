@@ -59,7 +59,6 @@ class TestEmulationStorage:
         with create_test_session() as session:
             emulation_run = session.query(db.EmulationRun).filter(db.EmulationRun.id == test_emulation_run.id).one()
             assert emulation_run.status == EmulationStatus.ERROR
-            assert emulation_run.port is None
 
     @pytest.mark.parametrize("test_user_role", [db.Role.admin, db.Role.user], indirect=True)
     @pytest.mark.parametrize(

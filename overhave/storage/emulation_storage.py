@@ -59,7 +59,9 @@ class EmulationStorage(IEmulationStorage):
     @staticmethod
     def create_emulation_run(emulation_id: int, initiated_by: str) -> int:
         with db.create_session() as session:
-            emulation_run = db.EmulationRun(emulation_id=emulation_id, initiated_by=initiated_by)
+            emulation_run = db.EmulationRun(
+                emulation_id=emulation_id, initiated_by=initiated_by, status=db.EmulationStatus.CREATED
+            )
             session.add(emulation_run)
             session.flush()
             return emulation_run.id
