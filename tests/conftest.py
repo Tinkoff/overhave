@@ -185,25 +185,25 @@ def flask_scaffold_findpackagepath_mock() -> Iterator[None]:
 
 
 @pytest.fixture()
-def registry():
+def registry() -> CollectorRegistry:
     return CollectorRegistry()
 
 
 @pytest.fixture()
-def base_container(registry: CollectorRegistry):
+def base_container(registry: CollectorRegistry) -> BaseOverhaveMetricContainer:
     return BaseOverhaveMetricContainer(registry=registry)
 
 
 @pytest.fixture()
-def test_container(registry: CollectorRegistry):
+def test_container(registry: CollectorRegistry) -> TestRunOverhaveMetricContainer:
     return TestRunOverhaveMetricContainer(registry=registry)
 
 
 @pytest.fixture()
-def emulation_container(registry: CollectorRegistry):
+def emulation_container(registry: CollectorRegistry) -> EmulationRunOverhaveMetricContainer:
     return EmulationRunOverhaveMetricContainer(registry=registry)
 
 
 @pytest.fixture()
-def publication_container(registry: CollectorRegistry):
+def publication_container(registry: CollectorRegistry) -> PublicationOverhaveMetricContainer:
     return PublicationOverhaveMetricContainer(registry=registry)
