@@ -5,6 +5,7 @@ from pytest_mock import MockFixture
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import GitRepositoryInitializer
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication import StashVersionPublisher
 from overhave.publication.stash import OverhaveStashPublisherSettings
 from overhave.scenario import FileManager
@@ -55,6 +56,7 @@ def test_stash_publisher_with_default_reviewers(
     mocked_file_manager: FileManager,
     mocked_git_initializer: GitRepositoryInitializer,
     mocked_stash_client: StashHttpClient,
+    publication_container: PublicationOverhaveMetricContainer,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
     return StashVersionPublisher(
@@ -68,6 +70,7 @@ def test_stash_publisher_with_default_reviewers(
         git_initializer=mocked_git_initializer,
         stash_publisher_settings=test_stash_publisher_settings_with_default_reviewers,
         stash_client=mocked_stash_client,
+        metric_container=publication_container,
     )
 
 
@@ -79,6 +82,7 @@ def test_stash_publisher_with_reviewers_mapping(
     mocked_file_manager: FileManager,
     mocked_git_initializer: GitRepositoryInitializer,
     mocked_stash_client: StashHttpClient,
+    publication_container: PublicationOverhaveMetricContainer,
     mocker: MockFixture,
 ) -> StashVersionPublisher:
     return StashVersionPublisher(
@@ -92,4 +96,5 @@ def test_stash_publisher_with_reviewers_mapping(
         git_initializer=mocked_git_initializer,
         stash_publisher_settings=test_stash_project_settings_with_reviewers_mapping,
         stash_client=mocked_stash_client,
+        metric_container=publication_container,
     )

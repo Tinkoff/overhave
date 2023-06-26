@@ -10,7 +10,6 @@ from overhave.metrics import (
 )
 
 
-@cache
 def get_collector_registry() -> CollectorRegistry:
     return CollectorRegistry()
 

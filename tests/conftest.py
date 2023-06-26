@@ -14,6 +14,7 @@ import sqlalchemy_utils as sau
 from _pytest.fixtures import FixtureRequest
 from _pytest.logging import LogCaptureFixture
 from _pytest.python import Metafunc
+from prometheus_client import CollectorRegistry
 from pytest_mock import MockerFixture
 from sqlalchemy import event
 
@@ -31,6 +32,12 @@ from overhave import (
 )
 from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
 from overhave.factory.context.base_context import BaseFactoryContext
+from overhave.metrics import (
+    BaseOverhaveMetricContainer,
+    EmulationRunOverhaveMetricContainer,
+    PublicationOverhaveMetricContainer,
+    TestRunOverhaveMetricContainer,
+)
 from overhave.pytest_plugin import IProxyManager
 from tests.db_utils import BEFORE_CURSOR_EXECUTE_EVENT_NAME, THREAD_LOCALS, validate_db_session
 from tests.objects import PROJECT_WORKDIR, FeatureTestContainer, XDistWorkerValueType, get_test_feature_containers
@@ -175,3 +182,28 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 def flask_scaffold_findpackagepath_mock() -> Iterator[None]:
     with mock.patch("flask.scaffold._find_package_path", return_value=PROJECT_WORKDIR.as_posix()):
         yield
+
+
+@pytest.fixture()
+def registry():
+    return CollectorRegistry()
+
+
+@pytest.fixture()
+def base_container(registry: CollectorRegistry):
+    return BaseOverhaveMetricContainer(registry=registry)
+
+
+@pytest.fixture()
+def test_container(registry: CollectorRegistry):
+    return TestRunOverhaveMetricContainer(registry=registry)
+
+
+@pytest.fixture()
+def emulation_container(registry: CollectorRegistry):
+    return EmulationRunOverhaveMetricContainer(registry=registry)
+
+
+@pytest.fixture()
+def publication_container(registry: CollectorRegistry):
+    return PublicationOverhaveMetricContainer(registry=registry)

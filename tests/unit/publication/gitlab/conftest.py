@@ -6,6 +6,7 @@ from pytest_mock import MockFixture
 
 from overhave import OverhaveFileSettings, OverhaveProjectSettings
 from overhave.entities import GitRepositoryInitializer
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.gitlab import GitlabVersionPublisher, OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer import TokenizerClient, TokenizerClientSettings
 from overhave.scenario import FileManager
@@ -76,6 +77,7 @@ def test_gitlab_publisher_with_default_reviewers(
     mocked_gitlab_client: GitlabHttpClient,
     mocked_tokenizer_client: TokenizerClient,
     mocker: MockFixture,
+    publication_container: PublicationOverhaveMetricContainer,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -89,6 +91,7 @@ def test_gitlab_publisher_with_default_reviewers(
         gitlab_publisher_settings=test_gitlab_publisher_settings_with_default_reviewers,
         gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
+        metric_container=publication_container,
     )
 
 
@@ -102,6 +105,7 @@ def test_gitlab_publisher_with_reviewers_mapping(
     mocked_gitlab_client: GitlabHttpClient,
     mocked_tokenizer_client: TokenizerClient,
     mocker: MockFixture,
+    publication_container: PublicationOverhaveMetricContainer,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
         file_settings=test_file_settings,
@@ -115,4 +119,5 @@ def test_gitlab_publisher_with_reviewers_mapping(
         gitlab_publisher_settings=test_gitlab_project_settings_with_reviewers_mapping,
         gitlab_client=mocked_gitlab_client,
         tokenizer_client=mocked_tokenizer_client,
+        metric_container=publication_container,
     )
