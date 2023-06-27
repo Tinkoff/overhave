@@ -1,7 +1,7 @@
 import enum
 import logging
 import socket
-from logging.config import DictConfigurator  # type: ignore
+from logging.config import DictConfigurator
 from typing import Any
 
 import sqlalchemy as sa
