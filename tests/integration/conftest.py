@@ -12,6 +12,7 @@ from overhave import OverhaveEmulationSettings, db
 from overhave.db import EmulationRun, DraftStatus
 from overhave.storage import (
     EmulationModel,
+    EmulationRunModel,
     EmulationStorage,
     FeatureModel,
     FeatureTypeModel,
@@ -64,8 +65,8 @@ def test_feature_storage() -> FeatureStorage:
 
 
 @pytest.fixture(scope="module")
-def test_emulation_storage() -> EmulationStorage:
-    return EmulationStorage(OverhaveEmulationSettings())
+def test_emulation_storage(emulation_settings: OverhaveEmulationSettings) -> EmulationStorage:
+    return EmulationStorage(emulation_settings)
 
 
 @pytest.fixture()
@@ -268,13 +269,34 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 
 
 @pytest.fixture()
-def test_emulation_run(
-    test_emulation_storage: EmulationStorage, test_system_user: SystemUserModel, test_emulation: EmulationModel
-) -> EmulationRun:
-    with create_test_session():
-        return test_emulation_storage.create_emulation_run(
-            emulation_id=test_emulation.id, initiated_by=test_system_user.login
+def test_emulation_run(test_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
+    with create_test_session() as session:
+        emulation_run = db.EmulationRun(
+            emulation_id=test_emulation.id,
+            initiated_by=test_system_user.login,
+            port=5000,
+            status=db.EmulationStatus.CREATED,
         )
+        session.add(emulation_run)
+        session.flush()
+        return EmulationRunModel.from_orm(emulation_run)
+
+
+@pytest.fixture(scope="module")
+def envs_for_mock() -> dict[str, str | None]:
+    return {
+        "OVERHAVE_EMULATION_BASE_CMD": "overhave emulate",
+    }
+
+
+@pytest.fixture(scope="module")
+def mock_default_value() -> str:
+    return ""
+
+
+@pytest.fixture(scope="module")
+def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
+    return OverhaveEmulationSettings()
 
 @pytest.fixture()
 def test_draft(

@@ -249,8 +249,9 @@ class FeatureView(ModelViewConfigured, FactoryViewUtilsMixin):
             return rendered
 
         logger.debug("Process feature 'RUN' request")
-        tasks = data["task"].split(",")
-        self._validate_tasks(tasks=tasks)
+        if data["task"]:
+            tasks = data["task"].split(",")
+            self._validate_tasks(tasks=tasks)
 
         mutable_data = dict(data)
         mutable_data["file_path"] = self._make_file_path(data["file_path"])

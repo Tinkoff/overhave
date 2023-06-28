@@ -2,12 +2,14 @@ import logging
 from functools import cache
 
 import pytest
+import walrus
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
 from pytest_redis import factories
 from redis import Redis, Sentinel
 
 from overhave.factory import ConsumerFactory
+from overhave.metrics import BaseOverhaveMetricContainer
 from overhave.transport import (
     BaseRedisSettings,
     OverhaveRedisSentinelSettings,
@@ -86,8 +88,15 @@ def mock_sentinel(redis_settings: BaseRedisSettings) -> None:
 
 
 @pytest.fixture()
-def redis_producer(redis_settings: BaseRedisSettings, mock_sentinel: None) -> RedisProducer:
-    return RedisProducer(settings=redis_settings, mapping={TestRunTask: RedisStream.TEST})
+def redis_producer(
+    redis_settings: BaseRedisSettings, base_container: BaseOverhaveMetricContainer, mock_sentinel: None, redisdb
+) -> RedisProducer:
+    return RedisProducer(
+        settings=redis_settings,
+        mapping={TestRunTask: RedisStream.TEST},
+        metric_container=base_container,
+        database=walrus.Database(connection_pool=redisdb.connection_pool),
+    )
 
 
 @pytest.fixture()

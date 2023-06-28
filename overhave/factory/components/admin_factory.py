@@ -3,6 +3,8 @@ from functools import cached_property, partial
 from multiprocessing.pool import ThreadPool
 from typing import Callable, Mapping
 
+import walrus
+
 from overhave.base_settings import AuthorizationStrategy
 from overhave.entities import (
     DefaultAdminAuthorizationManager,
@@ -14,6 +16,7 @@ from overhave.entities import (
 from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveAdminContext
+from overhave.metrics import get_common_metric_container
 from overhave.storage import IFeatureTypeStorage, SystemUserGroupStorage
 from overhave.transport import (
     EmulationTask,
@@ -23,7 +26,7 @@ from overhave.transport import (
     RedisStream,
     TestRunTask,
 )
-from overhave.transport.redis.deps import get_redis_settings
+from overhave.transport.redis.deps import get_redis_settings, make_redis
 
 
 class IAdminFactory(IOverhaveFactory[OverhaveAdminContext]):
@@ -97,6 +100,11 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
         return self._feature_type_storage
 
     @cached_property
+    def _database(self) -> walrus.Database:
+        redis = make_redis(get_redis_settings())
+        return walrus.Database(connection_pool=redis.connection_pool)
+
+    @cached_property
     def _redis_producer(self) -> RedisProducer:
         return RedisProducer(
             settings=get_redis_settings(),
@@ -105,6 +113,8 @@ class AdminFactory(FactoryWithS3ManagerInit[OverhaveAdminContext], IAdminFactory
                 PublicationTask: RedisStream.PUBLICATION,
                 EmulationTask: RedisStream.EMULATION,
             },
+            database=self._database,
+            metric_container=get_common_metric_container(),
         )
 
     @property

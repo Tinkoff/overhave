@@ -1,7 +1,10 @@
 from functools import cached_property, partial
 from typing import Callable
 
+import walrus
+
 from overhave.factory.getters import get_emulation_factory, get_publication_factory, get_test_execution_factory
+from overhave.metrics import get_common_metric_container
 from overhave.pytest_plugin import get_proxy_manager
 from overhave.transport import (
     AnyRedisTask,
@@ -12,7 +15,7 @@ from overhave.transport import (
     RedisStream,
     TestRunTask,
 )
-from overhave.transport.redis.deps import get_redis_settings
+from overhave.transport.redis.deps import get_redis_settings, make_redis
 
 
 class ConsumerFactory:
@@ -22,10 +25,17 @@ class ConsumerFactory:
         self._stream = stream
 
     @cached_property
+    def _database(self) -> walrus.Database:
+        redis = make_redis(get_redis_settings())
+        return walrus.Database(connection_pool=redis.connection_pool)
+
+    @cached_property
     def _consumer(self) -> RedisConsumer:
         return RedisConsumer(
             settings=get_redis_settings(),
             stream_name=self._stream,
+            database=self._database,
+            metric_container=get_common_metric_container(),
         )
 
     @cached_property

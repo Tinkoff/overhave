@@ -5,6 +5,7 @@ from typing import Generic, cast
 import git
 
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.base_publisher import BaseVersionPublisher
 from overhave.publication.errors import (
     BaseGitVersionPublisherError,
@@ -32,6 +33,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
         file_manager: FileManager,
         git_initializer: GitRepositoryInitializer,
         git_publisher_settings: GitPublisherSettings,
+        metric_container: PublicationOverhaveMetricContainer,
     ) -> None:
         super().__init__(
             project_settings=project_settings,
@@ -40,6 +42,7 @@ class GitVersionPublisher(Generic[GitPublisherSettings], BaseVersionPublisher, a
             test_run_storage=test_run_storage,
             draft_storage=draft_storage,
             file_manager=file_manager,
+            metric_container=metric_container,
         )
         self._git_initializer = git_initializer
         self._git_publisher_settings = git_publisher_settings

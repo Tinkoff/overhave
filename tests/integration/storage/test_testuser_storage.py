@@ -37,17 +37,21 @@ class TestTestUserStorage:
         self, test_user_storage: TestUserStorage, test_testuser: TestUserModel, feature_type_id: int
     ) -> None:
         with count_queries(1):
-            test_users = test_user_storage.get_test_users(
-                feature_type_id=feature_type_id, allow_update=test_testuser.allow_update
-            )
+            with db.create_session() as session:
+                test_users = test_user_storage.get_test_users_by_feature_type_name(
+                    session=session, feature_type_id=feature_type_id, allow_update=test_testuser.allow_update
+                )
         assert not test_users
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_user_list(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
         with count_queries(2):
-            test_users = test_user_storage.get_test_users(
-                feature_type_id=test_testuser.feature_type_id, allow_update=test_testuser.allow_update
-            )
+            with db.create_session() as session:
+                test_users = test_user_storage.get_test_users_by_feature_type_name(
+                    session=session,
+                    feature_type_id=test_testuser.feature_type_id,
+                    allow_update=test_testuser.allow_update,
+                )
         assert len(test_users) == 1
         assert test_users[0] == test_testuser
 

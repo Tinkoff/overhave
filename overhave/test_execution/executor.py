@@ -6,6 +6,7 @@ from pathlib import Path
 from overhave import db
 from overhave.db import TestRunStatus
 from overhave.entities import OverhaveFileSettings, ReportManager
+from overhave.metrics import TestRunOverhaveMetricContainer
 from overhave.scenario import FileManager
 from overhave.storage import IFeatureStorage, IScenarioStorage, ITestRunStorage, TestExecutorContext
 from overhave.test_execution.test_runner import PytestRunner
@@ -38,6 +39,7 @@ class TestExecutor(ITestExecutor):
         file_manager: FileManager,
         test_runner: PytestRunner,
         report_manager: ReportManager,
+        metric_container: TestRunOverhaveMetricContainer,
     ):
         self._file_settings = file_settings
         self._feature_storage = feature_storage
@@ -46,6 +48,7 @@ class TestExecutor(ITestExecutor):
         self._file_manager = file_manager
         self._test_runner = test_runner
         self._report_manager = report_manager
+        self._metric_container = metric_container
 
     def _run_test(self, context: TestExecutorContext, alluredir: Path) -> int:
         with self._file_manager.tmp_feature_file(context=context) as feature_file:
@@ -80,15 +83,18 @@ class TestExecutor(ITestExecutor):
             self._test_run_storage.set_run_status(
                 run_id=test_run_id, status=TestRunStatus.INTERNAL_ERROR, traceback=str(e)
             )
+            self._metric_container.add_test_run_status(status=TestRunStatus.INTERNAL_ERROR.value)
             return
 
         logger.debug("Test returncode: %s", test_return_code)
         if test_return_code == 0:
             self._test_run_storage.set_run_status(run_id=test_run_id, status=TestRunStatus.SUCCESS)
+            self._metric_container.add_test_run_status(status=TestRunStatus.SUCCESS.value)
         else:
             self._test_run_storage.set_run_status(
                 run_id=test_run_id, status=TestRunStatus.FAILED, traceback="Test run failed!"
             )
+            self._metric_container.add_test_run_status(status=TestRunStatus.FAILED.value)
         self._report_manager.create_allure_report(test_run_id=test_run_id, results_dir=results_dir)
 
     def process_test_task(self, task: TestRunTask) -> None:

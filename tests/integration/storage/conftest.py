@@ -38,7 +38,7 @@ def test_feature_storage(test_tag_storage: FeatureTagStorage) -> FeatureStorage:
     return FeatureStorage()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def test_feature_type_storage() -> FeatureTypeStorage:
     return FeatureTypeStorage()
 

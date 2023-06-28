@@ -6,6 +6,7 @@ from gitlab import GitlabError
 
 from overhave import db
 from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
 from overhave.publication.gitlab.tokenizer.client import TokenizerClient
@@ -31,6 +32,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         gitlab_publisher_settings: OverhaveGitlabPublisherSettings,
         gitlab_client: GitlabHttpClient,
         tokenizer_client: TokenizerClient,
+        metric_container: PublicationOverhaveMetricContainer,
     ):
         super().__init__(
             project_settings=project_settings,
@@ -41,14 +43,16 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             file_manager=file_manager,
             git_initializer=git_initializer,
             git_publisher_settings=gitlab_publisher_settings,
+            metric_container=metric_container,
         )
         self._gitlab_client = gitlab_client
         self._tokenizer_client = tokenizer_client
 
-    def publish_version(self, draft_id: int) -> None:
+    def publish_version(self, draft_id: int) -> db.DraftStatus:
         context = self._prepare_publisher_context(draft_id)
         if context is None:
-            return
+            self._draft_storage.set_draft_status(draft_id=draft_id, status=db.DraftStatus.INTERNAL_ERROR)
+            return db.DraftStatus.INTERNAL_ERROR
         merge_request = GitlabMrRequest(
             project_id=self._git_publisher_settings.repository_id,
             title=context.feature.name,
@@ -71,13 +75,15 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
                 published_at=response.created_at,
             )
             logger.info("Draft.id=%s successfully sent to GitLab", draft_id)
+            return db.DraftStatus.CREATED
         except (GitlabError, httpx.HTTPError) as err:
             logger.exception("Got error while trying to sent merge-request!")
             if isinstance(err, GitlabError) and err.response_code == HTTPStatus.CONFLICT:
                 self._draft_storage.save_response_as_duplicate(
                     draft_id=context.draft.id, feature_id=context.feature.id, traceback=str(err)
                 )
-                return
+                return db.DraftStatus.DUPLICATE
             self._draft_storage.set_draft_status(
                 draft_id=draft_id, status=db.DraftStatus.INTERNAL_ERROR, traceback=str(err)
             )
+            return db.DraftStatus.INTERNAL_ERROR

@@ -5,6 +5,7 @@ from overhave.factory.base_factory import IOverhaveFactory
 from overhave.factory.components.abstract_consumer import ITaskConsumerFactory
 from overhave.factory.components.s3_init_factory import FactoryWithS3ManagerInit
 from overhave.factory.context import OverhaveTestExecutionContext
+from overhave.metrics import TestRunOverhaveMetricContainer, get_test_metric_container
 from overhave.test_execution.executor import ITestExecutor, TestExecutor
 from overhave.transport import TestRunTask
 
@@ -33,6 +34,7 @@ class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext
             file_manager=self._file_manager,
             test_runner=self._test_runner,
             report_manager=self._report_manager,
+            metric_container=self._metric_container,
         )
 
     @property
@@ -41,3 +43,7 @@ class TestExecutionFactory(FactoryWithS3ManagerInit[OverhaveTestExecutionContext
 
     def process_task(self, task: TestRunTask) -> None:
         return self._test_executor.process_test_task(task)
+
+    @property
+    def _metric_container(self) -> TestRunOverhaveMetricContainer:
+        return get_test_metric_container()

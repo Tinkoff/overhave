@@ -1,5 +1,7 @@
 import abc
 
+import sqlalchemy.orm as so
+
 from overhave import db
 from overhave.storage import TestUserModel, TestUserSpecification
 from overhave.utils import get_current_time
@@ -36,7 +38,9 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_users(feature_type_id: int, allow_update: bool) -> list[TestUserModel]:
+    def get_test_users_by_feature_type_name(
+        session: so.Session, feature_type_id: int, allow_update: bool
+    ) -> list[TestUserModel]:
         pass
 
     @staticmethod
@@ -82,14 +86,15 @@ class TestUserStorage(ITestUserStorage):
             return None
 
     @staticmethod
-    def get_test_users(feature_type_id: int, allow_update: bool) -> list[TestUserModel]:
-        with db.create_session() as session:
-            db_users: list[db.TestUser] = (
-                session.query(db.TestUser)
-                .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update == allow_update)
-                .all()
-            )
-            return [TestUserModel.from_orm(user) for user in db_users]
+    def get_test_users_by_feature_type_name(
+        session: so.Session, feature_type_id: int, allow_update: bool
+    ) -> list[TestUserModel]:
+        db_users = (
+            session.query(db.TestUser)
+            .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update.is_(allow_update))
+            .all()
+        )
+        return [TestUserModel.from_orm(user) for user in db_users]
 
     @staticmethod
     def create_test_user(
