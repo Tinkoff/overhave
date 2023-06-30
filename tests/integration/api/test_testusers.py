@@ -54,14 +54,14 @@ class TestTestUserAPI:
         assert obj == test_testuser
 
     def test_delete_user_no_query(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
-        response = test_api_client.delete("/test_user//delete", auth=test_api_bearer_auth)
+        response = test_api_client.delete("/test_user/", auth=test_api_bearer_auth)
         assert response.status_code == 404
         validate_content_null(response, False)
 
     def test_delete_user_by_id_empty(
         self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth, faker: Faker
     ) -> None:
-        response = test_api_client.delete(f"/test_user/{faker.random_int()}/delete", auth=test_api_bearer_auth)
+        response = test_api_client.delete(f"/test_user/{faker.random_int()}", auth=test_api_bearer_auth)
         assert response.status_code == 400
         validate_content_null(response, False)
 
@@ -69,7 +69,7 @@ class TestTestUserAPI:
     def test_delete_user_by_id(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
-        response = test_api_client.delete(f"/test_user/{test_testuser.id}/delete", auth=test_api_bearer_auth)
+        response = test_api_client.delete(f"/test_user/{test_testuser.id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, True)
 
