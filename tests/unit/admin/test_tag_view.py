@@ -57,15 +57,16 @@ class TestTagView:
 
     @pytest.mark.parametrize("user_role", [db.Role.admin, db.Role.user], indirect=True)
     @pytest.mark.parametrize("value", ["(!)", "+5", "k$ek", "@", "(*"])
-    def test_incorrect_tag_raises_error(
+    def test_incorrect_tag_value_validation_error(
         self,
         test_tags_view: views.TagsView,
         current_user_mock: mock.MagicMock,
         test_tags_row: db.Tags,
         faker: Faker,
         form_mock: mock.MagicMock,
+        test_system_user_login: str,
         value: str,
     ) -> None:
-        form_mock.data["value"] = value
+        db_tag = db.Tags(value=value, created_by=test_system_user_login)
         with pytest.raises(ValidationError):
-            test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=True)
+            test_tags_view.on_model_change(form=form_mock, model=db_tag, is_created=True)

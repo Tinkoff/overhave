@@ -192,12 +192,9 @@ def test_tags_row(faker: Faker, test_system_user_login: str) -> db.Tags:
     return db.Tags(value=faker.word(), created_by=test_system_user_login)
 
 
-@pytest.fixture()
-def form_mock(test_incorrect_testing_user_row: db.TestUser) -> mock.MagicMock:
-    form_mock = mock.MagicMock()
-    form_mock.data = {}
-    form_mock._obj = test_incorrect_testing_user_row
-    return form_mock
+@pytest.fixture(scope="class")
+def form_mock() -> mock.MagicMock:
+    return mock.MagicMock()
 
 
 @pytest.fixture()
@@ -208,12 +205,6 @@ def test_testing_user_view(faker: Faker) -> views.TestUserView:
 @pytest.fixture()
 def test_testing_user_row() -> db.TestUser:
     return db.TestUser()
-
-
-@pytest.fixture()
-def test_incorrect_testing_user_row(faker: Faker) -> db.TestUser:
-    test_user: db.TestUser = db.TestUser(feature_type=db.FeatureType(name=faker.word()))
-    return test_user
 
 
 @pytest.fixture()
