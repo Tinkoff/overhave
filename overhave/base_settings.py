@@ -7,10 +7,8 @@ from typing import Any
 import sqlalchemy as sa
 import sqlalchemy.engine
 import sqlalchemy.exc
-import sqlalchemy.pool
 from pydantic import BaseSettings, Field, validator
-from sqlalchemy import Pool
-from sqlalchemy.pool import SingletonThreadPool
+from sqlalchemy.pool import Pool, SingletonThreadPool
 
 OVERHAVE_ENV_PREFIX = "OVERHAVE_"
 
