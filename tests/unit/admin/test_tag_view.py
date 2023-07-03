@@ -29,14 +29,11 @@ class TestTagView:
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_validation_error_tag_not_creator_or_admin(
-        self,
-        test_tags_view: views.TagsView,
-        current_user_mock: mock.MagicMock,
-        test_tags_row: db.Tags,
-        form_mock: mock.MagicMock,
+        self, test_tags_view: views.TagsView, current_user_mock: mock.MagicMock, form_mock: mock.MagicMock, faker: Faker
     ) -> None:
+        db_tag = db.Tags(value=faker.word(), created_by=faker.word())
         with pytest.raises(ValidationError):
-            test_tags_view.on_model_change(form=form_mock, model=test_tags_row, is_created=False)
+            test_tags_view.on_model_change(form=form_mock, model=db_tag, is_created=False)
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
     def test_get_tag_delete_error(
