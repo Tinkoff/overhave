@@ -28,7 +28,7 @@ class TestTagView:
         assert test_tags_row.created_by == previous_row.created_by
 
     @pytest.mark.parametrize("user_role", [db.Role.user], indirect=True)
-    def test_get_tag_created_error(
+    def test_get_tag_validation_error_tag_not_creator_or_admin(
         self,
         test_tags_view: views.TagsView,
         current_user_mock: mock.MagicMock,

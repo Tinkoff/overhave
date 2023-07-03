@@ -189,7 +189,7 @@ def test_tags_view() -> views.TagsView:
 
 @pytest.fixture()
 def test_tags_row(faker: Faker, test_system_user_login: str) -> db.Tags:
-    return db.Tags(value=faker.word(), created_by=test_system_user_login)
+    return db.Tags(value=faker.word(), created_by=faker.word())
 
 
 @pytest.fixture()
