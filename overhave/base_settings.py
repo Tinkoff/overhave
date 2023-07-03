@@ -7,7 +7,6 @@ from typing import Any
 import sqlalchemy as sa
 import sqlalchemy.engine
 import sqlalchemy.exc
-import sqlalchemy.pool
 from pydantic import BaseSettings, Field, validator
 from sqlalchemy.pool import Pool, SingletonThreadPool
 
