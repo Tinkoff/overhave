@@ -192,7 +192,7 @@ def test_tags_row(faker: Faker, test_system_user_login: str) -> db.Tags:
     return db.Tags(value=faker.word(), created_by=test_system_user_login)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def form_mock() -> mock.MagicMock:
     return mock.MagicMock()
 
