@@ -311,7 +311,7 @@ def test_draft(
             status=DraftStatus.CREATED,
         )
         draft.pr_url = faker.word()
-        draft.published_at = datetime.datetime.now()
+        draft.published_at = datetime.now()
         session.add(draft)
         session.flush()
         return cast(DraftModel, DraftModel.from_orm(draft))
