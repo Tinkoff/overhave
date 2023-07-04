@@ -50,7 +50,7 @@ class TestUserView(ModelViewConfigured):
 
     _feature_type: FeatureTypeName | None = None
 
-    def on_form_prefill(self, form, id) -> None:  # type: ignore  # noqa: A002
+    def on_form_prefill(self, form: Form, id) -> None:  # type: ignore  # noqa: A002
         if not isinstance(form._obj, db.TestUser):
             return
         self._feature_type = cast(FeatureTypeName, form._obj.feature_type.name)

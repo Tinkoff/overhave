@@ -23,8 +23,7 @@ class TagsView(ModelViewConfigured):
     _tag_name_pattern = re.compile(r"^[0-9a-zA-Zа-яА-ЯёЁ_]+$")
 
     def on_model_change(self, form: Form, model: db.Tags, is_created: bool) -> None:
-        tag = form.data.get("value")
-        if tag is not None and not self._tag_name_pattern.match(tag):
+        if not self._tag_name_pattern.match(model.value):
             raise ValidationError("Unsupported symbols in tag name!")
         if not is_created:
             if current_user.login == model.created_by or current_user.role == db.Role.admin:
