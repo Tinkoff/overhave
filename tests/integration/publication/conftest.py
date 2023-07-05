@@ -34,7 +34,8 @@ def gitlab_version_publisher(
 
 @pytest.fixture()
 def gitlab_version_publisher_without_context(
-    simple_gitlab_version_publisher, publisher_context
+    simple_gitlab_version_publisher,
+    publisher_context,
 ) -> GitlabVersionPublisher:
     simple_gitlab_version_publisher._prepare_publisher_context = lambda *args: None
     return simple_gitlab_version_publisher
@@ -72,7 +73,6 @@ def simple_gitlab_version_publisher(
 @pytest.fixture()
 def stash_version_publisher(
     simple_stash_version_publisher,
-    request,
     publisher_context,
 ) -> StashVersionPublisher:
     simple_stash_version_publisher._prepare_publisher_context = lambda *args: publisher_context
