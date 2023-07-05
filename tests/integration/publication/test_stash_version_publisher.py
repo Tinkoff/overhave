@@ -13,14 +13,15 @@ from tests.db_utils import count_queries, create_test_session
 
 @pytest.mark.usefixtures("database")
 @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
-@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
+@pytest.mark.parametrize("test_user_role", [db.Role.user, db.Role.admin], indirect=True)
 class TestStashbVersionPublisher:
     """Integration tests for Overhave StashVersion Publisher."""
 
-    @pytest.mark.parametrize("stash_version_publisher", [True], indirect=True)  # тут бы параметр покрасивее назвать
-    def test_context_is_none(self, stash_version_publisher: StashVersionPublisher, test_draft: DraftModel) -> None:
+    def test_context_is_none(
+        self, stash_version_publisher_without_context: StashVersionPublisher, test_draft: DraftModel
+    ) -> None:
         with count_queries(1):
-            draft_status = stash_version_publisher.publish_version(draft_id=test_draft.id)
+            draft_status = stash_version_publisher_without_context.publish_version(draft_id=test_draft.id)
             assert draft_status == db.DraftStatus.INTERNAL_ERROR
         with create_test_session() as session:
             draft = session.query(db.Draft).filter(db.Draft.id == test_draft.id).one()
@@ -62,8 +63,9 @@ class TestStashbVersionPublisher:
 
     def test_http_conflict(self, stash_version_publisher: StashVersionPublisher, test_draft: DraftModel) -> None:
         with count_queries(2):
-            error = StashHttpClientConflictError()
-            stash_version_publisher._client.send_pull_request.side_effect = error  # type: ignore
+            stash_version_publisher._client.send_pull_request.side_effect = (  # type: ignore
+                StashHttpClientConflictError()
+            )
             draft_status = stash_version_publisher.publish_version(draft_id=test_draft.id)
             assert draft_status == db.DraftStatus.DUPLICATE
         with create_test_session() as session:
