@@ -4,7 +4,7 @@ import logging
 import git
 
 from overhave import db
-from overhave.entities import GitPullError, OverhaveFileSettings
+from overhave.entities import GitPullError
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.publication.errors import BaseGitVersionPublisherError

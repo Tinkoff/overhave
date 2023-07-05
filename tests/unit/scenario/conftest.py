@@ -77,7 +77,7 @@ def test_testrun() -> TestRunModel:
 
 
 @pytest.fixture()
-def test_scenario(faker: Faker) -> ScenarioModel:
+def test_scenario(test_scenario_text: str, faker: Faker) -> ScenarioModel:
     return ScenarioModel(id=faker.random_int(), feature_id=faker.random_int(), text=test_scenario_text)
 
 

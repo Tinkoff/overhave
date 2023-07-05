@@ -4,7 +4,7 @@ from typing import Generic, cast
 
 import git
 
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.entities import GitRepositoryInitializer
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.base_publisher import BaseVersionPublisher
 from overhave.publication.errors import (

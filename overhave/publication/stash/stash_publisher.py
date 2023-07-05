@@ -3,7 +3,7 @@ import logging
 import httpx
 
 from overhave import db
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.entities import GitRepositoryInitializer
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings

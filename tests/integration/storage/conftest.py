@@ -1,22 +1,15 @@
-import datetime
 import socket
-from typing import cast
 from unittest import mock
 
 import pytest
 from faker import Faker
 
-from overhave import db
-from overhave.db import DraftStatus
 from overhave.storage import (
-    DraftModel,
-    DraftStorage,
     FeatureModel,
     FeatureStorage,
     FeatureTagStorage,
     FeatureTypeStorage,
     ScenarioModel,
-    SystemUserModel,
     TestRunStorage,
 )
 from tests.db_utils import create_test_session
@@ -49,7 +42,6 @@ def test_second_created_test_run_id(
 ) -> int:
     with create_test_session():
         return test_run_storage.create_testrun(test_scenario.id, test_feature.author)
-
 
 
 @pytest.fixture()

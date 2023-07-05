@@ -9,12 +9,15 @@ from faker import Faker
 from pydantic import SecretStr
 
 from overhave import OverhaveEmulationSettings, db
-from overhave.db import EmulationRun, DraftStatus
+from overhave.db import DraftStatus
 from overhave.storage import (
+    DraftModel,
+    DraftStorage,
     EmulationModel,
     EmulationRunModel,
     EmulationStorage,
     FeatureModel,
+    FeatureStorage,
     FeatureTypeModel,
     ScenarioModel,
     ScenarioStorage,
@@ -25,7 +28,7 @@ from overhave.storage import (
     TestRunStorage,
     TestUserModel,
     TestUserSpecification,
-    TestUserStorage, DraftStorage, FeatureStorage, DraftModel,
+    TestUserStorage,
 )
 from overhave.utils import get_current_time
 from tests.db_utils import create_test_session
@@ -55,9 +58,11 @@ def test_scenario_storage() -> ScenarioStorage:
 def test_run_storage() -> TestRunStorage:
     return TestRunStorage()
 
+
 @pytest.fixture(scope="class")
 def test_draft_storage() -> DraftStorage:
     return DraftStorage()
+
 
 @pytest.fixture(scope="class")
 def test_feature_storage() -> FeatureStorage:
@@ -297,6 +302,7 @@ def mock_default_value() -> str:
 @pytest.fixture(scope="module")
 def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
     return OverhaveEmulationSettings()
+
 
 @pytest.fixture()
 def test_draft(
