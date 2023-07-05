@@ -53,11 +53,6 @@ class TestTestUserAPI:
         obj = TestUserModel.parse_obj(response.json())
         assert obj == test_testuser
 
-    def test_delete_user_no_query(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
-        response = test_api_client.delete("/test_user/5000000", auth=test_api_bearer_auth)
-        assert response.status_code == 404
-        validate_content_null(response, False)
-
     def test_delete_user_by_id_empty(
         self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth, faker: Faker
     ) -> None:
