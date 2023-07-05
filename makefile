@@ -1,7 +1,7 @@
 CODE = overhave
 VENV ?= .venv
 WORK_DIR ?= .
-MIN_COVERAGE ?= 87.1
+MIN_COVERAGE ?= 88.0
 PACKAGE_BUILD_DIR ?= dist
 PYTHON_VERSION ?= 3.11
 
