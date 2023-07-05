@@ -118,7 +118,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
         description="Get list of test users with given `feature_type` and `allow_update`",
     )
     test_user_router.add_api_route(
-        "/{user_id}/delete",
+        "/{user_id}",
         delete_test_user_handler,
         methods=["DELETE"],
         summary="Delete TestUser",
