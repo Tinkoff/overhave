@@ -2,6 +2,7 @@ import logging
 
 from pydantic import SecretStr
 
+from overhave import db
 from overhave.entities.auth_managers.secret_mixin import AdminSecretMixin
 from overhave.storage import SystemUserModel
 
@@ -24,7 +25,8 @@ class SimpleAdminAuthorizationManager(AdminSecretMixin):
     """
 
     def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
-        user = self._system_user_storage.get_user_by_credits(login=username)
+        with db.create_session() as session:
+            user = self._system_user_storage.get_user_by_credits(session=session, login=username)
         if user is None:
             user = self._system_user_storage.create_user(login=username, password=password)
         if user.password is None:

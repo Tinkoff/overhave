@@ -1,6 +1,7 @@
 import abc
 
 import sqlalchemy as sa
+import sqlalchemy.orm as so
 from pydantic import SecretStr
 
 from overhave import db
@@ -22,12 +23,14 @@ class ISystemUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_user_by_credits(login: str, password: SecretStr | None = None) -> SystemUserModel | None:
+    def get_user_by_credits(
+        session: so.Session, login: str, password: SecretStr | None = None
+    ) -> SystemUserModel | None:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def update_user_role(user_model: SystemUserModel) -> None:
+    def update_user_role(session: so.Session, user_id: int, role: db.Role) -> None:
         pass
 
 
@@ -54,17 +57,17 @@ class SystemUserStorage(ISystemUserStorage):
             return SystemUserModel.from_orm(db_user)
 
     @staticmethod
-    def get_user_by_credits(login: str, password: SecretStr | None = None) -> SystemUserModel | None:
-        with db.create_session() as session:
-            query = session.query(db.UserRole).filter(db.UserRole.login == login)
-            if password is not None:
-                query = query.filter(db.UserRole.password == password.get_secret_value())
-            db_user = query.one_or_none()
-            if db_user is not None:
-                return SystemUserModel.from_orm(db_user)
-            return None
+    def get_user_by_credits(
+        session: so.Session, login: str, password: SecretStr | None = None
+    ) -> SystemUserModel | None:
+        query = session.query(db.UserRole).filter(db.UserRole.login == login)
+        if password is not None:
+            query = query.filter(db.UserRole.password == password.get_secret_value())
+        db_user = query.one_or_none()
+        if db_user is not None:
+            return SystemUserModel.from_orm(db_user)
+        return None
 
     @staticmethod
-    def update_user_role(user_model: SystemUserModel) -> None:
-        with db.create_session() as session:
-            session.execute(sa.update(db.UserRole).where(db.UserRole.id == user_model.id).values(role=user_model.role))
+    def update_user_role(session: so.Session, user_id: int, role: db.Role) -> None:
+        session.execute(sa.update(db.UserRole).where(db.UserRole.id == user_id).values(role=role))

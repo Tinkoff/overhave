@@ -71,12 +71,12 @@ def _ensure_demo_app_has_features(settings_generator: OverhaveDemoSettingsGenera
     synchronizer = _create_synchronizer()
     with db.create_session() as session:
         create_db_features = session.query(db.Feature).first() is None
-    if not overhave_synchronizer_factory().system_user_storage.get_user_by_credits(
-        login=settings_generator.default_feature_user
-    ):
-        overhave_synchronizer_factory().system_user_storage.create_user(
-            login=settings_generator.default_feature_user, password=SecretStr(settings_generator.default_feature_user)
-        )
+        user_storage = overhave_synchronizer_factory().system_user_storage
+        if not user_storage.get_user_by_credits(session=session, login=settings_generator.default_feature_user):
+            user_storage.create_user(
+                login=settings_generator.default_feature_user,
+                password=SecretStr(settings_generator.default_feature_user),
+            )
     try:
         synchronizer.synchronize(create_db_features=create_db_features)
     except BaseScenarioParserError:

@@ -4,6 +4,7 @@ import fastapi
 from fastapi import security as fastapi_security
 from pydantic.types import SecretStr
 
+from overhave import db
 from overhave.api.auth import AUTH_HEADERS, create_access_token
 from overhave.api.deps import get_api_auth_settings, get_system_user_storage
 from overhave.api.settings import OverhaveApiAuthSettings
@@ -16,7 +17,10 @@ def login_for_access_token(
     auth_settings: OverhaveApiAuthSettings = fastapi.Depends(get_api_auth_settings),
     storage: ISystemUserStorage = fastapi.Depends(get_system_user_storage),
 ) -> AuthToken:
-    user = storage.get_user_by_credits(login=form_data.username, password=SecretStr(form_data.password))
+    with db.create_session() as session:
+        user = storage.get_user_by_credits(
+            session=session, login=form_data.username, password=SecretStr(form_data.password)
+        )
     if not user:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,

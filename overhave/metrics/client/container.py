@@ -36,6 +36,8 @@ class BaseOverhaveMetricContainer:
 class TestRunOverhaveMetricContainer(BaseOverhaveMetricContainer):
     """Overhave prometheus metric container for test runs."""
 
+    __test__ = False
+
     def __init__(self, registry: CollectorRegistry):
         super().__init__(registry=registry)
         self._init_test_run_metrics()

@@ -40,9 +40,10 @@ class TestSystemUserStorage:
                 login=faker.word(), password=test_system_user_password, role=test_user_role
             )
         with count_queries(1):
-            user = test_system_user_storage.get_user_by_credits(
-                login=created_user.login, password=created_user.password
-            )
+            with db.create_session() as session:
+                user = test_system_user_storage.get_user_by_credits(
+                    session=session, login=created_user.login, password=created_user.password
+                )
         assert user is not None
         assert user == created_user
 
@@ -55,10 +56,13 @@ class TestSystemUserStorage:
         faker: Faker,
     ) -> None:
         with count_queries(1):
-            assert (
-                test_system_user_storage.get_user_by_credits(login=faker.word(), password=test_system_user_password)
-                is None
-            )
+            with db.create_session() as session:
+                assert (
+                    test_system_user_storage.get_user_by_credits(
+                        session=session, login=faker.word(), password=test_system_user_password
+                    )
+                    is None
+                )
 
     @pytest.mark.parametrize("test_new_user_role", list(db.Role))
     def test_update_user_role(
@@ -67,10 +71,12 @@ class TestSystemUserStorage:
         test_system_user: SystemUserModel,
         test_new_user_role: db.Role,
     ) -> None:
-        test_system_user.role = test_new_user_role
         with count_queries(1):
-            test_system_user_storage.update_user_role(test_system_user)
+            with db.create_session() as session:
+                test_system_user_storage.update_user_role(
+                    session=session, user_id=test_system_user.id, role=test_new_user_role
+                )
         with count_queries(1):
             user = test_system_user_storage.get_user(test_system_user.id)
         assert user is not None
-        assert user == test_system_user
+        assert user.role == test_new_user_role

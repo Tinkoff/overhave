@@ -32,21 +32,22 @@ class AdminPanelUser(BaseModel):
     def is_anonymous(self) -> bool:
         return self.user_data is None
 
-    def get_id(self) -> int:
-        return self._get_authorized_user_or_raise().id
-
     @property
-    def login(self) -> str:
-        return self._get_authorized_user_or_raise().login
-
-    @property
-    def role(self) -> db.Role:
-        return self._get_authorized_user_or_raise().role
-
-    def _get_authorized_user_or_raise(self) -> SystemUserModel:
+    def _authorized_user(self) -> SystemUserModel:
         if self.user_data is None:
             raise UnauthorizedUserError("User is not authorized!")
         return self.user_data
+
+    def get_id(self) -> int:
+        return self._authorized_user.id
+
+    @property
+    def login(self) -> str:
+        return self._authorized_user.login
+
+    @property
+    def role(self) -> db.Role:
+        return self._authorized_user.role
 
     def __unicode__(self) -> str:
         if self.user_data is not None:

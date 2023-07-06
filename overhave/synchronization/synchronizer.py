@@ -53,10 +53,10 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
 
     def _update_feature(self, model: FeatureModel, info: StrictFeatureInfo, file_ts: datetime) -> None:
         logger.info("Feature is gonna be updated...")
-        self._storage_manager.ensure_users_exist(info)
-        model.name = info.name
         with db.create_session() as session:
+            self._storage_manager.ensure_users_exist(session=session, info=info)
             model.feature_tags = self._storage_manager.get_feature_tags(session=session, info=info)
+        model.name = info.name
         model.severity = info.severity
         model.last_edited_by = info.last_edited_by
         model.last_edited_at = file_ts
@@ -77,9 +77,9 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
 
         info.id = ANY_INT
         strict_info = StrictFeatureInfo(**info.dict())
-        self._storage_manager.ensure_users_exist(strict_info)
 
         with db.create_session() as session:
+            self._storage_manager.ensure_users_exist(session=session, info=strict_info)
             feature_tags = self._storage_manager.get_feature_tags(session=session, info=strict_info)
             feature_type = self._storage_manager.feature_type_by_name(session=session, feature_type=strict_info.type)
 
