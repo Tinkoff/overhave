@@ -49,7 +49,6 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
     @cached_property
     def _stash_publisher(self) -> StashVersionPublisher:
         return StashVersionPublisher(
-            file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,
             feature_storage=self._feature_storage,
             scenario_storage=self._scenario_storage,
@@ -59,6 +58,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             git_initializer=self._git_initializer,
             stash_publisher_settings=self.context.publisher_settings,  # type: ignore
             stash_client=self._stash_client,
+            metric_container=self.metric_container,
         )
 
     @cached_property
@@ -70,7 +70,6 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
         if self._tokenizer_client._settings.enabled and self._tokenizer_client._settings.url is None:
             raise UrlGitlabTokenizerNotScepifiedIfEnabled("Please set correct url for gitlab_tokenizer!")
         return GitlabVersionPublisher(
-            file_settings=self.context.file_settings,
             project_settings=self.context.project_settings,
             feature_storage=self._feature_storage,
             scenario_storage=self._scenario_storage,
@@ -81,6 +80,7 @@ class PublicationFactory(BaseOverhaveFactory[OverhavePublicationContext], IPubli
             gitlab_publisher_settings=self.context.publisher_settings,  # type: ignore
             gitlab_client=self._gitlab_client,
             tokenizer_client=self._tokenizer_client,
+            metric_container=self.metric_container,
         )
 
     @property
