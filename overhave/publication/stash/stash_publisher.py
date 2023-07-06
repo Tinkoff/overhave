@@ -3,7 +3,7 @@ import logging
 import httpx
 
 from overhave import db
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.entities import GitRepositoryInitializer
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.stash.settings import OverhaveStashPublisherSettings
@@ -26,7 +26,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -39,7 +38,6 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
         metric_container: PublicationOverhaveMetricContainer,
     ):
         super().__init__(
-            file_settings=file_settings,
             project_settings=project_settings,
             feature_storage=feature_storage,
             scenario_storage=scenario_storage,

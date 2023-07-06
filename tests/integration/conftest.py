@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import cast
 from uuid import uuid1
 
@@ -8,11 +9,15 @@ from faker import Faker
 from pydantic import SecretStr
 
 from overhave import OverhaveEmulationSettings, db
+from overhave.db import DraftStatus
 from overhave.storage import (
+    DraftModel,
+    DraftStorage,
     EmulationModel,
     EmulationRunModel,
     EmulationStorage,
     FeatureModel,
+    FeatureStorage,
     FeatureTypeModel,
     ScenarioModel,
     ScenarioStorage,
@@ -52,6 +57,16 @@ def test_scenario_storage() -> ScenarioStorage:
 @pytest.fixture(scope="module")
 def test_run_storage() -> TestRunStorage:
     return TestRunStorage()
+
+
+@pytest.fixture(scope="class")
+def test_draft_storage() -> DraftStorage:
+    return DraftStorage()
+
+
+@pytest.fixture(scope="class")
+def test_feature_storage() -> FeatureStorage:
+    return FeatureStorage()
 
 
 @pytest.fixture(scope="module")
@@ -287,3 +302,22 @@ def mock_default_value() -> str:
 @pytest.fixture(scope="module")
 def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
     return OverhaveEmulationSettings()
+
+
+@pytest.fixture()
+def test_draft(
+    faker: Faker, test_scenario: ScenarioModel, test_created_test_run_id: int, test_system_user: SystemUserModel
+) -> DraftModel:
+    with create_test_session() as session:
+        draft: db.Draft = db.Draft(
+            feature_id=test_scenario.feature_id,
+            test_run_id=test_created_test_run_id,
+            text=test_scenario.text,
+            published_by=test_system_user.login,
+            status=DraftStatus.CREATED,
+        )
+        draft.pr_url = faker.word()
+        draft.published_at = datetime.now()
+        session.add(draft)
+        session.flush()
+        return cast(DraftModel, DraftModel.from_orm(draft))

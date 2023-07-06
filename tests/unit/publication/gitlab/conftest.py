@@ -80,7 +80,6 @@ def test_gitlab_publisher_with_default_reviewers(
     publication_container: PublicationOverhaveMetricContainer,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
-        file_settings=test_file_settings,
         project_settings=test_project_settings,
         feature_storage=mocker.create_autospec(IFeatureStorage),
         scenario_storage=mocker.create_autospec(IScenarioStorage),
@@ -108,7 +107,6 @@ def test_gitlab_publisher_with_reviewers_mapping(
     publication_container: PublicationOverhaveMetricContainer,
 ) -> GitlabVersionPublisher:
     return GitlabVersionPublisher(
-        file_settings=test_file_settings,
         project_settings=test_project_settings,
         feature_storage=mocker.create_autospec(IFeatureStorage),
         scenario_storage=mocker.create_autospec(IScenarioStorage),

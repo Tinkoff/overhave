@@ -5,7 +5,7 @@ import httpx
 from gitlab import GitlabError
 
 from overhave import db
-from overhave.entities import GitRepositoryInitializer, OverhaveFileSettings
+from overhave.entities import GitRepositoryInitializer
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.git_publisher import GitVersionPublisher
 from overhave.publication.gitlab.settings import OverhaveGitlabPublisherSettings
@@ -22,7 +22,6 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -36,7 +35,6 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
         metric_container: PublicationOverhaveMetricContainer,
     ):
         super().__init__(
-            file_settings=file_settings,
             project_settings=project_settings,
             feature_storage=feature_storage,
             scenario_storage=scenario_storage,

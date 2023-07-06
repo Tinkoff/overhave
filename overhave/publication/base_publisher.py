@@ -4,7 +4,7 @@ import logging
 import git
 
 from overhave import db
-from overhave.entities import GitPullError, OverhaveFileSettings
+from overhave.entities import GitPullError
 from overhave.metrics import PublicationOverhaveMetricContainer
 from overhave.publication.abstract_publisher import IVersionPublisher
 from overhave.publication.errors import BaseGitVersionPublisherError
@@ -20,7 +20,6 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
 
     def __init__(
         self,
-        file_settings: OverhaveFileSettings,
         project_settings: OverhaveProjectSettings,
         feature_storage: IFeatureStorage,
         scenario_storage: IScenarioStorage,
@@ -29,7 +28,6 @@ class BaseVersionPublisher(IVersionPublisher, abc.ABC):
         file_manager: FileManager,
         metric_container: PublicationOverhaveMetricContainer,
     ) -> None:
-        self._file_settings = file_settings
         self._project_settings = project_settings
         self._feature_storage = feature_storage
         self._scenario_storage = scenario_storage
