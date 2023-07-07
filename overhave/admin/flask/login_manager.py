@@ -1,8 +1,8 @@
 import logging
+from dataclasses import dataclass
 
 from flask import redirect
 from flask_login import LoginManager
-from pydantic import BaseModel
 from werkzeug import Response
 
 from overhave import db
@@ -15,7 +15,8 @@ class UnauthorizedUserError(Exception):
     """Raises when user is not authorized and trying to get user fields such as role or login."""
 
 
-class AdminPanelUser(BaseModel):
+@dataclass(frozen=True)
+class AdminPanelUser:
     """SystemUserModel wrapper for flask_login."""
 
     user_data: SystemUserModel | None

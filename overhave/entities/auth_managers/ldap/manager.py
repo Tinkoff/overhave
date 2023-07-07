@@ -63,7 +63,7 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
                 return user
             logger.debug("Have not found user with username '%s'!", username)
             if self._is_user_can_be_created(session=session, user_groups=user_groups):
-                user = self._system_user_storage.create_user(login=username)
+                user = self._system_user_storage.create_user(session=session, login=username)
                 self._assign_admin_if_neccessary(session=session, user_id=user.id, user_groups=user_groups)
                 return user
 

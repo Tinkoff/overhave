@@ -14,6 +14,7 @@ from tests.db_utils import create_test_session
 from tests.integration.api.conftest import validate_content_null
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestTestRunAPI:
     """Integration tests for Overhave TestRuns API."""
 
@@ -27,7 +28,6 @@ class TestTestRunAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_run_test_by_tag_handler_handler(
         self,
@@ -46,7 +46,6 @@ class TestTestRunAPI:
         test_run = TestRunModel.parse_obj(response_test_run.json())
         assert test_run.scenario_id == test_scenario.id
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_run_tests_by_tag_handler_handler(
         self,
@@ -78,7 +77,6 @@ class TestTestRunAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_test_run_handler_found_running(
         self,
@@ -97,7 +95,6 @@ class TestTestRunAPI:
         assert model.report is None
         assert model.report_status == TestReportStatus.EMPTY
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_test_run_handler_found_finished(
         self,

@@ -27,8 +27,8 @@ class SimpleAdminAuthorizationManager(AdminSecretMixin):
     def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         with db.create_session() as session:
             user = self._system_user_storage.get_user_by_credits(session=session, login=username)
-        if user is None:
-            user = self._system_user_storage.create_user(login=username, password=password)
+            if user is None:
+                user = self._system_user_storage.create_user(session=session, login=username, password=password)
         if user.password is None:
             raise NullablePasswordError(f"User with id={user.id} has not got password!")
         if user.password.get_secret_value() == password.get_secret_value():

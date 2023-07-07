@@ -74,6 +74,7 @@ def _ensure_demo_app_has_features(settings_generator: OverhaveDemoSettingsGenera
         user_storage = overhave_synchronizer_factory().system_user_storage
         if not user_storage.get_user_by_credits(session=session, login=settings_generator.default_feature_user):
             user_storage.create_user(
+                session=session,
                 login=settings_generator.default_feature_user,
                 password=SecretStr(settings_generator.default_feature_user),
             )

@@ -10,6 +10,7 @@ from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestFeatureAPI:
     """Integration tests for Overhave FeatureTags API."""
 
@@ -29,7 +30,6 @@ class TestFeatureAPI:
         validate_content_null(response, False)
         assert response.json() == []
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_no_feature_by_tag_id(
         self, test_api_client: TestClient, test_tag: TagModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -38,7 +38,6 @@ class TestFeatureAPI:
         validate_content_null(response, False)
         assert response.json() == []
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_feature_by_tag_id(
         self,
@@ -61,7 +60,6 @@ class TestFeatureAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_no_feature_by_tag_value(
         self, test_api_client: TestClient, test_tag: TagModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -70,7 +68,6 @@ class TestFeatureAPI:
         validate_content_null(response, False)
         assert response.json() == []
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_feature_by_tag_value(
         self,

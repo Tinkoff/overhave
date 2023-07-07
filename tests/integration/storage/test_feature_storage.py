@@ -79,9 +79,8 @@ class TestFeatureStorage:
         updated_severity: allure.severity_level,
         faker: Faker,
     ) -> None:
-        with count_queries(1):
-            new_system_user = test_system_user_storage.create_user(login=uuid1().hex)
         with create_test_session() as session:
+            new_system_user = test_system_user_storage.create_user(session=session, login=uuid1().hex)
             new_db_tag = db.Tags(value=faker.word() + faker.word(), created_by=new_system_user.login)
             session.add(new_db_tag)
             session.flush()

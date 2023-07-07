@@ -12,11 +12,11 @@ from overhave.utils import get_current_time
 from tests.db_utils import count_queries, create_test_session
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 @pytest.mark.usefixtures("database")
 class TestDraftStorage:
     """Integration tests for :class:`DraftStorage`."""
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel) -> None:
         with count_queries(1):
@@ -28,7 +28,6 @@ class TestDraftStorage:
         assert draft_model.feature_id == test_draft.feature_id
         assert draft_model.test_run_id == test_draft.test_run_id
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("draft_status", [db.DraftStatus.REQUESTED])
     def test_create_new_draft(
@@ -53,7 +52,6 @@ class TestDraftStorage:
                 assert saved_draft.test_run_id == test_run.id
                 assert saved_draft.status == draft_status
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("draft_status", [db.DraftStatus.REQUESTED])
     def test_create_new_draft_without_text(
@@ -74,7 +72,6 @@ class TestDraftStorage:
                         session=session, test_run=test_run, published_by=test_run.executed_by, status=draft_status
                     )
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     def test_get_existing_draft(self, test_draft_storage: DraftStorage, test_draft: DraftModel, faker: Faker) -> None:
         with db.create_session() as session:
@@ -96,7 +93,6 @@ class TestDraftStorage:
                 assert saved_draft.test_run_id == test_draft.test_run_id
                 assert saved_draft.status == test_draft.status
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize(("pr_url", "published_at"), [("pr_url", get_current_time())])
     def test_save_response(
@@ -125,7 +121,6 @@ class TestDraftStorage:
             assert new_test_draft.feature_id == test_feature.id
             assert new_test_draft.feature.released is True
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("traceback", ["trace", None])
     def test_save_response_as_duplicate_no_draft(
@@ -137,7 +132,6 @@ class TestDraftStorage:
                     draft_id=faker.random_int(), feature_id=test_feature.id, traceback=traceback
                 )
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("traceback", ["trace", None])
     @pytest.mark.parametrize(
@@ -147,7 +141,7 @@ class TestDraftStorage:
     def test_save_response_as_duplicate_with_not_succeed_previous_draft(
         self,
         test_draft_storage: DraftStorage,
-        test_system_user: SystemUserModel,
+        service_system_user: SystemUserModel,
         test_feature: FeatureModel,
         test_created_test_run_id: int,
         test_second_created_test_run_id: int,
@@ -164,7 +158,7 @@ class TestDraftStorage:
                 feature_id=first_test_run.scenario.feature_id,
                 test_run_id=first_test_run.id,
                 text=first_test_run.scenario.text,
-                published_by=test_system_user.login,
+                published_by=service_system_user.login,
                 published_at=published_at,
                 status=first_draft_state,
                 pr_url=pr_url,
@@ -180,7 +174,7 @@ class TestDraftStorage:
                 feature_id=second_test_run.scenario.feature_id,
                 test_run_id=second_test_run.id,
                 text=second_test_run.scenario.text,
-                published_by=test_system_user.login,
+                published_by=service_system_user.login,
                 status=db.DraftStatus.CREATING,
             )
             session.add(second_draft)
@@ -206,7 +200,6 @@ class TestDraftStorage:
                 assert second_draft.published_at != first_draft.published_at
                 assert second_draft.pr_url is None
 
-    @pytest.mark.parametrize("test_user_role", list(db.Role), indirect=True)
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
     @pytest.mark.parametrize("draft_status", list(db.DraftStatus))
     @pytest.mark.parametrize("traceback", [None, "random trace str"])

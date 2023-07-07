@@ -1,7 +1,9 @@
+import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
 from pydantic.types import SecretStr
 
+from overhave import db
 from overhave.api.settings import OverhaveApiAuthSettings
 from overhave.storage import AuthToken, SystemUserModel
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
@@ -34,6 +36,7 @@ class TestAuthAPI:
         assert response.status_code == 401
         validate_content_null(response, False)
 
+    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_create_token(
         self,
         test_api_client: TestClient,

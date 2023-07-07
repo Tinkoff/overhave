@@ -1,17 +1,16 @@
+from typing import Iterator
 from unittest import mock
 
 import httpx
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from pydantic.types import SecretStr
 
-from overhave import db, overhave_api
-from overhave.storage import AuthStorage, SystemUserModel, SystemUserStorage, TestUserSpecification
+from overhave import overhave_api
+from overhave.storage import AuthStorage, SystemUserModel, TestUserSpecification
 from overhave.transport.http.api_client.authenticator import OverhaveApiAuthenticator
 from overhave.transport.http.api_client.settings import OverhaveApiAuthenticatorSettings
 from overhave.transport.http.base_client import BearerAuth
-from tests.db_utils import create_test_session
 
 
 @pytest.fixture(scope="module")
@@ -35,18 +34,6 @@ def test_api_client(database) -> TestClient:
 
 
 @pytest.fixture()
-def service_system_user(
-    test_system_user_storage: SystemUserStorage,
-    database,
-    faker: Faker,
-) -> SystemUserModel:
-    with create_test_session():
-        return test_system_user_storage.create_user(
-            login=f"{faker.word()}.{faker.word()}", password=SecretStr(faker.word()), role=db.Role.admin
-        )
-
-
-@pytest.fixture()
 def api_authenticator_settings(test_api_client: TestClient) -> OverhaveApiAuthenticatorSettings:
     return OverhaveApiAuthenticatorSettings(url=test_api_client.base_url)
 
@@ -54,7 +41,7 @@ def api_authenticator_settings(test_api_client: TestClient) -> OverhaveApiAuthen
 @pytest.fixture()
 def api_authenticator(
     mock_envs, test_api_client: TestClient, api_authenticator_settings: OverhaveApiAuthenticatorSettings
-) -> OverhaveApiAuthenticator:
+) -> Iterator[OverhaveApiAuthenticator]:
     with mock.patch.object(httpx, "request", new_callable=lambda: test_api_client.request):
         yield OverhaveApiAuthenticator(settings=api_authenticator_settings, auth_storage=AuthStorage())
 

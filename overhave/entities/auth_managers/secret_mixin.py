@@ -30,11 +30,13 @@ class AdminSecretMixin(BaseAdminAuthorizationManager, abc.ABC):
         return SecretStr(uuid4().hex)
 
     def _make_secret(self) -> None:
+        secret = self._get_secret()
         with db.create_session() as session:
             user = self._system_user_storage.get_user_by_credits(session=session, login=_ADMIN_USERNAME)
-        if user is not None:
-            logger.info("Admin user already exists")
-            return
-        secret = self._get_secret()
+            if user is not None:
+                logger.info("Admin user already exists")
+                return
+            self._system_user_storage.create_user(
+                session=session, login=_ADMIN_USERNAME, password=secret, role=db.Role.admin
+            )
         logger.info("Generated admin secret: %s", secret.get_secret_value())
-        self._system_user_storage.create_user(login=_ADMIN_USERNAME, password=secret, role=db.Role.admin)

@@ -6,7 +6,6 @@ import allure
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
-from pydantic import SecretStr
 
 from overhave import OverhaveEmulationSettings, db
 from overhave.db import DraftStatus
@@ -91,13 +90,17 @@ def test_user_role(request: FixtureRequest) -> db.Role:
 
 
 @pytest.fixture()
-def test_system_user(
-    test_system_user_storage: SystemUserStorage, database: None, faker: Faker, test_user_role: db.Role
+def service_system_user(
+    test_system_user_storage: SystemUserStorage,
+    database: None,
+    test_user_role: db.Role,
+    faker: Faker,
 ) -> SystemUserModel:
-    with create_test_session():
-        return test_system_user_storage.create_user(
-            login=faker.word(), password=SecretStr(faker.word()), role=test_user_role
-        )
+    with create_test_session() as session:
+        db_user = db.UserRole(login=f"{faker.word()}_{faker.word()}", password=faker.word(), role=test_user_role)
+        session.add(db_user)
+        session.flush()
+        return SystemUserModel.from_orm(db_user)
 
 
 @pytest.fixture()
@@ -114,7 +117,7 @@ def testuser_allow_update(request: FixtureRequest) -> bool:
 
 @pytest.fixture()
 def test_testuser(
-    test_system_user: SystemUserModel,
+    service_system_user: SystemUserModel,
     faker: Faker,
     test_feature_type,
     test_specification: TestUserSpecification,
@@ -125,7 +128,7 @@ def test_testuser(
             feature_type_id=test_feature_type.id,
             key=cast(str, faker.word()),
             name=cast(str, faker.word()),
-            created_by=test_system_user.login,
+            created_by=service_system_user.login,
             specification=test_specification,
             allow_update=testuser_allow_update,
         )
@@ -135,9 +138,9 @@ def test_testuser(
 
 
 @pytest.fixture()
-def test_tag(test_system_user: SystemUserModel, faker: Faker) -> TagModel:
+def test_tag(service_system_user: SystemUserModel, faker: Faker) -> TagModel:
     with create_test_session() as session:
-        tag = db.Tags(value=faker.word(), created_by=test_system_user.login)
+        tag = db.Tags(value=faker.word(), created_by=service_system_user.login)
         session.add(tag)
         session.flush()
         return cast(TagModel, TagModel.from_orm(tag))
@@ -152,7 +155,7 @@ def test_severity(request: FixtureRequest) -> allure.severity_level:
 
 @pytest.fixture()
 def test_feature(
-    test_system_user: SystemUserModel,
+    service_system_user: SystemUserModel,
     test_feature_type: FeatureTypeModel,
     test_severity: allure.severity_level,
     faker: Faker,
@@ -160,13 +163,13 @@ def test_feature(
     with create_test_session() as session:
         feature = db.Feature(
             name=faker.word(),
-            author=test_system_user.login,
+            author=service_system_user.login,
             type_id=test_feature_type.id,
             task=[faker.word()[:11]],
             file_path=f"{faker.word()}/{faker.word()}",
             severity=test_severity,
             last_edited_at=get_current_time(),
-            last_edited_by=test_system_user.login,
+            last_edited_by=service_system_user.login,
         )
         session.add(feature)
         session.flush()
@@ -175,7 +178,7 @@ def test_feature(
 
 @pytest.fixture()
 def test_features(
-    test_system_user: SystemUserModel,
+    service_system_user: SystemUserModel,
     test_feature_type: FeatureTypeModel,
     test_severity: allure.severity_level,
     faker: Faker,
@@ -186,13 +189,13 @@ def test_features(
         for x in range(num_features):
             feature = db.Feature(
                 name=faker.word(),
-                author=test_system_user.login,
+                author=service_system_user.login,
                 type_id=test_feature_type.id,
                 task=[faker.word()[:11]],
                 file_path=f"{faker.word()}/{faker.word()}",
                 severity=test_severity,
                 last_edited_at=get_current_time(),
-                last_edited_by=test_system_user.login,
+                last_edited_by=service_system_user.login,
             )
             session.add(feature)
             session.flush()
@@ -260,13 +263,13 @@ def test_report() -> str:
 
 
 @pytest.fixture()
-def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
+def test_emulation(service_system_user: SystemUserModel, test_testuser, faker: Faker) -> EmulationModel:
     with create_test_session() as session:
         emulation = db.Emulation(
             name=cast(str, faker.word()),
             command=cast(str, faker.word()),
             test_user_id=test_testuser.id,
-            created_by=test_system_user.login,
+            created_by=service_system_user.login,
         )
         session.add(emulation)
         session.flush()
@@ -274,11 +277,11 @@ def test_emulation(test_system_user: SystemUserModel, test_testuser, faker: Fake
 
 
 @pytest.fixture()
-def test_emulation_run(test_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
+def test_emulation_run(service_system_user: SystemUserModel, test_emulation: EmulationModel) -> EmulationRunModel:
     with create_test_session() as session:
         emulation_run = db.EmulationRun(
             emulation_id=test_emulation.id,
-            initiated_by=test_system_user.login,
+            initiated_by=service_system_user.login,
             port=5000,
             status=db.EmulationStatus.CREATED,
         )
@@ -306,14 +309,14 @@ def emulation_settings(mock_envs: None) -> OverhaveEmulationSettings:
 
 @pytest.fixture()
 def test_draft(
-    faker: Faker, test_scenario: ScenarioModel, test_created_test_run_id: int, test_system_user: SystemUserModel
+    faker: Faker, test_scenario: ScenarioModel, test_created_test_run_id: int, service_system_user: SystemUserModel
 ) -> DraftModel:
     with create_test_session() as session:
         draft: db.Draft = db.Draft(
             feature_id=test_scenario.feature_id,
             test_run_id=test_created_test_run_id,
             text=test_scenario.text,
-            published_by=test_system_user.login,
+            published_by=service_system_user.login,
             status=DraftStatus.CREATED,
         )
         draft.pr_url = faker.word()

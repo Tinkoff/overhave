@@ -4,7 +4,7 @@ from pydantic import SecretStr
 
 from overhave import db
 from overhave.storage import SystemUserModel, SystemUserStorage
-from tests.db_utils import count_queries
+from tests.db_utils import count_queries, create_test_session
 
 
 @pytest.mark.usefixtures("database")
@@ -13,19 +13,43 @@ class TestSystemUserStorage:
     """Integration tests for :class:`TestSystemUserStorage`."""
 
     def test_get_existing_user(
-        self, test_system_user_storage: SystemUserStorage, test_system_user: SystemUserModel
+        self, test_system_user_storage: SystemUserStorage, service_system_user: SystemUserModel
     ) -> None:
         with count_queries(1):
-            user = test_system_user_storage.get_user(test_system_user.id)
+            user = test_system_user_storage.get_user(service_system_user.id)
         assert user is not None
-        assert user == test_system_user
+        assert user == service_system_user
 
     def test_get_not_existing_user(
-        self, test_system_user_storage: SystemUserStorage, test_system_user: SystemUserModel
+        self, test_system_user_storage: SystemUserStorage, service_system_user: SystemUserModel
     ) -> None:
         with count_queries(1):
-            user = test_system_user_storage.get_user(test_system_user.id + 1)
+            user = test_system_user_storage.get_user(service_system_user.id + 1)
         assert user is None
+
+    @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])
+    def test_create_user_with_password(
+        self,
+        test_system_user_storage: SystemUserStorage,
+        test_user_role: db.Role,
+        test_system_user_password: SecretStr | None,
+        faker: Faker,
+    ) -> None:
+        login = faker.word()
+        with count_queries(1):
+            with db.create_session() as session:
+                user = test_system_user_storage.create_user(
+                    session=session, login=login, password=test_system_user_password, role=test_user_role
+                )
+                user_id = user.id
+        with create_test_session() as session:
+            db_user: db.UserRole = session.query(db.UserRole).filter(db.UserRole.id == user_id).one()
+            assert db_user.login == login
+            if test_system_user_password is None:
+                assert db_user.password is None
+            else:
+                assert db_user.password == test_system_user_password.get_secret_value()
+            assert db_user.role is test_user_role
 
     @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])
     def test_get_existing_user_by_credits(
@@ -35,9 +59,9 @@ class TestSystemUserStorage:
         test_user_role: db.Role,
         faker: Faker,
     ) -> None:
-        with count_queries(1):
+        with create_test_session() as session:
             created_user = test_system_user_storage.create_user(
-                login=faker.word(), password=test_system_user_password, role=test_user_role
+                session=session, login=faker.word(), password=test_system_user_password, role=test_user_role
             )
         with count_queries(1):
             with db.create_session() as session:
@@ -68,15 +92,15 @@ class TestSystemUserStorage:
     def test_update_user_role(
         self,
         test_system_user_storage: SystemUserStorage,
-        test_system_user: SystemUserModel,
+        service_system_user: SystemUserModel,
         test_new_user_role: db.Role,
     ) -> None:
         with count_queries(1):
             with db.create_session() as session:
                 test_system_user_storage.update_user_role(
-                    session=session, user_id=test_system_user.id, role=test_new_user_role
+                    session=session, user_id=service_system_user.id, role=test_new_user_role
                 )
         with count_queries(1):
-            user = test_system_user_storage.get_user(test_system_user.id)
+            user = test_system_user_storage.get_user(service_system_user.id)
         assert user is not None
         assert user.role == test_new_user_role

@@ -18,7 +18,9 @@ class ISystemUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def create_user(login: str, password: SecretStr | None = None, role: db.Role = db.Role.user) -> SystemUserModel:
+    def create_user(
+        session: so.Session, login: str, password: SecretStr | None = None, role: db.Role = db.Role.user
+    ) -> SystemUserModel:
         pass
 
     @staticmethod
@@ -46,15 +48,16 @@ class SystemUserStorage(ISystemUserStorage):
             return None
 
     @staticmethod
-    def create_user(login: str, password: SecretStr | None = None, role: db.Role = db.Role.user) -> SystemUserModel:
-        with db.create_session() as session:
-            db_password = None
-            if password is not None:
-                db_password = password.get_secret_value()
-            db_user = db.UserRole(login=login, password=db_password, role=role)
-            session.add(db_user)
-            session.flush()
-            return SystemUserModel.from_orm(db_user)
+    def create_user(
+        session: so.Session, login: str, password: SecretStr | None = None, role: db.Role = db.Role.user
+    ) -> SystemUserModel:
+        db_password = None
+        if password is not None:
+            db_password = password.get_secret_value()
+        db_user = db.UserRole(login=login, password=db_password, role=role)
+        session.add(db_user)
+        session.flush()
+        return SystemUserModel.from_orm(db_user)
 
     @staticmethod
     def get_user_by_credits(
