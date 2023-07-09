@@ -33,6 +33,7 @@ class TestGenerateTaskInfo:
 class TestScenarioCompiler:
     """Unit tests for :class:`ScenarioCompiler`."""
 
+    @pytest.mark.parametrize("feature_tags", [["tag1", "tag2"]])
     @pytest.mark.parametrize("test_scenario_text", ["Incorrect scenario"], indirect=True)
     def test_compile_scenario_from_incorrect_text(
         self,
@@ -43,6 +44,7 @@ class TestScenarioCompiler:
         with pytest.raises(IncorrectScenarioTextError):
             test_scenario_compiler.compile(context=test_executor_ctx)
 
+    @pytest.mark.parametrize("feature_tags", [[], ["tag1", "tag2"]])
     def test_compile_scenario_from_correct_text(
         self,
         tasks_keyword: str | None,

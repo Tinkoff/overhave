@@ -1,10 +1,12 @@
+from typing import Sequence
+
 import allure
 from pytest_bdd import types as default_types
 
 from overhave.entities import OverhaveLanguageSettings
 from overhave.scenario.compiler.settings import OverhaveScenarioCompilerSettings
 from overhave.scenario.prefix_mixin import PrefixMixin
-from overhave.storage import TestExecutorContext
+from overhave.storage import TagModel, TestExecutorContext
 
 
 def generate_task_info(tasks: list[str], header: str | None) -> str:
@@ -13,10 +15,8 @@ def generate_task_info(tasks: list[str], header: str | None) -> str:
     return ""
 
 
-def generate_tags_list(context: TestExecutorContext) -> list[str] | None:
-    if feature_tags := [i.value for i in context.feature.feature_tags]:
-        return feature_tags
-    return None
+def _join_all_tags(lines: Sequence[str]) -> str:
+    return " ".join(lines).replace("  ", " ")
 
 
 class ScenarioCompilerError(Exception):
@@ -45,13 +45,9 @@ class ScenarioCompiler(PrefixMixin):
             return ""
         return f"{self._compilation_settings.tag_prefix}{tag}"
 
-    def _get_additional_tags(self, scenario_text: str, tags: list[str] | None) -> str:
-        if f"{self._compilation_settings.tag_prefix}{tags}" in scenario_text:
-            return ""
-        if tags is not None:
-            tags_with_prefix = (f"{self._compilation_settings.tag_prefix}{tag}" for tag in tags)
-            return f"{' '.join(tags_with_prefix)}"
-        return ""
+    def _get_additional_tags(self, scenario_text: str, tags: list[TagModel]) -> str:
+        tags_with_prefix = (f"{self._compilation_settings.tag_prefix}{tag.value}" for tag in tags)
+        return f"{' '.join(tag for tag in tags_with_prefix if tag not in scenario_text)}"
 
     def _get_severity_tag(self, severity: allure.severity_level) -> str:
         return f"{self._compilation_settings.severity_prefix}{severity.value}"
@@ -91,11 +87,16 @@ class ScenarioCompiler(PrefixMixin):
         blocks_delimiter = f" {self._compilation_settings.blocks_delimiter} "
         if context.test_run.start is None:
             raise RuntimeError
+        joined_tags = _join_all_tags(
+            (
+                self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name),
+                self._get_additional_tags(scenario_text=text, tags=context.feature.feature_tags),
+                self._get_severity_tag(severity=context.feature.severity),
+            )
+        )
         return "\n".join(
             (
-                f"{self._get_feature_type_tag(scenario_text=text, tag=context.feature.feature_type.name)} "
-                f"{self._get_additional_tags(scenario_text=text, tags=generate_tags_list(context))} "
-                f"{self._get_severity_tag(severity=context.feature.severity)}",
+                joined_tags,
                 f"{self._as_prefix(feature_prefix)} {context.feature.name}",
                 f"{self._compilation_settings.id_prefix} {context.feature.id}",
                 (

@@ -38,7 +38,7 @@ def test_scenario_text(request: FixtureRequest, language_settings: OverhaveLangu
 
 
 @pytest.fixture()
-def test_feature() -> FeatureModel:
+def test_feature(feature_tags: list[str], faker: Faker) -> FeatureModel:
     return FeatureModel(
         id=1,
         created_at=get_current_time(),
@@ -51,8 +51,8 @@ def test_feature() -> FeatureModel:
         released=False,
         feature_type=FeatureTypeModel(id=1, name=get_test_feature_extractor().feature_types[0]),
         feature_tags=[
-            TagModel(id=1, value="tag1", created_by="qqq", created_at=get_current_time()),
-            TagModel(id=2, value="tag2", created_by="qqq", created_at=get_current_time()),
+            TagModel(id=faker.random_int(), value=tag, created_by="qqq", created_at=get_current_time())
+            for tag in feature_tags
         ],
         file_path="my_folder/my_feature",
         severity=allure.severity_level.NORMAL,
