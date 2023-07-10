@@ -32,8 +32,7 @@ class AdminSecretMixin(BaseAdminAuthorizationManager, abc.ABC):
     def _make_secret(self) -> None:
         secret = self._get_secret()
         with db.create_session() as session:
-            user = self._system_user_storage.get_user_by_credits(session=session, login=_ADMIN_USERNAME)
-            if user is not None:
+            if self._system_user_storage.get_user_by_credits(session=session, login=_ADMIN_USERNAME):
                 logger.info("Admin user already exists")
                 return
             self._system_user_storage.create_user(

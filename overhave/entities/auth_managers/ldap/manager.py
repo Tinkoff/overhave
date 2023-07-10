@@ -37,13 +37,14 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
         self._system_user_group_storage = system_user_group_storage
         self._ldap_authenticator = ldap_authenticator
 
-    def _assign_admin_if_neccessary(self, session: so.Session, user_id: int, user_groups: list[str]) -> None:
-        if self._settings.ldap_admin_group not in user_groups:
-            return
-        self._system_user_storage.update_user_role(session=session, user_id=user_id, role=db.Role.admin)
+    @staticmethod
+    def _user_role_by_admin_group_entry(user_has_admin_group: bool) -> db.Role:
+        if user_has_admin_group:
+            return db.Role.admin
+        return db.Role.user
 
-    def _is_user_can_be_created(self, session: so.Session, user_groups: list[str]) -> bool:
-        return self._settings.ldap_admin_group in user_groups or self._system_user_group_storage.has_any_group(
+    def _can_user_be_created(self, session: so.Session, user_has_admin_group: bool, user_groups: list[str]) -> bool:
+        return user_has_admin_group or self._system_user_group_storage.has_any_group(
             session=session, user_groups=user_groups
         )
 
@@ -56,16 +57,22 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
         logger.debug("LDAP user groups: \n %s", pformat(user_groups))
 
         with db.create_session() as session:
-            # TODO: в коде оперировать db.User, и уже в самом конце возвращать SystemUserModel
+            user_has_admin_group = self._settings.ldap_admin_group in user_groups
+            intended_user_role = self._user_role_by_admin_group_entry(user_has_admin_group)
+
             user = self._system_user_storage.get_user_by_credits(session=session, login=username)
             if user is not None:
-                self._assign_admin_if_neccessary(session=session, user_id=user.id, user_groups=user_groups)
-                return user
-            logger.debug("Have not found user with username '%s'!", username)
-            if self._is_user_can_be_created(session=session, user_groups=user_groups):
-                user = self._system_user_storage.create_user(session=session, login=username)
-                self._assign_admin_if_neccessary(session=session, user_id=user.id, user_groups=user_groups)
-                return user
+                if user.role is db.Role.user and user.role is not intended_user_role:
+                    user.role = intended_user_role
+                    session.flush()
+                return SystemUserModel.from_orm(user)
 
-        logger.debug("Received user groups (%s) are not supplied with database groups!", user_groups)
+            logger.debug("Have not found user with username '%s'!", username)
+            if self._can_user_be_created(
+                session=session, user_has_admin_group=user_has_admin_group, user_groups=user_groups
+            ):
+                user = self._system_user_storage.create_user(session=session, login=username, role=intended_user_role)
+                return SystemUserModel.from_orm(user)
+
+        logger.debug("Received user groups (%s) are not supplied with exist groups!", user_groups)
         return None

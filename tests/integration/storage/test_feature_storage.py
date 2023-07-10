@@ -79,9 +79,10 @@ class TestFeatureStorage:
         updated_severity: allure.severity_level,
         faker: Faker,
     ) -> None:
+        system_user_login = f"{faker.word()}_{faker.word()}"
         with create_test_session() as session:
-            new_system_user = test_system_user_storage.create_user(session=session, login=uuid1().hex)
-            new_db_tag = db.Tags(value=faker.word() + faker.word(), created_by=new_system_user.login)
+            test_system_user_storage.create_user(session=session, login=system_user_login)
+            new_db_tag = db.Tags(value=faker.word() + faker.word(), created_by=system_user_login)
             session.add(new_db_tag)
             session.flush()
             new_tag_model = TagModel.from_orm(new_db_tag)
@@ -92,7 +93,7 @@ class TestFeatureStorage:
             name=uuid1().hex,
             author=test_feature_with_tag.author,
             type_id=test_feature_type.id,
-            last_edited_by=new_system_user.login,
+            last_edited_by=system_user_login,
             last_edited_at=get_current_time(),
             task=[uuid1().hex],
             file_path=uuid1().hex,

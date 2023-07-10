@@ -16,7 +16,7 @@ class TestSystemUserStorage:
         self, test_system_user_storage: SystemUserStorage, service_system_user: SystemUserModel
     ) -> None:
         with count_queries(1):
-            user = test_system_user_storage.get_user(service_system_user.id)
+            user = test_system_user_storage.get_user_model(service_system_user.id)
         assert user is not None
         assert user == service_system_user
 
@@ -24,7 +24,7 @@ class TestSystemUserStorage:
         self, test_system_user_storage: SystemUserStorage, service_system_user: SystemUserModel
     ) -> None:
         with count_queries(1):
-            user = test_system_user_storage.get_user(service_system_user.id + 1)
+            user = test_system_user_storage.get_user_model(service_system_user.id + 1)
         assert user is None
 
     @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])
@@ -60,16 +60,18 @@ class TestSystemUserStorage:
         faker: Faker,
     ) -> None:
         with create_test_session() as session:
-            created_user = test_system_user_storage.create_user(
+            db_user = test_system_user_storage.create_user(
                 session=session, login=faker.word(), password=test_system_user_password, role=test_user_role
             )
+            created_user_model = SystemUserModel.from_orm(db_user)
         with count_queries(1):
             with db.create_session() as session:
-                user = test_system_user_storage.get_user_by_credits(
-                    session=session, login=created_user.login, password=created_user.password
+                gotten_db_user = test_system_user_storage.get_user_by_credits(
+                    session=session, login=created_user_model.login, password=created_user_model.password
                 )
-        assert user is not None
-        assert user == created_user
+                assert gotten_db_user is not None
+                gotten_user_model = SystemUserModel.from_orm(gotten_db_user)
+        assert gotten_user_model == created_user_model
 
     @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])
     def test_get_not_existing_user_by_credits(
@@ -87,20 +89,3 @@ class TestSystemUserStorage:
                     )
                     is None
                 )
-
-    @pytest.mark.parametrize("test_new_user_role", list(db.Role))
-    def test_update_user_role(
-        self,
-        test_system_user_storage: SystemUserStorage,
-        service_system_user: SystemUserModel,
-        test_new_user_role: db.Role,
-    ) -> None:
-        with count_queries(1):
-            with db.create_session() as session:
-                test_system_user_storage.update_user_role(
-                    session=session, user_id=service_system_user.id, role=test_new_user_role
-                )
-        with count_queries(1):
-            user = test_system_user_storage.get_user(service_system_user.id)
-        assert user is not None
-        assert user.role == test_new_user_role

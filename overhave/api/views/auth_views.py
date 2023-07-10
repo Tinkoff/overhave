@@ -18,15 +18,14 @@ def login_for_access_token(
     storage: ISystemUserStorage = fastapi.Depends(get_system_user_storage),
 ) -> AuthToken:
     with db.create_session() as session:
-        user = storage.get_user_by_credits(
+        if not storage.get_user_by_credits(
             session=session, login=form_data.username, password=SecretStr(form_data.password)
-        )
-    if not user:
-        raise fastapi.HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers=AUTH_HEADERS.dict(),
-        )
+        ):
+            raise fastapi.HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers=AUTH_HEADERS.dict(),
+            )
     expires_at = get_current_time() + auth_settings.access_token_expire_timedelta
     access_token = create_access_token(auth_settings=auth_settings, username=form_data.username, expires_at=expires_at)
     return AuthToken(access_token=access_token, expires_at=expires_at)

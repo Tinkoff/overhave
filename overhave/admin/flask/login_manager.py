@@ -69,7 +69,7 @@ class FlaskLoginManager(LoginManager):
 
     def _get_user(self, user_id: int) -> AdminPanelUser:
         logger.info("Get user by id=%s...", user_id)
-        return AdminPanelUser(user_data=self._system_user_storage.get_user(user_id=user_id))
+        return AdminPanelUser(user_data=self._system_user_storage.get_user_model(user_id=user_id))
 
     def _unathorized_response(self) -> Response:
         return redirect(f"/{self.login_view}")

@@ -17,4 +17,7 @@ class DefaultAdminAuthorizationManager(AdminSecretMixin):
 
     def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         with db.create_session() as session:
-            return self._system_user_storage.get_user_by_credits(session=session, login=username, password=password)
+            user = self._system_user_storage.get_user_by_credits(session=session, login=username, password=password)
+            if user is None:
+                return None
+            return SystemUserModel.from_orm(user)

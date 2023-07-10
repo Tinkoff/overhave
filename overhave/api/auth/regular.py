@@ -32,6 +32,6 @@ def get_authorized_user(
         raise creds_exception
     with db.create_session() as session:
         user = storage.get_user_by_credits(session=session, login=token_data.username)
-    if user is None:
-        raise creds_exception
-    return user
+        if user is None:
+            raise creds_exception
+        return SystemUserModel.from_orm(user)
