@@ -76,8 +76,8 @@ def test_client(test_app: OverhaveAdminApp) -> FlaskClient:
 
 
 @pytest.fixture()
-def test_authorized_user(test_client: FlaskClient, test_system_user: SystemUserModel) -> SystemUserModel:
+def test_authorized_user(test_client: FlaskClient, service_system_user: SystemUserModel) -> SystemUserModel:
     LoginForm.validate_on_submit = lambda self: True
-    LoginForm.get_user = lambda self: AdminPanelUser(user_data=test_system_user)
+    LoginForm.get_user = lambda self: AdminPanelUser(user_data=service_system_user)
     test_client.post("/login")
-    return test_system_user
+    return service_system_user

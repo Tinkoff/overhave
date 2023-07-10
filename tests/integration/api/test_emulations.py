@@ -9,6 +9,7 @@ from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestEmulationsAPI:
     """Integration tests for Overhave Emulation API."""
 
@@ -33,7 +34,6 @@ class TestEmulationsAPI:
         validate_content_null(response, False)
         assert not response.json()
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_emulation_run_list_by_test_user_id(
         self,
         test_api_client: TestClient,

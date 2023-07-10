@@ -14,6 +14,7 @@ from overhave.storage import TestExecutorContext
     [("https://tasktracker.mydomain.com/browse", "Tasks")],
 )
 @pytest.mark.parametrize("language_settings", [OverhaveLanguageSettings()])
+@pytest.mark.parametrize("feature_tags", [[], ["tag1", "tag2"]])
 class TestFileManager:
     """Unit tests for :class:`FileManager`."""
 

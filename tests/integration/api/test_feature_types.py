@@ -1,10 +1,13 @@
+import pytest
 from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
+from overhave import db
 from overhave.storage import FeatureTypeModel
 from overhave.transport.http.base_client import BearerAuth
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestFeatureTypesAPI:
     """Integration tests for Overhave FeatureTypes API."""
 

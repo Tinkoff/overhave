@@ -9,6 +9,7 @@ from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestFeatureTagsAPI:
     """Integration tests for Overhave FeatureTags API."""
 
@@ -30,7 +31,6 @@ class TestFeatureTagsAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_tag_by_value(
         self, test_api_client: TestClient, test_tag: TagModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -62,7 +62,6 @@ class TestFeatureTagsAPI:
         obj = response.json()
         assert obj == []
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_tags_like_value(
         self, test_api_client: TestClient, test_tag: TagModel, test_api_bearer_auth: BearerAuth
     ) -> None:

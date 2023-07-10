@@ -19,17 +19,17 @@ class TestFeatureTagStorage:
     """Integration tests for :class:`FeatureTagStorage`."""
 
     def test_create_tag(
-        self, test_tag_storage: FeatureTagStorage, test_system_user: SystemUserModel, faker: Faker
+        self, test_tag_storage: FeatureTagStorage, service_system_user: SystemUserModel, faker: Faker
     ) -> None:
         tag_value = faker.word()
         with count_queries(2):
             with db.create_session() as session:
                 db_tag = test_tag_storage.get_or_create_tag(
-                    session=session, value=tag_value, created_by=test_system_user.login
+                    session=session, value=tag_value, created_by=service_system_user.login
                 )
                 session.flush()
                 assert db_tag.value == tag_value
-                assert db_tag.created_by == test_system_user.login
+                assert db_tag.created_by == service_system_user.login
 
     def test_get_tag(self, test_tag_storage: FeatureTagStorage, test_tag: TagModel) -> None:
         with count_queries(1):

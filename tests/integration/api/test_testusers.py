@@ -11,6 +11,7 @@ from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
 
 
+@pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
 class TestTestUserAPI:
     """Integration tests for Overhave TestUser API."""
 
@@ -26,7 +27,6 @@ class TestTestUserAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_user_by_id(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -43,7 +43,6 @@ class TestTestUserAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_user_by_key(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -60,7 +59,6 @@ class TestTestUserAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_delete_user_by_id(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -83,7 +81,6 @@ class TestTestUserAPI:
         )
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_user_list(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -96,19 +93,18 @@ class TestTestUserAPI:
         assert len(obj) == 1
         assert obj[0] == test_testuser
 
-    def test_get_user_spec_no_query(self, test_api_client: TestClient) -> None:
+    def test_get_user_spec_no_query(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
         response = test_api_client.get("/test_user//specification")
         assert response.status_code == 404
         validate_content_null(response, False)
 
     def test_get_user_spec_empty(
-        self, test_api_client: TestClient, faker: Faker, test_api_bearer_auth: BearerAuth
+        self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth, faker: Faker
     ) -> None:
         response = test_api_client.get(f"/test_user/{faker.random_int()}/specification", auth=test_api_bearer_auth)
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_user_spec(
         self, test_api_client: TestClient, test_testuser: TestUserModel, test_api_bearer_auth: BearerAuth
     ) -> None:
@@ -116,7 +112,7 @@ class TestTestUserAPI:
         assert response.status_code == 200
         assert response.json() == test_testuser.specification
 
-    def test_put_user_spec_no_query(self, test_api_client: TestClient) -> None:
+    def test_put_user_spec_no_query(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
         response = test_api_client.put("/test_user//specification")
         assert response.status_code == 404
         validate_content_null(response, False)
@@ -143,7 +139,6 @@ class TestTestUserAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("testuser_allow_update", [False], indirect=True)
     def test_put_user_spec_not_allowed(
         self,
@@ -160,7 +155,6 @@ class TestTestUserAPI:
         assert response.status_code == 400
         validate_content_null(response, False)
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("testuser_allow_update", [True], indirect=True)
     def test_put_user_spec(
         self,

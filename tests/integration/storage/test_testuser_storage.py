@@ -64,7 +64,7 @@ class TestTestUserStorage:
         test_user_name: str,
         test_specification: TestUserSpecification,
         test_feature_type: FeatureTypeModel,
-        test_system_user: SystemUserModel,
+        service_system_user: SystemUserModel,
         allow_update: bool,
     ) -> None:
         with count_queries(1):
@@ -75,7 +75,7 @@ class TestTestUserStorage:
                 name=test_user_name,
                 specification=test_specification,
                 feature_type_id=test_feature_type.id,
-                created_by=test_system_user.login,
+                created_by=service_system_user.login,
                 allow_update=allow_update,
             )
         with count_queries(2):

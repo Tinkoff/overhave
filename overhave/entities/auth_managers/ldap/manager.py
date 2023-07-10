@@ -1,9 +1,10 @@
 import logging
 from pprint import pformat
 
+import sqlalchemy.orm as so
 from pydantic import SecretStr
 
-from overhave.db import Role
+from overhave import db
 from overhave.entities.auth_managers.base import BaseAdminAuthorizationManager
 from overhave.entities.auth_managers.ldap.settings import OverhaveLdapManagerSettings
 from overhave.storage import ISystemUserGroupStorage, ISystemUserStorage, SystemUserModel
@@ -36,11 +37,16 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
         self._system_user_group_storage = system_user_group_storage
         self._ldap_authenticator = ldap_authenticator
 
-    def _reassign_role_if_neccessary(self, user: SystemUserModel, user_groups: list[str]) -> None:
-        if self._settings.ldap_admin_group not in user_groups:
-            return
-        user.role = Role.admin
-        self._system_user_storage.update_user_role(user_model=user)
+    @staticmethod
+    def _user_role_by_admin_group_entry(user_has_admin_group: bool) -> db.Role:
+        if user_has_admin_group:
+            return db.Role.admin
+        return db.Role.user
+
+    def _can_user_be_created(self, session: so.Session, user_has_admin_group: bool, user_groups: list[str]) -> bool:
+        return user_has_admin_group or self._system_user_group_storage.has_any_group(
+            session=session, user_groups=user_groups
+        )
 
     def authorize_user(self, username: str, password: SecretStr) -> SystemUserModel | None:
         logger.debug("Try to authorize user '%s'...", username)
@@ -49,14 +55,24 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
             logger.info("LDAP user '%s' does not exist!", username)
             return None
         logger.debug("LDAP user groups: \n %s", pformat(user_groups))
-        user = self._system_user_storage.get_user_by_credits(login=username)
-        if user is not None:
-            self._reassign_role_if_neccessary(user=user, user_groups=user_groups)
-            return user
-        logger.debug("Have not found user with username '%s'!", username)
-        if self._system_user_group_storage.has_any_group(user_groups) or self._settings.ldap_admin_group in user_groups:
-            user = self._system_user_storage.create_user(login=username)
-            self._reassign_role_if_neccessary(user=user, user_groups=user_groups)
-            return user
-        logger.debug("Received user groups (%s) are not supplied with database groups!", user_groups)
+
+        with db.create_session() as session:
+            user_has_admin_group = self._settings.ldap_admin_group in user_groups
+            intended_user_role = self._user_role_by_admin_group_entry(user_has_admin_group)
+
+            user = self._system_user_storage.get_user_by_credits(session=session, login=username)
+            if user is not None:
+                if user.role is db.Role.user and user.role is not intended_user_role:
+                    user.role = intended_user_role
+                    session.flush()
+                return SystemUserModel.from_orm(user)
+
+            logger.debug("Have not found user with username '%s'!", username)
+            if self._can_user_be_created(
+                session=session, user_has_admin_group=user_has_admin_group, user_groups=user_groups
+            ):
+                user = self._system_user_storage.create_user(session=session, login=username, role=intended_user_role)
+                return SystemUserModel.from_orm(user)
+
+        logger.debug("Received user groups (%s) are not supplied with exist groups!", user_groups)
         return None

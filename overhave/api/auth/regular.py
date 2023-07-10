@@ -4,6 +4,7 @@ import fastapi
 from fastapi import security as fastapi_security
 from jose import JWTError
 
+from overhave import db
 from overhave.api.auth.models import AUTH_HEADERS
 from overhave.api.auth.token import get_token_data
 from overhave.api.deps import get_api_auth_settings, get_system_user_storage
@@ -29,7 +30,8 @@ def get_authorized_user(
             raise creds_exception
     except JWTError:
         raise creds_exception
-    user = storage.get_user_by_credits(login=token_data.username)
-    if user is None:
-        raise creds_exception
-    return user
+    with db.create_session() as session:
+        user = storage.get_user_by_credits(session=session, login=token_data.username)
+        if user is None:
+            raise creds_exception
+        return SystemUserModel.from_orm(user)
