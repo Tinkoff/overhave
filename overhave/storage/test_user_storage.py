@@ -1,5 +1,6 @@
 import abc
 
+import sqlalchemy as sa
 import sqlalchemy.orm as so
 
 from overhave import db
@@ -28,12 +29,12 @@ class ITestUserStorage(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_user_by_id(user_id: int) -> TestUserModel | None:
+    def get_testuser_model_by_id(user_id: int) -> TestUserModel | None:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def get_test_user_by_key(key: str) -> TestUserModel | None:
+    def get_testuser_model_by_key(key: str) -> TestUserModel | None:
         pass
 
     @staticmethod
@@ -41,18 +42,6 @@ class ITestUserStorage(abc.ABC):
     def get_test_users_by_feature_type_name(
         session: so.Session, feature_type_id: int, allow_update: bool
     ) -> list[TestUserModel]:
-        pass
-
-    @staticmethod
-    @abc.abstractmethod
-    def create_test_user(
-        key: str,
-        name: str,
-        specification: TestUserSpecification,
-        created_by: str,
-        feature_type_id: int,
-        allow_update: bool,
-    ) -> TestUserModel:
         pass
 
     @staticmethod
@@ -70,7 +59,7 @@ class TestUserStorage(ITestUserStorage):
     """Class for Test User storage."""
 
     @staticmethod
-    def get_test_user_by_id(user_id: int) -> TestUserModel | None:
+    def get_testuser_model_by_id(user_id: int) -> TestUserModel | None:
         with db.create_session() as session:
             user = session.get(db.TestUser, user_id)
             if user is not None:
@@ -78,7 +67,7 @@ class TestUserStorage(ITestUserStorage):
             return None
 
     @staticmethod
-    def get_test_user_by_key(key: str) -> TestUserModel | None:
+    def get_testuser_model_by_key(key: str) -> TestUserModel | None:
         with db.create_session() as session:
             user: db.TestUser | None = session.query(db.TestUser).filter(db.TestUser.key == key).one_or_none()
             if user is not None:
@@ -97,29 +86,6 @@ class TestUserStorage(ITestUserStorage):
         return [TestUserModel.from_orm(user) for user in db_users]
 
     @staticmethod
-    def create_test_user(
-        key: str,
-        name: str,
-        specification: TestUserSpecification,
-        created_by: str,
-        feature_type_id: int,
-        allow_update: bool,
-    ) -> TestUserModel:
-        with db.create_session() as session:
-            test_user = db.TestUser(
-                key=key,
-                name=name,
-                specification=specification,
-                feature_type_id=feature_type_id,
-                created_by=created_by,
-                allow_update=allow_update,
-                changed_at=get_current_time(),
-            )
-            session.add(test_user)
-            session.flush()
-            return TestUserModel.from_orm(test_user)
-
-    @staticmethod
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:
         with db.create_session() as session:
             test_user = session.get(db.TestUser, user_id)
@@ -127,8 +93,11 @@ class TestUserStorage(ITestUserStorage):
                 raise TestUserDoesNotExistError(f"Test user with id {user_id} does not exist!")
             if not test_user.allow_update:
                 raise TestUserUpdatingNotAllowedError(f"Test user updating with id {user_id} not allowed!")
-            test_user.specification = specification
-            test_user.changed_at = get_current_time()
+            session.execute(
+                sa.update(db.TestUser)
+                .where(db.TestUser.id == test_user.id)
+                .values(specification=specification, changed_at=get_current_time())
+            )
 
     @staticmethod
     def delete_test_user(user_id: int) -> None:

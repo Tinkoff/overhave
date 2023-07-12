@@ -3,31 +3,30 @@ from faker import Faker
 
 from overhave import db
 from overhave.storage import (
-    FeatureTypeModel,
-    SystemUserModel,
     TestUserDoesNotExistError,
     TestUserModel,
     TestUserSpecification,
     TestUserStorage,
     TestUserUpdatingNotAllowedError,
 )
-from tests.db_utils import count_queries
+from tests.db_utils import count_queries, create_test_session
 
 
+@pytest.mark.usefixtures("database")
 class TestTestUserStorage:
     """Integration tests for :class:`TestUserStorage`."""
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_test_user_by_id(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
         with count_queries(2):
-            test_user = test_user_storage.get_test_user_by_id(test_testuser.id)
+            test_user = test_user_storage.get_testuser_model_by_id(test_testuser.id)
         assert test_user is not None
         assert test_user == test_testuser
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     def test_get_user_by_key(self, test_user_storage: TestUserStorage, test_testuser: TestUserModel) -> None:
         with count_queries(2):
-            test_user = test_user_storage.get_test_user_by_key(test_testuser.key)
+            test_user = test_user_storage.get_testuser_model_by_key(test_testuser.key)
         assert test_user is not None
         assert test_user == test_testuser
 
@@ -55,36 +54,16 @@ class TestTestUserStorage:
         assert len(test_users) == 1
         assert test_users[0] == test_testuser
 
-    @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
-    @pytest.mark.parametrize("allow_update", [True, False])
-    def test_create_test_user(
+    def test_update_test_user_specification_no_user(
         self,
         test_user_storage: TestUserStorage,
-        test_user_key: str,
-        test_user_name: str,
-        test_specification: TestUserSpecification,
-        test_feature_type: FeatureTypeModel,
-        service_system_user: SystemUserModel,
-        allow_update: bool,
+        faker: Faker,
     ) -> None:
         with count_queries(1):
-            assert test_user_storage.get_test_user_by_key(test_user_key) is None
-        with count_queries(2):
-            test_user_storage.create_test_user(
-                key=test_user_key,
-                name=test_user_name,
-                specification=test_specification,
-                feature_type_id=test_feature_type.id,
-                created_by=service_system_user.login,
-                allow_update=allow_update,
-            )
-        with count_queries(2):
-            test_user = test_user_storage.get_test_user_by_key(test_user_key)
-        assert test_user is not None
-        assert test_user.key == test_user_key
-        assert test_user.name == test_user_name
-        assert test_user.specification == test_specification
-        assert test_user.allow_update == allow_update
+            with pytest.raises(TestUserDoesNotExistError):
+                test_user_storage.update_test_user_specification(
+                    user_id=faker.random_int(), specification=TestUserSpecification({faker.word(): faker.word()})
+                )
 
     @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
     @pytest.mark.parametrize("new_specification", [{"kek": "lol", "overhave": "test"}, {}, {"test": "new_value"}])
@@ -114,8 +93,8 @@ class TestTestUserStorage:
         assert test_testuser.specification == test_specification
         with count_queries(2):
             test_user_storage.update_test_user_specification(test_testuser.id, new_specification)
-        with count_queries(2):
-            test_user = test_user_storage.get_test_user_by_key(test_testuser.key)
+        with create_test_session():
+            test_user = test_user_storage.get_testuser_model_by_key(test_testuser.key)
         assert test_user is not None
         assert test_user.specification == new_specification
 
@@ -131,4 +110,4 @@ class TestTestUserStorage:
         with count_queries(3):
             test_user_storage.delete_test_user(test_testuser.id)
         with count_queries(1):
-            assert test_user_storage.get_test_user_by_id(test_testuser.id) is None
+            assert test_user_storage.get_testuser_model_by_id(test_testuser.id) is None

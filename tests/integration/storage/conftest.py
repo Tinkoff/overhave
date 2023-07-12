@@ -2,7 +2,6 @@ import socket
 from unittest import mock
 
 import pytest
-from faker import Faker
 
 from overhave.storage import (
     FeatureModel,
@@ -42,13 +41,3 @@ def test_second_created_test_run_id(
 ) -> int:
     with create_test_session():
         return test_run_storage.create_testrun(test_scenario.id, test_feature.author)
-
-
-@pytest.fixture()
-def test_user_key(faker: Faker) -> str:
-    return faker.word()
-
-
-@pytest.fixture()
-def test_user_name(faker: Faker) -> str:
-    return faker.word()

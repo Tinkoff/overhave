@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _get_test_user_by_id_handler(user_id: int, test_user_storage: ITestUserStorage) -> TestUserModel:
     logger.info("Getting %s with user_id=%s...", TestUserModel.__name__, user_id)
-    test_user = test_user_storage.get_test_user_by_id(user_id)
+    test_user = test_user_storage.get_testuser_model_by_id(user_id)
     if test_user is None:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=f"User with id={user_id} does not exist!"
@@ -31,7 +31,7 @@ def _get_test_user_by_id_handler(user_id: int, test_user_storage: ITestUserStora
 
 def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserStorage) -> TestUserModel:
     logger.info("Getting %s with user_key='%s'...", TestUserModel.__name__, user_key)
-    test_user = test_user_storage.get_test_user_by_key(user_key)
+    test_user = test_user_storage.get_testuser_model_by_key(user_key)
     if test_user is None:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=f"User with key='{user_key}' does not exist!"
