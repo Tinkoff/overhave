@@ -1,14 +1,27 @@
+import os
 from datetime import datetime
+from pathlib import Path
 from typing import cast
 from uuid import uuid1
 
 import allure
+import httpx
+import py
 import pytest
 from _pytest.fixtures import FixtureRequest
 from faker import Faker
+from pytest_mock import MockerFixture
 
-from overhave import OverhaveEmulationSettings, db
+from overhave import (
+    OverhaveAdminSettings,
+    OverhaveAuthorizationStrategy,
+    OverhaveEmulationSettings,
+    OverhaveScenarioCompilerSettings,
+    OverhaveScenarioParserSettings,
+    db,
+)
 from overhave.db import DraftStatus
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.storage import (
     DraftModel,
     DraftStorage,
@@ -31,6 +44,33 @@ from overhave.storage import (
 )
 from overhave.utils import get_current_time
 from tests.db_utils import create_test_session
+
+
+@pytest.fixture()
+def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local, test_ldap_auth_manager) -> BaseFactoryContext:
+    context_mock = session_mocker.MagicMock()
+    context_mock.auth_settings.auth_strategy = OverhaveAuthorizationStrategy.LDAP
+    context_mock.s3_manager_settings.enabled = False
+    context_mock.compilation_settings = OverhaveScenarioCompilerSettings()
+    context_mock.parser_settings = OverhaveScenarioParserSettings()
+
+    if os.environ.get("TEST_SUPPORT_CHAT_URL"):
+        test_support_chat_url = httpx.URL(os.environ["TEST_SUPPORT_CHAT_URL"])
+    else:
+        test_support_chat_url = None
+    context_mock.admin_settings = OverhaveAdminSettings(support_chat_url=test_support_chat_url)
+
+    root_dir = Path(tmpdir)
+    features_dir = root_dir / "features"
+    fixtures_dir = root_dir / "fixtures"
+    reports_dir = root_dir / "reports"
+    for path in (features_dir, fixtures_dir, reports_dir):
+        path.mkdir()
+    context_mock.file_settings.tmp_features_dir = features_dir
+    context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
+    context_mock.file_settings.tmp_reports_dir = reports_dir
+
+    return cast("BaseFactoryContext", context_mock)
 
 
 @pytest.fixture(scope="module")
