@@ -28,7 +28,7 @@ class OverhaveIndexView(AdminIndexView):
         url: str,
         auth_manager: IAdminAuthorizationManager,
         index_template_path: Path | None,
-        support_chat_url: httpx.URL,
+        support_chat_url: httpx.URL | None,
     ) -> None:
         super().__init__(
             name=name,
@@ -47,10 +47,9 @@ class OverhaveIndexView(AdminIndexView):
             user = form.get_user()
             login_user(user)
         except ValidationError:
-            flash_msg = (
-                f"Username '{form.username.data}' is not registered! "
-                f"Please contact the <a href='{self._support_chat_url}'>support channel</a>!"
-            )
+            flash_msg = f"Username '{form.username.data}' is not registered!"
+            if self._support_chat_url:
+                flash_msg += f" Please contact the <a href='{self._support_chat_url}'>support channel</a>!"
 
             return form.flash_and_redirect(Markup(flash_msg))
         except ldap.SERVER_DOWN:
