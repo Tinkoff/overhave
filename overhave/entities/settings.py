@@ -29,6 +29,8 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     # Force filling the tasks field in feature creation
     strict_feature_tasks: bool = False
 
+    support_chat_url: httpx.URL = httpx.URL("http://localhost")
+
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""

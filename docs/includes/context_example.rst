@@ -34,7 +34,10 @@
             task_tracker_url="https://jira.company.com/browse",
             tasks_keyword="Tasks",
         ),
-        admin_settings=OverhaveAdminSettings(index_template_path=path_settings.index_template_path),
+        admin_settings=OverhaveAdminSettings(
+            index_template_path=path_settings.index_template_path,
+            support_chat_url="https://messenger.company.com/chat_id",
+        ),
         auth_settings=OverhaveAuthorizationSettings(auth_strategy=AuthorizationStrategy.LDAP),
         ldap_client_settings=OverhaveLdapClientSettings(
             ldap_url="ldap://company.com", ldap_domain="company\\", ldap_dn="dc=company,dc=com"
