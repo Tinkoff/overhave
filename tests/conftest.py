@@ -2,9 +2,12 @@ import logging
 import os
 from contextlib import ExitStack
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Iterator, Sequence, cast
 from unittest import mock
 
+import httpx
+import py
 import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm as so
@@ -13,11 +16,16 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.logging import LogCaptureFixture
 from _pytest.python import Metafunc
 from prometheus_client import CollectorRegistry
+from pytest_mock import MockerFixture
 from sqlalchemy import event
 
 from overhave import (
+    OverhaveAdminSettings,
+    OverhaveAuthorizationStrategy,
     OverhaveDBSettings,
     OverhaveLoggingSettings,
+    OverhaveScenarioCompilerSettings,
+    OverhaveScenarioParserSettings,
     db,
     overhave_admin_factory,
     overhave_proxy_manager,
@@ -25,6 +33,7 @@ from overhave import (
     overhave_test_execution_factory,
 )
 from overhave.factory import IAdminFactory, ISynchronizerFactory, ITestExecutionFactory
+from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.metrics import (
     BaseOverhaveMetricContainer,
     EmulationRunOverhaveMetricContainer,
@@ -122,6 +131,33 @@ def clean_synchronizer_factory() -> Callable[[], ISynchronizerFactory]:
     overhave_synchronizer_factory.cache_clear()
     yield overhave_synchronizer_factory
     overhave_synchronizer_factory.cache_clear()
+
+
+@pytest.fixture()
+def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> BaseFactoryContext:
+    context_mock = session_mocker.MagicMock()
+    context_mock.auth_settings.auth_strategy = OverhaveAuthorizationStrategy.LDAP
+    context_mock.s3_manager_settings.enabled = False
+    context_mock.compilation_settings = OverhaveScenarioCompilerSettings()
+    context_mock.parser_settings = OverhaveScenarioParserSettings()
+
+    if os.environ.get("TEST_SUPPORT_CHAT_URL"):
+        test_support_chat_url = httpx.URL(os.environ["TEST_SUPPORT_CHAT_URL"])
+    else:
+        test_support_chat_url = None
+    context_mock.admin_settings = OverhaveAdminSettings(support_chat_url=test_support_chat_url)
+
+    root_dir = Path(tmpdir)
+    features_dir = root_dir / "features"
+    fixtures_dir = root_dir / "fixtures"
+    reports_dir = root_dir / "reports"
+    for path in (features_dir, fixtures_dir, reports_dir):
+        path.mkdir()
+    context_mock.file_settings.tmp_features_dir = features_dir
+    context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
+    context_mock.file_settings.tmp_reports_dir = reports_dir
+
+    return cast("BaseFactoryContext", context_mock)
 
 
 @pytest.fixture(scope="session")

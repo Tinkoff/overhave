@@ -1,13 +1,10 @@
-from pathlib import Path
 from typing import Callable, cast
 
-import py
 import pytest
 from _pytest.fixtures import FixtureRequest
-from pytest_mock import MockerFixture, MockFixture
+from pytest_mock import MockFixture
 
 from overhave import (
-    OverhaveAuthorizationStrategy,
     OverhaveFileSettings,
     OverhaveProjectSettings,
     OverhaveScenarioCompilerSettings,
@@ -17,27 +14,6 @@ from overhave.entities import FeatureExtractor, GitRepositoryInitializer
 from overhave.factory import IAdminFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.scenario import FileManager
-
-
-@pytest.fixture()
-def mocked_context(session_mocker: MockerFixture, tmpdir: py.path.local) -> BaseFactoryContext:
-    context_mock = session_mocker.MagicMock()
-    context_mock.auth_settings.auth_strategy = OverhaveAuthorizationStrategy.LDAP
-    context_mock.s3_manager_settings.enabled = False
-    context_mock.compilation_settings = OverhaveScenarioCompilerSettings()
-    context_mock.parser_settings = OverhaveScenarioParserSettings()
-
-    root_dir = Path(tmpdir)
-    features_dir = root_dir / "features"
-    fixtures_dir = root_dir / "fixtures"
-    reports_dir = root_dir / "reports"
-    for path in (features_dir, fixtures_dir, reports_dir):
-        path.mkdir()
-    context_mock.file_settings.tmp_features_dir = features_dir
-    context_mock.file_settings.tmp_fixtures_dir = fixtures_dir
-    context_mock.file_settings.tmp_reports_dir = reports_dir
-
-    return cast("BaseFactoryContext", context_mock)
 
 
 @pytest.fixture(scope="session")
