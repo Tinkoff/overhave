@@ -8,9 +8,14 @@ import botocore.exceptions
 import httpx
 import urllib3
 from boto3_type_annotations.s3 import Client
-from pydantic.tools import parse_obj_as
 
-from overhave.transport.s3.models import BucketModel, DeletionResultModel, ObjectModel
+from overhave.transport.s3.models import (
+    LIST_BUCKET_MODEL_ADAPTER,
+    LIST_OBJECT_MODEL_ADAPTER,
+    BucketModel,
+    DeletionResultModel,
+    ObjectModel,
+)
 from overhave.transport.s3.objects import OverhaveS3Bucket
 from overhave.transport.s3.settings import OverhaveS3ManagerSettings
 from overhave.utils import make_url
@@ -118,7 +123,7 @@ class S3Manager:
     @_s3_error(msg="Error while getting buckets list!")
     def _get_buckets(self) -> list[BucketModel]:
         response = self._ensured_client.list_buckets()
-        return parse_obj_as(list[BucketModel], response.get("Buckets"))
+        return LIST_BUCKET_MODEL_ADAPTER.validate_python(response.get("Buckets"))
 
     @_s3_error(msg="Error while creating bucket!")
     def create_bucket(self, bucket: str) -> None:
@@ -143,7 +148,7 @@ class S3Manager:
     def get_bucket_objects(self, bucket: str) -> list[ObjectModel]:
         response = self._ensured_client.list_objects(Bucket=bucket)
         logger.debug("List objects response:\n%s", response)
-        return parse_obj_as(list[ObjectModel], response.get("Contents"))
+        return LIST_OBJECT_MODEL_ADAPTER.validate_python(response.get("Contents"))
 
     @_s3_error(msg="Error while deleting bucket objects!")
     def delete_bucket_objects(self, bucket: str, objects: list[ObjectModel]) -> DeletionResultModel:
@@ -155,7 +160,7 @@ class S3Manager:
             Delete={"Objects": [{"Key": obj.name} for obj in objects]},
         )
         logger.debug("Delete objects response:\n%s", response)
-        return DeletionResultModel.parse_obj(response)
+        return DeletionResultModel.model_validate(response)
 
     def _ensure_bucket_clean(self, bucket: str) -> None:
         objects = self.get_bucket_objects(bucket)

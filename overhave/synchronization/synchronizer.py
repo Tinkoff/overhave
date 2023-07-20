@@ -1,4 +1,5 @@
 import logging
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import cast
@@ -76,7 +77,7 @@ class OverhaveSynchronizer(BaseFileExtractor, IOverhaveSynchronizer):
             info.last_edited_by = info.author
 
         info.id = ANY_INT
-        strict_info = StrictFeatureInfo(**info.dict())
+        strict_info = StrictFeatureInfo(**asdict(info))
 
         with db.create_session() as session:
             self._storage_manager.ensure_users_exist(session=session, info=strict_info)

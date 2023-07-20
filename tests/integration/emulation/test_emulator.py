@@ -22,7 +22,7 @@ class TestEmulator:
             emulator.start_emulation(task=emulation_task)
         with create_test_session() as session:
             emulation_run_db = session.get(db.EmulationRun, emulation_task.data.emulation_run_id)
-            emulation_run_model = EmulationRunModel.from_orm(emulation_run_db)
+            emulation_run_model = EmulationRunModel.model_validate(emulation_run_db)
         assert emulation_run_model.status is db.EmulationStatus.READY
         mock_subprocess_popen.assert_called_once()
 
@@ -37,6 +37,6 @@ class TestEmulator:
             emulator.start_emulation(task=emulation_task)
         with create_test_session() as session:
             emulation_run_db = session.get(db.EmulationRun, emulation_task.data.emulation_run_id)
-            emulation_run_model = EmulationRunModel.from_orm(emulation_run_db)
+            emulation_run_model = EmulationRunModel.model_validate(emulation_run_db)
         assert emulation_run_model.status is db.EmulationStatus.ERROR
         mock_subprocess_popen.assert_called_once()

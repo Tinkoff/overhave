@@ -4,7 +4,7 @@ from typing import Any, Generic, Mapping, cast
 import httpx
 import tenacity
 from pydantic import BaseModel, ValidationError
-from pydantic.main import ModelMetaclass
+from pydantic._internal._model_construction import ModelMetaclass
 
 from overhave.transport.http.base_client.objects import HttpMethod
 from overhave.transport.http.base_client.settings import HttpSettingsType
@@ -29,7 +29,7 @@ class BaseHttpClient(Generic[HttpSettingsType]):
     @staticmethod
     def _parse_or_raise(response: httpx.Response, model: ModelMetaclass) -> BaseModel:
         try:
-            return cast(BaseModel, model).parse_obj(response.json())
+            return cast(BaseModel, model).model_validate(response.json())
         except (ValueError, ValidationError) as e:
             url = getattr(response, "raw_url", response.url)
             raise HttpClientValidationError(f'Response validation error for "{url}"') from e

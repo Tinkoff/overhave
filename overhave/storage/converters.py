@@ -16,7 +16,7 @@ class _SqlAlchemyOrmModel(BaseModel):
     """:class:`BaseModel` with enabled `orm_mode`."""
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SystemUserModel(_SqlAlchemyOrmModel):

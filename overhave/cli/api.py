@@ -14,4 +14,4 @@ def api(
     from overhave.api.settings import OverhaveUvicornApiSettings
 
     settings = OverhaveUvicornApiSettings(port=port, workers=workers)
-    uvicorn.run(app, **settings.dict())
+    uvicorn.run(app, **settings.model_dump())

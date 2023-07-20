@@ -28,11 +28,11 @@ class _IRedisTask(BaseModel, abc.ABC):
 class BaseRedisTask(_IRedisTask):
     """Base task for Redis streams."""
 
-    data: Any
+    data: BaseModel
 
     @property
     def message(self) -> dict[bytes, bytes]:
-        return {b"data": self.data.json().encode("utf-8")}
+        return {b"data": self.data.model_dump_json().encode("utf-8")}
 
 
 class TestRunData(BaseModel):

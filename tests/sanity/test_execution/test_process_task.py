@@ -25,7 +25,7 @@ class TestOverhaveTestExecution:
         subprocess_run_mock.assert_called_once()
         with create_test_session() as session:
             db_test_run = session.query(db.TestRun).filter(db.TestRun.id == test_executed_testruntask_id).one()
-            test_run: TestRunModel = TestRunModel.from_orm(db_test_run)
+            test_run = TestRunModel.model_validate(db_test_run)
         assert test_run.id == test_executed_testruntask_id
         assert isinstance(test_run.created_at, datetime)
         assert test_run.status is db.TestRunStatus.SUCCESS

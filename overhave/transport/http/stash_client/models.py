@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Final
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class StashProject(BaseModel):
@@ -23,7 +23,7 @@ class StashBranch(BaseModel):
     branch: str = Field(..., alias="id")
     repository: StashRepository
 
-    @validator("branch")
+    @field_validator("branch")
     def insert_refs(cls, v: str) -> str:
         return "refs/heads/" + v
 
@@ -43,7 +43,7 @@ class StashReviewer(BaseModel):
 class StashBasicPrInfo(BaseModel):
     """Model for Stash basic pull-request information."""
 
-    title: str | None
+    title: str | None = Field(default=None)
     open: bool
 
 
@@ -68,9 +68,9 @@ class StashPrCreationResponse(StashBasicPrInfo):
 
     created_date: datetime = Field(..., alias="createdDate")
     updated_date: datetime = Field(..., alias="updatedDate")
-    pull_request_url: str | None
-    traceback: Exception | None
-    links: StashLinksType | None
+    pull_request_url: str | None = Field(default=None)
+    traceback: Exception | None = Field(default=None)
+    links: StashLinksType | None = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True

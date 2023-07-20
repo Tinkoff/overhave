@@ -22,7 +22,7 @@ def get_authorized_user(
     creds_exception = fastapi.HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers=AUTH_HEADERS.dict(),
+        headers=AUTH_HEADERS.model_dump(),
     )
     try:
         token_data = get_token_data(auth_settings=auth_settings, token=token)
@@ -34,4 +34,4 @@ def get_authorized_user(
         user = storage.get_user_by_credits(session=session, login=token_data.username)
         if user is None:
             raise creds_exception
-        return SystemUserModel.from_orm(user)
+        return SystemUserModel.model_validate(user)

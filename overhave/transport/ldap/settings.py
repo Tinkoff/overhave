@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from pydantic.env_settings import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class OverhaveLdapClientSettings(BaseSettings):

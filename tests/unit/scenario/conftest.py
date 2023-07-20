@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest import mock
 
 import allure
@@ -119,7 +120,7 @@ def test_scenario_parser(
 
 @pytest.fixture()
 def test_file_settings(tmpdir: py.path.local) -> OverhaveFileSettings:
-    settings = OverhaveFileSettings(work_dir=tmpdir, root_dir=tmpdir, tmp_dir=tmpdir / "tmp")
+    settings = OverhaveFileSettings(work_dir=Path(tmpdir), root_dir=Path(tmpdir), tmp_dir=Path(tmpdir / "tmp"))
     settings.tmp_features_dir.mkdir(parents=True)
     settings.tmp_fixtures_dir.mkdir(parents=True)
     return settings

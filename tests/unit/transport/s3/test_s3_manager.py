@@ -88,7 +88,7 @@ class TestInitializedS3Manager:
     ) -> None:
         objects = test_initialized_s3_manager.get_bucket_objects(bucket.value)
         mocked_boto3_client.list_objects.assert_called_once_with(Bucket=bucket.value)
-        assert objects == [ObjectModel.parse_obj(test_object_dict)]
+        assert objects == [ObjectModel.model_validate(test_object_dict)]
 
     def test_upload_file(
         self,
@@ -122,7 +122,7 @@ class TestInitializedS3Manager:
         test_initialized_s3_manager: S3Manager,
         bucket: OverhaveS3Bucket,
     ) -> None:
-        objects = [ObjectModel.parse_obj(test_object_dict)]
+        objects = [ObjectModel.model_validate(test_object_dict)]
         test_initialized_s3_manager.delete_bucket_objects(bucket=bucket.value, objects=objects)
         mocked_boto3_client.delete_objects.assert_called_once_with(
             Bucket=bucket, Delete={"Objects": [{"Key": obj.name} for obj in objects]}

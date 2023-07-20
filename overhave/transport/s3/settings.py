@@ -1,6 +1,7 @@
 from typing import Any
 
-from pydantic import BaseSettings, root_validator
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings
 
 
 class OverhaveS3ManagerSettings(BaseSettings):
@@ -8,10 +9,10 @@ class OverhaveS3ManagerSettings(BaseSettings):
 
     enabled: bool = False
 
-    url: str | None
-    region_name: str | None
-    access_key: str | None
-    secret_key: str | None
+    url: str | None = Field(default=None)
+    region_name: str | None = Field(default=None)
+    access_key: str | None = Field(default=None)
+    secret_key: str | None = Field(default=None)
     verify: bool = True
 
     autocreate_buckets: bool = False
@@ -19,7 +20,7 @@ class OverhaveS3ManagerSettings(BaseSettings):
     class Config:
         env_prefix = "OVERHAVE_S3_"
 
-    @root_validator
+    @model_validator(mode="before")
     def validate_enabling(cls, values: dict[str, Any]) -> dict[str, Any]:
         enabled = values.get("enabled")
         if enabled and not all(

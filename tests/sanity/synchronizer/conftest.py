@@ -8,7 +8,7 @@ from demo.settings import OverhaveDemoSettingsGenerator
 from overhave import db, overhave_synchronizer_factory
 from overhave.cli.synchronizer import _create_synchronizer, _create_validator
 from overhave.factory import ISynchronizerFactory
-from overhave.scenario import FeatureValidator
+from overhave.scenario import IFeatureValidator
 from overhave.storage import FeatureTypeModel, SystemUserModel
 from overhave.synchronization import IOverhaveSynchronizer
 from tests.db_utils import create_test_session
@@ -27,7 +27,7 @@ def prepared_admin_user(database: None) -> SystemUserModel:
         db_user = db.UserRole(login="admin", password="admin", role=db.Role.admin)
         session.add(db_user)
         session.flush()
-        return SystemUserModel.from_orm(db_user)
+        return SystemUserModel.model_validate(db_user)
 
 
 @pytest.fixture()
@@ -55,7 +55,7 @@ def test_resolved_validator(
     mocked_git_repo: mock.MagicMock,
     mock_envs: None,
     test_demo_settings_generator: OverhaveDemoSettingsGenerator,
-) -> FeatureValidator:
+) -> IFeatureValidator:
     _prepare_synchronizer_factory(settings_generator=test_demo_settings_generator)
     return _create_validator()
 
@@ -67,4 +67,4 @@ def test_db_feature_types(database: None) -> list[FeatureTypeModel]:
         session.add_all((db.FeatureType(name=feature_type) for feature_type in feature_types))
         session.flush()
         db_feature_types = session.query(db.FeatureType).all()
-        return [FeatureTypeModel.from_orm(db_feature_type) for db_feature_type in db_feature_types]
+        return [FeatureTypeModel.model_validate(x) for x in db_feature_types]

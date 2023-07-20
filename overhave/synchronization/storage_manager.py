@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 
 import sqlalchemy.orm as so
-from pydantic import parse_obj_as
 
 from overhave.scenario import StrictFeatureInfo
 from overhave.storage import (
@@ -70,11 +69,11 @@ class SynchronizerStorageManager:
             for tag in info.tags
         ]
         session.flush()
-        return parse_obj_as(list[TagModel], db_tags)
+        return [TagModel.model_validate(x) for x in db_tags]
 
     def feature_type_by_name(self, session: so.Session, feature_type: FeatureTypeName) -> FeatureTypeModel:
         db_feature_type = self._feature_type_storage.feature_type_by_name(session=session, name=feature_type)
-        return FeatureTypeModel.from_orm(db_feature_type)
+        return FeatureTypeModel.model_validate(db_feature_type)
 
     def ensure_users_exist(self, session: so.Session, info: StrictFeatureInfo) -> None:
         for user in {info.author, info.last_edited_by}:

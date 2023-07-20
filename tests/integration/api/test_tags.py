@@ -1,12 +1,12 @@
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from pydantic import parse_obj_as
 
 from overhave import db
 from overhave.storage import TagModel
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
+from tests.objects import LIST_TAG_MODEL_ADAPTER
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -40,7 +40,7 @@ class TestFeatureTagsAPI:
         )
         assert response.status_code == 200
         assert response.json()
-        obj = TagModel.parse_obj(response.json())
+        obj = TagModel.model_validate(response.json())
         assert obj == test_tag
 
     def test_get_tags_like_value_no_body(self, test_api_client: TestClient, test_api_bearer_auth: BearerAuth) -> None:
@@ -70,6 +70,6 @@ class TestFeatureTagsAPI:
             auth=test_api_bearer_auth,
         )
         assert response.status_code == 200
-        obj = parse_obj_as(list[TagModel], response.json())
+        obj = LIST_TAG_MODEL_ADAPTER.validate_python(response.json())
         assert len(obj) == 1
         assert obj[0] == test_tag

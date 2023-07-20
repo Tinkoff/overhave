@@ -7,7 +7,7 @@ class TestStashHttpClientModels:
     """Unit tests for :class:`StashHttpClient` models."""
 
     def test_pr_creation_response(self) -> None:
-        response = StashPrCreationResponse.parse_obj(  # noqa: ECE001
+        response = StashPrCreationResponse.model_validate(  # noqa: ECE001
             {
                 "id": 270,
                 "version": 0,

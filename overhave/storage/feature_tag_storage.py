@@ -33,14 +33,14 @@ class FeatureTagStorage(IFeatureTagStorage):
         with db.create_session() as session:
             tag = session.query(db.Tags).filter(db.Tags.value == value).one_or_none()
             if tag is not None:
-                return TagModel.from_orm(tag)
+                return TagModel.model_validate(tag)
             return None
 
     @staticmethod
     def get_tags_like_value(value: str) -> list[TagModel]:
         with db.create_session() as session:
             db_tags = session.query(db.Tags).filter(db.Tags.value.like(value)).all()
-            return [TagModel.from_orm(tag) for tag in db_tags]
+            return [TagModel.model_validate(tag) for tag in db_tags]
 
     @staticmethod
     def get_or_create_tag(session: so.Session, value: str, created_by: str) -> db.Tags:

@@ -1,4 +1,5 @@
-from pydantic.fields import Field
+from typing import Literal
+
 from pydantic.main import BaseModel
 
 
@@ -11,7 +12,7 @@ class AuthTokenData(BaseModel):
 class AuthHeaders(BaseModel):
     """Model for OAuth2 auth_managers HTTP headers."""
 
-    Authorization: str = Field("Bearer", const=True)
+    Authorization: Literal["Bearer"] = "Bearer"
 
 
-AUTH_HEADERS = AuthHeaders()
+AUTH_HEADERS: AuthHeaders = AuthHeaders()

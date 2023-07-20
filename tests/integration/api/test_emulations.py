@@ -1,12 +1,12 @@
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from pydantic import parse_obj_as
 
 from overhave import db
 from overhave.storage import EmulationRunModel, TestUserModel
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
+from tests.objects import LIST_EMULATIONRUN_MODEL_ADAPTER
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -46,6 +46,6 @@ class TestEmulationsAPI:
             auth=test_api_bearer_auth,
         )
         assert response.status_code == 200
-        obj = parse_obj_as(list[EmulationRunModel], response.json())
+        obj = LIST_EMULATIONRUN_MODEL_ADAPTER.validate_python(response.json())
         assert len(obj) == 1
         assert obj[0] == test_emulation_run

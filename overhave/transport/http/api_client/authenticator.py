@@ -27,9 +27,9 @@ class OverhaveApiAuthenticator(BaseHttpClient[OverhaveApiAuthenticatorSettings])
         response = self._make_request(
             method=HttpMethod.POST,
             url=self._settings.get_auth_token_url,
-            data=data.dict(by_alias=True),
+            data=data.model_dump(by_alias=True),
         )
-        return AuthToken.parse_obj(response.json())
+        return AuthToken.model_validate(response.json())
 
     def _get_auth_token(self, username: str, password: SecretStr) -> AuthToken:
         token: AuthToken | None = self._auth_storage.get_auth_token(username=username)

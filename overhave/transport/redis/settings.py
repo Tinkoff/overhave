@@ -1,7 +1,8 @@
+from datetime import timedelta
+
 import yarl
-from pydantic.class_validators import validator
-from pydantic.datetime_parse import timedelta
-from pydantic.env_settings import BaseSettings
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
 
 
 class BaseRedisSettings(BaseSettings):
@@ -25,7 +26,7 @@ class OverhaveRedisSettings(BaseRedisSettings):
 
     url: yarl.URL = yarl.URL("redis://localhost:6379")
 
-    @validator("url", pre=True)
+    @field_validator("url", mode="before")
     def validate_url(cls, v: str | yarl.URL) -> yarl.URL:
         if isinstance(v, str):
             return yarl.URL(v)
@@ -40,7 +41,7 @@ class OverhaveRedisSentinelSettings(BaseRedisSettings):
     master_set: str = "foo"
     password: str = "bar"
 
-    @validator("urls", pre=True)
+    @field_validator("urls", mode="before")
     def validate_urls(cls, v: list[str] | list[yarl.URL]) -> list[yarl.URL]:
         urls = []
         for url in v:

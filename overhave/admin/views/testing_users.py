@@ -13,7 +13,7 @@ from overhave.utils import get_current_time
 
 
 def _make_dict_from_model(model: type[BaseModel]) -> dict[str, int | str]:
-    return {key: value.type_.__name__ for key, value in model.__fields__.items()}
+    return {key: value.annotation.__name__ for key, value in model.model_fields.items() if value.annotation is not None}
 
 
 class TestUserView(ModelViewConfigured):

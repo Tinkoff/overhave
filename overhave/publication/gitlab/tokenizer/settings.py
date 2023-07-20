@@ -1,7 +1,6 @@
-from typing import Any
-
 import httpx
-from pydantic import validator
+from pydantic import field_validator
+from pydantic_core.core_schema import FieldValidationInfo
 
 from overhave.transport.http import BaseHttpClientSettings
 from overhave.utils import make_url
@@ -19,12 +18,12 @@ class TokenizerClientSettings(BaseHttpClientSettings):
     class Config:
         env_prefix = "OVERHAVE_GITLAB_TOKENIZER_"
 
-    @validator("url", pre=True)
+    @field_validator("url", mode="before")
     def make_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
-    @validator("url", "remote_key", "remote_key_name")
-    def validate_remote_key_and_initiator(cls, v: str | None, values: dict[str, Any]) -> str | None:
-        if values.get("enabled") and not isinstance(v, str):
+    @field_validator("url", "remote_key", "remote_key_name", mode="after")
+    def validate_remote_key_and_initiator(cls, v: str | None, values: FieldValidationInfo) -> str | None:
+        if values.data.get("enabled") and not isinstance(v, str):
             raise ValueError("Please verify that url, remote_key and remote_key_name variables are not nullable!")
         return v

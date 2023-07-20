@@ -2,12 +2,12 @@ import allure
 import pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from pydantic import parse_obj_as
 
 from overhave import db
 from overhave.storage import FeatureModel, TagModel
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
+from tests.objects import LIST_FEATURE_MODEL_ADAPTER
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -50,7 +50,7 @@ class TestFeatureAPI:
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()
-        features = parse_obj_as(list[FeatureModel], response.json())
+        features = LIST_FEATURE_MODEL_ADAPTER.validate_python(response.json())
         assert features == [test_feature_with_tag]
 
     def test_get_feature_by_not_existing_tag_value(
@@ -80,5 +80,5 @@ class TestFeatureAPI:
         assert response.status_code == 200
         validate_content_null(response, False)
         assert response.json()
-        features = parse_obj_as(list[FeatureModel], response.json())
+        features = LIST_FEATURE_MODEL_ADAPTER.validate_python(response.json())
         assert features == [test_feature_with_tag]

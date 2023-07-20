@@ -1,6 +1,6 @@
 from typing import cast
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from overhave.entities import (
     OverhaveEmulationSettings,

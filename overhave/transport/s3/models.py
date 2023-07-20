@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import Extra, Field, root_validator
-from pydantic.main import BaseModel
+from pydantic import BaseModel, Field, TypeAdapter, model_validator
 
 
 class BucketModel(BaseModel):
@@ -10,6 +9,9 @@ class BucketModel(BaseModel):
 
     name: str = Field(alias="Name")
     created_at: datetime = Field(alias="CreationDate")
+
+
+LIST_BUCKET_MODEL_ADAPTER: TypeAdapter[list[BucketModel]] = TypeAdapter(list[BucketModel])
 
 
 class OwnerModel(BaseModel):
@@ -30,21 +32,24 @@ class ObjectModel(BaseModel):
     owner: OwnerModel = Field(alias="Owner")
 
     class Config:
-        extra = Extra.allow
+        extra = "allow"
+
+
+LIST_OBJECT_MODEL_ADAPTER: TypeAdapter[list[ObjectModel]] = TypeAdapter(list[ObjectModel])
 
 
 class BaseObjectToDeletionModel(BaseModel):
     """Base model for boto3 client object deletion result."""
 
     name: str = Field(alias="Key")
-    etag: str | None = Field(alias="VersionId")
+    etag: str | None = Field(default=None, alias="VersionId")
 
 
 class DeletedObjectModel(BaseObjectToDeletionModel):
     """Model for boto3 client deleted object."""
 
-    marker: bool | None = Field(alias="DeleteMarker")
-    marker_id: bool | None = Field(alias="DeleteMarkerVersionId")
+    marker: bool | None = Field(default=None, alias="DeleteMarker")
+    marker_id: bool | None = Field(default=None, alias="DeleteMarkerVersionId")
 
 
 class NotDeletedObjectModel(BaseObjectToDeletionModel):
@@ -57,11 +62,11 @@ class NotDeletedObjectModel(BaseObjectToDeletionModel):
 class DeletionResultModel(BaseModel):
     """Model for boto3 client objects deletion result."""
 
-    deleted: list[DeletedObjectModel] | None = Field(alias="Deleted")
-    errors: list[NotDeletedObjectModel] | None = Field(alias="Errors")
-    requester: str | None = Field(alias="RequestCharged")
+    deleted: list[DeletedObjectModel] | None = Field(default=None, alias="Deleted")
+    errors: list[NotDeletedObjectModel] | None = Field(default=None, alias="Errors")
+    requester: str | None = Field(default=None, alias="RequestCharged")
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     def validate_results(cls, values: dict[str, Any]) -> dict[str, Any]:
         deleted = values.get("Deleted")
         errors = values.get("Errors")

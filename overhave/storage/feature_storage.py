@@ -4,7 +4,6 @@ from typing import Iterable, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.storage.converters import FeatureModel
@@ -66,7 +65,7 @@ class FeatureStorage(IFeatureStorage):
     @staticmethod
     def feature_model_by_id(session: so.Session, feature_id: int) -> FeatureModel:
         feature = session.query(db.Feature).filter(db.Feature.id == feature_id).one()
-        return FeatureModel.from_orm(feature)
+        return FeatureModel.model_validate(feature)
 
     @staticmethod
     def create_feature(model: FeatureModel) -> int:
@@ -124,7 +123,7 @@ class FeatureStorage(IFeatureStorage):
                 .scalar_subquery()
             )
             features = session.query(db.Feature).filter(db.Feature.id.in_(feature_ids_query)).all()
-            return parse_obj_as(list[FeatureModel], features)
+            return [FeatureModel.model_validate(x) for x in features]
 
     @staticmethod
     def get_feature_model(feature_id: int) -> FeatureModel | None:

@@ -53,7 +53,9 @@ class TestOverhaveRunAdmin:
         feature_type_models: list[FeatureTypeModel] = []
         with create_test_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
-            feature_type_models.extend([FeatureTypeModel.from_orm(feature_type) for feature_type in db_feature_types])
+            feature_type_models.extend(
+                [FeatureTypeModel.model_validate(feature_type) for feature_type in db_feature_types]
+            )
         assert len(feature_type_models) == len(test_feature_types)
         assert {model.name for model in feature_type_models} == set(test_feature_types)
 

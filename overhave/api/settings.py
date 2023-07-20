@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from pydantic.env_settings import BaseSettings
 from pydantic.types import SecretStr
+from pydantic_settings import BaseSettings
 
 from overhave.base_settings import OVERHAVE_ENV_PREFIX
 

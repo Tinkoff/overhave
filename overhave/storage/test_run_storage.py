@@ -72,11 +72,11 @@ class TestRunStorage(ITestRunStorage):
 
     def testrun_model_by_id(self, session: so.Session, run_id: int) -> TestRunModel:
         run = session.query(db.TestRun).filter(db.TestRun.id == run_id).one()
-        return TestRunModel.from_orm(run)
+        return TestRunModel.model_validate(run)
 
     def get_testrun_model(self, run_id: int) -> TestRunModel | None:
         with db.create_session() as session:
             run = session.get(db.TestRun, run_id)
             if run is None:
                 return None
-            return TestRunModel.from_orm(run)
+            return TestRunModel.model_validate(run)

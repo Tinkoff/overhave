@@ -2,21 +2,21 @@ import fastapi
 
 from overhave.api.auth import get_authorized_user
 from overhave.api.views import (
-    delete_test_user_handler,
+    delete_testuser_handler,
     docs,
     emulation_run_list_handler,
     favicon,
     feature_types_list_handler,
     get_features_handler,
     get_test_run_handler,
-    get_test_user_handler,
+    get_testuser_handler,
     login_for_access_token,
     run_tests_by_tag_handler,
     tags_item_handler,
     tags_list_handler,
-    test_user_get_spec_handler,
-    test_user_list_handler,
-    test_user_put_spec_handler,
+    testuser_get_spec_handler,
+    testuser_list_handler,
+    testuser_put_spec_handler,
 )
 from overhave.storage import (
     AuthToken,
@@ -103,7 +103,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
 
     test_user_router.add_api_route(
         "/",
-        get_test_user_handler,
+        get_testuser_handler,
         methods=["GET"],
         response_model=TestUserModel,
         summary="Get TestUser",
@@ -111,7 +111,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
     )
     test_user_router.add_api_route(
         "/list",
-        test_user_list_handler,
+        testuser_list_handler,
         methods=["GET"],
         response_model=list[TestUserModel],
         summary="Get list of TestUsers",
@@ -119,14 +119,14 @@ def _get_testuser_router() -> fastapi.APIRouter:
     )
     test_user_router.add_api_route(
         "/{user_id}",
-        delete_test_user_handler,
+        delete_testuser_handler,
         methods=["DELETE"],
         summary="Delete TestUser",
         description="Delete test user by `user_id`",
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",
-        test_user_get_spec_handler,
+        testuser_get_spec_handler,
         methods=["GET"],
         response_model=TestUserSpecification,
         summary="Get TestUser specification",
@@ -134,7 +134,7 @@ def _get_testuser_router() -> fastapi.APIRouter:
     )
     test_user_router.add_api_route(
         "/{user_id}/specification",
-        test_user_put_spec_handler,
+        testuser_put_spec_handler,
         methods=["PUT"],
         summary="Put test user specification",
         description="Update test user specification by `user_id` and given payload",

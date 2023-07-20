@@ -66,7 +66,7 @@ class DraftStorage(IDraftStorage):
     @staticmethod
     def draft_model_by_id(session: so.Session, draft_id: int) -> DraftModel:
         draft = session.query(db.Draft).filter(db.Draft.id == draft_id).one()
-        return DraftModel.from_orm(draft)
+        return DraftModel.model_validate(draft)
 
     @staticmethod
     def get_last_published_at_for_feature(feature_id: int) -> datetime | None:

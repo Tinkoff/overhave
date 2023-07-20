@@ -5,7 +5,6 @@ from typing import cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.entities.settings import OverhaveEmulationSettings
@@ -105,7 +104,7 @@ class EmulationStorage(IEmulationStorage):
             emulation_run.status = db.EmulationStatus.REQUESTED
             emulation_run.port = self._get_next_port(session)
             emulation_run.changed_at = get_current_time()
-            return EmulationRunModel.from_orm(emulation_run)
+            return EmulationRunModel.model_validate(emulation_run)
 
     def set_emulation_run_status(self, emulation_run_id: int, status: db.EmulationStatus) -> None:
         with db.create_session() as session:
@@ -135,4 +134,4 @@ class EmulationStorage(IEmulationStorage):
             emulation_runs = (
                 session.query(db.EmulationRun).where(db.EmulationRun.emulation_id.in_(emulation_ids_query)).all()
             )
-            return parse_obj_as(list[EmulationRunModel], emulation_runs)
+            return [EmulationRunModel.model_validate(x) for x in emulation_runs]
