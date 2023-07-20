@@ -33,7 +33,7 @@ class TestTestUserAPI:
         response = test_api_client.get(f"/test_user/?user_id={test_testuser.id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         assert response.json()
-        obj = TestUserModel.parse_obj(response.json())
+        obj = TestUserModel.model_validate(response.json())
         assert obj == test_testuser
 
     def test_get_user_by_key_empty(
@@ -49,7 +49,7 @@ class TestTestUserAPI:
         response = test_api_client.get(f"/test_user/?user_key={test_testuser.key}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         assert response.json()
-        obj = TestUserModel.parse_obj(response.json())
+        obj = TestUserModel.model_validate(response.json())
         assert obj == test_testuser
 
     def test_delete_user_by_id_empty(

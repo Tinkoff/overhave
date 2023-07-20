@@ -30,7 +30,7 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     strict_feature_tasks: bool = False
 
     # Link to support chat
-    support_chat_url: httpx.URL | None
+    support_chat_url: httpx.URL | None = Field(default=None)
 
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):

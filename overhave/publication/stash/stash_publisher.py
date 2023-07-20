@@ -63,7 +63,7 @@ class StashVersionPublisher(GitVersionPublisher[OverhaveStashPublisherSettings])
             toRef=self._git_publisher_settings.target_branch,
             reviewers=self._git_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
-        logger.info("Prepared pull-request: %s", pull_request.json(by_alias=True))
+        logger.info("Prepared pull-request: %s", pull_request.model_dump_json(by_alias=True))
         try:
             response = self._client.send_pull_request(pull_request)
             if isinstance(response, StashPrCreationResponse):
