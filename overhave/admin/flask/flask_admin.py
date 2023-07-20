@@ -23,6 +23,7 @@ def get_flask_admin(factory: IAdminFactory) -> Admin:
         url="/",
         auth_manager=factory.auth_manager,
         index_template_path=factory.context.admin_settings.index_template_path,
+        support_chat_url=factory.context.admin_settings.support_chat_url,
     )
     admin = Admin(
         name="Overhave", template_mode="bootstrap4", index_view=index_view, base_template="overhave_master.html"

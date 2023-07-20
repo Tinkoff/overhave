@@ -7,15 +7,45 @@ from uuid import uuid1
 import pytest
 from faker import Faker
 from flask.testing import FlaskClient
+from pytest_mock import MockFixture
 
-from overhave import OverhaveAdminApp, overhave_app
+from overhave import OverhaveAdminApp, OverhaveLdapManagerSettings, overhave_app
 from overhave.admin.flask.login_manager import AdminPanelUser
 from overhave.admin.views.index.login_form import LoginForm
 from overhave.base_settings import DataBaseSettings
+from overhave.entities import LDAPAdminAuthorizationManager
 from overhave.factory import IAdminFactory
 from overhave.factory.context.base_context import BaseFactoryContext
 from overhave.pytest_plugin import IProxyManager
-from overhave.storage import SystemUserModel
+from overhave.storage import SystemUserGroupStorage, SystemUserModel, SystemUserStorage
+from overhave.transport import LDAPAuthenticator
+
+
+@pytest.fixture()
+def mocked_ldap_authenticator(mocker: MockFixture) -> LDAPAuthenticator:
+    mocked = mocker.create_autospec(LDAPAuthenticator)
+    mocked.get_user_groups.return_value = None
+    return mocked
+
+
+@pytest.fixture()
+def test_ldap_manager_settings(faker) -> OverhaveLdapManagerSettings:
+    return OverhaveLdapManagerSettings(ldap_admin_group=faker.word())
+
+
+@pytest.fixture()
+def test_ldap_auth_manager(
+    test_system_user_storage: SystemUserStorage,
+    test_system_user_group_storage: SystemUserGroupStorage,
+    mocked_ldap_authenticator: LDAPAuthenticator,
+    test_ldap_manager_settings: OverhaveLdapManagerSettings,
+) -> LDAPAdminAuthorizationManager:
+    return LDAPAdminAuthorizationManager(
+        settings=test_ldap_manager_settings,
+        system_user_storage=test_system_user_storage,
+        system_user_group_storage=test_system_user_group_storage,
+        ldap_authenticator=mocked_ldap_authenticator,
+    )
 
 
 @pytest.fixture()
@@ -24,10 +54,12 @@ def patched_app_admin_factory(
     database: None,
     mocked_context: BaseFactoryContext,
     clean_admin_factory: Callable[[], IAdminFactory],
+    test_ldap_auth_manager,
 ) -> IAdminFactory:
     db_settings.setup_engine()
     factory = clean_admin_factory()
     factory.set_context(mocked_context)
+    factory.auth_manager = test_ldap_auth_manager
     return factory
 
 
