@@ -29,6 +29,7 @@ class IFeatureStorage(abc.ABC):
         pass
 
     @staticmethod
+    @abc.abstractmethod
     def get_feature_model(feature_id: int) -> FeatureModel | None:
         pass
 
@@ -51,7 +52,7 @@ class IFeatureStorage(abc.ABC):
 def _append_tags_to_feature(session: so.Session, feature: db.Feature, tag_ids: Iterable[int]) -> None:
     db_tags: list[db.Tags] = []
     for tag_id in tag_ids:
-        db_tag = session.get(db.Tags, tag_id)
+        db_tag: db.Tags | None = session.get(db.Tags, tag_id)
         if db_tag is None:
             raise FeatureTagNotExistsError(f"Feature tag with id={tag_id} does not exist!")
         logger.info("Append tag with id=%s and value=%s", tag_id, db_tag.value)
@@ -130,5 +131,5 @@ class FeatureStorage(IFeatureStorage):
         with db.create_session() as session:
             feature = session.get(db.Feature, feature_id)
             if feature is not None:
-                return FeatureModel.from_orm(feature)
+                return FeatureModel.model_validate(feature)
             return None

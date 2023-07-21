@@ -69,7 +69,7 @@ class StepCollector:
     def _compile_full_step_name(self, fixture_name: str, step_type: str) -> str:
         prefix = step_type.title()
         if self._step_prefixes is not None:
-            prefix = self._step_prefixes.dict()[step_type.upper()].strip()
+            prefix = self._step_prefixes.model_dump()[step_type.upper()].strip()
         return f"{prefix} {fixture_name}"
 
     def _compile_step_models(self, steps: tuple[FixtureDef[Any], ...]) -> list[BddStepModel]:

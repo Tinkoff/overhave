@@ -68,10 +68,12 @@ class TestUserView(ModelViewConfigured):
     def _validate_json(model: db.TestUser) -> None:
         if not isinstance(model.specification, dict):
             raise ValidationError("Could not convert specified data into correct JSON!")
-        parser = get_admin_factory().context.project_settings.user_spec_template_mapping.get(model.feature_type.name)
+        parser: type[BaseModel] | None = get_admin_factory().context.project_settings.user_spec_template_mapping.get(
+            model.feature_type.name
+        )
         if parser is not None:
             try:
-                parser.parse_obj(model.specification)
+                parser.model_validate(model.specification)
             except ValueError:
                 raise ValidationError(f"Could not convert specified data into {parser.__name__} model!")
 
