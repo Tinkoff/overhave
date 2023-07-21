@@ -20,4 +20,4 @@ class DefaultAdminAuthorizationManager(AdminSecretMixin):
             user = self._system_user_storage.get_user_by_credits(session=session, login=username, password=password)
             if user is None:
                 return None
-            return SystemUserModel.from_orm(user)
+            return SystemUserModel.model_validate(user)

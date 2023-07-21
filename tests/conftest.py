@@ -55,7 +55,7 @@ def setup_logging(caplog: LogCaptureFixture, request: FixtureRequest) -> None:
 @pytest.fixture(scope="session")
 def db_settings(worker_id: XDistWorkerValueType) -> OverhaveDBSettings:
     settings = OverhaveDBSettings(db_echo=True)
-    settings.db_url = sa.make_url(f"{settings.db_url.render_as_string(hide_password=False)}/overhave_{worker_id}")
+    settings.db_url = f"{settings.db_url}/overhave_{worker_id}"
     return settings
 
 

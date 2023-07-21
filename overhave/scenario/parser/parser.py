@@ -1,5 +1,6 @@
 import logging
 import re
+from dataclasses import asdict
 from datetime import datetime
 from functools import cached_property
 from typing import Sequence
@@ -193,6 +194,6 @@ class ScenarioParser(PrefixMixin):
         if feature_info.id is None:
             raise NullableFeatureIdError("Feature has not got specified ID!")
         try:
-            return StrictFeatureInfo(**feature_info.dict())
+            return StrictFeatureInfo(**asdict(feature_info))
         except ValueError as err:
             raise StrictFeatureParsingError("Could not parse feature to StrictFeatureInfo!") from err

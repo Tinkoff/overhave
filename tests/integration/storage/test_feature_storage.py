@@ -85,7 +85,7 @@ class TestFeatureStorage:
             new_db_tag = db.Tags(value=faker.word() + faker.word(), created_by=system_user_login)
             session.add(new_db_tag)
             session.flush()
-            new_tag_model = TagModel.from_orm(new_db_tag)
+            new_tag_model = TagModel.model_validate(new_db_tag)
 
         new_feature_model = FeatureModel(
             id=test_feature_with_tag.id,

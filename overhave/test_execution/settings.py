@@ -1,5 +1,5 @@
 import httpx
-from pydantic import validator
+from pydantic import Field, field_validator
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
@@ -17,7 +17,7 @@ class OverhaveAdminLinkSettings(BaseOverhavePrefix):
     feature_id_filter_path: str = "feature/?flt2_0={feature_id}"
     feature_id_placeholder: str = "Overhave feature #{feature_id}"
 
-    @validator("admin_url", pre=True)
+    @field_validator("admin_url", mode="before")
     def make_admin_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
@@ -38,9 +38,9 @@ class OverhaveTestSettings(BaseOverhavePrefix):
     """Settings for PytestRunner, which runs scenario tests with specified addoptions."""
 
     default_pytest_addoptions: str = "--disable-warnings"
-    extra_pytest_addoptions: str | None
+    extra_pytest_addoptions: str | None = Field(default=None)
 
-    workers: int | None  # Number of xdist workers, `None` by default
+    workers: int | None = Field(default=None, description="Number of xdist workers")
 
 
 class OverhaveStepCollectorSettings(BaseOverhavePrefix):

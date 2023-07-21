@@ -1,10 +1,10 @@
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, Sequence
 
 import httpx
 from flask_admin.contrib.sqla import ModelView
-from pydantic import root_validator, validator
-from pydantic.datetime_parse import timedelta
+from pydantic import Field, field_validator, model_validator
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.entities.language import StepPrefixesModel
@@ -14,10 +14,10 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     """Settings for Overhave Flask Admin customization."""
 
     # Path to custom index template. By default, contains Overhave project info.
-    index_template_path: Path | None
+    index_template_path: Path | None = Field(default=None)
 
     # Custom SQLAlchemy ModelViews for Overhave admin panel
-    custom_views: Sequence[ModelView] | None
+    custom_views: Sequence[ModelView] | None = Field(default=None)
 
     # Enable testing with test execution consumer, based on Redis tasks. Enabled by default.
     # When disabled - all test runs will be executed with :class:`Threadpool`.
@@ -30,13 +30,13 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     strict_feature_tasks: bool = False
 
     # Link to support chat
-    support_chat_url: httpx.URL | None
+    support_chat_url: httpx.URL | None = Field(default=None)
 
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""
 
-    step_prefixes: StepPrefixesModel | None
+    step_prefixes: StepPrefixesModel | None = Field(default=None)
 
 
 class OverhaveFileSettings(BaseOverhavePrefix):
@@ -68,7 +68,7 @@ class OverhaveFileSettings(BaseOverhavePrefix):
     # Temporary directory for scenarios test runs
     tmp_dir: Path = Path("/tmp/overhave")  # noqa: S108
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     def validate_dirs(cls, values: dict[str, Any]) -> dict[str, Any]:
         root_dir = values.get("root_dir")
         if root_dir:
@@ -78,13 +78,11 @@ class OverhaveFileSettings(BaseOverhavePrefix):
                 values[directory] = Path(root_dir) / directory.replace("_dir", "")
         return values
 
-    @validator("steps_dir")
-    def validate_nesting(cls, v: Path, values: dict[str, Any]) -> Path:
-        validate_steps_dir = values["validate_steps_dir"]
-        if validate_steps_dir:
-            work_dir: Path = values["work_dir"]
-            v.relative_to(work_dir)
-        return v
+    @model_validator(mode="after")  # type: ignore[misc]
+    def validate_nesting(self) -> "OverhaveFileSettings":
+        if self.validate_steps_dir and not self.steps_dir.relative_to(self.work_dir):
+            raise ValueError("'steps_dir' is not relative to 'work_dir', but should be!")
+        return self  # type: ignore[return-value]
 
     @property
     def tmp_features_dir(self) -> Path:
@@ -124,13 +122,13 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     emulation_prefix: str = "--permit-write --once --address {address} --port {port} --timeout {timeout}"
 
     # Specific terminal tool startup command with relative `feature_type`, for example: `myapp {feature_type}`
-    emulation_base_cmd: str | None
+    emulation_base_cmd: str | None = Field(default=None)
     # Terminal tool command postfix with specified user `name` and `model`, for example: `--name={name} --model={model}`
     # If it is no need in use - may be optional.
-    emulation_postfix: str | None
+    emulation_postfix: str | None = Field(default=None)
 
     # Optional additional terminal tool usage description
-    emulation_desc_link: str | None
+    emulation_desc_link: str | None = Field(default=None)
 
     emulation_bind_ip: str = "0.0.0.0"  # noqa: S104
     # Ports for emulation binding. Expects as string with format `["port1", "port2", ...]`
@@ -141,18 +139,18 @@ class OverhaveEmulationSettings(BaseOverhavePrefix):
     # and `emulation_service_mount` = `mount` - mount point for service redirection.
     # If `emulation_service_mount` is `None` - this is localhost debug.
     emulation_service_url: httpx.URL = httpx.URL("http://localhost")
-    emulation_service_mount: str | None
+    emulation_service_mount: str | None = Field(default=None)
 
     # Wait until emulation become served
     emulation_wait_timeout: timedelta = timedelta(seconds=300)
 
-    @validator("emulation_service_url", pre=True)
+    @field_validator("emulation_service_url", mode="before")
     def validate_url(cls, v: str | httpx.URL) -> httpx.URL:
         if isinstance(v, str):
             return httpx.URL(v)
         return v
 
-    @validator("emulation_ports", pre=True)
+    @field_validator("emulation_ports", mode="before")
     def validate_ports(cls, v: list[int] | str) -> list[int]:
         if isinstance(v, str):
             return [int(x.strip()) for x in v.split(",")]

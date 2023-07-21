@@ -1,14 +1,16 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 
 from overhave.db import TestReportStatus
 
 
-class ReportPresenceResolution(BaseModel):
+@dataclass(frozen=True)
+class ReportPresenceResolution:
     """Model for report presence resolution result."""
 
     exists: bool
+
+    report_status: TestReportStatus | None = None
     s3_enabled: bool = False
-    report_status: TestReportStatus | None
 
     @property
     def not_ready(self) -> bool:

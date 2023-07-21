@@ -3,12 +3,12 @@ from pathlib import Path
 from typing import NewType
 from unittest import mock
 
-from pydantic import root_validator
+from pydantic import TypeAdapter, model_validator
 from pydantic.main import BaseModel
 
 from demo.settings import OverhaveDemoAppLanguage
 from overhave.entities import FeatureExtractor, OverhaveFileSettings
-from overhave.storage import FeatureTypeName
+from overhave.storage import EmulationRunModel, FeatureModel, FeatureTypeModel, FeatureTypeName, TagModel, TestUserModel
 
 _BLOCKS_DELIMITER = "\n\n"
 
@@ -16,6 +16,12 @@ XDistWorkerValueType = NewType("XDistWorkerValueType", str)
 XDistMasterWorker = XDistWorkerValueType("master")
 
 PROJECT_WORKDIR = Path(__file__).parent.parent
+
+LIST_FEATURE_MODEL_ADAPTER: TypeAdapter[list[FeatureModel]] = TypeAdapter(list[FeatureModel])
+LIST_FEATURETYPE_MODEL_ADAPTER: TypeAdapter[list[FeatureTypeModel]] = TypeAdapter(list[FeatureTypeModel])
+LIST_TAG_MODEL_ADAPTER: TypeAdapter[list[TagModel]] = TypeAdapter(list[TagModel])
+LIST_TESTUSER_MODEL_ADAPTER: TypeAdapter[list[TestUserModel]] = TypeAdapter(list[TestUserModel])
+LIST_EMULATIONRUN_MODEL_ADAPTER: TypeAdapter[list[EmulationRunModel]] = TypeAdapter(list[EmulationRunModel])
 
 
 @cache
@@ -46,7 +52,7 @@ class FeatureTestContainer(BaseModel):
     scenario: str
     language: OverhaveDemoAppLanguage
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     def make_scenario(cls, values: dict[str, str]) -> dict[str, str]:
         name = values.get("name")
         content = values.get("content")

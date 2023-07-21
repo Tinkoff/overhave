@@ -1,8 +1,9 @@
+from typing import Iterator
+from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from pytest_mock import MockFixture
 
 from overhave import OverhaveEmulationSettings
 from overhave.emulation import Emulator
@@ -34,9 +35,9 @@ def emulator_raises_error(request: FixtureRequest) -> bool:
 
 
 @pytest.fixture()
-def mock_subprocess_popen(mocker: MockFixture, emulator_raises_error: bool) -> MagicMock:
+def mock_subprocess_popen(emulator_raises_error: bool) -> Iterator[MagicMock]:
     mock_popen = MagicMock()
     if emulator_raises_error:
         mock_popen = MagicMock(side_effect=FileNotFoundError())
-    with mocker.patch("subprocess.Popen", mock_popen):
+    with mock.patch("subprocess.Popen", mock_popen):
         yield mock_popen

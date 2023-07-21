@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 @pytest.fixture(scope="module")
 def envs_for_mock(db_settings: OverhaveDBSettings) -> dict[str, str | None]:
     return {
-        "OVERHAVE_DB_URL": db_settings.db_url.render_as_string(hide_password=False),
+        "OVERHAVE_DB_URL": db_settings.db_url,
         "OVERHAVE_WORK_DIR": PROJECT_WORKDIR.as_posix(),
     }
 
@@ -53,21 +53,21 @@ def test_db_user(database: None, test_system_user_login: str) -> SystemUserModel
         db_user = db.UserRole(login=test_system_user_login, password="test_password", role=db.Role.user)
         session.add(db_user)
         session.flush()
-        return SystemUserModel.from_orm(db_user)
+        return SystemUserModel.model_validate(db_user)
 
 
 @pytest.fixture()
 def test_db_feature(test_feature_container: FeatureTestContainer, test_db_user: SystemUserModel) -> FeatureModel:
     with create_test_session() as session:
         db_feature = session.query(db.Feature).filter(db.Feature.file_path == test_feature_container.file_path).one()
-        return FeatureModel.from_orm(db_feature)
+        return FeatureModel.model_validate(db_feature)
 
 
 @pytest.fixture()
 def test_db_scenario(test_db_feature: FeatureModel, test_db_user: SystemUserModel) -> ScenarioModel:
     with create_test_session() as session:
         db_scenario = session.query(db.Scenario).filter(db.Scenario.feature_id == test_db_feature.id).one()
-        return ScenarioModel.from_orm(db_scenario)
+        return ScenarioModel.model_validate(db_scenario)
 
 
 @pytest.fixture()
@@ -81,7 +81,7 @@ def test_db_test_run(test_db_scenario: ScenarioModel) -> TestRunModel:
         )
         if db_test_run is None:
             raise RuntimeError("TestRun should not be None!")
-        return TestRunModel.from_orm(db_test_run)
+        return TestRunModel.model_validate(db_test_run)
 
 
 @pytest.fixture()

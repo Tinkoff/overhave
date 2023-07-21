@@ -10,7 +10,7 @@ class TestGitlabHttpClientModels:
     """Unit tests for :class:`GitlabHttpClient` models."""
 
     def test_mr_creation_response(self) -> None:
-        response: GitlabMrCreationResponse = GitlabMrCreationResponse.parse_obj(
+        response: GitlabMrCreationResponse = GitlabMrCreationResponse.model_validate(
             {
                 "id": 1,
                 "iid": 1,
@@ -117,6 +117,6 @@ class TestGitlabHttpClientModels:
 
     def test_bullshit_mr_creation_response(self) -> None:
         with pytest.raises(ValidationError):
-            GitlabMrCreationResponse.parse_obj(
+            GitlabMrCreationResponse.model_validate(
                 {"state": "merged", "created_at": "2017-04-29T08:46:00Z", "updated_at": "2017-04-29T08:46:00Z"}
             )

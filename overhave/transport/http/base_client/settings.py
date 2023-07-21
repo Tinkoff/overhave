@@ -2,7 +2,8 @@ from datetime import timedelta
 from typing import TypeVar
 
 import httpx
-from pydantic import BaseSettings, validator
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
 
 from overhave.utils import make_url
 
@@ -18,7 +19,7 @@ class BaseHttpClientSettings(BaseSettings):
     write_timeout: timedelta | None = None
     pool_timeout: timedelta | None = None
 
-    @validator("url", pre=True)
+    @field_validator("url", mode="before")
     def make_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 

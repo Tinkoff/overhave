@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 from faker import Faker
-from wtforms import ValidationError
+from wtforms.validators import ValidationError
 
 from overhave import db
 from overhave.admin import views

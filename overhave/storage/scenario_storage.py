@@ -38,13 +38,13 @@ class ScenarioStorage(IScenarioStorage):
     @staticmethod
     def scenario_model_by_id(session: so.Session, scenario_id: int) -> ScenarioModel:
         scenario = session.query(db.Scenario).filter(db.Scenario.id == scenario_id).one()
-        return ScenarioModel.from_orm(scenario)
+        return ScenarioModel.model_validate(scenario)
 
     @staticmethod
     def get_scenario_by_feature_id(feature_id: int) -> ScenarioModel:
         with db.create_session() as session:
             scenario: db.Scenario = session.query(db.Scenario).filter(db.Scenario.feature_id == feature_id).one()
-            return ScenarioModel.from_orm(scenario)
+            return ScenarioModel.model_validate(scenario)
 
     @staticmethod
     def update_scenario(model: ScenarioModel) -> None:

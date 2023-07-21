@@ -32,7 +32,7 @@ class TestAuthAPI:
         self, test_api_client: TestClient, api_authenticator: OverhaveApiAuthenticator, faker: Faker
     ) -> None:
         data = TokenRequestData(username=faker.word(), password=faker.word())
-        response = test_api_client.post("/token", data=data.dict(by_alias=True))
+        response = test_api_client.post("/token", data=data.model_dump(by_alias=True))
         assert response.status_code == 401
         validate_content_null(response, False)
 
@@ -45,10 +45,10 @@ class TestAuthAPI:
     ) -> None:
         password = service_system_user.password or SecretStr("")
         data = TokenRequestData(username=service_system_user.login, password=password.get_secret_value())
-        response = test_api_client.post("/token", data=data.dict(by_alias=True))
+        response = test_api_client.post("/token", data=data.model_dump(by_alias=True))
         assert response.status_code == 200
         validate_content_null(response, False)
-        token = AuthToken.parse_obj(response.json())
+        token = AuthToken.model_validate(response.json())
         assert token.access_token
         settings_expire_timedelta = OverhaveApiAuthSettings().access_token_expire_timedelta
         assert get_current_time() < token.expires_at < get_current_time() + settings_expire_timedelta

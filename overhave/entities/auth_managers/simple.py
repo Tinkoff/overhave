@@ -32,5 +32,5 @@ class SimpleAdminAuthorizationManager(AdminSecretMixin):
             if user.password is None:
                 raise NullablePasswordError(f"User with id={user.id} has not got password!")
             if user.password == password.get_secret_value():
-                return SystemUserModel.from_orm(user)
+                return SystemUserModel.model_validate(user)
         return None

@@ -65,14 +65,14 @@ class LDAPAdminAuthorizationManager(BaseAdminAuthorizationManager):
                 if user.role is db.Role.user and user.role is not intended_user_role:
                     user.role = intended_user_role
                     session.flush()
-                return SystemUserModel.from_orm(user)
+                return SystemUserModel.model_validate(user)
 
             logger.debug("Have not found user with username '%s'!", username)
             if self._can_user_be_created(
                 session=session, user_has_admin_group=user_has_admin_group, user_groups=user_groups
             ):
                 user = self._system_user_storage.create_user(session=session, login=username, role=intended_user_role)
-                return SystemUserModel.from_orm(user)
+                return SystemUserModel.model_validate(user)
 
         logger.debug("Received user groups (%s) are not supplied with exist groups!", user_groups)
         return None

@@ -61,7 +61,7 @@ class GitlabVersionPublisher(GitVersionPublisher[OverhaveGitlabPublisherSettings
             description=self._compile_publication_description(context),
             reviewer_ids=self._git_publisher_settings.get_reviewers(feature_type=context.feature.feature_type.name),
         )
-        logger.info("Prepared merge-request: %s", merge_request.json(by_alias=True))
+        logger.info("Prepared merge-request: %s", merge_request.model_dump_json(by_alias=True))
         try:
             token = (
                 self._gitlab_client._settings.auth_token or self._tokenizer_client.get_token(draft_id=draft_id).token

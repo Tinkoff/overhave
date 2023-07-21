@@ -36,7 +36,7 @@ class SystemUserStorage(ISystemUserStorage):
         with db.create_session() as session:
             db_user = session.get(db.UserRole, user_id)
             if db_user is not None:
-                return SystemUserModel.from_orm(db_user)
+                return SystemUserModel.model_validate(db_user)
             return None
 
     @staticmethod

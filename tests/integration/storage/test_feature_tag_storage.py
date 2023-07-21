@@ -38,7 +38,7 @@ class TestFeatureTagStorage:
                     session=session, value=test_tag.value, created_by=test_tag.created_by
                 )
                 session.flush()
-                tag_model = TagModel.from_orm(db_tag)
+                tag_model = TagModel.model_validate(db_tag)
         _validate_tag_model(tag=tag_model, validation_tag=test_tag)
 
     def test_get_tag_by_value_not_exist(

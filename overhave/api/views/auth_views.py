@@ -24,7 +24,7 @@ def login_for_access_token(
             raise fastapi.HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
                 detail="Incorrect username or password",
-                headers=AUTH_HEADERS.dict(),
+                headers=AUTH_HEADERS.model_dump(),
             )
     expires_at = get_current_time() + auth_settings.access_token_expire_timedelta
     access_token = create_access_token(auth_settings=auth_settings, username=form_data.username, expires_at=expires_at)

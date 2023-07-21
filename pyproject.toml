@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "overhave"
-version = "4.1.1"
+version = "5.0.0"
 description = "Overhave - web-framework for BDD"
 readme = "README.rst"
 authors = [
@@ -63,6 +63,7 @@ sqlalchemy = ">=1.4"
 sqlalchemy-utils = "^0.41.1"
 sqlalchemy-utc = "^0.14.0"
 prometheus-client = "^0.16.0"
+pydantic-settings = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8-awesome = "<1.3"

@@ -19,7 +19,7 @@ from overhave.storage import (
 logger = logging.getLogger(__name__)
 
 
-def _get_test_user_by_id_handler(user_id: int, test_user_storage: ITestUserStorage) -> TestUserModel:
+def _get_testuser_by_id_handler(user_id: int, test_user_storage: ITestUserStorage) -> TestUserModel:
     logger.info("Getting %s with user_id=%s...", TestUserModel.__name__, user_id)
     test_user = test_user_storage.get_testuser_model_by_id(user_id)
     if test_user is None:
@@ -29,7 +29,7 @@ def _get_test_user_by_id_handler(user_id: int, test_user_storage: ITestUserStora
     return test_user
 
 
-def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserStorage) -> TestUserModel:
+def _get_testuser_by_key_handler(user_key: str, test_user_storage: ITestUserStorage) -> TestUserModel:
     logger.info("Getting %s with user_key='%s'...", TestUserModel.__name__, user_key)
     test_user = test_user_storage.get_testuser_model_by_key(user_key)
     if test_user is None:
@@ -39,21 +39,21 @@ def _get_test_user_by_key_handler(user_key: str, test_user_storage: ITestUserSto
     return test_user
 
 
-def get_test_user_handler(
+def get_testuser_handler(
     user_id: int | None = None,
     user_key: str | None = None,
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
 ) -> TestUserModel:
     if user_id is not None:
-        return _get_test_user_by_id_handler(user_id=user_id, test_user_storage=test_user_storage)
+        return _get_testuser_by_id_handler(user_id=user_id, test_user_storage=test_user_storage)
     if user_key is not None:
-        return _get_test_user_by_key_handler(user_key=user_key, test_user_storage=test_user_storage)
+        return _get_testuser_by_key_handler(user_key=user_key, test_user_storage=test_user_storage)
     raise fastapi.HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail="'user_id' or 'user_key' query parameter should be set!"
     )
 
 
-def delete_test_user_handler(
+def delete_testuser_handler(
     user_id: int,
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
 ) -> None:
@@ -65,7 +65,7 @@ def delete_test_user_handler(
         )
 
 
-def test_user_list_handler(
+def testuser_list_handler(
     feature_type: FeatureTypeName,
     allow_update: bool,
     feature_type_storage: IFeatureTypeStorage = fastapi.Depends(get_feature_type_storage),
@@ -89,21 +89,23 @@ def test_user_list_handler(
         )
 
 
-def test_user_get_spec_handler(
+def testuser_get_spec_handler(
     user_id: int, test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage)
 ) -> TestUserSpecification:
-    test_user = _get_test_user_by_id_handler(user_id=user_id, test_user_storage=test_user_storage)
+    test_user = _get_testuser_by_id_handler(user_id=user_id, test_user_storage=test_user_storage)
     return test_user.specification
 
 
-def test_user_put_spec_handler(
+def testuser_put_spec_handler(
     user_id: int,
-    specification: TestUserSpecification,
+    specification: dict[str, str | None],
     test_user_storage: ITestUserStorage = fastapi.Depends(get_test_user_storage),
 ) -> None:
     logger.info("Updating %s for user_id=%s...", TestUserSpecification.__name__, user_id)
     try:
-        test_user_storage.update_test_user_specification(user_id=user_id, specification=specification)
+        test_user_storage.update_test_user_specification(
+            user_id=user_id, specification=TestUserSpecification(specification)
+        )
     except TestUserDoesNotExistError:
         raise fastapi.HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=f"User with id={user_id} does not exist!"

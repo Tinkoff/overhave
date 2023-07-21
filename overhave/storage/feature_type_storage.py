@@ -61,4 +61,4 @@ class FeatureTypeStorage(IFeatureTypeStorage):
     def all_feature_types(self) -> list[FeatureTypeModel]:
         with db.create_session() as session:
             db_feature_types = session.query(db.FeatureType).all()
-            return [FeatureTypeModel.from_orm(x) for x in db_feature_types]
+            return [FeatureTypeModel.model_validate(x) for x in db_feature_types]

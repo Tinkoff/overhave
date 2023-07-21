@@ -7,7 +7,8 @@ from typing import Any
 import sqlalchemy as sa
 import sqlalchemy.engine
 import sqlalchemy.exc
-from pydantic import BaseSettings, Field, validator
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
 from sqlalchemy.pool import Pool, SingletonThreadPool
 
 OVERHAVE_ENV_PREFIX = "OVERHAVE_"
@@ -20,27 +21,17 @@ class BaseOverhavePrefix(BaseSettings):
         env_prefix = OVERHAVE_ENV_PREFIX
 
 
-class SAUrl(sqlalchemy.engine.URL):  # SQLAlchemy2.0 - sa.URL
-    """Custom URL for Pydantic BaseSettings validation."""
-
-    @classmethod
-    def __get_validators__(cls):  # type: ignore
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v: str) -> sqlalchemy.engine.URL:  # SQLAlchemy2.0 - sa.URL
-        try:
-            return sqlalchemy.engine.make_url(v)  # SQLAlchemy2.0 - sa.make_url
-        except sqlalchemy.exc.ArgumentError as e:
-            raise ValueError from e
+def _as_alchemy_url(db_url: str) -> sqlalchemy.engine.URL:  # SQLAlchemy2.0 - sa.make_url
+    try:
+        return sqlalchemy.engine.make_url(db_url)  # SQLAlchemy2.0 - sa.make_url
+    except sqlalchemy.exc.ArgumentError as e:
+        raise ValueError from e
 
 
 class DataBaseSettings(BaseOverhavePrefix):
     """Overhave database settings."""
 
-    db_url: SAUrl = Field(
-        SAUrl.validate("postgresql://postgres:postgres@localhost/overhave")  # type: ignore[assignment]
-    )
+    db_url: str = "postgresql://postgres:postgres@localhost/overhave"
     db_pool_recycle: int = 500
     db_pool_size: int = 6
     db_echo: bool = False
@@ -51,7 +42,7 @@ class DataBaseSettings(BaseOverhavePrefix):
     def _create_engine(self) -> sqlalchemy.engine.Engine:  # SQLAlchemy2.0 - sa.Engine
         return sa.engine_from_config(
             {
-                "url": self.db_url,
+                "url": _as_alchemy_url(self.db_url),
                 "pool_recycle": self.db_pool_recycle,
                 "pool_pre_ping": True,
                 "pool_size": self.db_pool_size,
@@ -77,7 +68,7 @@ class LoggingSettings(BaseOverhavePrefix):
     log_level: str = logging.getLevelName(logging.INFO)
     log_config: dict[str, Any] = {}
 
-    @validator("log_config", each_item=True)
+    @field_validator("log_config", check_fields=True)
     def dict_config_validator(cls, v: dict[str, Any]) -> DictConfigurator | None:
         if not v:
             return None

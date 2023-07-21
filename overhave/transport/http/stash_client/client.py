@@ -34,7 +34,7 @@ class StashHttpClient(BaseHttpClient[OverhaveStashClientSettings]):
         response = self._make_request(
             method=HttpMethod.POST,
             url=url,
-            json=pull_request.dict(by_alias=True),
+            json=pull_request.model_dump(by_alias=True),
             auth=BearerAuth(self._settings.auth_token),
             raise_for_status=False,
         )

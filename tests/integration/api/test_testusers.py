@@ -3,12 +3,12 @@ import json
 import pytest as pytest
 from faker import Faker
 from fastapi.testclient import TestClient
-from pydantic.tools import parse_obj_as
 
 from overhave import db
 from overhave.storage import TestUserModel, TestUserSpecification
 from overhave.transport.http.base_client import BearerAuth
 from tests.integration.api.conftest import validate_content_null
+from tests.objects import LIST_TESTUSER_MODEL_ADAPTER
 
 
 @pytest.mark.parametrize("test_user_role", [db.Role.user], indirect=True)
@@ -33,7 +33,7 @@ class TestTestUserAPI:
         response = test_api_client.get(f"/test_user/?user_id={test_testuser.id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         assert response.json()
-        obj = TestUserModel.parse_obj(response.json())
+        obj = TestUserModel.model_validate(response.json())
         assert obj == test_testuser
 
     def test_get_user_by_key_empty(
@@ -49,7 +49,7 @@ class TestTestUserAPI:
         response = test_api_client.get(f"/test_user/?user_key={test_testuser.key}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         assert response.json()
-        obj = TestUserModel.parse_obj(response.json())
+        obj = TestUserModel.model_validate(response.json())
         assert obj == test_testuser
 
     def test_delete_user_by_id_empty(
@@ -89,7 +89,7 @@ class TestTestUserAPI:
             auth=test_api_bearer_auth,
         )
         assert response.status_code == 200
-        obj = parse_obj_as(list[TestUserModel], response.json())
+        obj = LIST_TESTUSER_MODEL_ADAPTER.validate_python(response.json())
         assert len(obj) == 1
         assert obj[0] == test_testuser
 

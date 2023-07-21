@@ -33,7 +33,7 @@ class GitlabHttpClient(BaseHttpClient[OverhaveGitlabClientSettings]):
         )
         project = gitlab_python_client.projects.get(repository_id, lazy=True)
         try:
-            result = project.mergerequests.create(merge_request.dict(by_alias=True))
+            result = project.mergerequests.create(merge_request.model_dump(by_alias=True))
             logger.debug("Response from GitLab: %s", result)
             if isinstance(result, ProjectMergeRequest):
                 return GitlabMrCreationResponse(created_at=result.created_at, web_url=result.web_url)

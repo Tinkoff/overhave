@@ -43,7 +43,7 @@ class TestTestRunAPI:
         validate_content_null(response, False)
         test_run_id = cast(list[int], response.json())
         response_test_run = test_api_client.get(f"/test_run/?test_run_id={test_run_id[0]}", auth=test_api_bearer_auth)
-        test_run = TestRunModel.parse_obj(response_test_run.json())
+        test_run = TestRunModel.model_validate(response_test_run.json())
         assert test_run.scenario_id == test_scenario.id
 
     @pytest.mark.parametrize("test_severity", [allure.severity_level.NORMAL], indirect=True)
@@ -64,7 +64,7 @@ class TestTestRunAPI:
         assert len(test_runs_id) == 2
         for test_run_id in test_runs_id:
             response_test_run = test_api_client.get(f"/test_run/?test_run_id={test_run_id}", auth=test_api_bearer_auth)
-            test_run = TestRunModel.parse_obj(response_test_run.json())
+            test_run = TestRunModel.model_validate(response_test_run.json())
             assert test_run.status == TestRunStatus.STARTED
 
     def test_get_test_run_handler_not_found(
@@ -90,7 +90,7 @@ class TestTestRunAPI:
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
-        model = TestRunModel.parse_obj(response.json())
+        model = TestRunModel.model_validate(response.json())
         assert model.status == TestRunStatus.RUNNING
         assert model.report is None
         assert model.report_status == TestReportStatus.EMPTY
@@ -113,7 +113,7 @@ class TestTestRunAPI:
         response = test_api_client.get(f"/test_run/?test_run_id={test_created_test_run_id}", auth=test_api_bearer_auth)
         assert response.status_code == 200
         validate_content_null(response, False)
-        model = TestRunModel.parse_obj(response.json())
+        model = TestRunModel.model_validate(response.json())
         assert model.status == TestRunStatus.SUCCESS
         assert model.report == test_report
         assert model.report_status == TestReportStatus.SAVED

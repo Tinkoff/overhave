@@ -79,7 +79,7 @@ def test_feature_type(database: None, faker: Faker) -> FeatureTypeModel:
         feature_type = db.FeatureType(name=cast(str, faker.word()))
         session.add(feature_type)
         session.flush()
-        return cast(FeatureTypeModel, FeatureTypeModel.from_orm(feature_type))
+        return FeatureTypeModel.model_validate(feature_type)
 
 
 @pytest.fixture()
@@ -100,7 +100,7 @@ def service_system_user(
         db_user = db.UserRole(login=f"{faker.word()}_{faker.word()}", password=faker.word(), role=test_user_role)
         session.add(db_user)
         session.flush()
-        return SystemUserModel.from_orm(db_user)
+        return SystemUserModel.model_validate(db_user)
 
 
 @pytest.fixture()
@@ -134,7 +134,7 @@ def test_testuser(
         )
         session.add(test_user)
         session.flush()
-        return cast(TestUserModel, TestUserModel.from_orm(test_user))
+        return TestUserModel.model_validate(test_user)
 
 
 @pytest.fixture()
@@ -143,7 +143,7 @@ def test_tag(service_system_user: SystemUserModel, faker: Faker) -> TagModel:
         tag = db.Tags(value=faker.word(), created_by=service_system_user.login)
         session.add(tag)
         session.flush()
-        return cast(TagModel, TagModel.from_orm(tag))
+        return TagModel.model_validate(tag)
 
 
 @pytest.fixture()
@@ -173,7 +173,7 @@ def test_feature(
         )
         session.add(feature)
         session.flush()
-        return cast(FeatureModel, FeatureModel.from_orm(feature))
+        return FeatureModel.model_validate(feature)
 
 
 @pytest.fixture()
@@ -199,7 +199,7 @@ def test_features(
             )
             session.add(feature)
             session.flush()
-            features.append(cast(FeatureModel, FeatureModel.from_orm(feature)))
+            features.append(FeatureModel.model_validate(feature))
     return features
 
 
@@ -210,7 +210,7 @@ def test_feature_with_tag(test_feature: FeatureModel, test_tag: TagModel) -> Fea
         feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
         feature.feature_tags.append(tag)
         session.flush()
-        return cast(FeatureModel, FeatureModel.from_orm(feature))
+        return FeatureModel.model_validate(feature)
 
 
 @pytest.fixture()
@@ -222,7 +222,7 @@ def test_features_with_tag(test_features: list[FeatureModel], test_tag: TagModel
             feature = session.query(db.Feature).filter(db.Feature.id == test_feature.id).one()
             feature.feature_tags.append(tag)
             session.flush()
-            features.append(cast(FeatureModel, FeatureModel.from_orm(feature)))
+            features.append(FeatureModel.model_validate(feature))
     return features
 
 
@@ -232,7 +232,7 @@ def test_scenario(test_feature: FeatureModel, faker: Faker) -> ScenarioModel:
         db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
         session.add(db_scenario)
         session.flush()
-        return cast(ScenarioModel, ScenarioModel.from_orm(db_scenario))
+        return ScenarioModel.model_validate(db_scenario)
 
 
 @pytest.fixture()
@@ -253,7 +253,7 @@ def test_scenarios(test_features: list[FeatureModel], faker: Faker) -> list[Scen
             db_scenario = db.Scenario(feature_id=test_feature.id, text=faker.word())
             session.add(db_scenario)
             session.flush()
-        scenarios.append(cast(ScenarioModel, ScenarioModel.from_orm(db_scenario)))
+        scenarios.append(ScenarioModel.model_validate(db_scenario))
     return scenarios
 
 
@@ -273,7 +273,7 @@ def test_emulation(service_system_user: SystemUserModel, test_testuser, faker: F
         )
         session.add(emulation)
         session.flush()
-        return cast(EmulationModel, EmulationModel.from_orm(emulation))
+        return EmulationModel.model_validate(emulation)
 
 
 @pytest.fixture()
@@ -287,7 +287,7 @@ def test_emulation_run(service_system_user: SystemUserModel, test_emulation: Emu
         )
         session.add(emulation_run)
         session.flush()
-        return EmulationRunModel.from_orm(emulation_run)
+        return EmulationRunModel.model_validate(emulation_run)
 
 
 @pytest.fixture(scope="module")
@@ -323,4 +323,4 @@ def test_draft(
         draft.published_at = datetime.now()
         session.add(draft)
         session.flush()
-        return cast(DraftModel, DraftModel.from_orm(draft))
+        return DraftModel.model_validate(draft)

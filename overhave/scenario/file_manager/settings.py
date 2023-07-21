@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Mapping
 
 import httpx
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, model_validator
 
 from overhave.base_settings import BaseOverhavePrefix
 from overhave.utils import make_url
@@ -45,17 +45,17 @@ class OverhaveProjectSettings(BaseOverhavePrefix):
     # Keys for specification mapping are still the same - feature types.
     user_spec_template_mapping: Mapping[str, type[BaseModel]] = {}
 
-    @validator("task_tracker_url", pre=True)
+    @model_validator(mode="after")
+    def validate_links_keyword(self: "OverhaveProjectSettings") -> "OverhaveProjectSettings":  # type: ignore[misc]
+        if isinstance(self.tasks_keyword, str) and self.task_tracker_url is None:
+            raise ValueError("'task_tracker_url' should be specified in case of 'tasks_keyword' usage!")
+        return self
+
+    @field_validator("task_tracker_url", mode="before")
     def make_tasktracker_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 
-    @validator("tasks_keyword")
-    def validate_links_keyword(cls, v: str | None, values: dict[str, Any]) -> str | None:
-        if isinstance(v, str) and values.get("task_tracker_url") is None:
-            raise ValueError("Task tracker URL should be specified in case of links keyword usage!")
-        return v
-
-    @validator("git_project_url", pre=True)
+    @field_validator("git_project_url", mode="before")
     def make_git_project_url(cls, v: str | None) -> httpx.URL | None:
         return make_url(v)
 

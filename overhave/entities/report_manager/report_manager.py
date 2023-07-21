@@ -122,5 +122,6 @@ class ReportManager:
         )
         zip_report_path.unlink()
         logger.info("Unpacked Allure report: %s", unpacked_report)
-        resolution.exists = True
-        return resolution
+        return ReportPresenceResolution(
+            exists=True, s3_enabled=self._s3_manager.enabled, report_status=test_run.report_status
+        )

@@ -63,14 +63,14 @@ class TestSystemUserStorage:
             db_user = test_system_user_storage.create_user(
                 session=session, login=faker.word(), password=test_system_user_password, role=test_user_role
             )
-            created_user_model = SystemUserModel.from_orm(db_user)
+            created_user_model = SystemUserModel.model_validate(db_user)
         with count_queries(1):
             with db.create_session() as session:
                 gotten_db_user = test_system_user_storage.get_user_by_credits(
                     session=session, login=created_user_model.login, password=created_user_model.password
                 )
                 assert gotten_db_user is not None
-                gotten_user_model = SystemUserModel.from_orm(gotten_db_user)
+                gotten_user_model = SystemUserModel.model_validate(gotten_db_user)
         assert gotten_user_model == created_user_model
 
     @pytest.mark.parametrize("test_system_user_password", [None, SecretStr("secret password")])

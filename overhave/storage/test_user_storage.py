@@ -63,7 +63,7 @@ class TestUserStorage(ITestUserStorage):
         with db.create_session() as session:
             user = session.get(db.TestUser, user_id)
             if user is not None:
-                return TestUserModel.from_orm(user)
+                return TestUserModel.model_validate(user)
             return None
 
     @staticmethod
@@ -71,7 +71,7 @@ class TestUserStorage(ITestUserStorage):
         with db.create_session() as session:
             user: db.TestUser | None = session.query(db.TestUser).filter(db.TestUser.key == key).one_or_none()
             if user is not None:
-                return TestUserModel.from_orm(user)
+                return TestUserModel.model_validate(user)
             return None
 
     @staticmethod
@@ -83,7 +83,7 @@ class TestUserStorage(ITestUserStorage):
             .filter(db.TestUser.feature_type_id == feature_type_id, db.TestUser.allow_update.is_(allow_update))
             .all()
         )
-        return [TestUserModel.from_orm(user) for user in db_users]
+        return [TestUserModel.model_validate(user) for user in db_users]
 
     @staticmethod
     def update_test_user_specification(user_id: int, specification: TestUserSpecification) -> None:

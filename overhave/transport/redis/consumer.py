@@ -38,7 +38,7 @@ class RedisConsumer:
 
     def _clean_pending(self) -> None:
         pending_messages = self._stream.pending()
-        models: list[RedisPendingData] = [RedisPendingData.parse_obj(msg) for msg in pending_messages]
+        models: list[RedisPendingData] = [RedisPendingData.model_validate(msg) for msg in pending_messages]
         if models:
             message_ids = [x.message_id for x in models]
             self._stream.claim(*message_ids)
@@ -74,4 +74,4 @@ class RedisConsumer:
             raise StopIteration()
 
     def __exit__(self, exc_type: type[Exception], exc_val: Exception, exc_tb: TracebackType) -> None:
-        pass
+        pass  # no actions on exit required
