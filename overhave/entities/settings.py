@@ -32,6 +32,12 @@ class OverhaveAdminSettings(BaseOverhavePrefix):
     # Link to support chat
     support_chat_url: httpx.URL | None
 
+    @validator("support_chat_url", pre=True)
+    def validate_url(cls, v: str | httpx.URL) -> httpx.URL:
+        if isinstance(v, str):
+            return httpx.URL(v)
+        return v
+
 
 class OverhaveLanguageSettings(BaseOverhavePrefix):
     """Settings for language definitions."""
